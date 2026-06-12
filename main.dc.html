@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#061B30;}
+  ::selection{background:#25C281;color:#04261a;}
+</style>
+</helmet>
+
+<div style="font-family:'Pretendard',sans-serif;background:#061B30;color:#fff;">
+
+  <div style="height:4px;background:linear-gradient(90deg,#5AB7F0,#25C281);"></div>
+
+  <div style="background:#04121F;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b8aa6;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="border:1px solid rgba(37,194,129,0.5);color:#25C281;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">참가기업</span>
+        <span style="border:1px solid rgba(90,183,240,0.45);color:#5AB7F0;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">바이어</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:15px;">
+        <span style="color:#25C281;font-weight:600;cursor:pointer;">KOR</span>
+        <span style="cursor:pointer;">ENG</span>
+        <span style="color:rgba(255,255,255,0.14);">|</span>
+        <span style="cursor:pointer;">오시는 길</span>
+        <span style="cursor:pointer;">플로어맵</span>
+        <span style="cursor:pointer;">로그인</span>
+        <span style="cursor:pointer;">사전등록 확인</span>
+      </div>
+    </div>
+  </div>
+
+  <header style="position:sticky;top:0;z-index:50;background:rgba(6,27,48,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#5AB7F0,#25C281);position:relative;">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15px;height:3.4px;background:#061B30;border-radius:2px;"></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:3.4px;height:15px;background:#061B30;border-radius:2px;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;line-height:1;">
+          <span style="font-weight:800;font-size:19px;letter-spacing:-0.01em;color:#fff;">BIMTC</span>
+          <span style="font-size:10px;color:#6b8aa6;letter-spacing:0.02em;margin-top:3px;">부산국제의료관광컨벤션</span>
+        </div>
+      </div>
+      <nav style="display:flex;align-items:center;gap:30px;font-size:15px;font-weight:600;color:#bcd0e2;">
+        <span style="cursor:pointer;">BIMTC 소개</span>
+        <span style="cursor:pointer;">참가안내</span>
+        <span style="cursor:pointer;">참관안내</span>
+        <span style="cursor:pointer;">전시안내</span>
+        <span style="cursor:pointer;">커뮤니티</span>
+      </nav>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:9px 14px;width:160px;">
+          <span style="position:relative;width:14px;height:14px;display:inline-block;flex-shrink:0;">
+            <span style="position:absolute;width:9px;height:9px;border:1.6px solid #6b8aa6;border-radius:50%;top:0;left:0;"></span>
+            <span style="position:absolute;width:5px;height:1.6px;background:#6b8aa6;transform:rotate(45deg);bottom:1px;right:-1px;"></span>
+          </span>
+          <input placeholder="검색" style="background:transparent;border:none;outline:none;color:#fff;font-size:13px;font-family:'Pretendard',sans-serif;width:100%;" />
+        </div>
+        <button style="background:#25C281;color:#04261a;border:none;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">사전등록</button>
+      </div>
+    </div>
+  </header>
+
+  <div style="background:#0A2A47;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <span style="background:#25C281;color:#04261a;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;flex-shrink:0;">중요</span>
+      <span style="flex:1;min-width:200px;font-size:14px;color:#cfe0ee;font-weight:500;cursor:pointer;">2026 참가기업 모집 마감 임박 — 9월 30일까지 신청을 완료해 주세요.</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b8aa6;flex-shrink:0;">2026.06.10</span>
+      <span style="font-size:13px;color:#25C281;font-weight:700;cursor:pointer;flex-shrink:0;">공지 전체 →</span>
+    </div>
+  </div>
+
+  <section style="position:relative;overflow:hidden;background:#061B30;">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#0A2A47,#0A2A47 14px,#0C2F4f 14px,#0C2F4f 28px);opacity:0.5;"></div>
+    <div style="position:relative;max-width:1180px;margin:0 auto;padding:64px 32px 56px;display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:#25C281;font-weight:500;margin-bottom:20px;">BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</div>
+        <h1 style="font-size:54px;font-weight:800;line-height:1.14;letter-spacing:-0.025em;color:#fff;margin:0 0 22px;">세계 의료관광 비즈니스가<br><span style="background:linear-gradient(100deg,#25C281,#5AB7F0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">부산</span>에서 만납니다</h1>
+        <p style="font-size:18px;line-height:1.6;color:#aec5d8;margin:0 0 30px;max-width:480px;">병원·뷰티·웰니스·헬스케어 기업과 검증된 바이어를 1:1로 잇는, 아시아 대표 의료관광 컨벤션.</p>
+        <div style="display:flex;gap:12px;margin-bottom:34px;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(90,183,240,0.5);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:14.5px;font-weight:600;padding:11px 18px;border-radius:12px;"><span style="width:8px;height:8px;border-radius:50%;background:#5AB7F0;flex-shrink:0;"></span>2026.11.13(FRI) – 11.14(SAT)</span>
+          <span style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(37,194,129,0.5);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:14.5px;font-weight:600;padding:11px 18px;border-radius:12px;"><span style="width:8px;height:8px;border-radius:50%;background:#25C281;flex-shrink:0;"></span>BEXCO 제1전시장, 부산</span>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <button style="background:linear-gradient(135deg,#33E29A,#22C07E);color:#04261a;border:none;padding:19px 34px;border-radius:12px;font-size:17.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:10px;box-shadow:0 12px 32px rgba(37,194,129,0.5);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(37,194,129,0.65);">바이어 비즈미팅 신청 <span style="font-family:'IBM Plex Mono',monospace;font-size:19px;">→</span></button>
+          <button style="background:transparent;color:#aec5d8;border:1.5px solid rgba(255,255,255,0.22);padding:19px 30px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="border-color:rgba(255,255,255,0.45);color:#fff;">참가기업 신청</button>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div style="aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:repeating-linear-gradient(135deg,#0C2A45,#0C2A45 13px,#0F314f 13px,#0F314f 26px);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#6E92B0;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.04em;">[ 행사 현장 / 부산 전경 사진 ]</div>
+        <div style="position:absolute;left:-22px;bottom:34px;background:#04121F;border:1px solid rgba(37,194,129,0.4);color:#fff;border-radius:14px;padding:18px 22px;box-shadow:0 18px 40px rgba(0,0,0,0.4);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.14em;color:#25C281;margin-bottom:6px;">COUNTDOWN</div>
+          <div style="font-size:34px;font-weight:800;letter-spacing:-0.02em;line-height:1;">D-154</div>
+          <div style="font-size:12px;color:#9fb4c7;margin-top:6px;">개막까지</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#04263F;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:40px 32px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+      <sc-for list="{{ statsA }}" as="s" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:600;color:#25C281;letter-spacing:-0.02em;line-height:1;">{{ s.num }}</div>
+          <div style="font-size:14px;color:#9fc0d6;font-weight:500;">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background:#F4F8F6;color:#0A2236;">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">WHO PARTICIPATES</div>
+      <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#0A2236;margin:0 0 44px;">두 가지 길로 참여하세요</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div style="border:1px solid #d9e7f4;border-radius:18px;padding:40px;background:linear-gradient(160deg,#F4F9FE,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(11,95,165,0.06);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#9bb6cf;margin-bottom:18px;">01</div>
+          <h3 style="font-size:24px;font-weight:800;color:#0A2236;margin:0 0 12px;">참가기업으로 참여</h3>
+          <p style="font-size:15.5px;line-height:1.65;color:#52677d;margin:0 0 22px;">병원·뷰티·웰니스·헬스케어 기업을 위한 글로벌 마케팅 무대. 부스 전시와 1:1 비즈니스 미팅으로 해외 바이어를 직접 만나세요.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>전시 부스 및 기업 홍보</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>사전 매칭 1:1 비즈니스 미팅</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>바이어 네트워킹</div>
+          </div>
+          <div style="margin-top:auto;"><a style="color:#0B5FA5;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">참가 신청하기 <span style="font-family:'IBM Plex Mono',monospace;">→</span></a></div>
+        </div>
+        <div style="border:1px solid #cbe9dd;border-radius:18px;padding:40px;background:linear-gradient(160deg,#EFF9F4,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(17,163,123,0.06);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#9cccb9;margin-bottom:18px;">02</div>
+          <h3 style="font-size:24px;font-weight:800;color:#0A2236;margin:0 0 12px;">바이어 비즈미팅</h3>
+          <p style="font-size:15.5px;line-height:1.65;color:#52677d;margin:0 0 22px;">사전 매칭된 1:1 상담으로 검증된 한국 의료·웰니스 파트너를 발굴하세요. 바이어 초청 및 의전 프로그램을 운영합니다.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>맞춤 파트너 사전 매칭</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>바이어 초청 프로그램</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>현장 통역 지원</div>
+          </div>
+          <div style="margin-top:auto;"><a style="color:#0d8f6b;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">비즈미팅 신청 <span style="font-family:'IBM Plex Mono',monospace;">→</span></a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#04263F;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:84px 32px;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:18px;margin-bottom:34px;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">SCHEDULE</div>
+          <h2 style="font-size:32px;font-weight:800;color:#fff;margin:0;letter-spacing:-0.02em;">주요 일정 안내</h2>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:13px;">
+          <span style="background:#25C281;color:#04261a;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;">전체</span>
+          <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">모집·등록</span>
+          <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">행사·프로그램</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <sc-for list="{{ scheduleB }}" as="s" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:22px;padding:18px 24px;border:1px solid #cdd8e4;border-radius:14px;background:#e7edf3;box-shadow:0 2px 8px rgba(0,0,0,0.16);" style-hover="border-color:#25C281;background:#eef2f7;box-shadow:0 6px 16px rgba(37,194,129,0.15);">
+            <span style="width:148px;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:#5e7388;letter-spacing:-0.01em;">{{ s.date }}</span>
+            {{ s.tagEl }}
+            <span style="flex:1;min-width:160px;font-size:16.5px;font-weight:600;color:#0A2236;">{{ s.title }}</span>
+            {{ s.statusEl }}
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#9ab3c4;flex-shrink:0;">→</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="text-align:center;margin-top:30px;"><a style="color:#25C281;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">전체 일정 보기 <span style="font-family:'IBM Plex Mono',monospace;">→</span></a></div>
+    </div>
+  </section>
+
+  <section style="background:#0A2A47;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">OVERVIEW</div>
+        <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 28px;">행사 개요</h2>
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ overviewA }}" as="o" hint-placeholder-count="5">
+            <div style="display:flex;gap:24px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
+              <div style="width:96px;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#6b8aa6;padding-top:2px;">{{ o.k }}</div>
+              <div style="font-size:16px;font-weight:600;color:#e3edf6;">{{ o.v }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="aspect-ratio:16/10;border-radius:16px;background:repeating-linear-gradient(135deg,#0C2A45,#0C2A45 13px,#0F314f 13px,#0F314f 26px);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#6E92B0;font-family:'IBM Plex Mono',monospace;font-size:13px;">[ BEXCO 전경 사진 ]</div>
+        <div style="aspect-ratio:21/9;border-radius:16px;background:repeating-linear-gradient(135deg,#0A3A2C,#0A3A2C 13px,#0d4434 13px,#0d4434 26px);border:1px solid rgba(37,194,129,0.18);display:flex;align-items:center;justify-content:center;color:#5a9e85;font-family:'IBM Plex Mono',monospace;font-size:13px;">[ 오시는 길 · 지도 ]</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#061B30;">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">PROGRAM</div>
+      <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 44px;">프로그램 하이라이트</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+        <sc-for list="{{ programA }}" as="p" hint-placeholder-count="4">
+          <div style="border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;background:rgba(255,255,255,0.02);" style-hover="border-color:rgba(37,194,129,0.4);transform:translateY(-3px);">
+            <div style="width:44px;height:44px;border-radius:11px;background:{{ p.bg }};display:flex;align-items:center;justify-content:center;margin-bottom:20px;">{{ p.icon }}</div>
+            <h3 style="font-size:18px;font-weight:700;color:#fff;margin:0 0 10px;">{{ p.title }}</h3>
+            <p style="font-size:14px;line-height:1.6;color:#9fc0d6;margin:0;">{{ p.desc }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#ffffff;color:#0A2236;">
+    <div style="max-width:1180px;margin:0 auto;padding:84px 32px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS & VENUE</div>
+      <h2 style="font-size:32px;font-weight:800;color:#0A2236;margin:0 0 36px;letter-spacing:-0.02em;">행사장 안내</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:18px;">
+        <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
+          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF7F2,#EAF7F2 13px,#dff1e9 13px,#dff1e9 26px);display:flex;align-items:center;justify-content:center;color:#5a9683;font-family:'IBM Plex Mono',monospace;font-size:13px;">[ 오시는 길 · 지도 ]</div>
+          <div style="padding:26px 28px;">
+            <h3 style="font-size:19px;font-weight:800;margin:0 0 16px;color:#0A2236;">오시는 길</h3>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">KTX</span><span style="color:#33485e;">부산역 → 지하철 30분, 센텀시티역 하차</span></div>
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">AIR</span><span style="color:#33485e;">김해국제공항 → 리무진버스 약 50분</span></div>
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">METRO</span><span style="color:#33485e;">2호선 센텀시티역 1번 출구, 도보 5분</span></div>
+            </div>
+            <a style="display:inline-block;margin-top:20px;color:#0B5FA5;font-weight:700;font-size:14.5px;cursor:pointer;text-decoration:none;">지도 크게 보기 →</a>
+          </div>
+        </div>
+        <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
+          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;align-items:center;justify-content:center;color:#6885a3;font-family:'IBM Plex Mono',monospace;font-size:13px;">[ 부스 배치도 · 플로어맵 ]</div>
+          <div style="padding:26px 28px;">
+            <h3 style="font-size:19px;font-weight:800;margin:0 0 10px;color:#0A2236;">부스 배치도 (플로어맵)</h3>
+            <p style="font-size:14.5px;line-height:1.6;color:#52677d;margin:0 0 20px;">BEXCO 제1전시장 부스 배치와 참가기업 위치를 확인하세요. 카테고리별 전시 구역 안내 제공.</p>
+            <button style="background:#0B5FA5;color:#fff;border:none;padding:13px 22px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">부스 배치도 다운로드 (PDF)</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:24px;">
+        <sc-for list="{{ quickLinksB }}" as="q" hint-placeholder-count="4">
+          <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px 24px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#9fcabb;transform:translateY(-3px);">
+            <div style="width:44px;height:44px;border-radius:12px;background:#EFF7F3;display:flex;align-items:center;justify-content:center;">{{ q.icon }}</div>
+            <div style="font-size:17px;font-weight:800;color:#0A2236;">{{ q.title }}</div>
+            <div style="font-size:13px;line-height:1.55;color:#5e7388;">{{ q.desc }}</div>
+            <span style="margin-top:2px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#0d8f6b;font-weight:600;">바로가기 →</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#061B30;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">EXHIBITORS</div>
+          <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0;">참가기업 미리보기</h2>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:13px;font-weight:600;color:#5AB7F0;background:rgba(90,183,240,0.1);border:1px solid rgba(90,183,240,0.3);padding:8px 14px;border-radius:999px;">병원·의료</span>
+          <span style="font-size:13px;font-weight:600;color:#3FD79B;background:rgba(37,194,129,0.1);border:1px solid rgba(37,194,129,0.3);padding:8px 14px;border-radius:999px;">뷰티·성형</span>
+          <span style="font-size:13px;font-weight:600;color:#9fc0d6;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:8px 14px;border-radius:999px;">웰니스·헬스케어</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px;">
+        <sc-for list="{{ logos }}" as="l" hint-placeholder-count="12">
+          <div style="aspect-ratio:3/2;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#5b748c;font-family:'IBM Plex Mono',monospace;font-size:11px;">LOGO</div>
+        </sc-for>
+      </div>
+      <div style="text-align:center;margin-top:34px;"><a style="color:#25C281;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">전체 참가기업 보기 <span style="font-family:'IBM Plex Mono',monospace;">→</span></a></div>
+    </div>
+  </section>
+
+  <section style="background:#04263F;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;display:grid;grid-template-columns:1fr 1fr;gap:48px;">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+          <h2 style="font-size:24px;font-weight:800;color:#fff;margin:0;">공지사항</h2>
+          <a style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6b8aa6;cursor:pointer;text-decoration:none;">MORE +</a>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ notices }}" as="n" hint-placeholder-count="4">
+            <div style="display:flex;gap:18px;padding:18px 0;border-top:1px solid rgba(255,255,255,0.08);align-items:baseline;">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b8aa6;flex-shrink:0;width:74px;">{{ n.date }}</span>
+              <span style="font-size:15.5px;color:#e3edf6;font-weight:500;line-height:1.45;">{{ n.title }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+          <h2 style="font-size:24px;font-weight:800;color:#fff;margin:0;">보도기사</h2>
+          <a style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6b8aa6;cursor:pointer;text-decoration:none;">MORE +</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <sc-for list="{{ press }}" as="pr" hint-placeholder-count="3">
+            <div style="display:flex;gap:16px;align-items:center;">
+              <div style="width:88px;height:60px;border-radius:10px;flex-shrink:0;background:repeating-linear-gradient(135deg,#0A3A2C,#0A3A2C 10px,#0d4434 10px,#0d4434 20px);border:1px solid rgba(37,194,129,0.18);"></div>
+              <div>
+                <div style="font-size:15px;font-weight:600;color:#e3edf6;line-height:1.4;margin-bottom:6px;">{{ pr.title }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b8aa6;">{{ pr.src }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#061B30;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:48px 32px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#6b8aa6;text-align:center;margin-bottom:26px;">주최 · 주관 · 후원</div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px;">
+        <sc-for list="{{ sponsors }}" as="sp" hint-placeholder-count="6">
+          <div style="width:150px;height:54px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#5b748c;font-family:'IBM Plex Mono',monospace;font-size:11px;">{{ sp }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:linear-gradient(110deg,#0F5C44,#1C7FD6);">
+    <div style="max-width:1180px;margin:0 auto;padding:76px 32px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;">
+      <div>
+        <h2 style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin:0 0 12px;">지금 사전등록하고<br>비즈미팅을 신청하세요</h2>
+        <p style="font-size:16px;color:rgba(255,255,255,0.86);margin:0;">참가기업 신청 · 바이어 매칭 · 참관객 사전등록 모두 온라인으로.</p>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <button style="background:#fff;color:#0A2236;border:none;padding:16px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">참가기업 신청</button>
+        <button style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">비즈미팅 신청 →</button>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:#04121F;color:#7d93a8;">
+    <div style="max-width:1180px;margin:0 auto;padding:60px 32px 40px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:36px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5AB7F0,#25C281);"></div>
+          <span style="font-weight:800;font-size:18px;color:#fff;">BIMTC</span>
+        </div>
+        <p style="font-size:13px;line-height:1.7;margin:0 0 18px;color:#7d93a8;">부산국제의료관광컨벤션 사무국<br>부산광역시 동구 중앙대로 365, 4층<br>T. 051-461-4275~8 · E. bimtc@busan.com</p>
+        <div style="display:flex;gap:8px;">
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9fb4c7;cursor:pointer;">IG</span>
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9fb4c7;cursor:pointer;">YT</span>
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9fb4c7;cursor:pointer;">X</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+        <span style="color:#fff;font-weight:700;margin-bottom:5px;">바로가기</span>
+        <span style="cursor:pointer;">BIMTC 소개</span>
+        <span style="cursor:pointer;">참가안내</span>
+        <span style="cursor:pointer;">참관안내</span>
+        <span style="cursor:pointer;">전시안내</span>
+        <span style="cursor:pointer;">커뮤니티</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+        <span style="color:#fff;font-weight:700;margin-bottom:5px;">이용안내</span>
+        <span style="cursor:pointer;">오시는 길</span>
+        <span style="cursor:pointer;">플로어맵·부스배치도</span>
+        <span style="cursor:pointer;">자료실 다운로드</span>
+        <span style="cursor:pointer;">숙박·관광 안내</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+        <span style="color:#fff;font-weight:700;margin-bottom:5px;">고객지원</span>
+        <span style="cursor:pointer;">문의하기</span>
+        <span style="cursor:pointer;">자주 묻는 질문</span>
+        <span style="cursor:pointer;">사이트맵</span>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="max-width:1180px;margin:0 auto;padding:18px 32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4f6a82;">
+        <span>© 2026 BIMTC · BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</span>
+        <span>개인정보처리방침 · 이메일무단수집거부 · 사이트맵 · KOR / ENG</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const tagPill = (text, color) => React.createElement('span', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', padding: '5px 0', width: '52px', textAlign: 'center', borderRadius: '6px', color: color, background: color + '22', flexShrink: 0 } }, text);
+    const statusPill = (text, color) => React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '7px', fontSize: '13px', fontWeight: 700, color: color, flexShrink: 0, width: '74px' } }, React.createElement('span', { style: { width: '6px', height: '6px', borderRadius: '50%', background: color } }), text);
+
+    return {
+      statsA: [
+        { num: '13th', label: '누적 개최 (회)' },
+        { num: '12+', label: '참가국' },
+        { num: '320+', label: '참가기업' },
+        { num: '1,800+', label: '비즈니스 미팅' },
+      ],
+      overviewA: [
+        { k: '일시', v: '2026. 11. 13(금) – 11. 14(토) / 10:00–18:00' },
+        { k: '장소', v: 'BEXCO 제1전시장, 부산' },
+        { k: '주최', v: '부산광역시 · 부산국제의료관광컨벤션 조직위원회' },
+        { k: '규모', v: '320+ 참가기업 · 12개국 해외 바이어' },
+        { k: '참가대상', v: '병원 · 뷰티 · 웰니스 · 헬스케어 기업 / 해외 바이어' },
+      ],
+      programA: [
+        { title: '의료관광 컨퍼런스', desc: '글로벌 의료관광 트렌드와 정책 인사이트', bg: '#EAF2FB', icon: React.createElement('div', { style: { width: 18, height: 18, borderRadius: 4, border: '2.5px solid #0B5FA5' } }) },
+        { title: '1:1 비즈니스 미팅', desc: '사전 매칭된 바이어·기업 상담', bg: '#EAF7F2', icon: React.createElement('div', { style: { width: 18, height: 18, borderRadius: '50%', border: '2.5px solid #11A37B' } }) },
+        { title: '의료·뷰티 전시관', desc: '병원·뷰티·헬스케어 기업 부스 전시', bg: '#EAF2FB', icon: React.createElement('div', { style: { width: 16, height: 16, background: '#0B5FA5', transform: 'rotate(45deg)' } }) },
+        { title: '부대행사 · 체험', desc: '웰니스 체험존과 네트워킹 라운지', bg: '#EAF7F2', icon: React.createElement('div', { style: { width: 18, height: 18, borderRadius: 4, background: '#11A37B' } }) },
+      ],
+      scheduleB: [
+        { date: '2026.07.20 – 11.05', title: '참관객 사전등록 접수', tagEl: tagPill('등록', '#25C281'), statusEl: statusPill('진행중', '#25C281') },
+        { date: '~ 2026.09.30', title: '참가기업 신청 마감', tagEl: tagPill('모집', '#2E90D6'), statusEl: statusPill('D-110', '#2E90D6') },
+        { date: '~ 2026.10.16', title: '바이어 비즈미팅 매칭 신청', tagEl: tagPill('매칭', '#25C281'), statusEl: statusPill('접수중', '#25C281') },
+        { date: '2026.11.13', title: '개막식 & 의료관광 컨퍼런스', tagEl: tagPill('행사', '#E0A23C'), statusEl: statusPill('예정', '#7a9aab') },
+        { date: '2026.11.13 – 14', title: '의료·뷰티·헬스케어 전시관 운영', tagEl: tagPill('전시', '#E0A23C'), statusEl: statusPill('예정', '#7a9aab') },
+        { date: '2026.11.14', title: '웰니스 체험존 · 네트워킹 라운지', tagEl: tagPill('부대', '#E0A23C'), statusEl: statusPill('예정', '#7a9aab') },
+      ],
+      quickLinksB: [
+        { title: '문의하기', desc: '행사·참가·등록 관련 1:1 문의를 남겨주세요.', icon: React.createElement('div', { style: { width: 18, height: 18, borderRadius: '50%', border: '2.4px solid #0d8f6b' } }) },
+        { title: '자주 묻는 질문', desc: '참가 신청·사전등록 FAQ를 확인하세요.', icon: React.createElement('div', { style: { width: 18, height: 18, borderRadius: 5, border: '2.4px solid #0d8f6b' } }) },
+        { title: '자료실', desc: '브로슈어·신청서·결과보고서 다운로드.', icon: React.createElement('div', { style: { width: 15, height: 15, background: '#0d8f6b', transform: 'rotate(45deg)' } }) },
+        { title: '숙박·관광 안내', desc: '해외 바이어를 위한 부산 호텔·관광 정보.', icon: React.createElement('div', { style: { width: 18, height: 18, borderRadius: 5, background: '#0d8f6b' } }) },
+      ],
+      logos: Array.from({ length: 12 }),
+      sponsors: ['MINISTRY', 'BUSAN CITY', 'BEXCO', 'KHIDI', 'KTO', 'PARTNER'],
+      notices: [
+        { date: '2026.06.10', title: '2026 부산국제의료관광컨벤션 참가기업 모집 안내' },
+        { date: '2026.06.02', title: '해외 바이어 비즈니스 미팅 사전 매칭 신청 접수' },
+        { date: '2026.05.21', title: '참관객 사전등록 오픈 및 사전등록 혜택 안내' },
+        { date: '2026.05.08', title: '부스 배치도 및 참가 신청 절차 공지' },
+      ],
+      press: [
+        { title: '부산, 아시아 의료관광 허브로 도약… BIMTC 2026 개막 준비', src: '부산일보' },
+        { title: '해외 바이어 200여 명 부산 집결… 의료관광 비즈니스 활기', src: '국제신문' },
+        { title: '병원·뷰티·헬스케어 320개사 참가… 역대 최대 규모', src: 'MEDI NEWS' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

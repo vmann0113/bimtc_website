@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#EEF1F6;}
+  input,textarea{font-family:'Pretendard',sans-serif;}
+  ::selection{background:#0B5FA5;color:#fff;}
+</style>
+</helmet>
+
+<div style="font-family:'Pretendard',sans-serif;min-height:100vh;background:#EEF1F6;color:#0F2440;">
+
+  <div style="position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid #e3e9f1;box-shadow:0 1px 0 rgba(15,36,64,0.02);">
+    <div style="height:4px;background:linear-gradient(90deg,#0B5FA5,#11A37B);"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 26px;height:64px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#0B5FA5,#11A37B);position:relative;">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:14px;height:3.2px;background:#fff;border-radius:2px;"></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:3.2px;height:14px;background:#fff;border-radius:2px;"></div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:9px;">
+          <span style="font-weight:800;font-size:18px;letter-spacing:-0.01em;">BIMTC 비즈미팅</span>
+          <span style="font-size:12px;color:#8295ab;font-family:'IBM Plex Mono',monospace;">BUSINESS MATCHING</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E7289;">
+          <span style="color:#0B5FA5;font-weight:600;">D-154</span>
+          <span style="color:#cdd6e2;">·</span>
+          <span>2026.11.13–14 · BEXCO</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border:1px solid #e3e9f1;border-radius:999px;">
+          <div style="display:flex;flex-direction:column;line-height:1.2;text-align:right;">
+            <span style="font-size:13px;font-weight:700;">ooo 담당자</span>
+            <span style="font-size:11px;color:#8295ab;">굿모닝병원 · 참가기업</span>
+          </div>
+          <div style="width:32px;height:32px;border-radius:50%;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">굿</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:flex-start;max-width:1320px;margin:0 auto;">
+
+    <aside style="position:sticky;top:64px;width:248px;flex-shrink:0;padding:24px 18px;height:calc(100vh - 64px);">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#9aa9bd;padding:6px 14px 12px;">MENU</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+          <div onClick="{{ item.onClick }}" style="{{ item.style }}">
+            <span>{{ item.label }}</span>
+            <sc-if value="{{ item.badge }}"><span style="background:#0B5FA5;color:#fff;font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 6px;">{{ item.badge }}</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:22px;padding:18px;border-radius:14px;background:linear-gradient(160deg,#0B5FA5,#0a3d62);color:#fff;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;">도움이 필요하신가요?</div>
+        <div style="font-size:12px;line-height:1.6;color:#c8dcf0;margin-bottom:12px;">비즈미팅 운영 사무국이 매칭을 지원합니다.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9fcdf2;">051-461-4275~8</div>
+      </div>
+    </aside>
+
+    <main style="flex:1;min-width:0;padding:28px 30px 60px;">
+
+      <sc-if value="{{ showGuide }}" hint-placeholder-val="{{ true }}">
+        <div style="background:linear-gradient(150deg,#0B5FA5,#11A37B);border-radius:22px;padding:48px 44px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.05) 14px,transparent 14px,transparent 28px);"></div>
+          <div style="position:relative;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.16em;color:rgba(255,255,255,0.85);margin-bottom:16px;">BUSINESS MATCHING PROGRAM</div>
+            <h1 style="font-size:38px;font-weight:800;letter-spacing:-0.025em;line-height:1.18;margin:0 0 16px;">비즈니스 미팅,<br>이렇게 진행됩니다</h1>
+            <p style="font-size:16.5px;line-height:1.6;color:rgba(255,255,255,0.9);margin:0 0 28px;max-width:560px;">온라인으로 신청하면 사무국이 관심분야에 맞춰 매칭하고, 라운지 테이블을 시간대별로 예약해 현장에서 1:1로 만납니다.</p>
+            <button onClick="{{ goApply }}" style="background:#fff;color:#0B5FA5;border:none;padding:15px 28px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">지금 신청하기 →</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+          <sc-for list="{{ steps }}" as="st" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px 22px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+                <div style="width:42px;height:42px;border-radius:11px;background:{{ st.bg }};display:flex;align-items:center;justify-content:center;">{{ st.icon }}</div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#c2cdda;font-weight:600;">{{ st.no }}</span>
+              </div>
+              <h3 style="font-size:17px;font-weight:800;margin:0 0 8px;color:#0F2440;">{{ st.title }}</h3>
+              <p style="font-size:13.5px;line-height:1.6;color:#5E7289;margin:0;">{{ st.desc }}</p>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:30px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+          <sc-for list="{{ facts }}" as="f" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;gap:6px;border-left:2px solid #11A37B;padding-left:18px;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:#0B5FA5;letter-spacing:-0.02em;line-height:1.1;">{{ f.v }}</div>
+              <div style="font-size:13px;color:#5E7289;font-weight:500;">{{ f.k }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showApply }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:22px;">
+          <h2 style="font-size:26px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">비즈미팅 신청</h2>
+          <p style="font-size:14.5px;color:#5E7289;margin:0;">신청 정보를 입력하면 사무국이 검토 후 매칭을 진행합니다.</p>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:24px;">
+          <sc-for list="{{ applySteps }}" as="ap" hint-placeholder-count="3">
+            <div style="flex:1;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;border:1px solid {{ ap.border }};background:{{ ap.bg }};">
+              <div style="width:28px;height:28px;border-radius:50%;background:{{ ap.dotBg }};color:{{ ap.dotColor }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:'IBM Plex Mono',monospace;flex-shrink:0;">{{ ap.n }}</div>
+              <span style="font-size:14px;font-weight:700;color:{{ ap.textColor }};">{{ ap.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:34px;">
+          <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:22px;">
+              <div>
+                <label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:10px;color:#33485e;">신청 유형</label>
+                <div style="display:flex;gap:10px;">
+                  <button onClick="{{ setExhibitor }}" style="{{ roleExStyle }}">참가기업</button>
+                  <button onClick="{{ setBuyer }}" style="{{ roleBuStyle }}">바이어</button>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+                <div><label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">기관/기업명</label><input placeholder="예) 굿모닝병원" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">담당자명</label><input placeholder="예) ooo" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">국가/지역</label><input placeholder="예) 대한민국" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">이메일</label><input placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:22px;">
+              <div>
+                <label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:10px;color:#33485e;">관심 분야 (복수 선택)</label>
+                <div style="display:flex;flex-wrap:wrap;gap:9px;">
+                  <sc-for list="{{ fieldChips }}" as="fc" hint-placeholder-count="8">
+                    <span style="padding:9px 16px;border-radius:999px;border:1px solid #d3deea;background:#F4F8FD;color:#33485e;font-size:13.5px;font-weight:600;cursor:pointer;">{{ fc }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div><label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">미팅 목적</label><textarea placeholder="원하시는 협력·상담 내용을 적어주세요." style="width:100%;min-height:96px;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;resize:vertical;"></textarea></div>
+              <div><label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">희망 일자</label>
+                <div style="display:flex;gap:10px;">
+                  <span style="padding:10px 18px;border-radius:10px;border:1px solid #d3deea;background:#F4F8FD;font-size:14px;font-weight:600;color:#33485e;cursor:pointer;">11월 13일 (금)</span>
+                  <span style="padding:10px 18px;border-radius:10px;border:1px solid #d3deea;background:#F4F8FD;font-size:14px;font-weight:600;color:#33485e;cursor:pointer;">11월 14일 (토)</span>
+                  <span style="padding:10px 18px;border-radius:10px;border:1px solid #d3deea;background:#F4F8FD;font-size:14px;font-weight:600;color:#33485e;cursor:pointer;">상관없음</span>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <h3 style="font-size:17px;font-weight:800;margin:0 0 18px;">신청 내용 확인</h3>
+              <div style="border:1px solid #e6ebf2;border-radius:12px;overflow:hidden;">
+                <sc-for list="{{ reviewRows }}" as="rv" hint-placeholder-count="5">
+                  <div style="display:flex;gap:20px;padding:14px 18px;border-bottom:1px solid #eef2f7;">
+                    <span style="width:120px;flex-shrink:0;font-size:13px;color:#8295ab;font-family:'IBM Plex Mono',monospace;">{{ rv.k }}</span>
+                    <span style="font-size:14.5px;font-weight:600;color:#0F2440;">{{ rv.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <p style="font-size:13px;color:#8295ab;margin:16px 0 0;line-height:1.6;">제출 후 사무국이 검토하여 매칭 결과를 이메일로 안내합니다. 매칭이 확정되면 [예약 현황판]에서 라운지 테이블을 시간대별로 예약할 수 있습니다.</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isSubmitted }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;padding:30px 0;">
+              <div style="width:64px;height:64px;border-radius:50%;background:#E7F6F0;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                <div style="width:24px;height:13px;border-left:3px solid #11A37B;border-bottom:3px solid #11A37B;transform:rotate(-45deg);margin-top:-6px;"></div>
+              </div>
+              <h3 style="font-size:22px;font-weight:800;margin:0 0 10px;">신청이 접수되었습니다</h3>
+              <p style="font-size:14.5px;color:#5E7289;margin:0 0 26px;line-height:1.6;">사무국 매칭 후 결과를 안내드립니다.<br>매칭된 파트너에게 직접 1:1 미팅을 요청할 수도 있습니다.</p>
+              <div style="display:flex;gap:12px;justify-content:center;">
+                <button onClick="{{ goPartners }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;">파트너 찾기</button>
+                <button onClick="{{ goBoard }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;">예약 현황판 보기</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showApplyNav }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;justify-content:space-between;margin-top:30px;padding-top:24px;border-top:1px solid #eef2f7;">
+              <button onClick="{{ applyPrev }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;">이전</button>
+              <button onClick="{{ applyNext }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;">{{ applyNextLabel }}</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showPartners }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:22px;">
+          <h2 style="font-size:26px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">파트너 찾기</h2>
+          <p style="font-size:14.5px;color:#5E7289;margin:0;">매칭된 참가기업·바이어에게 1:1 미팅을 요청하세요.</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:20px;">
+          <span style="padding:9px 16px;border-radius:999px;background:#0B5FA5;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;">전체</span>
+          <span style="padding:9px 16px;border-radius:999px;background:#fff;border:1px solid #d8e0ea;color:#5E7289;font-size:13.5px;font-weight:600;cursor:pointer;">바이어</span>
+          <span style="padding:9px 16px;border-radius:999px;background:#fff;border:1px solid #d8e0ea;color:#5E7289;font-size:13.5px;font-weight:600;cursor:pointer;">참가기업</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <sc-for list="{{ partnersView }}" as="p" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;display:flex;flex-direction:column;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div style="width:46px;height:46px;border-radius:12px;background:{{ p.avBg }};color:{{ p.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">{{ p.initial }}</div>
+                <span style="font-size:11.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;padding:4px 10px;border-radius:999px;background:{{ p.tagBg }};color:{{ p.tagColor }};">{{ p.type }}</span>
+              </div>
+              <h3 style="font-size:16.5px;font-weight:800;margin:0 0 4px;color:#0F2440;">{{ p.name }}</h3>
+              <div style="font-size:13px;color:#8295ab;margin-bottom:14px;">{{ p.country }} · {{ p.org }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">
+                <sc-for list="{{ p.tags }}" as="t" hint-placeholder-count="2">
+                  <span style="font-size:12px;color:#33485e;background:#F1F5FA;border:1px solid #e4ebf3;padding:4px 10px;border-radius:7px;">{{ t }}</span>
+                </sc-for>
+              </div>
+              <div style="margin-top:auto;">
+                <sc-if value="{{ p.requested }}" hint-placeholder-val="{{ false }}">
+                  <button disabled style="width:100%;background:#E7F6F0;color:#0d8f6b;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:700;font-family:'Pretendard',sans-serif;">✓ 요청됨</button>
+                </sc-if>
+                <sc-if value="{{ p.notRequested }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ p.request }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">미팅 요청</button>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showRequests }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:22px;">
+          <h2 style="font-size:26px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">받은 미팅 요청</h2>
+          <p style="font-size:14.5px;color:#5E7289;margin:0;">수락하면 예약 현황판에서 라운지 테이블·시간을 배정할 수 있습니다.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{ requestsView }}" as="r" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+              <div style="width:50px;height:50px;border-radius:13px;background:{{ r.avBg }};color:{{ r.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex-shrink:0;">{{ r.initial }}</div>
+              <div style="flex:1;min-width:220px;">
+                <div style="display:flex;align-items:center;gap:9px;margin-bottom:5px;">
+                  <span style="font-size:16.5px;font-weight:800;color:#0F2440;">{{ r.name }}</span>
+                  <span style="font-size:11.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:999px;background:{{ r.tagBg }};color:{{ r.tagColor }};">{{ r.type }}</span>
+                </div>
+                <div style="font-size:13px;color:#8295ab;margin-bottom:8px;">{{ r.country }} · {{ r.org }}</div>
+                <div style="font-size:14px;color:#33485e;">“{{ r.msg }}”</div>
+              </div>
+              <sc-if value="{{ r.isPending }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:10px;flex-shrink:0;">
+                  <button onClick="{{ r.accept }}" style="background:#11A37B;color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">수락</button>
+                  <button onClick="{{ r.decline }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">거절</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ r.isAccepted }}" hint-placeholder-val="{{ false }}">
+                <span style="flex-shrink:0;font-size:13.5px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:11px 18px;border-radius:10px;">수락됨 · 현황판에서 배정</span>
+              </sc-if>
+              <sc-if value="{{ r.isDeclined }}" hint-placeholder-val="{{ false }}">
+                <span style="flex-shrink:0;font-size:13.5px;font-weight:700;color:#97a4b6;background:#f1f4f8;padding:11px 18px;border-radius:10px;">거절됨</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showBoard }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px;">
+          <div>
+            <h2 style="font-size:26px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">예약 현황판</h2>
+            <p style="font-size:14.5px;color:#5E7289;margin:0;">빈 칸을 클릭하면 라운지 테이블이 예약되고, 수락한 파트너가 자동 배정됩니다.</p>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onClick="{{ setDayD1 }}" style="{{ d1Style }}">11.13 (금)</button>
+            <button onClick="{{ setDayD2 }}" style="{{ d2Style }}">11.14 (토)</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px;font-size:12.5px;color:#5E7289;">
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#fff;border:1px solid #d8e0ea;"></span>빈자리</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#E7F6F0;border:1px solid #11A37B;"></span>내 미팅</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#eef1f6;border:1px solid #d8e0ea;"></span>예약됨</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px);border:1px solid #e9cf9a;"></span>제한</span>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:18px;overflow-x:auto;">
+          <div style="min-width:880px;">
+            <div style="display:flex;gap:6px;margin-bottom:6px;">
+              <div style="width:58px;flex-shrink:0;"></div>
+              <sc-for list="{{ tableHeaders }}" as="th" hint-placeholder-count="10">
+                <div style="flex:1;min-width:74px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#5E7289;padding:6px 0;">{{ th }}</div>
+              </sc-for>
+            </div>
+            <sc-for list="{{ boardRows }}" as="row" hint-placeholder-count="16">
+              <div style="display:flex;gap:6px;margin-bottom:6px;">
+                <div style="width:58px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8295ab;">{{ row.time }}</div>
+                <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="10">
+                  <div onClick="{{ c.onClick }}" title="{{ c.title }}" style="flex:1;min-width:74px;height:36px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;border-radius:7px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};cursor:{{ c.cursor }};">{{ c.label }}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showMeetings }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:22px;">
+          <h2 style="font-size:26px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">내 미팅 일정</h2>
+          <p style="font-size:14.5px;color:#5E7289;margin:0;">예약 현황판에서 배정한 미팅이 시간순으로 정리됩니다.</p>
+        </div>
+        <sc-if value="{{ hasMeetings }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <sc-for list="{{ myMeetings }}" as="m" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:20px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:78px;flex-shrink:0;padding-right:18px;border-right:1px solid #eef2f7;">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8295ab;">{{ m.day }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:#0B5FA5;">{{ m.time }}</span>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:16px;font-weight:800;color:#0F2440;margin-bottom:3px;">{{ m.partner }}</div>
+                  <div style="font-size:13px;color:#8295ab;">{{ m.note }}</div>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;flex-shrink:0;">{{ m.table }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noMeetings }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px dashed #d3deea;border-radius:16px;padding:56px;text-align:center;">
+            <div style="font-size:15px;color:#8295ab;margin-bottom:18px;">아직 배정된 미팅이 없습니다.</div>
+            <button onClick="{{ goBoard }}" style="background:#0B5FA5;color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">예약 현황판에서 미팅 잡기 →</button>
+          </div>
+        </sc-if>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:60;background:#0F2440;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 12px 30px rgba(15,36,64,0.3);">{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    view: 'guide',
+    applyStep: 1,
+    role: 'exhibitor',
+    day: 'D1',
+    partners: [
+      { id:1, name:'Ivanov Medical Group', type:'바이어', country:'러시아', org:'의료관광 에이전시', tags:['건강검진','중입자치료'], status:'none' },
+      { id:2, name:'Saigon Wellness Tour', type:'바이어', country:'베트남', org:'아웃바운드 여행사', tags:['뷰티','웰니스'], status:'none' },
+      { id:3, name:'리팅성형외과', type:'참가기업', country:'대한민국', org:'성형외과', tags:['성형','리프팅'], status:'requested' },
+      { id:4, name:'Mongol Med Travel', type:'바이어', country:'몽골', org:'의료 중개', tags:['건강검진','성형'], status:'none' },
+      { id:5, name:'좋은강안병원', type:'참가기업', country:'대한민국', org:'종합병원', tags:['검진','재활'], status:'none' },
+      { id:6, name:'Almaty Health Partners', type:'바이어', country:'카자흐스탄', org:'헬스케어 유통', tags:['뷰티','검진'], status:'none' },
+    ],
+    requests: [
+      { id:11, name:'Tashkent Medical Tour', type:'바이어', country:'우즈베키스탄', org:'의료관광 에이전시', tags:['건강검진','심장'], msg:'심혈관 검진 패키지 제휴에 관심이 있습니다.', status:'pending' },
+      { id:12, name:'Bangkok Beauty Co.', type:'바이어', country:'태국', org:'뷰티 유통', tags:['뷰티','피부'], msg:'피부·레이저 시술 송출 협력을 희망합니다.', status:'pending' },
+      { id:13, name:'범어사 웰니스센터', type:'참가기업', country:'대한민국', org:'템플스테이·웰니스', tags:['웰니스','명상'], msg:'외국인 대상 웰니스 프로그램을 소개하고 싶습니다.', status:'pending' },
+    ],
+    reservations: {
+      'D1-1-2': { by:'other' }, 'D1-3-6': { by:'other' }, 'D1-7-9': { by:'other' },
+      'D1-5-12': { by:'other' }, 'D1-0-7': { by:'other' }, 'D1-8-3': { by:'other' },
+      'D2-2-3': { by:'other' }, 'D2-6-8': { by:'other' }, 'D2-4-10': { by:'other' },
+    },
+    pendingAssign: [],
+    toast: null,
+  };
+
+  SLOTS = ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
+  LUNCH = [4,5];
+  DAYLABEL = { D1:'11.13', D2:'11.14' };
+
+  setView(v){ this.setState({ view:v }); }
+  flash(msg){ this.setState({ toast:msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 2200); }
+
+  requestPartner(id){
+    this.setState(s=>({ partners: s.partners.map(p=> p.id===id ? {...p, status:'requested'} : p) }));
+    this.flash('미팅 요청을 보냈습니다 · 상대 수락 시 확정됩니다');
+  }
+  accept(id){
+    let nm='';
+    this.setState(s=>{
+      const requests = s.requests.map(r=>{ if(r.id===id){ nm=r.name; return {...r, status:'accepted'}; } return r; });
+      return { requests, pendingAssign:[...s.pendingAssign, nm] };
+    });
+    this.flash('수락했습니다 · 예약 현황판에서 테이블을 배정하세요');
+  }
+  decline(id){
+    this.setState(s=>({ requests: s.requests.map(r=> r.id===id ? {...r, status:'declined'} : r) }));
+    this.flash('요청을 거절했습니다');
+  }
+  book(ti, si){
+    if(this.LUNCH.includes(si)){ this.flash('운영 제한 시간입니다 (휴식)'); return; }
+    const key = `${this.state.day}-${ti}-${si}`;
+    const r = this.state.reservations[key];
+    if(r && r.by==='other'){ this.flash('이미 다른 참가자가 예약한 시간입니다'); return; }
+    if(r && r.by==='me'){
+      const res = {...this.state.reservations}; const freed = res[key].partner; delete res[key];
+      const back = freed && freed!=='신규 미팅' ? [...this.state.pendingAssign, freed] : this.state.pendingAssign;
+      this.setState({ reservations:res, pendingAssign:back }); this.flash('예약을 취소했습니다'); return;
+    }
+    const pend = [...this.state.pendingAssign];
+    const partner = pend.shift() || '신규 미팅';
+    this.setState({ reservations:{...this.state.reservations, [key]:{ by:'me', partner }}, pendingAssign:pend });
+    this.flash(partner==='신규 미팅' ? '테이블을 예약했습니다' : `${partner} 미팅이 배정되었습니다`);
+  }
+
+  applyNext(){ this.setState(s=>({ applyStep: Math.min(s.applyStep+1, 4) })); }
+  applyPrev(){ this.setState(s=>({ applyStep: Math.max(s.applyStep-1, 1) })); }
+
+  initialOf(n){ const m={ 'Ivanov Medical Group':'IM','Saigon Wellness Tour':'SW','Mongol Med Travel':'MM','Almaty Health Partners':'AH','Tashkent Medical Tour':'TM','Bangkok Beauty Co.':'BB' }; return m[n] || n.slice(0,1); }
+  avatarColors(type){ return type==='바이어' ? { avBg:'#EAF2FC', avColor:'#0B5FA5', tagBg:'#EAF2FC', tagColor:'#0B5FA5' } : { avBg:'#E7F6F0', avColor:'#0d8f6b', tagBg:'#E7F6F0', tagColor:'#0d8f6b' }; }
+
+  renderVals(){
+    const v = this.state.view;
+    const navIdle = "display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:14.5px;font-weight:600;background:transparent;color:#4a5e76;border-left:3px solid transparent;";
+    const navActive = "display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:14.5px;font-weight:700;background:#EAF2FC;color:#0B5FA5;border-left:3px solid #0B5FA5;";
+    const pendingCount = this.state.requests.filter(r=>r.status==='pending').length;
+
+    const reservations = this.state.reservations;
+    const day = this.state.day;
+    const myMeetingsCount = Object.keys(reservations).filter(k=> reservations[k].by==='me').length;
+
+    const navItems = [
+      { key:'guide', label:'비즈미팅 안내' },
+      { key:'apply', label:'신청하기' },
+      { key:'partners', label:'파트너 찾기' },
+      { key:'requests', label:'받은 요청', badge:pendingCount },
+      { key:'board', label:'예약 현황판' },
+      { key:'meetings', label:'내 미팅 일정', badge:myMeetingsCount },
+    ].map(n=>({ ...n, badge:n.badge||0, active:v===n.key, style:(v===n.key?navActive:navIdle), onClick:()=>this.setView(n.key) }));
+
+    // board
+    const boardRows = this.SLOTS.map((time, si)=>({
+      time,
+      cells: Array.from({length:10}).map((_, ti)=>{
+        const key = `${day}-${ti}-${si}`;
+        const r = reservations[key];
+        let bg='#ffffff', color='#c0ccda', border='#e1e8f0', label='+', cursor='pointer', title='예약 가능';
+        if(this.LUNCH.includes(si)){ bg='repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 5px,#F6E2BE 5px,#F6E2BE 10px)'; color='#b78a3c'; border='#e9cf9a'; label=''; cursor='not-allowed'; title='운영 제한'; }
+        else if(r && r.by==='me'){ bg='#E7F6F0'; color='#0d8f6b'; border='#11A37B'; label='내 미팅'; cursor='pointer'; title='클릭하여 취소'; }
+        else if(r){ bg='#eef1f6'; color='#9aa9bd'; border='#dfe5ee'; label='예약됨'; cursor='not-allowed'; title='이미 예약됨'; }
+        return { key, bg, color, border, label, cursor, title, onClick:()=>this.book(ti, si) };
+      })
+    }));
+
+    // my meetings
+    const myMeetings = Object.keys(reservations).filter(k=>reservations[k].by==='me').map(k=>{
+      const [d, ti, si] = k.split('-'); const siN = parseInt(si,10);
+      return { sortKey:(d==='D1'?0:1000)+siN, day:this.DAYLABEL[d], time:this.SLOTS[siN], table:'TABLE '+(parseInt(ti,10)+1), partner:reservations[k].partner, note:reservations[k].partner==='신규 미팅'?'미배정 — 파트너 매칭 대기':'1:1 비즈니스 미팅 · 30분' };
+    }).sort((a,b)=>a.sortKey-b.sortKey);
+
+    // apply steps indicator
+    const aStep = this.state.applyStep;
+    const applySteps = [ {n:1,label:'기본정보'},{n:2,label:'관심분야·목적'},{n:3,label:'확인·제출'} ].map(st=>{
+      const done = aStep>st.n || aStep===4, cur = aStep===st.n;
+      return { ...st, bg: cur?'#EAF2FC':(done?'#E7F6F0':'#fff'), border: cur?'#bcd9f5':(done?'#c7ebdc':'#e6ebf2'),
+        dotBg: cur?'#0B5FA5':(done?'#11A37B':'#eef1f6'), dotColor:(cur||done)?'#fff':'#9aa9bd',
+        textColor: cur?'#0B5FA5':(done?'#0d8f6b':'#8295ab') };
+    });
+
+    const roleBase = "flex:1;padding:13px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;";
+    const exA = this.state.role==='exhibitor';
+    const reviewRows = [
+      { k:'신청 유형', v: exA?'참가기업':'바이어' },
+      { k:'기관/기업명', v:'굿모닝병원' },
+      { k:'담당자', v:'ooo' },
+      { k:'관심 분야', v:'건강검진 · 척추 · 재활' },
+      { k:'희망 일자', v:'11월 13일 (금)' },
+    ];
+
+    const partnersView = this.state.partners.map(p=>({
+      ...p, requested:p.status==='requested', notRequested:p.status!=='requested',
+      initial:this.initialOf(p.name), ...this.avatarColors(p.type), request:()=>this.requestPartner(p.id)
+    }));
+    const requestsView = this.state.requests.map(r=>({
+      ...r, isPending:r.status==='pending', isAccepted:r.status==='accepted', isDeclined:r.status==='declined',
+      initial:this.initialOf(r.name), ...this.avatarColors(r.type), accept:()=>this.accept(r.id), decline:()=>this.decline(r.id)
+    }));
+
+    const ico = (el)=>el;
+    const steps = [
+      { no:'01', title:'온라인 신청', desc:'참가기업·바이어 모두 관심분야와 목적을 입력해 신청합니다.', bg:'#EAF2FC', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:5,border:'2.5px solid #0B5FA5'}}) },
+      { no:'02', title:'사무국 매칭', desc:'관심분야를 바탕으로 사무국이 최적의 상대를 매칭합니다.', bg:'#E7F6F0', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.5px solid #11A37B'}}) },
+      { no:'03', title:'1:1 요청·수락', desc:'매칭된 상대에게 미팅을 요청하고 상대가 수락합니다.', bg:'#EAF2FC', icon:React.createElement('div',{style:{width:16,height:16,background:'#0B5FA5',transform:'rotate(45deg)'}}) },
+      { no:'04', title:'테이블·시간 예약', desc:'라운지 테이블을 30분 단위로 예약해 현장에서 만납니다.', bg:'#E7F6F0', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:5,background:'#11A37B'}}) },
+    ];
+    const facts = [
+      { v:'10', k:'미팅 라운지 테이블' },
+      { v:'30분', k:'미팅 1회 (슬롯)' },
+      { v:'2일', k:'11.13–14 · 10:00–18:00' },
+      { v:'1:1', k:'사전 매칭 미팅' },
+    ];
+    const fieldChips = ['건강검진','성형·뷰티','피부·레이저','척추·관절','재활','중입자치료','웰니스','치과'];
+
+    return {
+      navItems,
+      showGuide:v==='guide', showApply:v==='apply', showPartners:v==='partners',
+      showRequests:v==='requests', showBoard:v==='board', showMeetings:v==='meetings',
+      goApply:()=>this.setView('apply'), goPartners:()=>this.setView('partners'), goBoard:()=>this.setView('board'),
+      steps, facts, fieldChips,
+
+      applySteps,
+      isStep1:aStep===1, isStep2:aStep===2, isStep3:aStep===3, isSubmitted:aStep===4,
+      showApplyNav:aStep<=3,
+      applyNext:()=>this.applyNext(), applyPrev:()=>this.applyPrev(),
+      applyNextLabel: aStep===3?'신청 제출':'다음',
+      setExhibitor:()=>this.setState({role:'exhibitor'}), setBuyer:()=>this.setState({role:'buyer'}),
+      roleExStyle: roleBase + (exA?'background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;'),
+      roleBuStyle: roleBase + (!exA?'background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;'),
+      reviewRows,
+
+      partnersView, requestsView,
+
+      tableHeaders: Array.from({length:10}).map((_,i)=>'T'+(i+1)),
+      boardRows,
+      setDayD1:()=>this.setState({day:'D1'}), setDayD2:()=>this.setState({day:'D2'}),
+      d1Style: "padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;" + (day==='D1'?'background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;'),
+      d2Style: "padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;" + (day==='D2'?'background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;'),
+
+      myMeetings, hasMeetings:myMeetings.length>0, noMeetings:myMeetings.length===0,
+      toast:this.state.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
