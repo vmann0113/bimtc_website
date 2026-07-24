@@ -29,17 +29,23 @@
       <div style="display:flex;align-items:center;gap:11px;">
         <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5AB7F0,#25C281);"></div>
         <span style="font-weight:800;font-size:16px;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 3px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
-        <span style="font-size:13px;font-weight:700;color:#9fb4c7;border-left:1px solid rgba(255,255,255,0.15);padding-left:11px;">부스 신청</span>
+        <span style="font-size:13px;font-weight:700;color:#9fb4c7;border-left:1px solid rgba(255,255,255,0.15);padding-left:11px;">{{ hdr }}</span>
       </div>
-      <a href="index.html" style="font-size:12.5px;color:#9fb4c7;text-decoration:none;cursor:pointer;">← 홈으로</a>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="display:flex;align-items:center;gap:10px;font-family:'Pretendard',sans-serif;font-size:12px;color:#9fb4c7;">
+          <span onClick="{{ setKo }}" style="{{ koStyle }}">KOR</span>
+          <span onClick="{{ setEn }}" style="{{ enStyle }}">ENG</span>
+        </div>
+        <a href="index.html" style="font-size:12.5px;color:#9fb4c7;text-decoration:none;cursor:pointer;">{{ homeLabel }}</a>
+      </div>
     </div>
   </div>
 
   <sc-if value="{{ closed }}" hint-placeholder-val="{{ false }}">
     <div class="no-print" style="max-width:560px;margin:0 auto;padding:80px 24px;text-align:center;">
       <div style="width:66px;height:66px;border-radius:16px;background:#FBF3E2;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;"><div style="width:26px;height:26px;border-radius:7px;border:3px solid #E0A23C;"></div></div>
-      <h1 style="font-size:24px;font-weight:800;margin:0 0 10px;letter-spacing:-0.02em;">부스 신청 오픈 예정</h1>
-      <p style="font-size:14.5px;color:#5E7289;margin:0 0 28px;line-height:1.6;">부스 온라인 신청은 곧 오픈됩니다.<br>오픈 일정은 공지사항과 이메일로 안내드립니다.</p>
+      <h1 style="font-size:24px;font-weight:800;margin:0 0 10px;letter-spacing:-0.02em;">{{ closed_t }}</h1>
+      <p style="font-size:14.5px;color:#5E7289;margin:0 0 28px;line-height:1.6;">{{ closed_d }}</p>
       <a href="index.html" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;">홈으로</a>
     </div>
   </sc-if>
@@ -47,11 +53,11 @@
   <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}">
     <div class="no-print" style="max-width:640px;margin:0 auto;padding:70px 24px;text-align:center;">
       <div style="width:70px;height:70px;border-radius:50%;background:#E7F6F0;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;"><div style="width:26px;height:14px;border-left:3.4px solid #11A37B;border-bottom:3.4px solid #11A37B;transform:rotate(-45deg);margin-top:-6px;"></div></div>
-      <h1 style="font-size:26px;font-weight:800;margin:0 0 10px;letter-spacing:-0.02em;">부스 신청이 접수되었습니다</h1>
-      <p style="font-size:15px;color:#5E7289;margin:0 0 8px;line-height:1.6;">인보이스 번호 <strong style="color:#0B5FA5;">{{ invoiceNo }}</strong> · 총 <strong style="color:#0B5FA5;">{{ totalW }}</strong></p>
-      <p style="font-size:13.5px;color:#8295ab;margin:0 0 30px;line-height:1.6;">사무국의 입금 확인·승인 후 비즈미팅 매칭이 활성화됩니다. 인보이스를 지금 다운로드하실 수 있습니다.</p>
+      <h1 style="font-size:26px;font-weight:800;margin:0 0 10px;letter-spacing:-0.02em;">{{ done_t }}</h1>
+      <p style="font-size:15px;color:#5E7289;margin:0 0 8px;line-height:1.6;">{{ done_inv }} <strong style="color:#0B5FA5;">{{ invoiceNo }}</strong> · {{ done_total }} <strong style="color:#0B5FA5;">{{ totalW }}</strong></p>
+      <p style="font-size:13.5px;color:#8295ab;margin:0 0 30px;line-height:1.6;">{{ done_d }}</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button onClick="{{ downloadInvoice }}" style="background:#0B5FA5;color:#fff;border:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">인보이스 다운로드 (PDF)</button>
+        <button onClick="{{ downloadInvoice }}" style="background:#0B5FA5;color:#fff;border:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ dl_inv }}</button>
         <a href="index.html" style="background:#fff;color:#5E7289;text-decoration:none;border:1px solid #d8e0ea;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:700;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;">홈으로</a>
       </div>
     </div>
@@ -59,19 +65,16 @@
 
   <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ true }}">
   <div class="no-print" style="max-width:1240px;margin:0 auto;padding:24px 26px 70px;">
-    <sc-if value="{{ adminTest }}" hint-placeholder-val="{{ false }}">
-      <div style="background:#FFF6E5;border:1px solid #f0d9a8;border-radius:12px;padding:12px 18px;margin-bottom:18px;font-size:13px;color:#8a6d2f;font-weight:600;">관리자 테스트 모드 · 신청이 아직 공개 오픈되지 않았습니다. 사무국 계정으로 기능을 점검 중입니다.</div>
-    </sc-if>
     <div style="display:grid;grid-template-columns:1fr 360px;gap:26px;align-items:start;">
     <div>
-      <h1 style="font-size:26px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 온라인 신청 · 견적</h1>
-      <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">참가 구분·부스 타입·위치·부가 서비스를 선택하면 얼리버드/재참가 할인이 반영된 견적이 실시간 계산됩니다. <span style="color:#b78a3c;">* 단가는 예시이며 최종 금액은 사무국 확정 기준입니다.</span></p>
+      <h1 style="font-size:26px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">{{ pageTitle }}</h1>
+      <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">{{ intro }}</p>
 
       <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;margin-bottom:18px;">
-        <div style="font-size:16px;font-weight:800;margin-bottom:16px;"><span style="color:#0B5FA5;">1</span> 참가 구분</div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:16px;"><span style="color:#0B5FA5;">1</span> {{ s_type }}</div>
         <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <button onClick="{{ setNew }}" style="{{ newStyle }}">신규 참가</button>
-          <button onClick="{{ setReturning }}" style="{{ retStyle }}">기존 참가업체 (재참가 할인)</button>
+          <button onClick="{{ setNew }}" style="{{ newStyle }}">{{ p_new }}</button>
+          <button onClick="{{ setReturning }}" style="{{ retStyle }}">{{ p_ret }}</button>
         </div>
         <sc-if value="{{ isReturning }}" hint-placeholder-val="{{ false }}">
           <div style="position:relative;">
@@ -95,7 +98,7 @@
       </div>
 
       <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;margin-bottom:18px;">
-        <div style="font-size:16px;font-weight:800;margin-bottom:16px;"><span style="color:#0B5FA5;">2</span> 부스 타입</div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:16px;"><span style="color:#0B5FA5;">2</span> {{ s_booth }}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <sc-for list="{{ typeCards }}" as="t" hint-placeholder-count="2">
             <div onClick="{{ t.onClick }}" style="{{ t.style }}">
@@ -113,8 +116,8 @@
 
       <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;margin-bottom:18px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <div style="font-size:16px;font-weight:800;"><span style="color:#0B5FA5;">3</span> 부스 위치 선택</div>
-          <div style="font-size:13px;color:#5E7289;">선택 <strong style="color:#0B5FA5;">{{ boothCount }}</strong>개 · {{ boothCostW }}</div>
+          <div style="font-size:16px;font-weight:800;"><span style="color:#0B5FA5;">3</span> {{ s_loc }}</div>
+          <div style="font-size:13px;color:#5E7289;">{{ s_sel }} <strong style="color:#0B5FA5;">{{ boothCount }}</strong>{{ s_cnt }} · {{ boothCostW }}</div>
         </div>
         <p style="font-size:12.5px;color:#8295ab;margin:0 0 14px;">영화관 좌석처럼 원하는 부스를 클릭해 선택하세요. 회색은 이미 신청된 부스입니다.</p>
         <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:#5E7289;">
@@ -155,8 +158,8 @@
       </div>
 
       <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;margin-bottom:18px;">
-        <div style="font-size:16px;font-weight:800;margin-bottom:6px;"><span style="color:#0B5FA5;">4</span> 부가 서비스 (전기·통신·급배수)</div>
-        <p style="font-size:12px;color:#8295ab;margin:0 0 8px;">※ 기본 1kW(220V 단상)는 조립부스에 기본 제공됩니다. 독립부스는 별도 신청.</p>
+        <div style="font-size:16px;font-weight:800;margin-bottom:6px;"><span style="color:#0B5FA5;">4</span> {{ s_addon }}</div>
+        <p style="font-size:12px;color:#8295ab;margin:0 0 8px;">{{ s_addon_note }}</p>
         <div style="display:flex;flex-direction:column;">
           <sc-for list="{{ addonRows }}" as="a" hint-placeholder-count="6">
             <div style="display:flex;align-items:center;gap:16px;padding:13px 0;border-top:1px solid #eef2f7;">
@@ -176,16 +179,16 @@
       </div>
 
       <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;margin-bottom:18px;">
-        <div style="font-size:16px;font-weight:800;margin-bottom:6px;"><span style="color:#0B5FA5;">5</span> 팸투어(Fam Tour) 참가</div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:6px;"><span style="color:#0B5FA5;">5</span> {{ s_fam }}</div>
         <p style="font-size:12.5px;color:#8295ab;margin:0 0 14px;">{{ famDesc }}</p>
         <div style="display:flex;gap:10px;">
-          <button onClick="{{ setFamYes }}" style="{{ famYesStyle }}">참가 희망</button>
-          <button onClick="{{ setFamNo }}" style="{{ famNoStyle }}">참가 안 함</button>
+          <button onClick="{{ setFamYes }}" style="{{ famYesStyle }}">{{ fam_yes }}</button>
+          <button onClick="{{ setFamNo }}" style="{{ famNoStyle }}">{{ fam_no }}</button>
         </div>
       </div>
 
       <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;">
-        <div style="font-size:16px;font-weight:800;margin-bottom:16px;"><span style="color:#0B5FA5;">6</span> 신청 및 계약자 정보</div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:16px;"><span style="color:#0B5FA5;">6</span> {{ s_info }}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">회사명 (국문·상호간판명)</label><input value="{{ company }}" onInput="{{ setCompany }}" placeholder="예) 굿모닝병원" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
           <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">회사명 (영문)</label><input value="{{ companyEn }}" onInput="{{ setCompanyEn }}" placeholder="e.g. Goodmorning Hospital" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
@@ -218,7 +221,7 @@
     </div>
 
     <div style="position:sticky;top:84px;background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:26px;box-shadow:0 12px 34px rgba(15,36,64,0.06);">
-      <div style="font-size:17px;font-weight:800;margin-bottom:6px;">견적 요약</div>
+      <div style="font-size:17px;font-weight:800;margin-bottom:6px;">{{ q_title }}</div>
       <sc-if value="{{ earlyBirdOn }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:700;color:#0d8f6b;background:#E7F6F0;border-radius:7px;padding:6px 10px;margin-bottom:14px;display:inline-block;">{{ earlyBirdLabel }} 적용중 · {{ earlyBirdRateLabel }} 할인</div></sc-if>
       <div style="display:flex;flex-direction:column;gap:11px;margin:10px 0 16px;">
         <sc-for list="{{ lineItems }}" as="l" hint-placeholder-count="3">
@@ -232,14 +235,14 @@
         <sc-if value="{{ hasDiscount }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;justify-content:space-between;"><span style="font-size:13.5px;color:#0d8f6b;">할인 ({{ discountLabel }})</span><span style="font-size:14px;font-weight:700;color:#0d8f6b;">− {{ discountW }}</span></div>
         </sc-if>
-        <div style="display:flex;justify-content:space-between;"><span style="font-size:13.5px;color:#5E7289;">공급가액</span><span style="font-size:14px;font-weight:700;">{{ subtotalW }}</span></div>
-        <div style="display:flex;justify-content:space-between;"><span style="font-size:13.5px;color:#5E7289;">부가세 (10%)</span><span style="font-size:14px;font-weight:700;">{{ vatW }}</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:4px;padding-top:12px;border-top:2px solid #16294F;"><span style="font-size:15px;font-weight:800;">최종 입금액</span><span style="font-size:22px;font-weight:800;color:#0B5FA5;">{{ totalW }}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="font-size:13.5px;color:#5E7289;">{{ q_subtotal }}</span><span style="font-size:14px;font-weight:700;">{{ subtotalW }}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="font-size:13.5px;color:#5E7289;">{{ q_vat }}</span><span style="font-size:14px;font-weight:700;">{{ vatW }}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:4px;padding-top:12px;border-top:2px solid #16294F;"><span style="font-size:15px;font-weight:800;">{{ q_total }}</span><span style="font-size:22px;font-weight:800;color:#0B5FA5;">{{ totalW }}</span></div>
       </div>
       <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px;font-size:12.5px;color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ formError }}</div></sc-if>
-      <button onClick="{{ downloadInvoice }}" style="width:100%;margin-top:18px;background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:13px;border-radius:11px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">인보이스 미리보기·다운로드</button>
+      <button onClick="{{ downloadInvoice }}" style="width:100%;margin-top:18px;background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:13px;border-radius:11px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ dlPreview }}</button>
       <button onClick="{{ submit }}" style="width:100%;margin-top:10px;background:#0B5FA5;color:#fff;border:none;padding:15px;border-radius:11px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ submitLabel }}</button>
-      <p style="font-size:11.5px;color:#9aa9bd;margin:12px 0 0;line-height:1.6;text-align:center;">부스 신청·사무국 승인 완료 시 비즈미팅 매칭이 활성화됩니다.</p>
+      <p style="font-size:11.5px;color:#9aa9bd;margin:12px 0 0;line-height:1.6;text-align:center;">{{ q_note }}</p>
     </div>
     </div>
   </div>
@@ -274,7 +277,7 @@
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e6ebf2;"><span style="color:#5E7289;">부가세 (10%)</span><span style="font-weight:700;">{{ vatW }}</span></div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:16px;font-weight:800;"><span>합계</span><span style="color:#0B5FA5;">{{ totalW }}</span></div>
     </div>
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e6ebf2;font-size:11.5px;color:#8295ab;line-height:1.7;">선택 부스: {{ boothIdsLabel }} · 팸투어: {{ famLabel }}<br>* 본 견적서의 단가는 예시이며 최종 금액은 사무국 확정 기준입니다. 입금 계좌는 신청 확인 후 별도 안내됩니다.</div>
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e6ebf2;font-size:11.5px;color:#8295ab;line-height:1.7;">선택 부스: {{ boothIdsLabel }} · 팸투어: {{ famLabel }}</div>
   </div>
 
   <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
@@ -286,6 +289,7 @@
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   state = {
+    lang:(typeof localStorage!=='undefined'&&localStorage.getItem('bimtc_lang'))||'ko',
     gate:'loading', adminTest:false,
     participation:'new', retQuery:'', retCompany:'',
     boothType:'package', selected:[], addons:{}, taken:{}, famTour:null, layout:null,
@@ -397,6 +401,8 @@ class Component extends DCLogic {
 
   renderVals(){
     const c=this.calc();
+    const L=(ko,en)=>this.state.lang==='en'?en:ko;
+    const en=this.state.lang==='en';
     const bt=this.state.boothType;
     const CFG=this.cfg();
 
@@ -497,6 +503,24 @@ class Component extends DCLogic {
     const d=new Date();
     const eb=c.eb;
     return {
+      hdr:L('부스 신청','Booth Application'), homeLabel:L('← 홈으로','← Home'), home2:L('홈으로','Home'),
+      pageTitle:L('부스 온라인 신청 · 견적','Online Booth Application · Quote'),
+      intro:L('참가 구분·부스 타입·위치·부가 서비스를 선택하면 얼리버드/재참가 할인이 반영된 견적이 실시간 계산됩니다.','Select participation type, booth type, location and add-ons to see a live quote with early-bird/returning discounts applied.'),
+      s_type:L('참가 구분','Participation Type'), s_booth:L('부스 타입','Booth Type'), s_loc:L('부스 위치 선택','Select Booth Location'), s_sel:L('선택','Selected'), s_cnt:L('개',''),
+      s_addon:L('부가 서비스 (전기·통신·급배수)','Add-ons (Power·Comms·Water)'), s_addon_note:L('※ 기본 1kW(220V 단상)는 조립부스에 기본 제공됩니다. 독립부스는 별도 신청.','※ Basic 1kW (220V single-phase) is included with package booths. Space-only requires separate application.'),
+      s_fam:L('팸투어(Fam Tour) 참가','Fam Tour Participation'), s_info:L('신청 및 계약자 정보','Applicant & Contract Info'),
+      p_new:L('신규 참가','New'), p_ret:L('기존 참가업체 (재참가 할인)','Returning (discount)'),
+      fam_yes:L('참가 희망','Join'), fam_no:L('참가 안 함','No'),
+      q_title:L('견적 요약','Quote Summary'), q_subtotal:L('공급가액','Subtotal'), q_vat:L('부가세 (10%)','VAT (10%)'), q_total:L('최종 입금액','Total Due'),
+      q_note:L('부스 신청·사무국 승인 완료 시 비즈미팅 매칭이 활성화됩니다.','Business meeting matching activates after booth application & approval.'),
+      submitLabelText:L('부스 신청 제출','Submit Application'), dlPreview:L('인보이스 미리보기·다운로드','Preview & Download Invoice'),
+      closed_t:L('부스 신청 오픈 예정','Booth Application Coming Soon'), closed_d:L('부스 온라인 신청은 곧 오픈됩니다. 오픈 일정은 공지사항과 이메일로 안내드립니다.','Online booth applications open soon. Schedule will be announced via Notices and email.'),
+      done_t:L('부스 신청이 접수되었습니다','Your application has been received'), done_inv:L('인보이스 번호','Invoice No.'), done_total:L('총','Total'), done_d:L('사무국의 입금 확인·승인 후 비즈미팅 매칭이 활성화됩니다. 인보이스를 지금 다운로드하실 수 있습니다.','Business meeting matching activates after the secretariat confirms payment. You can download the invoice now.'), dl_inv:L('인보이스 다운로드 (PDF)','Download Invoice (PDF)'),
+      adminTestMsg:L('관리자 테스트 모드 · 신청이 아직 공개 오픈되지 않았습니다. 사무국 계정으로 기능을 점검 중입니다.','Admin test mode · Applications are not publicly open yet. Testing with a secretariat account.'),
+      setKo:()=>{ try{localStorage.setItem('bimtc_lang','ko')}catch(e){}; this.setState({lang:'ko'}); },
+      setEn:()=>{ try{localStorage.setItem('bimtc_lang','en')}catch(e){}; this.setState({lang:'en'}); },
+      koStyle:"cursor:pointer;font-weight:"+(en?'400':'700')+";color:"+(en?'#9fb4c7':'#fff')+";",
+      enStyle:"cursor:pointer;font-weight:"+(en?'700':'400')+";color:"+(en?'#fff':'#9fb4c7')+";",
       closed:this.state.gate==='closed', formOpen:this.state.gate==='open'&&!this.state.done, done:this.state.done,
       adminTest:this.state.adminTest,
 
@@ -531,7 +555,7 @@ class Component extends DCLogic {
       setBizType:this.set('bizType'), setBizItem:this.set('bizItem'), setItems:this.set('items'), setDept:this.set('dept'),
       formError:this.state.formError,
       submit:()=>this.submit(), downloadInvoice:()=>this.downloadInvoice(),
-      submitLabel:this.state.submitting?'접수 중…':'부스 신청 제출',
+      submitLabel:this.state.submitting?L('접수 중…','Submitting…'):L('부스 신청 제출','Submit Application'),
       invoiceNo:this.state.invoiceNo||'(제출 후 발급)',
       today:d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate(),
       boothIdsLabel:this.state.selected.length?this.state.selected.join(', '):'-',

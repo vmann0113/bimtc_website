@@ -471,8 +471,8 @@ class Component extends DCLogic {
       if(!u){ this.setState({ needLogin:true }); return; }
       this.setState({ user:u, role: u.type==='buyer'?'buyer':'exhibitor',
         apOrg:u.name||'', apEmail:u.email||'', apCountry:u.country||'' });
-      // 참가기업은 부스 신청 + 사무국 승인 완료 시에만 비즈미팅 이용 (바이어는 예외)
-      if(u.type!=='buyer'){
+      // 참가기업은 부스 신청 + 사무국 승인 완료 시에만 비즈미팅 이용 (바이어·관리자는 예외)
+      if(u.type!=='buyer' && !u.is_admin){
         try{
           const st = await window.BimtcDB.myApprovedBooths();
           if(st.count===0){ this.setState({ needBooth:true }); return; }
