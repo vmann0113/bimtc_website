@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#EEF1F6;}
+  input{font-family:'Pretendard',sans-serif;}
+  ::selection{background:#0B5FA5;color:#fff;}
+</style>
+<script src="bimtc-config.js"></script>
+<script src="bimtc-supabase.js"></script>
+</helmet>
+
+<div style="font-family:'Pretendard',sans-serif;min-height:100vh;background:#EEF1F6;color:#0F2440;">
+
+  <div style="position:sticky;top:0;z-index:40;background:#16294F;color:#fff;">
+    <div style="height:4px;background:linear-gradient(90deg,#5AB7F0,#25C281);"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 26px;height:60px;max-width:1280px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:11px;">
+        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5AB7F0,#25C281);"></div>
+        <span style="font-weight:800;font-size:16px;">부스 배치 편집기</span>
+        <span style="font-size:12px;font-weight:700;color:#9fb4c7;border-left:1px solid rgba(255,255,255,0.15);padding-left:11px;">ADMIN · 사무국 전용</span>
+      </div>
+      <a href="admin.html" style="font-size:12.5px;color:#9fb4c7;text-decoration:none;cursor:pointer;">← 관리자 콘솔</a>
+    </div>
+  </div>
+
+  <sc-if value="{{ needAdmin }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:520px;margin:0 auto;padding:80px 24px;text-align:center;">
+      <h1 style="font-size:22px;font-weight:800;margin:0 0 10px;">사무국(관리자) 전용 페이지</h1>
+      <p style="font-size:14px;color:#5E7289;margin:0 0 24px;">부스 배치 편집은 관리자 계정만 접근할 수 있습니다.</p>
+      <a href="index.html" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;font-family:'Pretendard',sans-serif;">홈으로</a>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ready }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1280px;margin:0 auto;padding:24px 26px 80px;display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start;">
+
+    <div style="position:sticky;top:80px;display:flex;flex-direction:column;gap:16px;">
+      <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:20px;">
+        <div style="font-size:14px;font-weight:800;margin-bottom:12px;">격자 크기</div>
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;"><label style="display:block;font-size:12px;color:#8295ab;margin-bottom:6px;font-weight:600;">행 (세로)</label><input value="{{ rows }}" onInput="{{ setRows }}" type="number" style="width:100%;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:14px;outline:none;" /></div>
+          <div style="flex:1;"><label style="display:block;font-size:12px;color:#8295ab;margin-bottom:6px;font-weight:600;">열 (가로)</label><input value="{{ cols }}" onInput="{{ setCols }}" type="number" style="width:100%;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:14px;outline:none;" /></div>
+        </div>
+        <div style="border-top:1px solid #eef2f7;margin-top:16px;padding-top:14px;">
+          <div style="font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:8px;">행 삽입 · 삭제 (번호 기준)</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
+            <input value="{{ rowAt }}" onInput="{{ setRowAt }}" type="number" placeholder="행#" style="width:56px;padding:8px;border:1px solid #d8e0ea;border-radius:8px;font-size:13px;outline:none;" />
+            <button onClick="{{ insRow }}" style="flex:1;padding:8px;border:1px solid #cfe0f2;background:#F4F9FE;color:#0B5FA5;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">위에 삽입</button>
+            <button onClick="{{ delRow }}" style="flex:1;padding:8px;border:1px solid #f0c9c4;background:#fdecea;color:#c0392b;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
+          </div>
+          <div style="font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:8px;">열 삽입 · 삭제 (번호 기준)</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input value="{{ colAt }}" onInput="{{ setColAt }}" type="number" placeholder="열#" style="width:56px;padding:8px;border:1px solid #d8e0ea;border-radius:8px;font-size:13px;outline:none;" />
+            <button onClick="{{ insCol }}" style="flex:1;padding:8px;border:1px solid #cfe0f2;background:#F4F9FE;color:#0B5FA5;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">왼쪽에 삽입</button>
+            <button onClick="{{ delCol }}" style="flex:1;padding:8px;border:1px solid #f0c9c4;background:#fdecea;color:#c0392b;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:20px;">
+        <div style="font-size:14px;font-weight:800;margin-bottom:6px;">브러시 (칸에 칠할 유형)</div>
+        <div style="font-size:11.5px;color:#8295ab;margin-bottom:12px;">유형을 고른 뒤 격자 칸을 클릭하세요.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <sc-for list="{{ brushes }}" as="b" hint-placeholder-count="6">
+            <div onClick="{{ b.onClick }}" style="{{ b.style }}">
+              <span style="width:16px;height:16px;border-radius:4px;background:{{ b.swatch }};border:1px solid rgba(15,36,64,0.12);flex-shrink:0;"></span>
+              <span>{{ b.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:14px;font-weight:800;">존(Zone) 구성</div>
+          <span onClick="{{ addZone }}" style="font-size:12px;font-weight:700;color:#0B5FA5;cursor:pointer;">+ 존 추가</span>
+        </div>
+        <div style="font-size:11.5px;color:#8295ab;margin-bottom:12px;">'판매' 브러시로 칠할 때 적용할 존을 선택하세요.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <sc-for list="{{ zoneRows }}" as="z" hint-placeholder-count="3">
+            <div onClick="{{ z.pick }}" style="{{ z.rowStyle }}">
+              <input value="{{ z.color }}" onInput="{{ z.setColor }}" type="color" style="width:26px;height:26px;border:none;background:none;padding:0;cursor:pointer;flex-shrink:0;" />
+              <input value="{{ z.name }}" onInput="{{ z.setName }}" style="flex:1;min-width:0;padding:6px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;" />
+              <span onClick="{{ z.del }}" style="font-size:12px;color:#c0392b;cursor:pointer;flex-shrink:0;">삭제</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:20px;">
+        <div style="font-size:14px;font-weight:800;margin-bottom:12px;">유형 색상 수정</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <sc-for list="{{ typeColorRows }}" as="t" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input value="{{ t.color }}" onInput="{{ t.setColor }}" type="color" style="width:26px;height:26px;border:none;background:none;padding:0;cursor:pointer;flex-shrink:0;" />
+              <span style="font-size:13px;color:#33485e;font-weight:600;">{{ t.label }}</span>
+            </div>
+          </sc-for>
+          <div style="font-size:11.5px;color:#8295ab;margin-top:4px;">판매 부스 색상은 위 '존(Zone) 구성'에서 존별로 지정합니다.</div>
+        </div>
+      </div>
+
+      <button onClick="{{ save }}" style="background:#0B5FA5;color:#fff;border:none;padding:15px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ saveLabel }}</button>
+      <button onClick="{{ reload }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:11px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">저장본 다시 불러오기</button>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px;">
+        <h1 style="font-size:20px;font-weight:800;margin:0;">전시장 배치도</h1>
+        <div style="font-size:12.5px;color:#5E7289;">판매 부스 <strong style="color:#0B5FA5;">{{ sellCount }}</strong>칸 · 비즈미팅 <strong style="color:#7a5cc4;">{{ bizCount }}</strong>칸</div>
+      </div>
+      <p style="font-size:12px;color:#8295ab;margin:0 0 16px;">각 칸을 클릭하면 현재 브러시 유형으로 바뀝니다. 판매 부스 번호는 행(A·B…)+열 순번으로 자동 부여됩니다.</p>
+      <div style="overflow-x:auto;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:{{ gridMinWidth }};">
+          <sc-for list="{{ grid }}" as="row" hint-placeholder-count="6">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <span style="width:18px;font-size:11px;font-weight:700;color:#9aa9bd;text-align:center;flex-shrink:0;">{{ row.label }}</span>
+              <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="10">
+                <div onClick="{{ c.onClick }}" title="{{ c.title }}" style="{{ c.style }}">{{ c.label }}</div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:5px;align-items:center;margin-top:3px;">
+            <span style="width:18px;flex-shrink:0;"></span>
+            <sc-for list="{{ bottomDoors }}" as="d" hint-placeholder-count="10">
+              <span onClick="{{ d.onClick }}" title="하단 입구" style="{{ d.style }}">{{ d.glyph }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:18px;font-size:12px;color:#5E7289;">
+        <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+          <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;border-radius:4px;background:{{ l.color }};border:1px solid rgba(15,36,64,0.12);"></span>{{ l.label }}</span>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:60;background:#0F2440;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 12px 30px rgba(15,36,64,0.3);">{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { gate:'loading', rows:6, cols:12, zones:[], cells:{}, doors:{}, typeColors:{}, brush:'sell', activeZone:'z1', saving:false, toast:null };
+  tc(k){ return (this.state.typeColors&&this.state.typeColors[k]) || this.TYPES[k].color; }
+
+  TYPES = {
+    clear:     { label:'빈칸 (지우기)', color:'#f4f6f9' },
+    aisle:     { label:'통로', color:'#c7d0dc' },
+    sell:      { label:'판매 부스 (존)', color:'#0B5FA5' },
+    common:    { label:'공용 공간', color:'#E0A23C' },
+    organizer: { label:'주최측 운영', color:'#64748b' },
+    biz:       { label:'비즈미팅 존', color:'#7a5cc4' },
+    stage:     { label:'무대', color:'#0f766e' },
+    seating:   { label:'객석', color:'#a3b8cc' },
+    lounge:    { label:'휴게공간', color:'#a3d977' },
+    entrance:  { label:'입구', color:'#e0392b' },
+    restroom:  { label:'화장실', color:'#2E90D6' },
+  };
+
+  async componentDidMount(){
+    try{
+      const isAdmin = await window.BimtcDB.isAdmin();
+      if(!isAdmin){ this.setState({ gate:'denied' }); return; }
+      this.setState({ gate:'ready' });
+      await this.loadSaved(true);
+    }catch(e){ this.setState({ gate:'ready' }); this.initDefault(); }
+  }
+
+  initDefault(){
+    // 실제 규모 빈 격자: 102m × 40.5m, 3m 부스 기준 세로 34 × 가로 13.
+    // 행사장이 사각형이 아니므로 셀은 비워두고, 편집기에서 실제 형태대로 칠하세요.
+    const zones=[
+      { key:'z1', name:'의료관광관', color:'#0B5FA5' },
+      { key:'z2', name:'의료체험·산업관', color:'#11A37B' },
+    ];
+    this.setState({ zones, cells:{}, rows:34, cols:13, activeZone:'z1' });
+  }
+
+  async loadSaved(silent){
+    try{
+      const saved = await window.BimtcDB.getLayout();
+      if(saved && saved.zones){
+        this.setState({ rows:saved.rows||6, cols:saved.cols||12, zones:saved.zones, cells:saved.cells||{}, doors:saved.doors||{}, typeColors:saved.typeColors||{}, activeZone:(saved.zones[0]&&saved.zones[0].key)||'z1' });
+        if(!silent) this.flash('저장된 배치를 불러왔습니다');
+      } else { this.initDefault(); }
+    }catch(e){ this.initDefault(); }
+  }
+
+  flash(m){ this.setState({toast:m}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:null}),2200); }
+  rowLabel(i){ var s=''; i=i+1; while(i>0){ var m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; }
+
+  toggleDoor(k){ this.setState(s=>{ const d={...s.doors}; if(d[k]) delete d[k]; else d[k]=1; return { doors:d }; }); }
+  remap(fn){ const nc={}; Object.keys(this.state.cells).forEach(k=>{ const p=k.split('_'),r=+p[0],c=+p[1]; const t=fn(r,c); if(t) nc[t[0]+'_'+t[1]]=this.state.cells[k]; }); return nc; }
+  insertRow(at){ at=Math.max(0,Math.min(this.state.rows,at)); const nc=this.remap((r,c)=> r>=at?[r+1,c]:[r,c]); this.setState({cells:nc, rows:this.state.rows+1}); this.flash((at+1)+'행 위치에 행을 삽입했습니다'); }
+  deleteRow(at){ if(this.state.rows<=1) return; at=Math.max(0,Math.min(this.state.rows-1,at)); const nc=this.remap((r,c)=> r===at?null:(r>at?[r-1,c]:[r,c])); this.setState({cells:nc, rows:this.state.rows-1}); this.flash((at+1)+'행을 삭제했습니다'); }
+  insertCol(at){ at=Math.max(0,Math.min(this.state.cols,at)); const nc=this.remap((r,c)=> c>=at?[r,c+1]:[r,c]); const nd={}; Object.keys(this.state.doors).forEach(k=>{ const c=+k.slice(1); nd['B'+(c>=at?c+1:c)]=1; }); this.setState({cells:nc, doors:nd, cols:this.state.cols+1}); this.flash((at+1)+'열 위치에 열을 삽입했습니다'); }
+  deleteCol(at){ if(this.state.cols<=1) return; at=Math.max(0,Math.min(this.state.cols-1,at)); const nc=this.remap((r,c)=> c===at?null:(c>at?[r,c-1]:[r,c])); const nd={}; Object.keys(this.state.doors).forEach(k=>{ const c=+k.slice(1); if(c===at) return; nd['B'+(c>at?c-1:c)]=1; }); this.setState({cells:nc, doors:nd, cols:this.state.cols-1}); this.flash((at+1)+'열을 삭제했습니다'); }
+  paint(r,c){
+    const key=r+'_'+c;
+    const b=this.state.brush;
+    const cells={...this.state.cells};
+    if(b==='clear'){ delete cells[key]; }
+    else if(b==='sell'){ cells[key]={ t:'sell', z:this.state.activeZone }; }
+    else { cells[key]={ t:b }; }
+    this.setState({ cells });
+  }
+
+  addZone(){
+    const palette=['#0B5FA5','#11A37B','#7a5cc4','#c0392b','#E0A23C','#0d8f6b','#2E90D6','#d6457a'];
+    const k='z'+Date.now().toString(36).slice(-4);
+    const z={ key:k, name:'새 존', color:palette[this.state.zones.length%palette.length] };
+    this.setState(s=>({ zones:[...s.zones, z], activeZone:k }));
+  }
+  delZone(k){ this.setState(s=>({ zones:s.zones.filter(z=>z.key!==k) })); }
+  setZoneField(k,f){ return (e)=>{ const v=e.target.value; this.setState(s=>({ zones:s.zones.map(z=>z.key===k?{...z,[f]:v}:z) })); }; }
+
+  buildLayout(){
+    // 판매 셀을 존별로 모아 boothLayout 형태로 변환 + 특수구역 정보
+    const rows=this.state.rows, cols=this.state.cols;
+    const special=[]; const sellByRow={};
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const cell=this.state.cells[r+'_'+c];
+        if(!cell) continue;
+        const id=this.rowLabel(r)+String(c+1).padStart(2,'0');
+        if(cell.t==='sell'){ (sellByRow[r]=sellByRow[r]||[]).push({ id, z:cell.z, r, c }); }
+        else special.push({ id, t:cell.t, r, c });
+      }
+    }
+    return { rows, cols, zones:this.state.zones, cells:this.state.cells, doors:this.state.doors, typeColors:this.state.typeColors, special };
+  }
+
+  async save(){
+    if(this.state.saving) return;
+    this.setState({saving:true});
+    const res=await window.BimtcDB.saveLayout(this.buildLayout());
+    this.setState({saving:false});
+    this.flash(res.ok ? '저장되었습니다 · 부스 신청에 반영됩니다' : ('저장 실패: '+res.error));
+  }
+
+  renderVals(){
+    const zmap={}; this.state.zones.forEach(z=>zmap[z.key]=z);
+    const colorOf=(cell)=>{
+      if(!cell) return '#ffffff';
+      if(cell.t==='clear') return '#ffffff';
+      if(cell.t==='sell'){ const z=zmap[cell.z]; return z?z.color:'#0B5FA5'; }
+      return this.tc(cell.t);
+    };
+    const zoneSwatch=(this.state.zones[0]&&this.state.zones[0].color)||'#0B5FA5';
+    let sellCount=0, bizCount=0;
+    // 존별 판매 순번
+    const perZoneCount={};
+    const grid=[];
+    for(let r=0;r<this.state.rows;r++){
+      const cells=[];
+      for(let c=0;c<this.state.cols;c++){
+        const cell=this.state.cells[r+'_'+c];
+        const bg=colorOf(cell);
+        let label=''; let title=this.rowLabel(r)+String(c+1).padStart(2,'0');
+        if(cell){
+          if(cell.t==='sell'){ sellCount++; label=String(c+1); title+=' · '+((zmap[cell.z]&&zmap[cell.z].name)||'존'); }
+          else if(cell.t==='biz'){ bizCount++; label='B'; title+=' · 비즈미팅'; }
+          else if(cell.t==='common'){ label='공'; title+=' · 공용'; }
+          else if(cell.t==='organizer'){ label='운'; title+=' · 주최운영'; }
+          else if(cell.t==='stage'){ label='무대'; title+=' · 무대'; }
+          else if(cell.t==='seating'){ label='객석'; title+=' · 객석'; }
+          else if(cell.t==='lounge'){ label='휴게'; title+=' · 휴게공간'; }
+          else if(cell.t==='restroom'){ label='WC'; title+=' · 화장실'; }
+        }
+        const light=(!cell||cell.t==='clear');
+        cells.push({ label, title,
+          style:"width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'Pretendard',sans-serif;flex-shrink:0;cursor:pointer;border:1px solid "+(light?'#dbe2ea':'rgba(0,0,0,0.08)')+";background:"+bg+";color:"+(light?'#b8c2d0':'#fff')+";",
+          onClick:(function(rr,cc){return ()=>this.paint(rr,cc);}).call(this,r,c) });
+      }
+      grid.push({ label:this.rowLabel(r), cells });
+    }
+    const doorStyle=(on)=>"width:30px;height:16px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;cursor:pointer;color:"+(on?'#e0392b':'#d3dbe4')+";font-weight:800;";
+    const bottomDoors=[];
+    for(let c=0;c<this.state.cols;c++){ const on=!!this.state.doors['B'+c];
+      bottomDoors.push({ glyph:on?'▲':'·', style:doorStyle(on), onClick:(function(cc){return ()=>this.toggleDoor('B'+cc);}).call(this,c) }); }
+
+    const brushDef=[['sell','판매 부스 (존)'],['biz','비즈미팅 존'],['stage','무대'],['seating','객석'],['lounge','휴게공간'],['common','공용 공간'],['organizer','주최측 운영'],['restroom','화장실'],['aisle','통로'],['clear','빈칸 (지우기)']];
+    const brushes=brushDef.map(([k,l])=>({ label:l, swatch:this.tc(k),
+      onClick:()=>this.setState({brush:k}),
+      style:"display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:700;border:1.5px solid "+(this.state.brush===k?'#0B5FA5':'#e6ebf2')+";background:"+(this.state.brush===k?'#F4F9FE':'#fff')+";color:#22384e;" }));
+
+    const zoneRows=this.state.zones.map(z=>({
+      name:z.name, color:z.color,
+      rowStyle:"display:flex;align-items:center;gap:8px;padding:6px;border-radius:8px;cursor:pointer;border:1.5px solid "+(this.state.activeZone===z.key?'#0B5FA5':'transparent')+";background:"+(this.state.activeZone===z.key?'#F4F9FE':'transparent')+";",
+      pick:()=>this.setState({activeZone:z.key, brush:'sell'}),
+      setColor:this.setZoneField(z.key,'color'), setName:this.setZoneField(z.key,'name'), del:()=>this.delZone(z.key)
+    }));
+
+    const legend=[{color:zoneSwatch,label:'판매 부스'},{color:this.tc('biz'),label:'비즈미팅 존'},{color:this.tc('stage'),label:'무대'},{color:this.tc('seating'),label:'객석'},{color:this.tc('lounge'),label:'휴게공간'},{color:this.tc('common'),label:'공용'},{color:this.tc('organizer'),label:'주최운영'},{color:this.tc('restroom'),label:'화장실'},{color:this.tc('aisle'),label:'통로'},{color:'#e0392b',label:'입구(하단 ▲)'}];
+    const colorTypes=[['biz','비즈미팅 존'],['stage','무대'],['seating','객석'],['lounge','휴게공간'],['common','공용 공간'],['organizer','주최측 운영'],['restroom','화장실'],['aisle','통로']];
+    const typeColorRows=colorTypes.map(([k,l])=>({ label:l, color:this.tc(k),
+      setColor:(e)=>{ const v=e.target.value; this.setState(s=>({ typeColors:{...s.typeColors,[k]:v} })); } }));
+
+    return {
+      needAdmin:this.state.gate==='denied', ready:this.state.gate==='ready',
+      rows:this.state.rows, cols:this.state.cols,
+      setRows:(e)=>this.setState({rows:Math.max(1,Math.min(30,parseInt(e.target.value)||1))}),
+      setCols:(e)=>this.setState({cols:Math.max(1,Math.min(30,parseInt(e.target.value)||1))}),
+      brushes, zoneRows, addZone:()=>this.addZone(),
+      grid, gridMinWidth:(this.state.cols*35+24)+'px', bottomDoors, typeColorRows,
+      insRow:(e)=>this.insertRow((parseInt(this.state.rowAt)||1)-1),
+      delRow:()=>this.deleteRow((parseInt(this.state.rowAt)||1)-1),
+      insCol:(e)=>this.insertCol((parseInt(this.state.colAt)||1)-1),
+      delCol:()=>this.deleteCol((parseInt(this.state.colAt)||1)-1),
+      rowAt:this.state.rowAt||'', colAt:this.state.colAt||'',
+      setRowAt:(e)=>this.setState({rowAt:e.target.value}), setColAt:(e)=>this.setState({colAt:e.target.value}),
+      legend, sellCount, bizCount,
+      save:()=>this.save(), saveLabel:this.state.saving?'저장 중…':'배치 저장 (홈페이지 반영)',
+      reload:()=>this.loadSaved(false),
+      toast:this.state.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#EEF1F6;}
+  input,textarea{font-family:'Pretendard',sans-serif;}
+  ::selection{background:#0B5FA5;color:#fff;}
+</style>
+<script src="bimtc-supabase.js"></script>
+</helmet>
+
+<div style="font-family:'Pretendard',sans-serif;min-height:100vh;background:#EEF1F6;color:#0F2440;">
+
+  <div style="position:sticky;top:0;z-index:40;background:#0A2236;color:#fff;">
+    <div style="height:4px;background:linear-gradient(90deg,#0B5FA5,#11A37B);"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 26px;height:60px;">
+      <div style="display:flex;align-items:center;gap:11px;">
+        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#0B5FA5,#11A37B);position:relative;">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:13px;height:3px;background:#fff;border-radius:2px;"></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:3px;height:13px;background:#fff;border-radius:2px;"></div>
+        </div>
+        <span style="font-weight:800;font-size:16px;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 3px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
+        <span style="font-size:13px;font-weight:700;color:#9fb4c7;">관리자</span>
+        <span style="font-size:11px;color:#7f97ad;font-family:'Pretendard',sans-serif;border-left:1px solid rgba(255,255,255,0.15);padding-left:11px;">ADMIN CONSOLE</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#7f97ad;">2026.11.13–14 · D-154</span>
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:#11A37B;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">사</div>
+          <span style="font-size:13px;font-weight:600;">{{ adminName }}</span>
+        </div>
+        <span onClick="{{ doLogout }}" style="font-size:12.5px;color:#9fb4c7;cursor:pointer;">로그아웃</span>
+        <a href="booth-editor.html" style="font-size:12.5px;color:#9fb4c7;text-decoration:none;cursor:pointer;">부스 배치 편집 →</a>
+        <a href="index.html" style="font-size:12.5px;color:#9fb4c7;text-decoration:none;cursor:pointer;">사이트로 →</a>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ gateLogin }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:420px;margin:0 auto;padding:60px 24px;">
+      <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:36px 32px;box-shadow:0 20px 50px rgba(15,36,64,0.08);">
+        <h1 style="font-size:21px;font-weight:800;margin:0 0 6px;">사무국 관리자 로그인</h1>
+        <p style="font-size:13.5px;color:#8295ab;margin:0 0 22px;">관리자 계정으로 로그인하세요.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">이메일</label><input value="{{ liEmail }}" onInput="{{ setLiEmail }}" onKeyDown="{{ liKey }}" placeholder="admin@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
+          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">비밀번호</label><input value="{{ liPw }}" onInput="{{ setLiPw }}" onKeyDown="{{ liKey }}" type="password" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
+          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ loginErr }}</div></sc-if>
+          <button onClick="{{ doAdminLogin }}" style="width:100%;background:#16294F;color:#fff;border:none;padding:14px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:4px;">{{ loginLabel }}</button>
+          <a href="index.html" style="text-align:center;font-size:13px;color:#8295ab;text-decoration:none;">홈으로</a>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ gateDenied }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:460px;margin:0 auto;padding:70px 24px;text-align:center;">
+      <h1 style="font-size:21px;font-weight:800;margin:0 0 10px;">관리자 권한이 없습니다</h1>
+      <p style="font-size:14px;color:#5E7289;margin:0 0 24px;line-height:1.6;">이 계정은 사무국 관리자 권한이 없습니다.<br>권한이 필요하면 사무국에 문의해 주세요.</p>
+      <span onClick="{{ doLogout }}" style="display:inline-block;background:#0B5FA5;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">다른 계정으로 로그인</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ gateReady }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;align-items:flex-start;max-width:1360px;margin:0 auto;">
+
+    <aside style="position:sticky;top:64px;width:230px;flex-shrink:0;padding:22px 16px;height:calc(100vh - 64px);">
+      <div style="font-family:'Pretendard',sans-serif;font-size:11px;letter-spacing:0.12em;color:#9aa9bd;padding:6px 14px 12px;">운영 메뉴</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
+          <div onClick="{{ n.onClick }}" style="{{ n.style }}">
+            <span>{{ n.label }}</span>
+            <sc-if value="{{ n.badge }}"><span style="background:#E0533C;color:#fff;font-size:11px;font-weight:700;font-family:'Pretendard',sans-serif;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 6px;">{{ n.badge }}</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+
+    <main style="flex:1;min-width:0;padding:26px 30px 60px;">
+
+      <!-- DASHBOARD -->
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">대시보드</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 24px;">2026 부산국제의료관광컨벤션 운영 현황 요약입니다.</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 24px;">
+              <div style="font-size:13px;color:#8295ab;font-weight:600;margin-bottom:10px;">{{ k.label }}</div>
+              <div style="font-family:'Pretendard',sans-serif;font-size:30px;font-weight:600;color:#0B5FA5;letter-spacing:-0.02em;line-height:1;">{{ k.value }}</div>
+              <div style="font-size:12px;color:{{ k.deltaColor }};margin-top:8px;font-weight:600;">{{ k.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;">
+            <div style="font-size:16px;font-weight:800;margin-bottom:18px;">최근 참가기업 신청</div>
+            <div style="display:flex;flex-direction:column;">
+              <sc-for list="{{ recentApps }}" as="a" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid #eef2f7;">
+                  <div style="width:34px;height:34px;border-radius:9px;background:{{ a.avBg }};color:{{ a.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ a.ini }}</div>
+                  <div style="flex:1;"><div style="font-size:14.5px;font-weight:700;">{{ a.name }}</div><div style="font-size:12px;color:#8295ab;">{{ a.type }} · {{ a.date }}</div></div>
+                  {{ a.statusEl }}
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;">
+            <div style="font-size:16px;font-weight:800;margin-bottom:18px;">처리 대기</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <sc-for list="{{ todos }}" as="t" hint-placeholder-count="3">
+                <div onClick="{{ t.onClick }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;background:#F4F8F6;border:1px solid #e2ece7;cursor:pointer;" style-hover="border-color:#b9d3ea;">
+                  <span style="font-size:14px;font-weight:600;color:#33485e;">{{ t.label }}</span>
+                  <span style="font-family:'Pretendard',sans-serif;font-size:15px;font-weight:700;color:#E0533C;">{{ t.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- APPLICATIONS -->
+      <sc-if value="{{ isApps }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">참가기업 신청 관리</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">신청을 검토하고 승인/반려합니다. 승인 시 참가기업으로 확정됩니다.</p>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
+          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+            <span style="width:200px;flex-shrink:0;">기업 / 담당자</span>
+            <span style="width:58px;flex-shrink:0;">유형</span>
+            <span style="flex:1;min-width:0;">관심분야</span>
+            <span style="width:52px;flex-shrink:0;">신청일</span>
+            <span style="width:180px;text-align:right;">상태 / 처리</span>
+          </div>
+          <sc-for list="{{ appsView }}" as="a" hint-placeholder-count="6">
+            <div style="display:flex;gap:16px;padding:16px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
+              <div style="width:200px;flex-shrink:0;display:flex;align-items:center;gap:11px;">
+                <div style="width:34px;height:34px;border-radius:9px;background:{{ a.avBg }};color:{{ a.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ a.ini }}</div>
+                <div style="min-width:0;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.name }}</div><div style="font-size:11.5px;color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.contact }}</div></div>
+              </div>
+              <span style="width:58px;flex-shrink:0;font-size:13px;color:#33485e;">{{ a.type }}</span>
+              <span style="flex:1;min-width:0;font-size:13px;color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.field }}</span>
+              <span style="width:52px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#8295ab;">{{ a.date }}</span>
+              <div style="width:150px;flex-shrink:0;display:flex;justify-content:flex-end;white-space:nowrap;">
+                <sc-if value="{{ a.isPending }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;gap:8px;">
+                    <button onClick="{{ a.approve }}" style="background:#11A37B;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인</button>
+                    <button onClick="{{ a.reject }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">반려</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ a.isApproved }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;">승인됨</span></sc-if>
+                <sc-if value="{{ a.isRejected }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#97a4b6;background:#f1f4f8;padding:8px 14px;border-radius:8px;">반려됨</span></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- BOOTH APPLICATIONS -->
+      <sc-if value="{{ isBooths }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 신청 · 입금 승인</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">입금 확인 후 승인하면 해당 참가기업의 비즈미팅 매칭이 활성화됩니다.</p>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
+          <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+            <span style="width:180px;flex-shrink:0;">기업 / 담당자</span>
+            <span style="width:80px;flex-shrink:0;">부스</span>
+            <span style="flex:1;min-width:0;">위치</span>
+            <span style="width:120px;flex-shrink:0;text-align:right;">입금액</span>
+            <span style="width:150px;flex-shrink:0;text-align:right;">상태 / 승인</span>
+          </div>
+          <sc-for list="{{ boothsView }}" as="b" hint-placeholder-count="4">
+            <div style="display:flex;gap:14px;padding:15px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
+              <div style="width:180px;flex-shrink:0;min-width:0;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.company }}</div><div style="font-size:11.5px;color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.contact }} · {{ b.email }}</div></div>
+              <span style="width:80px;flex-shrink:0;font-size:13px;color:#33485e;">{{ b.type }} {{ b.count }}</span>
+              <span style="flex:1;min-width:0;font-size:12.5px;color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.ids }}</span>
+              <span style="width:120px;flex-shrink:0;text-align:right;font-size:13.5px;font-weight:700;color:#0B5FA5;">{{ b.total }}</span>
+              <div style="width:150px;flex-shrink:0;display:flex;justify-content:flex-end;">
+                <sc-if value="{{ b.isPending }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;gap:8px;">
+                    <button onClick="{{ b.approve }}" style="background:#11A37B;color:#fff;border:none;padding:8px 15px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인</button>
+                    <button onClick="{{ b.reject }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">반려</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.isApproved }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;">승인됨</span></sc-if>
+                <sc-if value="{{ b.isRejected }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#97a4b6;background:#f1f4f8;padding:8px 14px;border-radius:8px;">반려됨</span></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReg }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">참관객 사전등록 명단</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">사전등록 현황입니다. CSV로 내보내 현장 명단으로 활용하세요.</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;gap:10px;">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#0B5FA5;">{{ regTotal }}</span><span style="font-size:12px;color:#8295ab;margin-left:8px;">총 등록</span></div>
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#11A37B;">{{ regToday }}</span><span style="font-size:12px;color:#8295ab;margin-left:8px;">오늘</span></div>
+          </div>
+          <button onClick="{{ exportCsv }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
+        </div>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
+          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+            <span style="width:90px;">이름</span><span style="flex:1;">소속</span><span style="flex:1.2;">관심분야</span><span style="width:90px;">방문일</span><span style="width:120px;">등록일시</span>
+          </div>
+          <sc-for list="{{ regs }}" as="r" hint-placeholder-count="6">
+            <div style="display:flex;gap:16px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
+              <span style="width:90px;font-size:14px;font-weight:700;">{{ r.name }}</span>
+              <span style="flex:1;font-size:13.5px;color:#33485e;">{{ r.org }}</span>
+              <span style="flex:1.2;font-size:13px;color:#5e7289;">{{ r.field }}</span>
+              <span style="width:90px;font-size:13px;color:#33485e;">{{ r.day }}</span>
+              <span style="width:120px;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;">{{ r.at }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- MATCHING -->
+      <sc-if value="{{ isMatch }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">비즈미팅 매칭 관리</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">신청 기업·바이어를 관심분야 기준으로 매칭합니다.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ matchRows }}" as="m" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ m.aIni }}</div>
+                <div><div style="font-size:14.5px;font-weight:700;">{{ m.a }}</div><div style="font-size:12px;color:#8295ab;">{{ m.aField }}</div></div>
+              </div>
+              <div style="font-family:'Pretendard',sans-serif;color:#c2cdda;font-size:18px;">⇄</div>
+              <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ m.bIni }}</div>
+                <div><div style="font-size:14.5px;font-weight:700;">{{ m.b }}</div><div style="font-size:12px;color:#8295ab;">{{ m.bField }}</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+                <span style="font-size:12px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 11px;border-radius:999px;">적합도 {{ m.score }}</span>
+                <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#0d8f6b;">✓ 매칭됨</span></sc-if>
+                <sc-if value="{{ m.notDone }}" hint-placeholder-val="{{ true }}"><button onClick="{{ m.match }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">매칭 확정</button></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- LOUNGE -->
+      <sc-if value="{{ isLounge }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">라운지 운영</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">테이블·시간 슬롯을 열고 닫아 예약 가능 여부를 관리합니다. 칸 클릭으로 제한 토글.</p>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px;font-size:12.5px;color:#5E7289;">
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#fff;border:1px solid #d8e0ea;"></span>운영</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#eef1f6;border:1px solid #d8e0ea;"></span>예약됨</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px);border:1px solid #e9cf9a;"></span>제한(닫음)</span>
+        </div>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:18px;overflow-x:auto;">
+          <div style="min-width:820px;">
+            <div style="display:flex;gap:6px;margin-bottom:6px;">
+              <div style="width:52px;flex-shrink:0;"></div>
+              <sc-for list="{{ tableHeaders }}" as="th" hint-placeholder-count="10">
+                <div style="flex:1;min-width:66px;text-align:center;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:600;color:#5E7289;padding:6px 0;">{{ th }}</div>
+              </sc-for>
+            </div>
+            <sc-for list="{{ loungeRows }}" as="row" hint-placeholder-count="12">
+              <div style="display:flex;gap:6px;margin-bottom:6px;">
+                <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:'Pretendard',sans-serif;font-size:11px;color:#8295ab;">{{ row.time }}</div>
+                <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="10">
+                  <div onClick="{{ c.onClick }}" style="flex:1;min-width:66px;height:32px;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:10px;font-weight:600;border-radius:6px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};cursor:{{ c.cursor }};">{{ c.label }}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- CMS -->
+      <sc-if value="{{ isCms }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px;">
+          <div>
+            <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">공지·콘텐츠 관리</h1>
+            <p style="font-size:14px;color:#5E7289;margin:0;">공지사항·보도·자료실 콘텐츠를 등록하고 관리합니다.</p>
+          </div>
+          <button onClick="{{ addNotice }}" style="background:#0B5FA5;color:#fff;border:none;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">+ 새 공지 등록</button>
+        </div>
+        <sc-if value="{{ cmsFlash }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#E7F6F0;border:1px solid #c7ebdc;color:#0d8f6b;border-radius:12px;padding:14px 18px;font-size:14px;font-weight:600;margin-bottom:16px;">새 공지가 목록 맨 위에 등록되었습니다.</div>
+        </sc-if>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
+          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+            <span style="width:60px;">구분</span><span style="flex:1;">제목</span><span style="width:96px;">게시일</span><span style="width:80px;text-align:center;">노출</span><span style="width:60px;"></span>
+          </div>
+          <sc-for list="{{ cmsRows }}" as="c" hint-placeholder-count="5">
+            <div style="display:flex;gap:16px;padding:15px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
+              <span style="width:60px;font-size:11.5px;font-weight:700;font-family:'Pretendard',sans-serif;color:#0d8f6b;">{{ c.tag }}</span>
+              <span style="flex:1;font-size:14.5px;font-weight:600;color:#22384e;">{{ c.title }}</span>
+              <span style="width:96px;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#8295ab;">{{ c.date }}</span>
+              <div style="width:80px;display:flex;justify-content:center;">
+                <div onClick="{{ c.toggle }}" style="width:40px;height:23px;border-radius:999px;background:{{ c.tglBg }};position:relative;cursor:pointer;transition:background .15s;">
+                  <div style="position:absolute;top:2px;left:{{ c.tglLeft }};width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left .15s;"></div>
+                </div>
+              </div>
+              <span style="width:60px;text-align:right;font-size:12.5px;color:#b0bccb;cursor:pointer;">편집</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:60;background:#0F2440;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 12px 30px rgba(15,36,64,0.3);">{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    view: 'dash',
+    gate:'loading', liEmail:'', liPw:'', loginErr:'', loginBusy:false,
+    user: null,
+    apps: [],
+    booths: [],
+    regs: [],
+    matches: [],
+    notices: [],
+    reserved: {},
+    restricted: {},
+    cmsFlash: false,
+    toast: null,
+  };
+
+  SLOTS = ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'];
+
+  async componentDidMount(){
+    try{
+      const u = await window.BimtcDB.currentUser();
+      if(!u){ this.setState({ gate:'login' }); return; }
+      if(!u.is_admin){ this.setState({ gate:'denied', user:u }); return; }
+      this.setState({ gate:'ready', user:u });
+      await this.reload();
+    }catch(e){ this.flash('로딩 오류: '+e.message); }
+  }
+  async doAdminLogin(){
+    if(this.state.loginBusy) return;
+    this.setState({ loginBusy:true, loginErr:'' });
+    const res = await window.BimtcDB.login(this.state.liEmail, this.state.liPw);
+    if(!res.ok){ this.setState({ loginBusy:false, loginErr:res.error }); return; }
+    const u = await window.BimtcDB.currentUser();
+    if(!u || !u.is_admin){ this.setState({ loginBusy:false, loginErr:'관리자 권한이 없는 계정입니다.' }); await window.BimtcDB.logout(); return; }
+    this.setState({ loginBusy:false, gate:'ready', user:u });
+    await this.reload();
+  }
+  async reload(){
+    const [apps, regs, matches, notices, resvs, booths] = await Promise.all([
+      window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
+      window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
+      window.BimtcDB.listBoothApplications()
+    ]);
+    const reserved={}; resvs.forEach(r=>{ reserved[r.table_idx+'-'+r.slot_idx]=1; });
+    this.setState({ apps, regs, matches, notices, reserved, booths });
+  }
+
+  typeLabel(t){ return t==='buyer' ? '바이어' : '참가기업'; }
+  short(iso){ if(!iso) return ''; const d=new Date(iso); return (d.getMonth()+1).toString().padStart(2,'0')+'.'+d.getDate().toString().padStart(2,'0'); }
+  shortTime(iso){ if(!iso) return ''; const d=new Date(iso); return this.short(iso)+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+  flash(m){ this.setState({toast:m}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:null}),2200); }
+  ini(n){ return (n||'?').slice(0,2); }
+  av(type){ return type==='바이어' ? {avBg:'#EAF2FC',avColor:'#0B5FA5'} : {avBg:'#E7F6F0',avColor:'#0d8f6b'}; }
+
+  async approve(id){ await window.BimtcDB.setApplicationStatus(id,'approved'); await this.reload(); this.flash('참가기업으로 승인했습니다'); }
+  async reject(id){ await window.BimtcDB.setApplicationStatus(id,'rejected'); await this.reload(); this.flash('신청을 반려했습니다'); }
+  async confirmMatch(id){ await window.BimtcDB.setRequestStatus(id,'accepted'); await this.reload(); this.flash('매칭을 확정했습니다'); }
+  async approveBooth(id){ await window.BimtcDB.setBoothStatus(id,'approved'); await this.reload(); this.flash('부스 신청을 승인했습니다 · 비즈미팅 활성화'); }
+  async rejectBooth(id){ await window.BimtcDB.setBoothStatus(id,'rejected'); await this.reload(); this.flash('부스 신청을 반려했습니다'); }
+  toggleCell(ti,si){ const k=ti+'-'+si; if(this.state.reserved[k]) { this.flash('이미 예약된 슬롯입니다'); return; } this.setState(s=>{ const r={...s.restricted}; if(r[k])delete r[k]; else r[k]=1; return {restricted:r}; }); }
+  async addNotice(){ await window.BimtcDB.addNotice({tag:'신규', title:'새 공지사항 (제목을 입력하세요)', published:true}); await this.reload(); this.setState({cmsFlash:true}); this.flash('새 공지를 등록했습니다'); }
+  async toggleCms(id, on){ await window.BimtcDB.toggleNotice(id, on); await this.reload(); }
+  exportCsv(){
+    const rows=[['이름','소속','관심분야','방문일','등록일시']].concat(this.state.regs.map(r=>[r.name||'', r.org||'', (r.interests||[]).join(' '), r.visit_day||'', r.created_at||'']));
+    const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='bimtc_visitors.csv'; a.click(); URL.revokeObjectURL(url);
+    this.flash('CSV를 내보냈습니다');
+  }
+
+  renderVals(){
+    const v=this.state.view;
+    const apps=this.state.apps||[], regsData=this.state.regs||[], matches=this.state.matches||[], notices=this.state.notices||[], reserved=this.state.reserved||{}, restricted=this.state.restricted||{};
+    const idle="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;background:transparent;color:#4a5e76;border-left:3px solid transparent;";
+    const active="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;background:#EAF2FC;color:#0B5FA5;border-left:3px solid #0B5FA5;";
+    const booths=this.state.booths||[];
+    const pendingApps=apps.filter(a=>a.status==='pending').length;
+    const pendingBooths=booths.filter(b=>b.status==='submitted').length;
+    const pendingMatch=matches.filter(m=>m.status!=='accepted' && m.status!=='declined').length;
+
+    const nav=[
+      {k:'dash',label:'대시보드'},
+      {k:'apps',label:'참가기업 신청',badge:pendingApps},
+      {k:'booths',label:'부스 신청·승인',badge:pendingBooths},
+      {k:'reg',label:'사전등록 명단'},
+      {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
+      {k:'lounge',label:'라운지 운영'},
+      {k:'cms',label:'공지·콘텐츠'},
+    ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>this.setState({view:n.k})}));
+
+    const statusPill=(t,c)=>React.createElement('span',{style:{fontSize:'12px',fontWeight:700,color:c,background:c+'1e',padding:'4px 10px',borderRadius:'999px',flexShrink:0}},t);
+    const mapApp=(a)=>({ id:a.id, name:a.org_name||'(기업명 없음)', contact:a.contact||'', type:this.typeLabel(a.applicant_type),
+      field:a.field||'', date:this.short(a.created_at), status:a.status });
+    const recentApps=apps.slice(0,4).map(mapApp).map(a=>({name:a.name,type:a.type,date:a.date,ini:this.ini(a.name),...this.av(a.type),
+      statusEl: a.status==='approved'?statusPill('승인','#0d8f6b'):a.status==='rejected'?statusPill('반려','#97a4b6'):statusPill('대기','#E0533C')}));
+
+    const appsView=apps.map(mapApp).map(a=>({...a,ini:this.ini(a.name),...this.av(a.type),
+      isPending:a.status==='pending',isApproved:a.status==='approved',isRejected:a.status==='rejected',
+      approve:()=>this.approve(a.id),reject:()=>this.reject(a.id)}));
+
+    const matchRows=matches.map(m=>{
+      const aName=(m.from&&m.from.name)||'요청자', bName=(m.to&&m.to.name)||'대상';
+      const done=m.status==='accepted', declined=m.status==='declined';
+      return { id:m.id, a:aName, b:bName, aField:m.message||'', bField: done?'수락됨':(declined?'거절됨':'대기 중'),
+        score: declined?'—':'요청', aIni:this.ini(aName), bIni:this.ini(bName), done, notDone:!done && !declined, match:()=>this.confirmMatch(m.id) };
+    });
+
+    // lounge grid
+    const loungeRows=this.SLOTS.map((time,si)=>({time,cells:Array.from({length:10}).map((_,ti)=>{
+      const k=ti+'-'+si; let bg='#fff',color='#c0ccda',border='#e1e8f0',label='',cursor='pointer';
+      if(reserved[k]){bg='#eef1f6';color='#9aa9bd';border='#dfe5ee';label='예약';cursor='not-allowed';}
+      else if(restricted[k]){bg='repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px)';color='#b78a3c';border='#e9cf9a';label='닫음';}
+      return {bg,color,border,label,cursor,onClick:()=>this.toggleCell(ti,si)};
+    })}));
+
+    const cmsRows=notices.map(c=>({ id:c.id, tag:c.tag||'안내', title:c.title, date:(c.published_at||'').replace(/-/g,'.'),
+      on:c.published, tglBg:c.published?'#11A37B':'#cdd6e2', tglLeft:c.published?'18px':'2px', toggle:()=>this.toggleCms(c.id, !c.published) }));
+
+    const won=(n)=>(n||0).toLocaleString('ko-KR')+'원';
+    const boothsView=booths.map(b=>({ id:b.id, company:b.company||'(기업명)', contact:b.contact||'', email:b.email||'',
+      type:b.booth_type==='space'?'독립부스':'조립부스', count:(b.booth_ids||[]).length, ids:(b.booth_ids||[]).join(', ')||'-',
+      total:won(b.total), date:this.short(b.created_at), status:b.status,
+      isPending:b.status==='submitted', isApproved:b.status==='approved', isRejected:b.status==='rejected',
+      approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id) }));
+
+    const regs=regsData.map(r=>({ name:r.name||'ooo', org:r.org||'개인', field:(r.interests||[]).join('·'),
+      day: r.visit_day==='D1'?'11.13':r.visit_day==='D2'?'11.14':'양일', at:this.shortTime(r.created_at) }));
+
+    return {
+      navItems:nav,
+      adminName: this.state.user ? ('사무국 '+(this.state.user.name||this.state.user.email||'관리자')) : '사무국',
+      doLogout: async()=>{ await window.BimtcDB.logout(); window.location.href='index.html'; },
+      isDash:v==='dash',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',
+      gateLogin:this.state.gate==='login', gateDenied:this.state.gate==='denied', gateReady:this.state.gate==='ready',
+      liEmail:this.state.liEmail, liPw:this.state.liPw, loginErr:this.state.loginErr,
+      setLiEmail:(e)=>this.setState({liEmail:e.target.value}), setLiPw:(e)=>this.setState({liPw:e.target.value}),
+      liKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.doAdminLogin(); } },
+      doAdminLogin:()=>this.doAdminLogin(), loginLabel:this.state.loginBusy?'로그인 중…':'로그인',
+      boothsView, pendingBooths,
+      toast:this.state.toast,
+
+      kpis:[
+        {label:'참가기업 신청',value:String(apps.length),delta:'대기 '+pendingApps,deltaColor:'#0d8f6b'},
+        {label:'사전등록 참관객',value:String(regsData.length),delta:'실시간 집계',deltaColor:'#0d8f6b'},
+        {label:'비즈미팅 요청',value:String(matches.length),delta:'대기 '+pendingMatch,deltaColor:'#E0533C'},
+        {label:'승인 대기',value:String(pendingApps),delta:'처리 필요',deltaColor:'#E0533C'},
+      ],
+      recentApps,
+      todos:[
+        {label:'참가 신청 검토',count:pendingApps,onClick:()=>this.setState({view:'apps'})},
+        {label:'비즈미팅 매칭 확정',count:pendingMatch,onClick:()=>this.setState({view:'match'})},
+        {label:'미게시 공지',count:notices.filter(c=>!c.published).length,onClick:()=>this.setState({view:'cms'})},
+      ],
+      appsView,
+      regs,
+      regTotal: String(regsData.length),
+      regToday: '+' + regsData.filter(r=>{ if(!r.created_at) return false; const d=new Date(r.created_at); const n=new Date(); return d.toDateString()===n.toDateString(); }).length,
+      exportCsv: ()=>this.exportCsv(),
+      matchRows,
+      tableHeaders:Array.from({length:10}).map((_,i)=>'T'+(i+1)),
+      loungeRows,
+      cmsRows, cmsFlash:this.state.cmsFlash, addNotice:()=>this.addNotice(),
+    };
+  }
+}
+</script>
+</body>
+</html>

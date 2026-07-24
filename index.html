@@ -1,76 +1,1255 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BIMTC 2026 · 데모</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Pretendard',sans-serif;background:#061B30;color:#fff;min-height:100vh;}
-  .mono{font-family:'IBM Plex Mono',monospace;}
-  a{text-decoration:none;color:inherit;}
-  .card{transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;}
-  .card:hover{transform:translateY(-4px);border-color:rgba(37,194,129,0.55);box-shadow:0 22px 50px rgba(0,0,0,0.45);}
-  .go{transition:gap .18s ease;}
-  .card:hover .go{gap:14px;}
-  @media (max-width:820px){.grid{grid-template-columns:1fr !important;}.h1{font-size:40px !important;}}
-</style>
+<script src="./support.js"></script>
 </head>
 <body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#16294F;}
+  ::selection{background:#25C281;color:#04261a;}
+  input,textarea{font-family:'Pretendard',sans-serif;}
+</style>
+<script src="bimtc-config.js"></script>
+<script src="bimtc-supabase.js"></script>
+<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=2dwxs72c2o"></script>
+</helmet>
+
+<div style="font-family:'Pretendard',sans-serif;background:#16294F;color:#fff;">
+
   <div style="height:4px;background:linear-gradient(90deg,#5AB7F0,#25C281);"></div>
-  <div style="max-width:1080px;margin:0 auto;padding:64px 32px 80px;">
 
-    <header style="display:flex;align-items:center;gap:12px;margin-bottom:64px;">
-      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#5AB7F0,#25C281);position:relative;">
-        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:3.6px;background:#061B30;border-radius:2px;"></div>
-        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:3.6px;height:16px;background:#061B30;border-radius:2px;"></div>
+  <div style="background:#122043;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span onClick="{{ goLogin }}" style="border:1px solid rgba(37,194,129,0.5);color:#25C281;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">{{ t.role_ex }}</span>
+        <span onClick="{{ goLogin }}" style="border:1px solid rgba(90,183,240,0.45);color:#5AB7F0;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">{{ t.role_buyer }}</span>
       </div>
-      <div style="display:flex;flex-direction:column;line-height:1;">
-        <span style="font-weight:800;font-size:20px;letter-spacing:-0.01em;">BIMTC</span>
-        <span style="font-size:10px;color:#6b8aa6;margin-top:3px;">부산국제의료관광컨벤션</span>
+      <div style="display:flex;align-items:center;gap:15px;">
+        <span onClick="{{ setKo }}" style="{{ koStyle }}">KOR</span>
+        <span onClick="{{ setEn }}" style="{{ enStyle }}">ENG</span>
+        <span style="color:rgba(255,255,255,0.14);">|</span>
+        <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.u_access }}</span>
+        <span onClick="{{ goExhibition }}" style="cursor:pointer;">{{ t.u_floor }}</span>
+        <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
+        <span onClick="{{ goCheckReg }}" style="cursor:pointer;">{{ t.u_checkreg }}</span>
       </div>
-      <span class="mono" style="margin-left:auto;font-size:12px;letter-spacing:0.12em;color:#6b8aa6;">INTERNAL DEMO · 2026</span>
-    </header>
+    </div>
+  </div>
 
-    <div class="mono" style="font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:18px;">BIMTC 2026 REDESIGN · DEMO</div>
-    <h1 class="h1" style="font-size:54px;font-weight:800;line-height:1.12;letter-spacing:-0.025em;margin-bottom:18px;">사이트 개편 &amp; 비즈미팅 시스템<br><span style="background:linear-gradient(100deg,#25C281,#5AB7F0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">데모</span></h1>
-    <p style="font-size:17px;line-height:1.6;color:#aec5d8;max-width:560px;margin-bottom:14px;">내부 보고용 데모입니다. 아래에서 각 화면을 확인하세요.</p>
-    <p class="mono" style="font-size:12.5px;color:#5b748c;margin-bottom:48px;">2026.11.13(FRI)–11.14(SAT) · BEXCO 제1전시장, 부산</p>
+  <sc-if value="{{ teaserOn }}" hint-placeholder-val="{{ true }}">
+    <div style="background:linear-gradient(90deg,#FF6B5A,#FF8A5A);">
+      <div style="max-width:1180px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-family:'Pretendard',sans-serif;">
+        <span style="font-size:15px;font-weight:800;color:#FF6B5A;background:#fff;padding:5px 14px;border-radius:999px;">COMING SOON</span>
+        <span style="font-size:17px;color:#fff;font-weight:800;letter-spacing:-0.01em;">{{ t.teaser }}</span>
+      </div>
+    </div>
+  </sc-if>
 
-    <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+  <sc-if value="{{ countdownOn }}" hint-placeholder-val="{{ false }}">
+    <div style="background:linear-gradient(90deg,#FF6B5A,#FF8A5A);">
+      <div style="max-width:1180px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;font-family:'Pretendard',sans-serif;">
+        <span style="font-size:15px;font-weight:800;letter-spacing:0.02em;color:#FF6B5A;background:#fff;padding:5px 14px;border-radius:999px;">{{ ebLabel }}</span>
+        <span style="font-size:16px;color:#fff;font-weight:700;">{{ t.cd_left }}</span>
+        <span style="font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:0.01em;">{{ countdown }}</span>
+        <span style="font-size:14px;color:#fff;font-weight:600;background:rgba(0,0,0,0.12);padding:4px 12px;border-radius:999px;">{{ ebRateLabel }} {{ t.cd_discount }} {{ ebEndLabel }}</span>
+      </div>
+    </div>
+  </sc-if>
 
-      <a href="main.dc.html" class="card" style="display:block;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:34px;">
-        <div style="aspect-ratio:16/10;border-radius:14px;margin-bottom:24px;background:repeating-linear-gradient(135deg,#0A2A47,#0A2A47 12px,#0C2F4f 12px,#0C2F4f 24px);border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;">
-          <div style="position:absolute;inset:0;background:linear-gradient(140deg,rgba(11,95,165,0.25),rgba(37,194,129,0.25));"></div>
-          <div class="mono" style="position:absolute;left:18px;bottom:16px;font-size:11px;color:#aec5d8;letter-spacing:0.06em;">MAIN HOMEPAGE</div>
+  <header style="position:sticky;top:0;z-index:50;background:rgba(6,27,48,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;">
+      <div onClick="{{ goHome }}" style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+        <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#5AB7F0,#25C281);position:relative;">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15px;height:3.4px;background:#16294F;border-radius:2px;"></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:3.4px;height:15px;background:#16294F;border-radius:2px;"></div>
         </div>
-        <div class="mono" style="font-size:12px;color:#5AB7F0;letter-spacing:0.1em;margin-bottom:10px;">01 · 메인 홈페이지</div>
-        <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">메인 사이트 개편안</h2>
-        <p style="font-size:14.5px;line-height:1.6;color:#9fc0d6;margin-bottom:20px;">다크 테마, 빅사이트 기능 벤치마킹 — 히어로 · 주요 일정 · 행사장 안내 · 참가기업.</p>
-        <div class="go mono" style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#25C281;">데모 열기 →</div>
-      </a>
-
-      <a href="bizmeeting.dc.html" class="card" style="display:block;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:34px;">
-        <div style="aspect-ratio:16/10;border-radius:14px;margin-bottom:24px;background:repeating-linear-gradient(135deg,#0A2A47,#0A2A47 12px,#0C2F4f 12px,#0C2F4f 24px);border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;">
-          <div style="position:absolute;inset:0;background:linear-gradient(140deg,rgba(37,194,129,0.28),rgba(11,95,165,0.22));"></div>
-          <div class="mono" style="position:absolute;left:18px;bottom:16px;font-size:11px;color:#aec5d8;letter-spacing:0.06em;">BUSINESS MATCHING</div>
+        <div style="display:flex;flex-direction:column;line-height:1.05;">
+          <span style="font-size:9.5px;letter-spacing:0.2em;color:#6b8aa6;font-weight:700;margin-bottom:4px;">BIMTC 2026</span>
+          <span style="font-weight:800;font-size:18px;letter-spacing:-0.005em;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 4px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
         </div>
-        <div class="mono" style="font-size:12px;color:#25C281;letter-spacing:0.1em;margin-bottom:10px;">02 · 비즈미팅 시스템</div>
-        <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">비즈미팅 신청 · 매칭 · 예약</h2>
-        <p style="font-size:14.5px;line-height:1.6;color:#9fc0d6;margin-bottom:20px;">신청 → 매칭 → 1:1 요청·수락 → 라운지 테이블 시간대 예약까지, 클릭되는 프로토타입.</p>
-        <div class="go mono" style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#25C281;">데모 열기 →</div>
-      </a>
+      </div>
+      <nav style="display:flex;align-items:center;gap:30px;font-size:15px;font-weight:600;">
+        <sc-for list="{{ navLinks }}" as="nl" hint-placeholder-count="5">
+          <span onClick="{{ nl.onClick }}" style="{{ nl.style }}">{{ nl.label }}</span>
+        </sc-for>
+      </nav>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:9px 14px;width:160px;">
+          <span style="position:relative;width:14px;height:14px;display:inline-block;flex-shrink:0;">
+            <span style="position:absolute;width:9px;height:9px;border:1.6px solid #6b8aa6;border-radius:50%;top:0;left:0;"></span>
+            <span style="position:absolute;width:5px;height:1.6px;background:#6b8aa6;transform:rotate(45deg);bottom:1px;right:-1px;"></span>
+          </span>
+          <input placeholder="{{ t.u_search }}" style="background:transparent;border:none;outline:none;color:#fff;font-size:13px;width:100%;" />
+        </div>
+        <button onClick="{{ goVisit }}" style="background:#25C281;color:#04261a;border:none;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.u_prereg }}</button>
+      </div>
+    </div>
+  </header>
 
+  <!-- ================= HOME ================= -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <div>
+  <sc-if value="{{ hasImportant }}" hint-placeholder-val="{{ false }}">
+  <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <span style="background:#25C281;color:#04261a;font-family:'Pretendard',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;flex-shrink:0;">중요</span>
+      <span onClick="{{ goCommunity }}" style="flex:1;min-width:200px;font-size:14px;color:#cfe0ee;font-weight:500;cursor:pointer;">{{ importantTitle }}</span>
+      <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;flex-shrink:0;">{{ importantDate }}</span>
+      <span onClick="{{ goCommunity }}" style="font-size:13px;color:#25C281;font-weight:700;cursor:pointer;flex-shrink:0;">공지 전체 →</span>
+    </div>
+  </div>
+  </sc-if>
+
+  <section style="position:relative;overflow:hidden;background:linear-gradient(157deg,#6FB8D8 0%,#53BAA6 54%,#5CBB94 100%);">
+    <div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 8%,rgba(255,255,255,0.35),rgba(255,255,255,0) 46%);"></div>
+    <div style="position:relative;max-width:1180px;margin:0 auto;padding:66px 32px 60px;display:grid;grid-template-columns:1.08fr 0.92fr;gap:52px;align-items:center;">
+      <div>
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.15em;color:#173a63;font-weight:700;margin-bottom:20px;">BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</div>
+        <h1 style="font-size:55px;font-weight:800;line-height:1.13;letter-spacing:-0.025em;color:#183566;margin:0 0 22px;">{{ t.hero_over }}<br><span style="color:#FF6B5A;">{{ t.hero_busan }}</span>{{ t.hero_after }}</h1>
+        <p style="font-size:18px;line-height:1.6;color:#1c3f63;margin:0 0 30px;max-width:480px;font-weight:500;">{{ t.hero_sub }}</p>
+        <div style="display:flex;gap:12px;margin-bottom:34px;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#2E90D6;flex-shrink:0;"></span>2026.11.13(FRI) – 11.14(SAT)</span>
+          <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#11A37B;flex-shrink:0;"></span>{{ t.hero_venue }}</span>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <button onClick="{{ goConsole }}" style="background:#183566;color:#fff;border:none;padding:19px 34px;border-radius:12px;font-size:17.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:10px;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,53,102,0.45);">{{ t.cta_biz }} <span style="font-family:'Pretendard',sans-serif;font-size:19px;">→</span></button>
+          <button onClick="{{ goExhibit }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px 30px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="background:#fff;">{{ t.cta_exhibit }}</button>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div style="border-radius:18px;overflow:hidden;background:#fff;border:1px solid rgba(255,255,255,0.7);box-shadow:0 24px 60px rgba(24,53,102,0.28);"><img src="uploads/keyvisual.png" alt="MEDI × WELLNESS · BIMTC 2026 키비주얼" style="width:100%;display:block;" /></div>
+        <div style="position:absolute;left:-22px;bottom:34px;background:#183566;color:#fff;border-radius:14px;padding:18px 22px;box-shadow:0 18px 40px rgba(24,53,102,0.4);">
+          <div style="font-family:'Pretendard',sans-serif;font-size:11px;letter-spacing:0.14em;color:#5CE0B4;margin-bottom:6px;font-weight:700;">COUNTDOWN</div>
+          <div style="font-size:34px;font-weight:800;letter-spacing:-0.02em;line-height:1;">D-154</div>
+          <div style="font-size:12px;color:#9fc0d6;margin-top:6px;">{{ t.countdown_days }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#1E3160;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+      <div style="text-align:center;margin-bottom:34px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;font-weight:700;margin-bottom:10px;">2025 REVIEW</div>
+        <h2 style="font-size:28px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0;">2025 BIMTC</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+        <sc-for list="{{ statsA }}" as="s" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;">
+            <div style="font-family:'Pretendard',sans-serif;font-size:46px;font-weight:800;color:#25C281;letter-spacing:-0.03em;line-height:1;">{{ s.num }}</div>
+            <div style="font-size:14px;color:#9fc0d6;font-weight:600;">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F4F8F6;color:#0A2236;">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
+      <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">{{ t.who_over }}</div>
+      <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#0A2236;margin:0 0 44px;">{{ t.who_title }}</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div style="border:1px solid #d9e7f4;border-radius:18px;padding:40px;background:linear-gradient(160deg,#F4F9FE,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(11,95,165,0.06);">
+          <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#9bb6cf;margin-bottom:18px;">01</div>
+          <h3 style="font-size:24px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part1_title }}</h3>
+          <p style="font-size:15.5px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part1_desc }}</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>{{ t.part1_a }}</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>{{ t.part1_b }}</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>{{ t.part1_c }}</div>
+          </div>
+          <div style="margin-top:auto;"><a onClick="{{ goExhibit }}" style="color:#0B5FA5;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part1_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
+        </div>
+        <div style="border:1px solid #cbe9dd;border-radius:18px;padding:40px;background:linear-gradient(160deg,#EFF9F4,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(17,163,123,0.06);">
+          <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#9cccb9;margin-bottom:18px;">02</div>
+          <h3 style="font-size:24px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part2_title }}</h3>
+          <p style="font-size:15.5px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part2_desc }}</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>{{ t.part2_a }}</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>{{ t.part2_b }}</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>{{ t.part2_c }}</div>
+          </div>
+          <div style="margin-top:auto;"><a onClick="{{ goConsole }}" style="color:#0d8f6b;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part2_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#1E3160;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:84px 32px;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:18px;margin-bottom:34px;">
+        <div>
+          <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">SCHEDULE</div>
+          <h2 style="font-size:32px;font-weight:800;color:#fff;margin:0;letter-spacing:-0.02em;">{{ t.sched_title }}</h2>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-family:'Pretendard',sans-serif;font-size:13px;">
+          <span style="background:#25C281;color:#04261a;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;">전체</span>
+          <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">모집·등록</span>
+          <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">행사·프로그램</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <sc-for list="{{ scheduleB }}" as="s" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:22px;padding:18px 24px;border:1px solid #cdd8e4;border-radius:14px;background:#e7edf3;box-shadow:0 2px 8px rgba(0,0,0,0.16);" style-hover="border-color:#25C281;background:#eef2f7;box-shadow:0 6px 16px rgba(37,194,129,0.15);">
+            <span style="width:148px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:13.5px;color:#5e7388;letter-spacing:-0.01em;">{{ s.date }}</span>
+            {{ s.tagEl }}
+            <span style="flex:1;min-width:160px;font-size:16.5px;font-weight:600;color:#0A2236;">{{ s.title }}</span>
+            {{ s.statusEl }}
+            <span style="font-family:'Pretendard',sans-serif;font-size:15px;color:#9ab3c4;flex-shrink:0;">→</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#254075;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;">
+      <div>
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">OVERVIEW</div>
+        <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 28px;">{{ t.over_title }}</h2>
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ overviewA }}" as="o" hint-placeholder-count="6">
+            <div style="display:flex;gap:24px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
+              <div style="width:96px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12px;letter-spacing:0.08em;color:#6b8aa6;padding-top:2px;">{{ o.k }}</div>
+              <div style="font-size:16px;font-weight:600;color:#e3edf6;">{{ o.v }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:24px;"><a onClick="{{ goAbout }}" style="color:#25C281;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.over_more }}</a></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="aspect-ratio:16/10;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);"><img src="uploads/bexco.jpg" alt="BEXCO 부산전시컨벤션센터 전경" style="width:100%;height:100%;object-fit:cover;" /></div>
+        <a href="https://map.naver.com/p/search/부산 벡스코" target="_blank" style="aspect-ratio:21/9;border-radius:16px;background:repeating-linear-gradient(135deg,#0A3A2C,#0A3A2C 13px,#0d4434 13px,#0d4434 26px);border:1px solid rgba(37,194,129,0.18);display:flex;align-items:center;justify-content:center;gap:8px;color:#8fe3bf;font-family:'Pretendard',sans-serif;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;">📍 네이버 지도로 오시는 길 보기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#16294F;">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
+      <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">PROGRAM</div>
+      <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 44px;">{{ t.prog_title }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+        <sc-for list="{{ programA }}" as="p" hint-placeholder-count="4">
+          <div style="border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;background:rgba(255,255,255,0.02);" style-hover="border-color:rgba(37,194,129,0.4);transform:translateY(-3px);">
+            <div style="width:44px;height:44px;border-radius:11px;background:{{ p.bg }};display:flex;align-items:center;justify-content:center;margin-bottom:20px;">{{ p.icon }}</div>
+            <h3 style="font-size:18px;font-weight:700;color:#fff;margin:0 0 10px;">{{ p.title }}</h3>
+            <p style="font-size:14px;line-height:1.6;color:#9fc0d6;margin:0;">{{ p.desc }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#ffffff;color:#0A2236;">
+    <div style="max-width:1180px;margin:0 auto;padding:84px 32px;">
+      <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS & VENUE</div>
+      <h2 style="font-size:32px;font-weight:800;color:#0A2236;margin:0 0 36px;letter-spacing:-0.02em;">{{ t.access_title }}</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:18px;">
+        <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
+          <div id="bimtc-map-access" style="aspect-ratio:16/9;background:#dff1e9;"></div>
+          <div style="padding:26px 28px;">
+            <h3 style="font-size:19px;font-weight:800;margin:0 0 16px;color:#0A2236;">{{ t.access_way }}</h3>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">KTX</span><span style="color:#33485e;">{{ t.acc_ktx }}</span></div>
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">AIR</span><span style="color:#33485e;">{{ t.acc_air }}</span></div>
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">METRO</span><span style="color:#33485e;">{{ t.acc_metro }}</span></div>
+            </div>
+            <a href="https://map.naver.com/p/search/부산 벡스코" target="_blank" style="display:inline-block;margin-top:20px;color:#0B5FA5;font-weight:700;font-size:14.5px;cursor:pointer;text-decoration:none;">{{ t.access_map }}</a>
+          </div>
+        </div>
+        <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
+          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;align-items:center;justify-content:center;color:#6885a3;font-family:'Pretendard',sans-serif;font-size:13px;">[ 부스 배치도 · 플로어맵 ]</div>
+          <div style="padding:26px 28px;">
+            <h3 style="font-size:19px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.floor_title }}</h3>
+            <p style="font-size:14.5px;line-height:1.6;color:#52677d;margin:0 0 20px;">{{ t.floor_desc }}</p>
+            <button onClick="{{ goExhibition }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 22px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.floor_btn }}</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:24px;">
+        <sc-for list="{{ quickLinksB }}" as="q" hint-placeholder-count="4">
+          <div onClick="{{ q.onClick }}" style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px 24px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#9fcabb;transform:translateY(-3px);">
+            <div style="width:44px;height:44px;border-radius:12px;background:#EFF7F3;display:flex;align-items:center;justify-content:center;">{{ q.icon }}</div>
+            <div style="font-size:17px;font-weight:800;color:#0A2236;">{{ q.title }}</div>
+            <div style="font-size:13px;line-height:1.55;color:#5e7388;">{{ q.desc }}</div>
+            <span style="margin-top:2px;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#0d8f6b;font-weight:600;">{{ q.go }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#16294F;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
+      <div style="margin-bottom:36px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">EXHIBITORS</div>
+        <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0;">{{ t.exh_title }}</h2>
+      </div>
+      <div style="border:1px dashed rgba(255,255,255,0.18);border-radius:16px;background:rgba(255,255,255,0.03);padding:70px 24px;text-align:center;">
+        <h3 style="font-size:19px;font-weight:800;margin:0 0 10px;color:#fff;">{{ t.exh_soon }}</h3>
+        <p style="font-size:14.5px;color:#9fc0d6;margin:0;line-height:1.6;">{{ t.exh_soon_desc }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#1E3160;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;display:grid;grid-template-columns:1fr 1fr;gap:48px;">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+          <h2 style="font-size:24px;font-weight:800;color:#fff;margin:0;">{{ t.notice_title }}</h2>
+          <a onClick="{{ goCommunity }}" style="font-family:'Pretendard',sans-serif;font-size:13px;color:#6b8aa6;cursor:pointer;text-decoration:none;">{{ t.more }}</a>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ notices }}" as="n" hint-placeholder-count="4">
+            <div onClick="{{ goCommunity }}" style="display:flex;gap:18px;padding:18px 0;border-top:1px solid rgba(255,255,255,0.08);align-items:baseline;cursor:pointer;">
+              <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;flex-shrink:0;width:74px;">{{ n.date }}</span>
+              <span style="font-size:15.5px;color:#e3edf6;font-weight:500;line-height:1.45;">{{ n.title }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noNotices }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 0;color:#6b8aa6;font-size:14px;border-top:1px solid rgba(255,255,255,0.08);">{{ t.no_notice }}</div>
+          </sc-if>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+          <h2 style="font-size:24px;font-weight:800;color:#fff;margin:0;">{{ t.press_title }}</h2>
+          <a onClick="{{ goCommunity }}" style="font-family:'Pretendard',sans-serif;font-size:13px;color:#6b8aa6;cursor:pointer;text-decoration:none;">{{ t.more }}</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <sc-for list="{{ press }}" as="pr" hint-placeholder-count="3">
+            <div style="display:flex;gap:16px;align-items:center;">
+              <div style="width:88px;height:60px;border-radius:10px;flex-shrink:0;background:repeating-linear-gradient(135deg,#0A3A2C,#0A3A2C 10px,#0d4434 10px,#0d4434 20px);border:1px solid rgba(37,194,129,0.18);"></div>
+              <div>
+                <div style="font-size:15px;font-weight:600;color:#e3edf6;line-height:1.4;margin-bottom:6px;">{{ pr.title }}</div>
+                <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;">{{ pr.src }}</div>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noPress }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 0;color:#6b8aa6;font-size:14px;border-top:1px solid rgba(255,255,255,0.08);">{{ t.no_press }}</div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#16294F;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:48px 32px;">
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:56px;">
+        <div style="text-align:center;">
+          <div style="font-family:'Pretendard',sans-serif;font-size:12px;letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_host }}</div>
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:32px;">
+            <img src="uploads/logo_host1.png" alt="부산광역시" style="height:34px;width:auto;object-fit:contain;opacity:0.92;" />
+            <img src="uploads/logo_host2.png" alt="부산일보" style="height:30px;width:auto;object-fit:contain;opacity:0.92;" />
+          </div>
+        </div>
+        <div style="width:1px;align-self:stretch;background:rgba(255,255,255,0.1);"></div>
+        <div style="text-align:center;">
+          <div style="font-family:'Pretendard',sans-serif;font-size:12px;letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_org }}</div>
+          <div style="display:flex;justify-content:center;align-items:center;">
+            <img src="uploads/logo_org.png" alt="(사)부산권의료산업협의회" style="height:30px;width:auto;object-fit:contain;opacity:0.92;" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:linear-gradient(115deg,#1E88C4 0%,#2FB6A6 58%,#3FC08F 100%);">
+    <div style="max-width:1180px;margin:0 auto;padding:76px 32px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;">
+      <div>
+        <h2 style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin:0 0 12px;">{{ t.cta_band_title }}<br>{{ t.cta_band_title2 }}</h2>
+        <p style="font-size:16px;color:rgba(255,255,255,0.86);margin:0;">{{ t.cta_band_sub }}</p>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <button onClick="{{ goExhibit }}" style="background:#fff;color:#0A2236;border:none;padding:16px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_exhibit }}</button>
+        <button onClick="{{ goConsole }}" style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_biz }} →</button>
+      </div>
+    </div>
+  </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= ABOUT ================= -->
+  <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">HOME / BIMTC 소개</div>
+        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">BIMTC 소개</h1>
+        <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">부산국제의료관광컨벤션의 행사 개요와 걸어온 길을 소개합니다.</p>
+      </div>
+    </div>
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;">
+        <div>
+          <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">OVERVIEW</div>
+          <h2 style="font-size:30px;font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">행사 개요</h2>
+          <div style="display:flex;flex-direction:column;border-top:1px solid #e6ebf2;">
+            <sc-for list="{{ overviewA }}" as="o" hint-placeholder-count="6">
+              <div style="display:flex;gap:20px;padding:15px 0;border-bottom:1px solid #eef2f7;">
+                <div style="width:84px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;padding-top:2px;">{{ o.k }}</div>
+                <div style="font-size:15.5px;font-weight:600;color:#22384e;">{{ o.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:24px;padding:20px 22px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:14px;font-size:14px;line-height:1.7;color:#52677d;">
+            부산국제의료관광컨벤션(BIMTC)은 <strong style="color:#0A2236;">국내 최대 규모의 국제 웰니스·의료관광 통합 전시회</strong>로, 국내외 의료·웰니스·관광 산업 관계자가 한자리에 모이는 비즈니스 교류의 장입니다.
+          </div>
+        </div>
+        <div>
+          <div style="aspect-ratio:4/3;border-radius:16px;overflow:hidden;border:1px solid #dce6f2;margin-bottom:16px;"><img src="uploads/expo_hall.jpg" alt="BIMTC 전시장 전경" style="width:100%;height:100%;object-fit:cover;" /></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <sc-for list="{{ hallTags }}" as="h" hint-placeholder-count="4">
+              <div style="background:#0A2236;color:#fff;border-radius:12px;padding:16px 12px;text-align:center;">
+                <div style="font-size:14px;font-weight:800;">{{ h.t }}</div>
+                <div style="font-size:11px;color:#9fb4c7;margin-top:5px;">{{ h.d }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
+      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">HISTORY</div>
+        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">연혁</h2>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
+          <div style="display:flex;gap:16px;padding:14px 24px;background:#0A2236;color:#9fb4c7;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:600;">
+            <span style="width:64px;flex-shrink:0;">연도</span>
+            <span style="width:64px;flex-shrink:0;">회차</span>
+            <span style="width:130px;flex-shrink:0;">일시</span>
+            <span style="flex:1;">장소 · 규모</span>
+          </div>
+          <sc-for list="{{ historyRows }}" as="h" hint-placeholder-count="4">
+            <div style="display:flex;gap:16px;padding:16px 24px;border-top:1px solid #eef2f7;align-items:baseline;">
+              <span style="width:64px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:15px;font-weight:700;color:#0B5FA5;">{{ h.year }}</span>
+              <span style="width:64px;flex-shrink:0;font-size:14px;font-weight:600;color:#33485e;">{{ h.round }}</span>
+              <span style="width:130px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:13px;color:#5e7388;">{{ h.date }}</span>
+              <span style="flex:1;font-size:14.5px;color:#33485e;">{{ h.scale }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="font-size:12.5px;color:#8295ab;margin:14px 0 0;">* 회차 표기는 자료에 따라 일부 상이하여 사무국 확인 후 확정 예정입니다.</p>
+      </div>
+    </section>
+    <section style="background:#ffffff;color:#0A2236;border-top:1px solid #e6ebf2;">
+      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS</div>
+        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">찾아오시는 길</h2>
+        <div id="bimtc-map-about" style="aspect-ratio:21/7;border-radius:16px;overflow:hidden;border:1px solid #cbe9dd;background:#dff1e9;margin-bottom:24px;"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <sc-for list="{{ accessCards }}" as="a" hint-placeholder-count="3">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:14px;padding:24px;">
+              <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;font-weight:600;margin-bottom:10px;">{{ a.k }}</div>
+              <div style="font-size:14.5px;line-height:1.6;color:#33485e;">{{ a.v }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= EXHIBIT (참가안내) ================= -->
+  <sc-if value="{{ isExhibit }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">HOME / 참가안내</div>
+        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">참가안내</h1>
+        <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">병원·뷰티·웰니스·헬스케어 기업의 참가 절차와 부스 안내입니다.</p>
+      </div>
+    </div>
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">WHY EXHIBIT</div>
+        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">참가 혜택</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="3">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:30px 26px;">
+              <div style="width:44px;height:44px;border-radius:11px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin-bottom:18px;">{{ b.icon }}</div>
+              <h3 style="font-size:18px;font-weight:800;margin:0 0 8px;">{{ b.t }}</h3>
+              <p style="font-size:14px;line-height:1.6;color:#5e7388;margin:0;">{{ b.d }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+    <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
+      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">BOOTH & FEE</div>
+        <h2 style="font-size:30px;font-weight:800;margin:0 0 8px;letter-spacing:-0.02em;">부스 타입 · 참가비</h2>
+        <p style="font-size:13.5px;color:#0d8f6b;font-weight:600;margin:0 0 8px;">{{ boothNote }}</p>
+        <p style="font-size:13px;color:#8295ab;margin:0 0 28px;">* 신청기한: 2026년 추후 공지까지 (선착순 접수). VAT 별도.</p>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <sc-for list="{{ boothTiers }}" as="b" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid {{ b.border }};border-radius:16px;position:relative;overflow:hidden;display:flex;">
+              <sc-if value="{{ b.badge }}"><span style="position:absolute;top:16px;right:16px;z-index:2;font-family:'Pretendard',sans-serif;font-size:10.5px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:4px 9px;border-radius:999px;">{{ b.badge }}</span></sc-if>
+              <div style="width:300px;flex-shrink:0;background:#ffffff;border-right:1px solid #eef2f7;display:flex;align-items:center;justify-content:center;overflow:hidden;">{{ b.imgEl }}</div>
+              <div style="flex:1;padding:30px 32px;">
+              <div style="font-size:20px;font-weight:800;margin:0 0 4px;">{{ b.name }}</div>
+              <div style="font-family:'Pretendard',sans-serif;font-size:13px;color:#8295ab;margin-bottom:14px;">{{ b.size }}</div>
+              <div style="font-size:27px;font-weight:800;color:#0B5FA5;letter-spacing:-0.02em;margin-bottom:18px;">{{ b.price }}</div>
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <sc-for list="{{ b.feats }}" as="f" hint-placeholder-count="3">
+                  <div style="display:flex;gap:9px;font-size:13.5px;color:#33485e;"><span style="color:#11A37B;font-weight:800;">✓</span>{{ f }}</div>
+                </sc-for>
+              </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+    <section style="background:#ffffff;color:#0A2236;border-top:1px solid #e6ebf2;">
+      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">HOW TO APPLY</div>
+        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">참가 신청 절차</h2>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px;">
+          <sc-for list="{{ applyProcess }}" as="p" hint-placeholder-count="4">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px 22px;">
+              <div style="font-family:'Pretendard',sans-serif;font-size:22px;font-weight:600;color:#c2cdda;margin-bottom:14px;">{{ p.no }}</div>
+              <h3 style="font-size:16px;font-weight:800;margin:0 0 8px;">{{ p.t }}</h3>
+              <p style="font-size:13px;line-height:1.6;color:#5e7388;margin:0;">{{ p.d }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <button onClick="{{ goBooth }}" style="background:#0B5FA5;color:#fff;border:none;padding:16px 30px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">부스 신청하기 →</button>
+          <button onClick="{{ goConsole }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:16px 30px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">비즈미팅 신청</button>
+        </div>
+      </div>
+    </section>
+    <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
+      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">FAQ</div>
+        <h2 style="font-size:30px;font-weight:800;margin:0 0 28px;letter-spacing:-0.02em;">자주 묻는 질문</h2>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:22px 24px;">
+              <div style="display:flex;gap:12px;margin-bottom:8px;"><span style="font-family:'Pretendard',sans-serif;font-weight:700;color:#0B5FA5;">Q</span><span style="font-size:16px;font-weight:700;color:#0A2236;">{{ f.q }}</span></div>
+              <div style="display:flex;gap:12px;"><span style="font-family:'Pretendard',sans-serif;font-weight:700;color:#11A37B;">A</span><span style="font-size:14.5px;line-height:1.65;color:#52677d;">{{ f.a }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= VISIT (참관·사전등록) ================= -->
+  <sc-if value="{{ isVisit }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">HOME / 참관안내 · 사전등록</div>
+        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">참관안내 · 사전등록</h1>
+        <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">사전등록하면 대기 없이 빠르게 입장하고 다양한 혜택을 받을 수 있습니다.</p>
+      </div>
+    </div>
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;display:grid;grid-template-columns:0.9fr 1.1fr;gap:48px;align-items:start;">
+        <div>
+          <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">BENEFITS</div>
+          <h2 style="font-size:26px;font-weight:800;margin:0 0 20px;letter-spacing:-0.02em;">사전등록 혜택</h2>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <sc-for list="{{ visitBenefits }}" as="v" hint-placeholder-count="4">
+              <div style="display:flex;gap:14px;align-items:flex-start;padding:16px 18px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:12px;">
+                <span style="width:26px;height:26px;flex-shrink:0;border-radius:8px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">{{ v.n }}</span>
+                <div><div style="font-size:15px;font-weight:700;color:#0A2236;margin-bottom:3px;">{{ v.t }}</div><div style="font-size:13.5px;line-height:1.55;color:#5e7388;">{{ v.d }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:20px;padding:18px 20px;border-radius:12px;background:#EAF2FC;border:1px solid #cfe0f2;font-size:13.5px;line-height:1.65;color:#33485e;">관람 시간: <strong>2026.11.13–14, 10:00–18:00</strong><br>입장료: 무료 (사전등록 권장)</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:34px;box-shadow:0 12px 34px rgba(15,36,64,0.05);">
+          <sc-if value="{{ visitClosed }}" hint-placeholder-val="{{ true }}">
+            <div style="text-align:center;padding:26px 4px;">
+              <div style="width:60px;height:60px;border-radius:15px;background:#FBF3E2;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;"><div style="width:24px;height:24px;border-radius:7px;border:3px solid #E0A23C;"></div></div>
+              <h3 style="font-size:20px;font-weight:800;margin:0 0 10px;color:#0A2236;">사전등록 오픈 예정</h3>
+              <p style="font-size:14px;color:#5E7289;margin:0 0 22px;line-height:1.6;">참관객 사전등록은 곧 오픈됩니다.<br>오픈 일정은 공지사항으로 안내드립니다.</p>
+              <div style="border-top:1px solid #eef2f7;padding-top:22px;text-align:left;">
+                <label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">이미 등록하셨나요? 사전등록 확인</label>
+                <div style="display:flex;gap:10px;">
+                  <input value="{{ crEmail }}" onInput="{{ setCrEmail }}" onKeyDown="{{ crKey }}" placeholder="name@email.com" style="flex:1;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" />
+                  <button onClick="{{ checkReg }}" style="background:#0B5FA5;color:#fff;border:none;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">조회</button>
+                </div>
+                <sc-if value="{{ crSearched }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:14px;font-size:13.5px;color:{{ crMsgColor }};background:{{ crMsgBg }};border-radius:9px;padding:11px 14px;">{{ crMsg }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ visitorDone }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;padding:36px 0;">
+              <div style="width:64px;height:64px;border-radius:50%;background:#E7F6F0;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><div style="width:24px;height:13px;border-left:3px solid #11A37B;border-bottom:3px solid #11A37B;transform:rotate(-45deg);margin-top:-6px;"></div></div>
+              <h3 style="font-size:22px;font-weight:800;margin:0 0 10px;">사전등록이 완료되었습니다</h3>
+              <p style="font-size:14.5px;color:#5E7289;margin:0 0 24px;line-height:1.6;">등록하신 이메일로 입장 QR과 안내를 보내드립니다.<br>현장에서 QR을 제시하면 빠르게 입장하실 수 있습니다.</p>
+              <button onClick="{{ resetVisitor }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 26px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">추가 등록하기</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ visitorForm }}" hint-placeholder-val="{{ false }}">
+            <h3 style="font-size:20px;font-weight:800;margin:0 0 20px;">참관객 사전등록</h3>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">이름</label><input value="{{ vName }}" onInput="{{ setVName }}" placeholder="예) ooo" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">연락처</label><input value="{{ vPhone }}" onInput="{{ setVPhone }}" placeholder="010-0000-0000" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">이메일</label><input value="{{ vEmail }}" onInput="{{ setVEmail }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">소속 (선택)</label><input value="{{ vOrg }}" onInput="{{ setVOrg }}" placeholder="기관/회사명" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;margin-bottom:9px;color:#33485e;">관심 분야</label>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <sc-for list="{{ interestChips }}" as="c" hint-placeholder-count="6">
+                    <span onClick="{{ c.toggle }}" style="{{ c.style }}">{{ c.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;margin-bottom:9px;color:#33485e;">방문 예정일</label>
+                <div style="display:flex;gap:10px;">
+                  <sc-for list="{{ visitDays }}" as="d" hint-placeholder-count="3">
+                    <span onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:#5e7388;line-height:1.5;margin-top:4px;cursor:pointer;"><span style="width:18px;height:18px;flex-shrink:0;border:1.5px solid #b7c4d3;border-radius:5px;margin-top:1px;"></span>개인정보 수집·이용에 동의합니다. (사전등록 및 행사 안내 목적)</label>
+              <button onClick="{{ submitVisitor }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:15px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:6px;">사전등록 완료 →</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= CHECK REGISTRATION (사전등록 확인) ================= -->
+  <sc-if value="{{ isCheckReg }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#9fc0d6;margin-bottom:12px;">HOME / 사전등록 확인</div>
+        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">사전등록 확인</h1>
+        <p style="font-size:16px;color:#c3d6e6;margin:14px 0 0;">등록 시 입력한 이메일로 사전등록 내역을 조회합니다.</p>
+      </div>
+    </div>
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:640px;margin:0 auto;padding:56px 32px;">
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:34px;box-shadow:0 12px 34px rgba(15,36,64,0.05);">
+          <label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">이메일</label>
+          <div style="display:flex;gap:10px;">
+            <input value="{{ crEmail }}" onInput="{{ setCrEmail }}" onKeyDown="{{ crKey }}" placeholder="name@email.com" style="flex:1;padding:13px 15px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" />
+            <button onClick="{{ checkReg }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">조회</button>
+          </div>
+
+          <sc-if value="{{ crSearched }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:26px;">
+              <sc-if value="{{ crFound }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                  <div style="width:34px;height:34px;border-radius:50%;background:#E7F6F0;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><div style="width:15px;height:8px;border-left:2.6px solid #11A37B;border-bottom:2.6px solid #11A37B;transform:rotate(-45deg);margin-top:-4px;"></div></div>
+                  <div style="font-size:16px;font-weight:800;color:#0A2236;">사전등록이 확인되었습니다</div>
+                </div>
+                <sc-for list="{{ crRows }}" as="r" hint-placeholder-count="1">
+                  <div style="border:1px solid #e6ebf2;border-radius:12px;overflow:hidden;margin-bottom:12px;">
+                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">이름</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.name }}</span></div>
+                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">소속</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.org }}</span></div>
+                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">방문 예정일</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.dayLabel }}</span></div>
+                    <div style="display:flex;gap:16px;padding:13px 18px;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">관심 분야</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.fields }}</span></div>
+                  </div>
+                </sc-for>
+                <p style="font-size:13px;color:#8295ab;margin:14px 0 0;line-height:1.6;">현장에서 이 이메일로 안내된 QR 또는 성함으로 입장하실 수 있습니다.</p>
+              </sc-if>
+              <sc-if value="{{ crNotFound }}" hint-placeholder-val="{{ true }}">
+                <div style="padding:22px;border-radius:12px;background:#FCF3F2;border:1px solid #f3d6d2;">
+                  <div style="font-size:15px;font-weight:700;color:#c0392b;margin-bottom:6px;">등록 내역을 찾을 수 없습니다</div>
+                  <div style="font-size:13.5px;color:#8a5a55;line-height:1.6;">입력하신 이메일로 사전등록된 내역이 없습니다. 이메일을 확인하시거나 아래에서 새로 등록해 주세요.</div>
+                  <button onClick="{{ goVisit }}" style="margin-top:14px;background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">사전등록 하러 가기 →</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= EXHIBITION (전시안내) ================= -->
+  <sc-if value="{{ isExhibition }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">HOME / 전시안내</div>
+        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">전시안내</h1>
+        <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">참가기업 소개 · 부스 배치도 · 프로그램을 확인하세요.</p>
+        <div style="display:flex;gap:10px;margin-top:22px;">
+          <sc-for list="{{ exTabs }}" as="t" hint-placeholder-count="3">
+            <span onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</span>
+          </sc-for>
+        </div>
+      </div>
     </div>
 
-    <footer class="mono" style="margin-top:64px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:11.5px;color:#4f6a82;">
-      <span>© 2026 BIMTC · 부산국제의료관광컨벤션 사무국</span>
-      <span>051-461-4275~8 · bimtc@busan.com</span>
-    </footer>
+    <sc-if value="{{ exCompanies }}" hint-placeholder-val="{{ true }}">
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;">
+        <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:80px 24px;text-align:center;">
+          <div style="width:60px;height:60px;border-radius:15px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><div style="width:26px;height:20px;border-radius:4px;border:3px solid #0B5FA5;"></div></div>
+          <h3 style="font-size:20px;font-weight:800;margin:0 0 10px;color:#0A2236;">참가기업 정보 준비 중입니다</h3>
+          <p style="font-size:14.5px;color:#5E7289;margin:0;line-height:1.6;">참가기업 소개는 참가 신청 접수 후 순차적으로 공개될 예정입니다.<br>많은 관심 부탁드립니다.</p>
+        </div>
+      </div>
+    </section>
+    </sc-if>
 
+    <sc-if value="{{ exFloor }}" hint-placeholder-val="{{ false }}">
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;">
+        <h2 style="font-size:26px;font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">부스 배치도</h2>
+        <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:80px 24px;text-align:center;">
+          <div style="width:60px;height:60px;border-radius:15px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><div style="width:24px;height:24px;border-radius:6px;border:3px solid #0B5FA5;"></div></div>
+          <h3 style="font-size:20px;font-weight:800;margin:0 0 10px;color:#0A2236;">부스 배치도 준비 중입니다</h3>
+          <p style="font-size:14.5px;color:#5E7289;margin:0;line-height:1.6;">전시장 부스 배치도는 참가 신청 오픈에 맞춰 공개될 예정입니다.<br>많은 관심 부탁드립니다.</p>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{ exProgram }}" hint-placeholder-val="{{ false }}">
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;">
+        <h2 style="font-size:26px;font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">프로그램 (시간표)</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <sc-for list="{{ timetable }}" as="d" hint-placeholder-count="2">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px;">
+              <div style="font-size:18px;font-weight:800;margin-bottom:16px;color:#0B5FA5;">{{ d.day }}</div>
+              <div style="display:flex;flex-direction:column;">
+                <sc-for list="{{ d.rows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;gap:16px;padding:13px 0;border-top:1px solid #e6ebf2;">
+                    <span style="width:96px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#8295ab;">{{ r.time }}</span>
+                    <span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.title }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+    </sc-if>
   </div>
+  </sc-if>
+
+  <!-- ================= COMMUNITY ================= -->
+  <sc-if value="{{ isCommunity }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">HOME / 커뮤니티</div>
+        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">커뮤니티</h1>
+        <div style="display:flex;gap:10px;margin-top:22px;">
+          <sc-for list="{{ commTabs }}" as="t" hint-placeholder-count="3">
+            <span onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:56px 32px;">
+
+        <sc-if value="{{ commEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px dashed #d3deea;border-radius:16px;padding:64px 24px;text-align:center;color:#8295ab;font-size:15px;">등록된 게시물이 없습니다.</div>
+        </sc-if>
+
+        <sc-if value="{{ commNotice }}" hint-placeholder-val="{{ true }}">
+          <div style="border-top:2px solid #0A2236;">
+            <sc-for list="{{ noticeList }}" as="n" hint-placeholder-count="6">
+              <div style="display:flex;gap:24px;padding:20px 8px;border-bottom:1px solid #eef2f7;align-items:center;cursor:pointer;" style-hover="background:#F4F8F6;">
+                <span style="font-family:'Pretendard',sans-serif;font-size:12px;font-weight:600;color:#0d8f6b;width:52px;flex-shrink:0;">{{ n.tag }}</span>
+                <span style="flex:1;font-size:15.5px;font-weight:600;color:#22384e;">{{ n.title }}</span>
+                <span style="font-family:'Pretendard',sans-serif;font-size:12.5px;color:#9aa9bd;flex-shrink:0;">{{ n.date }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ commPress }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+            <sc-for list="{{ pressList }}" as="p" hint-placeholder-count="6">
+              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;cursor:pointer;" style-hover="border-color:#b9d3ea;transform:translateY(-3px);">
+                <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF7F2,#EAF7F2 12px,#dff1e9 12px,#dff1e9 24px);"></div>
+                <div style="padding:20px 22px;">
+                  <div style="font-size:15.5px;font-weight:700;line-height:1.45;color:#0A2236;margin-bottom:12px;">{{ p.title }}</div>
+                  <div style="display:flex;justify-content:space-between;font-family:'Pretendard',sans-serif;font-size:12px;color:#9aa9bd;"><span>{{ p.src }}</span><span>{{ p.date }}</span></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ commGallery }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+            <sc-for list="{{ galleryList }}" as="g" hint-placeholder-count="6">
+              <div style="border-radius:16px;overflow:hidden;border:1px solid #e6ebf2;cursor:pointer;" style-hover="transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,36,64,0.1);">
+                <div style="aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;align-items:center;justify-content:center;color:#8ba7c4;font-family:'Pretendard',sans-serif;font-size:12px;">PHOTO</div>
+                <div style="padding:16px 18px;background:#fff;">
+                  <div style="font-size:15px;font-weight:700;color:#0A2236;margin-bottom:5px;">{{ g.title }}</div>
+                  <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#9aa9bd;">{{ g.year }} · 사진 {{ g.count }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= LOGIN ================= -->
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:calc(100vh - 116px);background:repeating-linear-gradient(135deg,#16294F,#16294F 16px,#08223b 16px,#08223b 32px);display:flex;align-items:center;justify-content:center;padding:60px 24px;">
+    <div style="width:100%;max-width:420px;background:#fff;border-radius:20px;padding:40px 36px;box-shadow:0 30px 70px rgba(0,0,0,0.4);color:#0A2236;">
+      <div style="text-align:center;margin-bottom:26px;">
+        <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#0B5FA5,#11A37B);margin:0 auto 14px;position:relative;">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:19px;height:4px;background:#fff;border-radius:2px;"></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:4px;height:19px;background:#fff;border-radius:2px;"></div>
+        </div>
+        <h2 style="font-size:22px;font-weight:800;margin:0 0 6px;">{{ authTitle }}</h2>
+        <p style="font-size:13.5px;color:#8295ab;margin:0;">참가기업·바이어 회원 {{ authSubtitle }}</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:20px;">
+        <sc-for list="{{ loginRoles }}" as="r" hint-placeholder-count="2">
+          <button onClick="{{ r.onClick }}" style="{{ r.style }}">{{ r.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">기관/기업명</label><input value="{{ auName }}" onInput="{{ setAuName }}" placeholder="예) 굿모닝병원" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">국가/지역</label><input value="{{ auCountry }}" onInput="{{ setAuCountry }}" placeholder="예) 대한민국" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+        </sc-if>
+        <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">이메일</label><input value="{{ auEmail }}" onInput="{{ setAuEmail }}" onKeyDown="{{ authKey }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+        <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">비밀번호</label><input type="password" value="{{ auPw }}" onInput="{{ setAuPw }}" onKeyDown="{{ authKey }}" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+        <sc-if value="{{ authError }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ authError }}</div></sc-if>
+        <button onClick="{{ submitAuth }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:14px;border-radius:11px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:4px;">{{ authCta }}</button>
+      </div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:18px;font-size:13px;color:#5e7388;">
+        <span>{{ authSwitchLabel }}</span>
+        <span onClick="{{ toggleAuthMode }}" style="cursor:pointer;color:#0B5FA5;font-weight:700;">{{ authSwitchAction }}</span>
+      </div>
+      <div style="margin-top:22px;padding-top:20px;border-top:1px solid #eef2f7;text-align:center;">
+        <button onClick="{{ goAdmin }}" style="background:#F4F8F6;color:#5e7388;border:1px solid #e2ece7;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">사무국(관리자) 로그인 →</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ================= FOOTER (shared) ================= -->
+  <footer style="background:#122043;color:#7d93a8;">
+    <div style="max-width:1180px;margin:0 auto;padding:60px 32px 40px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:36px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5AB7F0,#25C281);"></div>
+          <span style="font-weight:800;font-size:17px;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 3px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
+        </div>
+        <p style="font-size:13px;line-height:1.7;margin:0 0 18px;color:#7d93a8;">{{ t.ft_office }}<br>{{ t.ft_addr }}<br>T. 051-461-4276~8 · F. 051-442-6006<br>E. bmia0528@naver.com</p>
+        <div style="display:flex;gap:8px;">
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:11px;color:#9fb4c7;cursor:pointer;">IG</span>
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:11px;color:#9fb4c7;cursor:pointer;">YT</span>
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:11px;color:#9fb4c7;cursor:pointer;">X</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+        <span style="color:#fff;font-weight:700;margin-bottom:5px;">{{ t.ft_quick }}</span>
+        <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.nav_about }}</span>
+        <span onClick="{{ goExhibit }}" style="cursor:pointer;">{{ t.nav_exhibit }}</span>
+        <span onClick="{{ goVisit }}" style="cursor:pointer;">{{ t.nav_visit }}</span>
+        <span onClick="{{ goExhibition }}" style="cursor:pointer;">{{ t.nav_exhibition }}</span>
+        <span onClick="{{ goCommunity }}" style="cursor:pointer;">{{ t.nav_community }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+        <span style="color:#fff;font-weight:700;margin-bottom:5px;">{{ t.ft_info }}</span>
+        <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.u_access }}</span>
+        <span onClick="{{ goExhibition }}" style="cursor:pointer;">{{ t.ft_floormap }}</span>
+        <span onClick="{{ goCommunity }}" style="cursor:pointer;">{{ t.ft_lib }}</span>
+        <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.ft_stay }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+        <span style="color:#fff;font-weight:700;margin-bottom:5px;">{{ t.ft_support }}</span>
+        <span onClick="{{ goExhibit }}" style="cursor:pointer;">{{ t.ft_contact }}</span>
+        <span onClick="{{ goExhibit }}" style="cursor:pointer;">{{ t.ft_faq }}</span>
+        <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="max-width:1180px;margin:0 auto;padding:18px 32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:'Pretendard',sans-serif;font-size:11.5px;color:#4f6a82;">
+        <span>© 2026 BIMTC · BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</span>
+        <span>개인정보처리방침 · 이메일무단수집거부 · 사이트맵 · KOR / ENG</span>
+      </div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:60;background:#0F2440;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,0.4);">{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { page: 'home', lang:'ko', exTab: 'companies', commTab: 'notice', loginRole: 'exhibitor', visitorDone: false, toast: null,
+    vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both',
+    crEmail:'', crSearched:false, crRows:[],
+    authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
+    isAdmin:false, now:Date.now() };
+
+  set(k){ return (e)=>this.setState({ [k]: (e && e.target) ? e.target.value : e }); }
+  L(ko,en){ return this.state.lang==='en' ? en : ko; }
+
+  go(p){ this.setState({ page: p }); if(typeof window!=='undefined') window.scrollTo(0,0); setTimeout(()=>this.initMaps(),120); }
+  componentDidMount(){
+    setTimeout(()=>this.initMaps(),200);
+    this._tick = setInterval(()=>this.setState({ now:Date.now() }), 1000);
+    (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u&&u.is_admin) this.setState({isAdmin:true}); }catch(e){} })();
+  }
+  componentWillUnmount(){ if(this._tick) clearInterval(this._tick); }
+  initMaps(){
+    if(typeof window==='undefined' || !window.naver || !window.naver.maps) return;
+    const pos = new window.naver.maps.LatLng(35.16906, 129.13469);
+    const draw = (id)=>{ const el=document.getElementById(id); if(!el || el.dataset.inited) return;
+      const map = new window.naver.maps.Map(el, { center:pos, zoom:15, minZoom:12, scrollWheel:false });
+      new window.naver.maps.Marker({ position:pos, map:map, title:'BEXCO 제1전시장' });
+      el.dataset.inited='1'; };
+    draw('bimtc-map-access'); draw('bimtc-map-about');
+  }
+  flash(msg){ this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 2400); }
+  goConsole(){ if(this.gate('buyer')) window.location.href = 'bizmeeting.html'; }
+  visitOpen(){ const c=window.BIMTC_CONFIG; if(c && c.apply.visit && c.apply.visit.open) return true; return !!this.state.isAdmin; }
+  goBooth(){ if(this.gate('booth')) window.location.href = 'booth.html'; }
+  gate(kind){
+    const cfg = window.BIMTC_CONFIG; if(!cfg) return true;
+    if(cfg.apply[kind] && cfg.apply[kind].open) return true;
+    if(this.state.isAdmin) return true;
+    this.flash((kind==='booth'?'부스':'바이어') + ' 신청은 오픈 예정입니다 · 오픈 시 공지·이메일로 안내드립니다');
+    return false;
+  }
+  goAdmin(){ if(typeof window!=='undefined') window.location.href = 'admin.html'; }
+
+  toggleVInterest(c){ this.setState(s=>{ const has=s.vInterests.includes(c); return { vInterests: has ? s.vInterests.filter(x=>x!==c) : [...s.vInterests, c] }; }); }
+  async checkReg(){
+    const em=(this.state.crEmail||'').trim();
+    if(!em){ this.flash('이메일을 입력해 주세요'); return; }
+    this.flash('조회 중…');
+    try{
+      const res = await window.BimtcDB.checkRegistration(em);
+      if(!res.ok){
+        const missing = /check_registration|schema cache|function/i.test(res.error||'');
+        this.flash(missing ? '조회 기능 설정이 필요합니다 (관리자: SQL 함수 실행)' : ('조회 실패: '+res.error));
+        return;
+      }
+      const dayLabel=(d)=> d==='D1'?'11월 13일 (금)':d==='D2'?'11월 14일 (토)':'양일 모두';
+      const rows=(res.rows||[]).map(r=>({ name:r.name||'-', org:r.org||'개인', dayLabel:dayLabel(r.visit_day), fields:(r.interests||[]).join(', ')||'-' }));
+      this.setState({ crSearched:true, crRows:rows });
+      this.flash(rows.length? '등록 내역을 찾았습니다':'등록 내역이 없습니다');
+    }catch(e){ this.flash('오류: '+e.message); }
+  }
+  async submitVisitor(){
+    const s=this.state;
+    if(!s.vName || !s.vEmail){ this.flash('이름과 이메일을 입력해 주세요'); return; }
+    this.flash('등록 중…');
+    try{
+      const res = await window.BimtcDB.addVisitor({ name:s.vName, phone:s.vPhone, email:s.vEmail, org:s.vOrg, interests:s.vInterests, day:s.vDay });
+      if(!res.ok){ this.flash('등록 실패: '+res.error); return; }
+      this.setState({ visitorDone:true, vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both' });
+      this.flash('사전등록이 완료되었습니다'); if(typeof window!=='undefined') window.scrollTo(0,0);
+    }catch(e){ this.flash('오류: '+e.message); }
+  }
+  async submitAuth(){
+    const s=this.state;
+    if(!s.auEmail || !s.auPw){ this.setState({authError:'이메일과 비밀번호를 입력해 주세요.'}); return; }
+    this.setState({authBusy:true, authError:''});
+    try{
+      let res;
+      if(s.authMode==='signup'){
+        res = await window.BimtcDB.signup({ email:s.auEmail, password:s.auPw, type:s.loginRole, name:s.auName, country:s.auCountry });
+        if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
+        const sess = res.session || ((await window.BimtcDB.client().auth.getSession()).data.session);
+        if(!sess){ this.setState({authBusy:false, authMode:'login', authError:'가입 완료! 이메일 인증 후 로그인해 주세요. (관리자가 이메일 인증을 꺼두면 즉시 로그인됩니다.)'}); return; }
+        this.goConsole(); return;
+      }
+      res = await window.BimtcDB.login(s.auEmail, s.auPw);
+      if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
+      this.goConsole();
+    }catch(e){ this.setState({authBusy:false, authError:e.message}); }
+  }
+
+  renderVals(){
+    const p = this.state.page;
+    const L=(ko,en)=>this.state.lang==='en'?en:ko;
+    const en=this.state.lang==='en';
+    const t={
+      nav_about:L('BIMTC 소개','About'), nav_exhibit:L('참가안내','Exhibit'), nav_visit:L('참관안내','Visit'), nav_exhibition:L('전시안내','Exhibition'), nav_community:L('커뮤니티','Community'),
+      u_access:L('오시는 길','Directions'), u_floor:L('플로어맵','Floor Map'), u_login:L('로그인','Login'), u_checkreg:L('사전등록 확인','Check Registration'), u_search:L('검색','Search'), u_prereg:L('사전등록','Pre-register'),
+      hero_over:L('세계 의료관광 비즈니스가','Where the world\u2019s medical tourism'), hero_busan:L('부산','business'), hero_after:L('에서 만납니다',' meets in Busan'),
+      hero_sub:L('병원·뷰티·웰니스·헬스케어 기업과 검증된 바이어를 1:1로 잇는, 아시아 대표 의료관광 컨벤션.','Asia\u2019s leading medical tourism convention connecting hospitals, beauty, wellness & healthcare companies with verified buyers 1:1.'),
+      hero_venue:L('BEXCO 제1전시장 3A홀, 부산','BEXCO Hall 3A, Busan'),
+      cta_biz:L('바이어 비즈미팅 신청','Buyer Business Meeting'), cta_exhibit:L('참가기업 신청','Exhibitor Application'),
+      countdown_days:L('개막까지','to opening'),
+      review_over:L('2025 BIMTC','2025 BIMTC'), review_title:L('2025 BIMTC','2025 BIMTC Review'),
+      who_over:L('WHO PARTICIPATES','WHO PARTICIPATES'), who_title:L('두 가지 길로 참여하세요','Two ways to participate'),
+      part1_title:L('참가기업으로 참여','Join as Exhibitor'), part1_desc:L('병원·뷰티·웰니스·헬스케어 기업을 위한 글로벌 마케팅 무대. 부스 전시와 1:1 비즈니스 미팅으로 바이어를 직접 만나세요.','A global marketing stage for hospitals, beauty, wellness & healthcare companies. Meet buyers directly through booth exhibits and 1:1 business meetings.'),
+      part1_a:L('전시 부스 및 기업 홍보','Exhibition booth & company promotion'), part1_b:L('사전 매칭 1:1 비즈니스 미팅','Pre-matched 1:1 business meetings'), part1_c:L('바이어 네트워킹','Buyer networking'), part1_cta:L('참가 신청하기','Apply as exhibitor'),
+      part2_title:L('바이어 비즈미팅','Buyer Business Meeting'), part2_desc:L('사전 매칭된 1:1 상담으로 검증된 한국 의료·웰니스 파트너를 발굴하세요. 바이어 초청 및 의전 프로그램을 운영합니다.','Discover verified Korean medical & wellness partners through pre-matched 1:1 consultations. Buyer invitation & VIP programs available.'),
+      part2_a:L('맞춤 파트너 사전 매칭','Customized partner pre-matching'), part2_b:L('바이어 초청 프로그램','Buyer invitation program'), part2_c:L('현장 통역 지원','On-site interpretation'), part2_cta:L('비즈미팅 신청','Apply for meeting'),
+      sched_over:L('SCHEDULE','SCHEDULE'), sched_title:L('주요 일정 안내','Key Schedule'),
+      over_over:L('OVERVIEW','OVERVIEW'), over_title:L('행사 개요','Event Overview'), over_more:L('행사 소개 자세히 보기 →','Learn more about BIMTC →'),
+      prog_over:L('PROGRAM','PROGRAM'), prog_title:L('프로그램 하이라이트','Program Highlights'),
+      access_over:L('ACCESS & VENUE','ACCESS & VENUE'), access_title:L('행사장 안내','Venue & Access'),
+      access_way:L('오시는 길','Directions'), access_map:L('지도 크게 보기 →','View larger map →'),
+      floor_title:L('부스 배치도 (플로어맵)','Booth Layout (Floor Map)'), floor_desc:L('BEXCO 제1전시장 부스 배치와 참가기업 위치를 확인하세요. 카테고리별 전시 구역 안내 제공.','Check the booth layout and exhibitor locations at BEXCO Hall 1. Zone guide by category provided.'), floor_btn:L('부스 배치도 보기','View booth layout'),
+      exh_over:L('EXHIBITORS','EXHIBITORS'), exh_title:L('참가기업 미리보기','Exhibitor Preview'), exh_soon:L('참가기업 모집 예정','Exhibitor recruitment coming soon'), exh_soon_desc:L('참가 신청 접수 후 참가기업이 순차적으로 소개될 예정입니다. 많은 관심 부탁드립니다.','Exhibitors will be introduced after applications open. Stay tuned.'),
+      notice_title:L('공지사항','Notices'), press_title:L('보도기사','Press'), more:L('MORE +','MORE +'),
+      no_notice:L('등록된 공지사항이 없습니다.','No notices yet.'), no_press:L('등록된 보도기사가 없습니다.','No press articles yet.'),
+      cta_band_title:L('지금 사전등록하고','Pre-register now and'), cta_band_title2:L('비즈미팅을 신청하세요','apply for business meetings'),
+      cta_band_sub:L('참가기업 신청 · 바이어 매칭 · 참관객 사전등록 모두 온라인으로.','Exhibitor application, buyer matching & visitor pre-registration — all online.'),
+      cd_left:L('마감까지','ends in'), cd_discount:L('할인 마감','off, ends'),
+      teaser:L('곧 1차 얼리버드가 시작됩니다! 많은 기대 부탁드립니다','1st Early-bird starts soon! Stay tuned'),
+      ft_quick:L('바로가기','Quick Links'), ft_info:L('이용안내','Information'), ft_support:L('고객지원','Support'),
+      ft_lib:L('자료실 다운로드','Downloads'), ft_stay:L('숙박·관광 안내','Stay & Tour'), ft_contact:L('문의하기','Contact'), ft_faq:L('자주 묻는 질문','FAQ'),
+      go:L('바로가기 →','Go →'), spons_host:L('주최','HOSTS'), spons_org:L('주관','ORGANIZER'),
+      ft_office:L('2026 부산국제의료관광컨벤션 사무국','2026 BIMTC Secretariat'), ft_addr:L('부산광역시 동구 중앙대로 365, 3층','3F, 365 Jungang-daero, Dong-gu, Busan'),
+      ft_floormap:L('플로어맵·부스배치도','Floor Map · Booths'),
+      role_ex:L('참가기업','Exhibitor'), role_buyer:L('바이어','Buyer'),
+      acc_ktx:L('부산역 → 지하철 30분, 센텀시티역 하차','Busan Stn → 30 min by metro, Centum City Stn'),
+      acc_air:L('김해국제공항 → 리무진버스 약 50분','Gimhae Int\u2019l Airport → approx. 50 min by limousine bus'),
+      acc_metro:L('2호선 센텀시티역 1번 출구, 도보 5분','Line 2 Centum City Stn Exit 1, 5 min walk'),
+    };
+    const go = (t2)=>()=>this.go(t2);
+    // 얼리버드 카운트다운 / 오픈 예정 티저
+    let cdOn=false, cdLabel='', cdRate='', cdEnd='', cdText='', teaser=false;
+    try{
+      const cfg=window.BIMTC_CONFIG;
+      const enabled=cfg&&cfg.countdownEnabled;
+      const eb=enabled&&cfg.currentEarlyBird&&cfg.currentEarlyBird();
+      if(enabled&&eb){
+        const ms=new Date(eb.end).getTime()-this.state.now;
+        if(ms>0){
+          const dd=Math.floor(ms/86400000), hh=Math.floor(ms%86400000/3600000), mm=Math.floor(ms%3600000/60000), ss=Math.floor(ms%60000/1000);
+          const z=(n)=>String(n).padStart(2,'0');
+          cdOn=true; cdLabel=eb.label; cdRate=Math.round(eb.discountRate*100)+'%';
+          const e=new Date(eb.end); cdEnd=(e.getMonth()+1)+'.'+e.getDate();
+          cdText=dd+'일 '+z(hh)+':'+z(mm)+':'+z(ss);
+        }
+      }
+      teaser=!cdOn;
+    }catch(e){ teaser=true; }
+
+    const navBase = "cursor:pointer;transition:color .15s;padding-bottom:2px;";
+    const navItem = (key,label)=>({ label, onClick: go(key), style: navBase + (p===key ? "color:#25C281;border-bottom:2px solid #25C281;" : "color:#bcd0e2;border-bottom:2px solid transparent;") });
+    const navLinks = [ navItem('about',t.nav_about), navItem('exhibit',t.nav_exhibit), navItem('visit',t.nav_visit), navItem('exhibition',t.nav_exhibition), navItem('community',t.nav_community) ];
+
+    const tagPill = (text, color) => React.createElement('span', { style: { fontFamily: "'Pretendard',sans-serif", fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', padding: '5px 0', width: '52px', textAlign: 'center', borderRadius: '6px', color: color, background: color + '22', flexShrink: 0 } }, text);
+    const statusPill = (text, color) => React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '7px', fontSize: '13px', fontWeight: 700, color: color, flexShrink: 0, width: '74px' } }, React.createElement('span', { style: { width: '6px', height: '6px', borderRadius: '50%', background: color } }), text);
+    const sq = (c,r,fill)=>React.createElement('div',{style:{width:16,height:16,borderRadius:r||4,background:fill?c:'transparent',border:fill?'none':('2.5px solid '+c)}});
+
+    // exhibition sub-tabs
+    const exTabDef = [ ['companies','참가기업 소개'], ['floor','부스 배치도'], ['program','프로그램'] ];
+    const pillTab = (active)=> "cursor:pointer;padding:9px 18px;border-radius:999px;font-size:14px;font-weight:700;" + (active ? "background:#25C281;color:#04261a;" : "background:rgba(255,255,255,0.06);color:#bcd0e2;border:1px solid rgba(255,255,255,0.14);");
+    const exTabs = exTabDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({exTab:k}), style: pillTab(this.state.exTab===k) }));
+
+    const commTabDef = [ ['notice','공지사항'], ['press','보도기사'], ['gallery','갤러리'] ];
+    const commTabs = commTabDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({commTab:k}), style: pillTab(this.state.commTab===k) }));
+
+    // exhibitors (real names from existing site)
+    const catStyle = { '의료':['#0B5FA5','#EAF2FC'], '뷰티':['#c0392b','#fdecea'], '웰니스':['#0d8f6b','#E7F6F0'], '산업':['#7a5cc4','#efeafb'] };
+    const exhibitorsRaw = [
+      ['부산365mc병원','대한민국','의료','비만·체형 전문 의료 서비스'],
+      ['삼성리한여성의원','대한민국','의료','여성 건강·산부인과 전문'],
+      ['좋은강안병원','대한민국','의료','종합병원 · 검진·재활'],
+      ['비비비당','대한민국','뷰티','뷰티·스킨케어 브랜드'],
+      ['에스엠비 웰니스','대한민국','웰니스','웰니스·헬스케어 프로그램'],
+      ['범어사','대한민국','웰니스','템플스테이·명상 웰니스'],
+      ['(주)메디펀','대한민국','산업','의료기기·헬스케어 산업'],
+      ['한중건강관리협회','중국','의료','한·중 의료관광 교류'],
+      ['부산관광공사','대한민국','산업','부산 관광·의료관광 지원'],
+    ];
+    const exhibitors = exhibitorsRaw.map(([name,country,cat,desc])=>({ name, country, cat, desc, catColor:catStyle[cat][0], catBg:catStyle[cat][1] }));
+    const exFilterDef = ['전체','병원·의료','뷰티·성형','웰니스·헬스케어'];
+    const exFilters = exFilterDef.map((l,i)=>({ label:l, style: (i===0? "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:700;background:#0B5FA5;color:#fff;" : "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;background:#fff;border:1px solid #d8e0ea;color:#5e7289;") }));
+
+    // floor map cells
+    const zoneColors = ['#cfe0f2','#cbe9dd','#e6dcf7','#f7e6cf'];
+    const floorCells = Array.from({length:40}).map((_,i)=>{
+      const z = i%4; const isAisle = (i%8===3);
+      return { bg: isAisle ? '#eef1f6' : zoneColors[z], label: isAisle ? '' : ('B'+(i+1)) };
+    });
+    const zoneLegend = [ {c:'#cfe0f2',t:'의료관광관'},{c:'#cbe9dd',t:'의료체험관'},{c:'#e6dcf7',t:'의료산업관'},{c:'#f7e6cf',t:'관광상품관'} ];
+
+    const timetable = [
+      { day:'11.13 (금)', rows:[ {time:'10:00',title:'개막식 · 개회 선언'}, {time:'11:00',title:'국제 심포지엄 (Session 1)'}, {time:'13:00',title:'바이어 비즈니스 상담회'}, {time:'15:00',title:'명의 초청 건강강좌'}, {time:'16:30',title:'의료 체험 프로그램'} ] },
+      { day:'11.14 (토)', rows:[ {time:'10:00',title:'국제 세미나 (Session 2)'}, {time:'11:30',title:'바이어 비즈니스 상담회'}, {time:'13:30',title:'웰니스 체험존 · 네트워킹'}, {time:'15:00',title:'우수 참가기업 시상'}, {time:'17:00',title:'폐회'} ] },
+    ];
+
+    // community data
+    const noticeList = [];
+    const pressList = [];
+    const galleryList = [];
+
+    const loginRoleDef = [ ['exhibitor','참가기업'], ['buyer','바이어'] ];
+    const loginRoles = loginRoleDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({loginRole:k}),
+      style: "flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;" + (this.state.loginRole===k ? "background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;" : "background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;") }));
+
+    return {
+      // routing
+      isHome:p==='home', isAbout:p==='about', isExhibit:p==='exhibit', isVisit:p==='visit', isExhibition:p==='exhibition', isCommunity:p==='community', isLogin:p==='login', isCheckReg:p==='checkreg',
+      t,
+      setKo:()=>this.setState({lang:'ko'}), setEn:()=>this.setState({lang:'en'}),
+      koStyle:"cursor:pointer;font-weight:"+(en?'400':'600')+";color:"+(en?'#6b8aa6':'#25C281')+";",
+      enStyle:"cursor:pointer;font-weight:"+(en?'600':'400')+";color:"+(en?'#25C281':'#6b8aa6')+";",
+      navLinks,
+      goHome:go('home'), goAbout:go('about'), goExhibit:go('exhibit'), goVisit:go('visit'), goExhibition:go('exhibition'), goCommunity:go('community'), goLogin:go('login'), goCheckReg:go('checkreg'),
+      crEmail:this.state.crEmail, setCrEmail:this.set('crEmail'),
+      crKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.checkReg(); } },
+      checkReg:()=>this.checkReg(),
+      crSearched:this.state.crSearched, crFound:this.state.crRows.length>0, crNotFound:this.state.crRows.length===0, crRows:this.state.crRows,
+      crMsg:this.state.crRows.length>0?'사전등록이 확인되었습니다 ('+this.state.crRows.length+'건). 하단 [사전등록 확인] 메뉴에서 상세를 볼 수 있습니다.':'해당 이메일로 등록된 내역이 없습니다.',
+      crMsgColor:this.state.crRows.length>0?'#0d8f6b':'#8a6d2f', crMsgBg:this.state.crRows.length>0?'#E7F6F0':'#FBF3E2',
+      goConsole:()=>this.goConsole(), goAdmin:()=>this.goAdmin(), goBooth:()=>this.goBooth(),
+      countdownOn: cdOn, teaserOn: teaser, ebLabel: cdLabel, ebRateLabel: cdRate, ebEndLabel: cdEnd, countdown: cdText,
+      toast:this.state.toast,
+
+      // home data
+      statsA: [ {num:'131',label:L('참가기업','Exhibitors')}, {num:'207',label:L('전시 부스','Booths')}, {num:'396',label:L('비즈니스 상담','Business meetings')}, {num:'65,202',label:L('관람객','Visitors')} ],
+      overviewA: [
+        {k:L('일시','Date'),v:L('2026. 11. 13(금) – 11. 14(토) / 10:00–18:00','Nov 13(Fri)–14(Sat), 2026 / 10:00–18:00')},
+        {k:L('장소','Venue'),v:L('BEXCO 제1전시장 3A홀, 부산','BEXCO Hall 3A, Busan')},
+        {k:L('주최','Hosts'),v:L('부산광역시 · 부산일보사','Busan Metropolitan City · Busan Ilbo')},
+        {k:L('주관','Organizer'),v:L('(사)부산권의료산업협의회 (BMIA)','Busan Medical Industry Association (BMIA)')},
+        {k:L('규모','Scale'),v:L('100개사 200부스 규모','100 companies · 200 booths')},
+        {k:L('전시관','Zones'),v:L('메디컬존 · 웰니스존 · 국제관광존 · 플레이존','Medical · Wellness · Global Tour · Play')},
+      ],
+      programA: [
+        {title:L('전시행사','Exhibition'),desc:L('의료관광·체험·산업·관광 4개 전시관 부스 운영','Four themed zones: medical, experience, industry & tourism'),bg:'#EAF2FB',icon:sq('#0B5FA5',4,true)},
+        {title:L('국제 심포지엄·세미나','Symposium & Seminar'),desc:L('국내외 전문가 발표와 의료관광 학술행사','Talks by domestic & global experts'),bg:'#EAF7F2',icon:sq('#11A37B',4,false)},
+        {title:L('명의 초청 건강강좌','Health Lectures'),desc:L('부산 명의들의 분야별 건강 특강','Special lectures by Busan\u2019s top doctors'),bg:'#EAF2FB',icon:sq('#0B5FA5',4,false)},
+        {title:L('바이어 비즈니스 상담회','Buyer Meetings'),desc:L('국내외 바이어와 참가기업의 1:1 매칭 상담','1:1 matched consultations with buyers'),bg:'#EAF7F2',icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.5px solid #11A37B'}})},
+      ],
+      scheduleB: [
+        { date:'2026.07.20 – 11.05', title:L('참관객 사전등록 접수','Visitor pre-registration'), tagEl:tagPill(L('등록','REG'),'#25C281'), statusEl:statusPill(L('진행중','Open'),'#25C281') },
+        { date:'~ 2026.09.30', title:L('참가기업 신청 마감','Exhibitor application deadline'), tagEl:tagPill(L('모집','APPLY'),'#2E90D6'), statusEl:statusPill('D-110','#2E90D6') },
+        { date:'~ 2026.10.16', title:L('바이어 비즈미팅 매칭 신청','Buyer meeting matching'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('접수중','Open'),'#25C281') },
+        { date:'2026.11.13', title:L('개막식 & 의료관광 콘퍼런스','Opening & Conference'), tagEl:tagPill(L('행사','EVENT'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:'2026.11.13 – 14', title:L('의료·뷰티·헬스케어 전시관 운영','Exhibition hall open'), tagEl:tagPill(L('전시','EXPO'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:'2026.11.14', title:L('웰니스 체험존 · 네트워킹 라운지','Wellness zone & networking'), tagEl:tagPill(L('부대','EXTRA'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+      ],
+      quickLinksB: [
+        { title:t.ft_contact, desc:L('행사·참가·등록 관련 1:1 문의를 남겨주세요.','Leave a 1:1 inquiry about the event.'), onClick:go('exhibit'), go:t.go, icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.4px solid #0d8f6b'}}) },
+        { title:t.ft_faq, desc:L('참가 신청·사전등록 FAQ를 확인하세요.','Check application & registration FAQ.'), onClick:go('exhibit'), go:t.go, icon:sq('#0d8f6b',5,false) },
+        { title:L('자료실','Downloads'), desc:L('브로슈어·신청서·결과보고서 다운로드.','Brochures, forms & reports.'), onClick:go('community'), go:t.go, icon:React.createElement('div',{style:{width:15,height:15,background:'#0d8f6b',transform:'rotate(45deg)'}}) },
+        { title:t.ft_stay, desc:L('부산 호텔·관광 정보 안내.','Busan hotel & tour info.'), onClick:go('about'), go:t.go, icon:sq('#0d8f6b',5,true) },
+      ],
+      logos: Array.from({length:12}),
+      sponsors: ['보건복지부','문화체육관광부','한국관광공사','한국보건산업진흥원','부산경제진흥원','부산관광공사'],
+      notices: noticeList.slice(0,4).map(n=>({date:n.date, title:n.title})),
+      press: pressList.slice(0,3).map(pr=>({title:pr.title, src:pr.src})),
+      noNotices: noticeList.length===0, noPress: pressList.length===0,
+      hasImportant: noticeList.length>0, importantTitle: noticeList.length>0?noticeList[0].title:'', importantDate: noticeList.length>0?noticeList[0].date:'',
+
+      // about
+      hallTags: [ {t:'메디컬존',d:'MEDICAL'}, {t:'웰니스존',d:'WELLNESS'}, {t:'국제관광존',d:'GLOBAL TOUR'}, {t:'플레이존',d:'PLAY'} ],
+      historyRows: [
+        { year:'2026', round:'예정', date:'11.13 – 11.14', scale:'BEXCO 제1전시장 3A홀 · 100개사 200부스 (준비 중)' },
+        { year:'2025', round:'개최', date:'—', scale:'131개사 207부스 · 바이어 77명 · 상담 396건 · 관람객 65,202명' },
+        { year:'2024', round:'개최', date:'—', scale:'100개사 200부스 · 11개국 70명 · 상담 212건(MOU 4) · 관람객 20,159명' },
+        { year:'2023', round:'개최', date:'—', scale:'119개사 202부스 · 16개국 72명 · 상담 80건(MOU 23) · 관람객 17,975명' },
+        { year:'2022', round:'개최', date:'—', scale:'100개사 200부스 · 8개국 100명 · 상담 131건(MOU 10) · 관람객 13,186명' },
+      ],
+      accessCards: [
+        { k:'KTX / 기차', v:'부산역 → 도시철도 약 30분, 센텀시티역 하차' },
+        { k:'항공', v:'김해국제공항 → 리무진버스 약 50분 / 택시 약 40분' },
+        { k:'도시철도', v:'2호선 센텀시티역 1번 출구, 도보 5분 (BEXCO)' },
+      ],
+
+      // exhibit
+      benefits: [
+        { t:'글로벌 마케팅', d:'국내외 바이어·참관객에게 기업과 서비스를 직접 홍보', icon:sq('#0B5FA5',4,false) },
+        { t:'1:1 비즈니스 매칭', d:'사전 매칭된 바이어와 라운지에서 상담 진행', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.5px solid #0B5FA5'}}) },
+        { t:'네트워킹', d:'의료·웰니스·관광 산업 관계자와의 교류 기회', icon:sq('#0B5FA5',4,true) },
+      ],
+      boothTiers: [
+        { name:'독립부스 (Space Only)', size:'3m × 3m · 최소 4부스 이상 신청', price:'1,800,000원', border:'#bcd9f5', badge:'', img:'uploads/booth_package.png', imgEl:React.createElement('img',{src:'uploads/booth_package.png',alt:'독립부스',style:{width:'100%',height:'100%',objectFit:'contain'}}), feats:['부스 공간만 제공 (VAT 별도)','벡스코 등록 장치업체 직접 시공','기본전력 미포함 — 1KW 이상 별도 신청'] },
+        { name:'조립부스 (Package Booth)', size:'3m × 3m × 높이 2.5m', price:'2,000,000원', border:'#c7ebdc', badge:'추천', img:'uploads/booth_space.avif', imgEl:React.createElement('img',{src:'uploads/booth_space.avif',alt:'조립부스',style:{width:'100%',height:'100%',objectFit:'contain'}}), feats:['상호간판(국·영문) 제공 (VAT 별도)','전기 1KW 기본 제공','안내데스크·접의자 1SET'] },
+      ],
+      boothNote: '조기 신청 할인: 1차 20% · 2차 10% / 재참가 10% · 신규참가 10% (부스면적 비용 한정, 중복 적용 가능)',
+      applyProcess: [
+        { no:'01', t:'온라인 참가 신청', d:'홈페이지에서 신청서 작성·접수' },
+        { no:'02', t:'인보이스 수령', d:'사무국으로부터 인보이스 수령' },
+        { no:'03', t:'부스 배정', d:'사무국 검토 후 부스 위치 배정' },
+        { no:'04', t:'참가 확정·셋업', d:'부스 셋업 및 비즈미팅 매칭 준비' },
+      ],
+      faqs: [
+        { q:'참가 신청 마감은 언제인가요?', a:'2026년 9월 30일까지 온라인 신청을 완료해 주세요. 부스는 선착순 배정됩니다.' },
+        { q:'해외 기업도 참가할 수 있나요?', a:'네, 해외 의료·웰니스·관광 기업도 참가 가능하며 통역·의전을 지원합니다.' },
+        { q:'비즈미팅은 어떻게 신청하나요?', a:'참가 신청 후 비즈미팅 콘솔에서 관심분야를 등록하면 사무국이 매칭합니다.' },
+        { q:'참가비에 무엇이 포함되나요?', a:'부스 기본 장치, 참가증, 주차권, 온라인 기업 홍보가 포함됩니다. (부스 타입별 상이)' },
+      ],
+
+      // visit
+      visitClosed: !this.visitOpen(),
+      visitorForm: this.visitOpen() && !this.state.visitorDone, visitorDone: this.state.visitorDone,
+      vName:this.state.vName, vPhone:this.state.vPhone, vEmail:this.state.vEmail, vOrg:this.state.vOrg,
+      setVName:this.set('vName'), setVPhone:this.set('vPhone'), setVEmail:this.set('vEmail'), setVOrg:this.set('vOrg'),
+      submitVisitor:()=>this.submitVisitor(),
+      resetVisitor:()=>this.setState({visitorDone:false}),
+      visitBenefits: [
+        { n:'1', t:'현장 대기 없이 빠른 입장', d:'사전등록 QR로 현장 등록 절차를 건너뜁니다.' },
+        { n:'2', t:'프로그램 사전 예약', d:'건강강좌·체험 프로그램을 미리 예약할 수 있습니다.' },
+        { n:'3', t:'기념품·이벤트 응모', d:'사전등록자 대상 현장 기념품과 경품 이벤트.' },
+        { n:'4', t:'행사 정보 알림', d:'프로그램 변경·주요 안내를 이메일로 받습니다.' },
+      ],
+      interestChips: ['건강검진','성형·뷰티','피부·레이저','웰니스','치과','한방','재활','관광'].map(c=>({
+        label:c, toggle:()=>this.toggleVInterest(c),
+        style: "padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;" + (this.state.vInterests.includes(c) ? "background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;" : "border:1px solid #d3deea;background:#F4F8FD;color:#33485e;")
+      })),
+      visitDays: [['D1','11.13 (금)'],['D2','11.14 (토)'],['both','양일 모두']].map(([k,l])=>({
+        label:l, onClick:()=>this.setState({vDay:k}),
+        style: "flex:1;text-align:center;padding:11px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;" + (this.state.vDay===k ? "background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;" : "border:1px solid #d3deea;background:#F4F8FD;color:#33485e;")
+      })),
+
+      // exhibition sub-tabs
+      exTabs, exFilters, exhibitors, zoneLegend, floorCells, timetable,
+      exCompanies:this.state.exTab==='companies', exFloor:this.state.exTab==='floor', exProgram:this.state.exTab==='program',
+
+      // community
+      commTabs, noticeList, pressList, galleryList,
+      commEmpty:(this.state.commTab==='notice'&&noticeList.length===0)||(this.state.commTab==='press'&&pressList.length===0)||(this.state.commTab==='gallery'&&galleryList.length===0),
+      commNotice:this.state.commTab==='notice'&&noticeList.length>0, commPress:this.state.commTab==='press'&&pressList.length>0, commGallery:this.state.commTab==='gallery'&&galleryList.length>0,
+
+      // login / auth
+      loginRoles,
+      isSignup: this.state.authMode==='signup',
+      authTitle: this.state.authMode==='signup' ? 'BIMTC 회원가입' : 'BIMTC 로그인',
+      authSubtitle: this.state.authMode==='signup' ? '신규 가입' : '로그인',
+      authCta: this.state.authBusy ? '처리 중…' : (this.state.authMode==='signup' ? '가입하고 시작하기 →' : '로그인 →'),
+      authError: this.state.authError,
+      authSwitchLabel: this.state.authMode==='signup' ? '이미 계정이 있으신가요?' : '아직 회원이 아니신가요?',
+      authSwitchAction: this.state.authMode==='signup' ? '로그인' : '회원가입',
+      toggleAuthMode: ()=>this.setState({ authMode: this.state.authMode==='signup'?'login':'signup', authError:'' }),
+      auName:this.state.auName, auCountry:this.state.auCountry, auEmail:this.state.auEmail, auPw:this.state.auPw,
+      setAuName:this.set('auName'), setAuCountry:this.set('auCountry'), setAuEmail:this.set('auEmail'), setAuPw:this.set('auPw'),
+      authKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.submitAuth(); } },
+      submitAuth:()=>this.submitAuth(),
+    };
+  }
+}
+</script>
 </body>
 </html>
