@@ -119,8 +119,9 @@
           <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#11A37B;flex-shrink:0;"></span>{{ t.hero_venue }}</span>
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;">
-          <button onClick="{{ goConsole }}" style="background:#183566;color:#fff;border:none;padding:19px 34px;border-radius:12px;font-size:17.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:10px;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,53,102,0.45);">{{ t.cta_biz }} <span style="font-family:'Pretendard',sans-serif;font-size:19px;">→</span></button>
-          <button onClick="{{ goExhibit }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px 30px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="background:#fff;">{{ t.cta_exhibit }}</button>
+          <button onClick="{{ regEx }}" style="background:#183566;color:#fff;border:none;padding:19px 30px;border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:9px;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,53,102,0.45);">{{ t.reg_ex }}</button>
+          <button onClick="{{ regBuyer }}" style="background:#0B5FA5;color:#fff;border:none;padding:19px 30px;border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);">{{ t.reg_buyer }}</button>
+          <button onClick="{{ regVisitor }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px 30px;border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);background:#fff;">{{ t.reg_visitor }}</button>
         </div>
       </div>
       <div style="position:relative;">
@@ -155,28 +156,39 @@
     <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
       <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">{{ t.who_over }}</div>
       <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#0A2236;margin:0 0 44px;">{{ t.who_title }}</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-        <div style="border:1px solid #d9e7f4;border-radius:18px;padding:40px;background:linear-gradient(160deg,#F4F9FE,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(11,95,165,0.06);">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+        <div style="border:1px solid #d9e7f4;border-radius:18px;padding:36px;background:linear-gradient(160deg,#F4F9FE,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(11,95,165,0.06);">
           <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#9bb6cf;margin-bottom:18px;">01</div>
-          <h3 style="font-size:24px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part1_title }}</h3>
-          <p style="font-size:15.5px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part1_desc }}</p>
+          <h3 style="font-size:22px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part1_title }}</h3>
+          <p style="font-size:15px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part1_desc }}</p>
           <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
             <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>{{ t.part1_a }}</div>
             <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>{{ t.part1_b }}</div>
             <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#0B5FA5;"></span>{{ t.part1_c }}</div>
           </div>
-          <div style="margin-top:auto;"><a onClick="{{ goExhibit }}" style="color:#0B5FA5;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part1_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
+          <div style="margin-top:auto;"><a onClick="{{ goBooth }}" style="color:#0B5FA5;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part1_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
         </div>
-        <div style="border:1px solid #cbe9dd;border-radius:18px;padding:40px;background:linear-gradient(160deg,#EFF9F4,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(17,163,123,0.06);">
+        <div style="border:1px solid #cbe9dd;border-radius:18px;padding:36px;background:linear-gradient(160deg,#EFF9F4,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(17,163,123,0.06);">
           <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#9cccb9;margin-bottom:18px;">02</div>
-          <h3 style="font-size:24px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part2_title }}</h3>
-          <p style="font-size:15.5px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part2_desc }}</p>
+          <h3 style="font-size:22px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part2_title }}</h3>
+          <p style="font-size:15px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part2_desc }}</p>
           <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
             <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>{{ t.part2_a }}</div>
             <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>{{ t.part2_b }}</div>
             <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#11A37B;"></span>{{ t.part2_c }}</div>
           </div>
           <div style="margin-top:auto;"><a onClick="{{ goConsole }}" style="color:#0d8f6b;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part2_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
+        </div>
+        <div style="border:1px solid #e2ddf3;border-radius:18px;padding:36px;background:linear-gradient(160deg,#F6F4FC,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(122,92,196,0.06);">
+          <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#b3a6d6;margin-bottom:18px;">03</div>
+          <h3 style="font-size:22px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part3_title }}</h3>
+          <p style="font-size:15px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part3_desc }}</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#7a5cc4;"></span>{{ t.part3_a }}</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#7a5cc4;"></span>{{ t.part3_b }}</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:#33485e;"><span style="width:6px;height:6px;border-radius:50%;background:#7a5cc4;"></span>{{ t.part3_c }}</div>
+          </div>
+          <div style="margin-top:auto;"><a onClick="{{ goVisit }}" style="color:#7a5cc4;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part3_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
         </div>
       </div>
     </div>
@@ -226,7 +238,10 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:16px;">
         <div style="aspect-ratio:16/10;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);"><img src="uploads/bexco.jpg" alt="BEXCO 부산전시컨벤션센터 전경" style="width:100%;height:100%;object-fit:cover;" /></div>
-        <a href="https://map.naver.com/p/search/부산 벡스코" target="_blank" style="aspect-ratio:21/9;border-radius:16px;background:repeating-linear-gradient(135deg,#0A3A2C,#0A3A2C 13px,#0d4434 13px,#0d4434 26px);border:1px solid rgba(37,194,129,0.18);display:flex;align-items:center;justify-content:center;gap:8px;color:#8fe3bf;font-family:'Pretendard',sans-serif;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;">📍 {{ t.map_link }}</a>
+        <div style="display:flex;gap:10px;">
+          <a href="https://map.naver.com/p/search/벡스코" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;background:#03C75A;color:#fff;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:800;text-decoration:none;cursor:pointer;">{{ t.map_naver }}</a>
+          <a href="https://map.kakao.com/?q=벡스코" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;background:#FEE500;color:#3A1D1D;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:800;text-decoration:none;cursor:pointer;">{{ t.map_kakao }}</a>
+        </div>
       </div>
     </div>
   </section>
@@ -265,11 +280,11 @@
           </div>
         </div>
         <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
-          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;align-items:center;justify-content:center;color:#6885a3;font-family:'Pretendard',sans-serif;font-size:13px;">{{ t.floor_ph }}</div>
+          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#6885a3;font-family:'Pretendard',sans-serif;font-size:13px;"><span style="background:#0B5FA5;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;">{{ t.floor_soon }}</span></div>
           <div style="padding:26px 28px;">
             <h3 style="font-size:19px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.floor_title }}</h3>
-            <p style="font-size:14.5px;line-height:1.6;color:#52677d;margin:0 0 20px;">{{ t.floor_desc }}</p>
-            <button onClick="{{ goExhibition }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 22px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.floor_btn }}</button>
+            <p style="font-size:14.5px;line-height:1.6;color:#52677d;margin:0 0 20px;">{{ t.floor_soon_desc }}</p>
+            <button disabled style="background:#e6ebf2;color:#9aa9bd;border:none;padding:13px 22px;border-radius:10px;font-size:14.5px;font-weight:700;font-family:'Pretendard',sans-serif;cursor:not-allowed;">{{ t.floor_soon }}</button>
           </div>
         </div>
       </div>
@@ -367,6 +382,7 @@
       <div>
         <h2 style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin:0 0 12px;">{{ t.cta_band_title }}<br>{{ t.cta_band_title2 }}</h2>
         <p style="font-size:16px;color:rgba(255,255,255,0.86);margin:0;">{{ t.cta_band_sub }}</p>
+        <p style="font-size:13.5px;color:rgba(255,255,255,0.7);margin:8px 0 0;">{{ t.cta_biz_note }}</p>
       </div>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
         <button onClick="{{ goExhibit }}" style="background:#fff;color:#0A2236;border:none;padding:16px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_exhibit }}</button>
@@ -807,6 +823,38 @@
           </div>
         </sc-if>
 
+        <sc-if value="{{ commLibrary }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+            <sc-for list="{{ libraryList }}" as="d" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:14px;">
+                <div style="width:46px;height:46px;border-radius:11px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:24px;border:2.5px solid #0B5FA5;border-radius:3px;"></div></div>
+                <div style="flex:1;"><div style="font-size:16px;font-weight:800;color:#0A2236;line-height:1.4;margin-bottom:4px;">{{ d.title }}</div><div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#9aa9bd;">{{ d.meta }}</div></div>
+                <a href="{{ d.href }}" target="_blank" style="background:#0B5FA5;color:#fff;text-decoration:none;text-align:center;padding:11px;border-radius:10px;font-size:14px;font-weight:700;">{{ lib_dl }} ↓</a>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ commInquiryDone }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid #c7ebdc;background:#E7F6F0;border-radius:16px;padding:56px 24px;text-align:center;"><div style="font-size:16px;font-weight:700;color:#0d8f6b;">{{ inq_thanks }}</div></div>
+        </sc-if>
+        <sc-if value="{{ commInquiryForm }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:640px;background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:32px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+              <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_name }}</label><input value="{{ inq_name_v }}" onInput="{{ setInqName }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
+              <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_org }}</label><input value="{{ inq_org_v }}" onInput="{{ setInqOrg }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
+              <div style="grid-column:1 / -1;"><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_email }}</label><input value="{{ inq_email_v }}" onInput="{{ setInqEmail }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
+            </div>
+            <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;font-weight:700;margin-bottom:9px;color:#33485e;">{{ inq_cat }}</label>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <sc-for list="{{ inqCatChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</span></sc-for>
+              </div>
+            </div>
+            <div style="margin-bottom:18px;"><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_msg }}</label><textarea value="{{ inq_msg_v }}" onInput="{{ setInqMsg }}" style="width:100%;min-height:120px;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;resize:vertical;font-family:'Pretendard',sans-serif;"></textarea></div>
+            <button onClick="{{ submitInquiry }}" style="background:#0B5FA5;color:#fff;border:none;padding:14px 28px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ inq_submit }}</button>
+          </div>
+        </sc-if>
+
       </div>
     </section>
   </div>
@@ -832,7 +880,14 @@
       <div style="display:flex;flex-direction:column;gap:14px;">
         <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
           <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_name }}</label><input value="{{ auName }}" onInput="{{ setAuName }}" placeholder="예) 굿모닝병원" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_dept }}</label><input value="{{ auDept }}" onInput="{{ setAuDept }}" placeholder="{{ t.lg_dept_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
           <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_country }}</label><input value="{{ auCountry }}" onInput="{{ setAuCountry }}" placeholder="예) 대한민국" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_phone }}</label>
+            <div style="display:flex;gap:8px;">
+              <input value="{{ auDial }}" onInput="{{ setAuDial }}" placeholder="+82" style="width:76px;padding:12px 10px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;text-align:center;" />
+              <input value="{{ auPhone }}" onInput="{{ setAuPhone }}" inputmode="numeric" placeholder="010-0000-0000" style="flex:1;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" />
+            </div>
+          </div>
         </sc-if>
         <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_email }}</label><input value="{{ auEmail }}" onInput="{{ setAuEmail }}" onKeyDown="{{ authKey }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
         <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_pw }}</label><input type="password" value="{{ auPw }}" onInput="{{ setAuPw }}" onKeyDown="{{ authKey }}" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
@@ -907,9 +962,19 @@ class Component extends DCLogic {
     vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both',
     crEmail:'', crSearched:false, crRows:[],
     authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
+    auDept:'', auDial:'+82', auPhone:'',
+    inqName:'', inqOrg:'', inqEmail:'', inqMsg:'', inqCat:'', inqDone:false,
     isAdmin:false, now:Date.now() };
 
+  async submitInquiry(){
+    if(!this.state.inqName || !this.state.inqEmail || !this.state.inqMsg){ alert(this.L('이름·이메일·문의 내용을 입력해 주세요.','Please enter name, email and message.')); return; }
+    try{ await window.BimtcDB.addInquiry({ name:this.state.inqName, org:this.state.inqOrg, email:this.state.inqEmail, category:this.state.inqCat, message:this.state.inqMsg }); }catch(e){}
+    this.setState({ inqDone:true });
+  }
+
   set(k){ return (e)=>this.setState({ [k]: (e && e.target) ? e.target.value : e }); }
+  setPhone(e){ var d=(e&&e.target?e.target.value:'').replace(/[^0-9]/g,'').slice(0,11); var out=d; if(d.length>7){ out=d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7); } else if(d.length>3){ out=d.slice(0,3)+'-'+d.slice(3); } this.setState({ auPhone: out }); }
+  setDial(e){ var v=(e&&e.target?e.target.value:''); v=v.replace(/[^0-9+]/g,''); if(v && v[0]!=='+') v='+'+v.replace(/\+/g,''); this.setState({ auDial: v }); }
   L(ko,en){ return this.state.lang==='en' ? en : ko; }
 
   go(p){ this.setState({ page: p }); if(typeof window!=='undefined') window.scrollTo(0,0); setTimeout(()=>this.initMaps(),120); }
@@ -977,7 +1042,7 @@ class Component extends DCLogic {
     try{
       let res;
       if(s.authMode==='signup'){
-        res = await window.BimtcDB.signup({ email:s.auEmail, password:s.auPw, type:s.loginRole, name:s.auName, country:s.auCountry });
+        res = await window.BimtcDB.signup({ email:s.auEmail, password:s.auPw, type:s.loginRole, name:s.auName, country:s.auCountry, dept:s.auDept, phone:(s.auDial+' '+s.auPhone).trim() });
         if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
         const sess = res.session || ((await window.BimtcDB.client().auth.getSession()).data.session);
         if(!sess){ this.setState({authBusy:false, authMode:'login', authError:'가입 완료! 이메일 인증 후 로그인해 주세요. (관리자가 이메일 인증을 꺼두면 즉시 로그인됩니다.)'}); return; }
@@ -1000,9 +1065,13 @@ class Component extends DCLogic {
       hero_sub:L('병원·뷰티·웰니스·헬스케어 기업과 검증된 바이어를 1:1로 잇는, 아시아 대표 의료관광 컨벤션.','Asia\u2019s leading medical tourism convention connecting hospitals, beauty, wellness & healthcare companies with verified buyers 1:1.'),
       hero_venue:L('BEXCO 제1전시장 3A홀, 부산','BEXCO Hall 3A, Busan'),
       cta_biz:L('바이어 비즈미팅 신청','Buyer Business Meeting'), cta_exhibit:L('참가기업 신청','Exhibitor Application'),
+      cta_join:L('참가기업·바이어 회원가입','Join as Exhibitor/Buyer'), cta_visit:L('참관객 사전등록','Visitor Pre-register'),
+      reg_ex:L('참가기업 등록','Register — Exhibitor'), reg_buyer:L('바이어 등록','Register — Buyer'), reg_visitor:L('방문객 등록','Register — Visitor'),
       countdown_days:L('개막까지','to opening'),
       review_over:L('2025 BIMTC','2025 BIMTC'), review_title:L('2025 BIMTC','2025 BIMTC Review'),
-      who_over:L('WHO PARTICIPATES','WHO PARTICIPATES'), who_title:L('두 가지 길로 참여하세요','Two ways to participate'),
+      who_over:L('WHO PARTICIPATES','WHO PARTICIPATES'), who_title:L('세 가지 길로 참여하세요','Three ways to participate'),
+      part3_title:L('방문객으로 참여','Join as Visitor'), part3_desc:L('사전등록하면 대기 없이 빠르게 입장하고, 전시·프로그램·건강강좌를 자유롭게 관람할 수 있습니다.','Pre-register for fast-track entry and free access to exhibits, programs and health talks.'),
+      part3_a:L('사전등록 빠른 입장','Fast-track entry via pre-registration'), part3_b:L('전시관·프로그램 자유 관람','Free access to exhibits & programs'), part3_c:L('사전등록자 현장 혜택','On-site benefits for pre-registrants'), part3_cta:L('사전등록 하기','Pre-register'),
       part1_title:L('참가기업으로 참여','Join as Exhibitor'), part1_desc:L('병원·뷰티·웰니스·헬스케어 기업을 위한 글로벌 마케팅 무대. 부스 전시와 1:1 비즈니스 미팅으로 바이어를 직접 만나세요.','A global marketing stage for hospitals, beauty, wellness & healthcare companies. Meet buyers directly through booth exhibits and 1:1 business meetings.'),
       part1_a:L('전시 부스 및 기업 홍보','Exhibition booth & company promotion'), part1_b:L('사전 매칭 1:1 비즈니스 미팅','Pre-matched 1:1 business meetings'), part1_c:L('바이어 네트워킹','Buyer networking'), part1_cta:L('참가 신청하기','Apply as exhibitor'),
       part2_title:L('바이어 비즈미팅','Buyer Business Meeting'), part2_desc:L('사전 매칭된 1:1 상담으로 검증된 한국 의료·웰니스 파트너를 발굴하세요. 바이어 초청 및 의전 프로그램을 운영합니다.','Discover verified Korean medical & wellness partners through pre-matched 1:1 consultations. Buyer invitation & VIP programs available.'),
@@ -1012,12 +1081,13 @@ class Component extends DCLogic {
       prog_over:L('PROGRAM','PROGRAM'), prog_title:L('프로그램 하이라이트','Program Highlights'),
       access_over:L('ACCESS & VENUE','ACCESS & VENUE'), access_title:L('행사장 안내','Venue & Access'),
       access_way:L('오시는 길','Directions'), access_map:L('지도 크게 보기 →','View larger map →'),
-      floor_title:L('부스 배치도 (플로어맵)','Booth Layout (Floor Map)'), floor_desc:L('BEXCO 제1전시장 부스 배치와 참가기업 위치를 확인하세요. 카테고리별 전시 구역 안내 제공.','Check the booth layout and exhibitor locations at BEXCO Hall 1. Zone guide by category provided.'), floor_btn:L('부스 배치도 보기','View booth layout'),
+      floor_title:L('부스 배치도 (플로어맵)','Booth Layout (Floor Map)'), floor_desc:L('BEXCO 제1전시장 부스 배치와 참가기업 위치를 확인하세요. 카테고리별 전시 구역 안내 제공.','Check the booth layout and exhibitor locations at BEXCO Hall 1. Zone guide by category provided.'), floor_btn:L('부스 배치도 보기','View booth layout'), floor_soon:L('준비 중입니다','Coming soon'), floor_soon_desc:L('부스 배치도는 현재 준비 중입니다. 확정되는 대로 공개할 예정입니다.','The booth layout is being prepared and will be published once confirmed.'),
       exh_over:L('EXHIBITORS','EXHIBITORS'), exh_title:L('참가기업 미리보기','Exhibitor Preview'), exh_soon:L('참가기업 모집 예정','Exhibitor recruitment coming soon'), exh_soon_desc:L('참가 신청 접수 후 참가기업이 순차적으로 소개될 예정입니다. 많은 관심 부탁드립니다.','Exhibitors will be introduced after applications open. Stay tuned.'),
       notice_title:L('공지사항','Notices'), press_title:L('보도기사','Press'), more:L('MORE +','MORE +'),
       no_notice:L('등록된 공지사항이 없습니다.','No notices yet.'), no_press:L('등록된 보도기사가 없습니다.','No press articles yet.'),
       cta_band_title:L('지금 사전등록하고','Pre-register now and'), cta_band_title2:L('비즈미팅을 신청하세요','apply for business meetings'),
       cta_band_sub:L('참가기업 신청 · 바이어 매칭 · 참관객 사전등록 모두 온라인으로.','Exhibitor application, buyer matching & visitor pre-registration — all online.'),
+      cta_biz_note:L('※ 비즈미팅은 참가기업·바이어만 이용할 수 있으며, 방문객은 비즈미팅 사용이 불가합니다.','※ Business meetings are for exhibitors & buyers only. Visitors cannot use the meeting service.'),
       cd_left:L('마감까지','ends in'), cd_discount:L('할인 마감','off, ends'),
       teaser:L('곧 1차 얼리버드가 시작됩니다! 많은 기대 부탁드립니다','1st Early-bird starts soon! Stay tuned'),
       ft_quick:L('바로가기','Quick Links'), ft_info:L('이용안내','Information'), ft_support:L('고객지원','Support'),
@@ -1027,7 +1097,7 @@ class Component extends DCLogic {
       ft_floormap:L('플로어맵·부스배치도','Floor Map · Booths'),
       ft_legal:L('개인정보처리방침 · 이메일무단수집거부 · 사이트맵','Privacy Policy · No Email Collection · Sitemap'),
       role_ex:L('참가기업','Exhibitor'), role_buyer:L('바이어','Buyer'),
-      sf_all:L('전체','All'), sf_reg:L('모집·등록','Apply·Register'), sf_event:L('행사·프로그램','Event·Program'), map_link:L('네이버 지도로 오시는 길 보기 →','View directions on Naver Map →'), floor_ph:L('[ 부스 배치도 · 플로어맵 ]','[ Booth Layout · Floor Map ]'),
+      sf_all:L('전체','All'), sf_reg:L('모집·등록','Apply·Register'), sf_event:L('행사·프로그램','Event·Program'), map_link:L('네이버 지도로 오시는 길 보기 →','View directions on Naver Map →'), map_naver:L('📍 네이버맵 길안내','📍 Naver Map'), map_kakao:L('📍 카카오맵 길안내','📍 Kakao Map'), floor_ph:L('[ 부스 배치도 · 플로어맵 ]','[ Booth Layout · Floor Map ]'),
       // sub-page breadcrumbs & headers
       ab_bc:L('HOME / BIMTC 소개','HOME / About'), ab_title:L('BIMTC 소개','About BIMTC'), ab_sub:L('부산국제의료관광컨벤션의 행사 개요와 걸어온 길을 소개합니다.','Overview and history of the Busan International Medical Tourism Convention.'),
       ab_ov:L('행사 개요','Overview'), ab_intro:L('부산국제의료관광컨벤션(BIMTC)은 국내 최대 규모의 국제 웰니스·의료관광 통합 전시회로, 국내외 의료·웰니스·관광 산업 관계자가 한자리에 모이는 비즈니스 교류의 장입니다.','BIMTC is Korea\u2019s largest integrated international wellness & medical tourism expo — a business networking hub bringing together medical, wellness & tourism professionals from home and abroad.'),
@@ -1052,6 +1122,7 @@ class Component extends DCLogic {
       lg_title:L('BIMTC 로그인','BIMTC Login'), lg_sub:L('참가기업·바이어 회원 로그인','Exhibitor & Buyer member login'),
       lg_signup:L('회원가입','Sign up'), lg_login:L('로그인','Login'), lg_email:L('이메일','Email'), lg_pw:L('비밀번호','Password'),
       lg_name:L('기관/기업명','Company/Org'), lg_country:L('국가/지역','Country'),
+      lg_dept:L('소속명','Affiliation'), lg_dept_ph:L('예) 마케팅팀 / 소속 부서·기관','e.g. Marketing team / department'), lg_phone:L('연락처','Phone'),
       lg_admin:L('사무국(관리자) 로그인 →','Secretariat (Admin) Login →'), lg_have:L('이미 계정이 있으신가요? 로그인','Already have an account? Login'), lg_no:L('계정이 없으신가요? 회원가입','No account? Sign up'),
       acc_ktx:L('부산역 → 지하철 30분, 센텀시티역 하차','Busan Stn → 30 min by metro, Centum City Stn'),
       acc_air:L('김해국제공항 → 리무진버스 약 50분','Gimhae Int\u2019l Airport → approx. 50 min by limousine bus'),
@@ -1090,7 +1161,7 @@ class Component extends DCLogic {
     const pillTab = (active)=> "cursor:pointer;padding:9px 18px;border-radius:999px;font-size:14px;font-weight:700;" + (active ? "background:#25C281;color:#04261a;" : "background:rgba(255,255,255,0.06);color:#bcd0e2;border:1px solid rgba(255,255,255,0.14);");
     const exTabs = exTabDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({exTab:k}), style: pillTab(this.state.exTab===k) }));
 
-    const commTabDef = [ ['notice',L('공지사항','Notices')], ['press',L('보도기사','Press')], ['gallery',L('갤러리','Gallery')] ];
+    const commTabDef = [ ['notice',L('공지사항','Notices')], ['press',L('보도기사','Press')], ['gallery',L('갤러리','Gallery')], ['library',L('자료실','Downloads')], ['inquiry',L('문의','Contact')] ];
     const commTabs = commTabDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({commTab:k}), style: pillTab(this.state.commTab===k) }));
 
     // exhibitors (real names from existing site)
@@ -1128,9 +1199,9 @@ class Component extends DCLogic {
     const pressList = [];
     const galleryList = [];
 
-    const loginRoleDef = [ ['exhibitor',L('참가기업','Exhibitor')], ['buyer',L('바이어','Buyer')] ];
+    const loginRoleDef = [ ['exhibitor',L('참가기업','Exhibitor')], ['buyer',L('바이어','Buyer')], ['visitor',L('방문객','Visitor')] ];
     const loginRoles = loginRoleDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({loginRole:k}),
-      style: "flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;" + (this.state.loginRole===k ? "background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;" : "background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;") }));
+      style: "flex:1;padding:12px 6px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;text-align:center;" + (this.state.loginRole===k ? "background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;" : "background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;") }));
 
     return {
       // routing
@@ -1148,6 +1219,9 @@ class Component extends DCLogic {
       crMsg:this.state.crRows.length>0?'사전등록이 확인되었습니다 ('+this.state.crRows.length+'건). 하단 [사전등록 확인] 메뉴에서 상세를 볼 수 있습니다.':'해당 이메일로 등록된 내역이 없습니다.',
       crMsgColor:this.state.crRows.length>0?'#0d8f6b':'#8a6d2f', crMsgBg:this.state.crRows.length>0?'#E7F6F0':'#FBF3E2',
       goConsole:()=>this.goConsole(), goAdmin:()=>this.goAdmin(), goBooth:()=>this.goBooth(),
+      regEx:()=>this.setState({loginRole:'exhibitor',authMode:'signup',page:'login'}),
+      regBuyer:()=>this.setState({loginRole:'buyer',authMode:'signup',page:'login'}),
+      regVisitor:()=>this.setState({loginRole:'visitor',authMode:'signup',page:'login'}),
       countdownOn: cdOn, teaserOn: teaser, ebLabel: cdLabel, ebRateLabel: cdRate, ebEndLabel: cdEnd, countdown: cdText,
       toast:this.state.toast,
 
@@ -1255,8 +1329,23 @@ class Component extends DCLogic {
 
       // community
       commTabs, noticeList, pressList, galleryList,
+      libraryList:[
+        { title:L('2026 BIMTC 브로슈어 (국문)','2026 BIMTC Brochure (KOR)'), meta:'PDF', href:'uploads/brochure_ko.pdf' },
+        { title:L('2026 BIMTC 브로슈어 (영문)','2026 BIMTC Brochure (ENG)'), meta:'PDF', href:'uploads/brochure_en_0723.pdf' },
+        { title:L('2026 BIMTC 공식 포스터','2026 BIMTC Official Poster'), meta:'IMAGE', href:'uploads/keyvisual.png' },
+      ],
+      lib_dl:L('다운로드','Download'),
+      inq_name:L('이름','Name'), inq_org:L('소속/기업','Organization'), inq_email:L('이메일','Email'), inq_cat:L('문의 유형','Category'), inq_msg:L('문의 내용','Message'), inq_submit:L('문의 보내기','Send inquiry'),
+      inq_cats:[L('참가(부스) 문의','Exhibitor / Booth'),L('바이어·비즈미팅 문의','Buyer / Meeting'),L('참관·사전등록 문의','Visitor / Registration'),L('기타','Other')],
+      inq_done:this.state.inqDone, inq_name_v:this.state.inqName, inq_org_v:this.state.inqOrg, inq_email_v:this.state.inqEmail, inq_msg_v:this.state.inqMsg, inq_cat_v:this.state.inqCat,
+      setInqName:this.set('inqName'), setInqOrg:this.set('inqOrg'), setInqEmail:this.set('inqEmail'), setInqMsg:this.set('inqMsg'), setInqCat:(v)=>this.setState({inqCat:v}),
+      submitInquiry:()=>this.submitInquiry(),
+      inqCatChips:(function(){ var cats=[L('참가(부스) 문의','Exhibitor / Booth'),L('바이어·비즈미팅 문의','Buyer / Meeting'),L('참관·사전등록 문의','Visitor / Registration'),L('기타','Other')]; var self=this; return cats.map(function(c){ return { label:c, onClick:()=>self.setState({inqCat:c}), style:"padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid "+(self.state.inqCat===c?'#0B5FA5':'#d3deea')+";background:"+(self.state.inqCat===c?'#EAF2FC':'#fff')+";color:"+(self.state.inqCat===c?'#0B5FA5':'#5E7289')+";" }; }); }).call(this),
+      commInquiryDone:this.state.commTab==='inquiry'&&this.state.inqDone, commInquiryForm:this.state.commTab==='inquiry'&&!this.state.inqDone,
+      inq_thanks:L('문의가 접수되었습니다. 사무국에서 이메일로 답변드립니다.','Your inquiry has been received. The secretariat will reply by email.'),
       commEmpty:(this.state.commTab==='notice'&&noticeList.length===0)||(this.state.commTab==='press'&&pressList.length===0)||(this.state.commTab==='gallery'&&galleryList.length===0),
       commNotice:this.state.commTab==='notice'&&noticeList.length>0, commPress:this.state.commTab==='press'&&pressList.length>0, commGallery:this.state.commTab==='gallery'&&galleryList.length>0,
+      commLibrary:this.state.commTab==='library', commInquiry:this.state.commTab==='inquiry',
 
       // login / auth
       loginRoles,
@@ -1269,6 +1358,8 @@ class Component extends DCLogic {
       authSwitchAction: this.state.authMode==='signup' ? L('로그인','Login') : L('회원가입','Sign up'),
       toggleAuthMode: ()=>this.setState({ authMode: this.state.authMode==='signup'?'login':'signup', authError:'' }),
       auName:this.state.auName, auCountry:this.state.auCountry, auEmail:this.state.auEmail, auPw:this.state.auPw,
+      auDept:this.state.auDept, auDial:this.state.auDial, auPhone:this.state.auPhone,
+      setAuDept:this.set('auDept'), setAuDial:(e)=>this.setDial(e), setAuPhone:(e)=>this.setPhone(e),
       setAuName:this.set('auName'), setAuCountry:this.set('auCountry'), setAuEmail:this.set('auEmail'), setAuPw:this.set('auPw'),
       authKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.submitAuth(); } },
       submitAuth:()=>this.submitAuth(),

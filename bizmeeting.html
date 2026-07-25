@@ -53,6 +53,14 @@
     </div>
   </div>
 
+  <sc-if value="{{ notAllowed }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:560px;margin:0 auto;padding:70px 24px;text-align:center;">
+      <div style="width:66px;height:66px;border-radius:16px;background:#FBF3E2;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;"><div style="width:26px;height:26px;border-radius:7px;border:3px solid #E0A23C;"></div></div>
+      <h1 style="font-size:24px;font-weight:800;margin:0 0 10px;letter-spacing:-0.02em;">비즈미팅 이용 대상이 아닙니다</h1>
+      <p style="font-size:14.5px;color:#5E7289;margin:0 0 28px;line-height:1.6;">비즈미팅은 참가기업·바이어 회원만 이용할 수 있습니다.<br>방문객 회원은 사전등록·행사 정보 이용이 가능합니다.</p>
+      <a href="index.html" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;">홈으로</a>
+    </div>
+  </sc-if>
   <sc-if value="{{ needLogin }}" hint-placeholder-val="{{ false }}">
     <div style="max-width:560px;margin:0 auto;padding:70px 24px;text-align:center;">
       <div style="width:66px;height:66px;border-radius:16px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;"><div style="width:24px;height:28px;border:3px solid #0B5FA5;border-radius:6px;"></div></div>
@@ -449,6 +457,7 @@ class Component extends DCLogic {
     user: null,
     needBooth: false,
     needLogin: false,
+    notAllowed: false,
     boothPending: false,
     partners: [],
     requests: [],
@@ -469,10 +478,11 @@ class Component extends DCLogic {
     try{
       const u = await window.BimtcDB.currentUser();
       if(!u){ this.setState({ needLogin:true }); return; }
+      if(u.type==='visitor' && !u.is_admin){ this.setState({ notAllowed:true }); return; }
       this.setState({ user:u, role: u.type==='buyer'?'buyer':'exhibitor',
         apOrg:u.name||'', apEmail:u.email||'', apCountry:u.country||'' });
       // 참가기업은 부스 신청 + 사무국 승인 완료 시에만 비즈미팅 이용 (바이어·관리자는 예외)
-      if(u.type!=='buyer' && !u.is_admin){
+      if(u.type!=='buyer' && u.type!=='visitor' && !u.is_admin){
         try{
           const st = await window.BimtcDB.myApprovedBooths();
           if(st.count===0){ this.setState({ needBooth:true }); return; }
@@ -718,8 +728,9 @@ class Component extends DCLogic {
       navItems,
       needBooth: this.state.needBooth,
       needLogin: this.state.needLogin,
+      notAllowed: this.state.notAllowed,
       boothPending: this.state.boothPending,
-      ready: !this.state.needBooth && !this.state.needLogin && !this.state.boothPending,
+      ready: !this.state.needBooth && !this.state.needLogin && !this.state.boothPending && !this.state.notAllowed,
       userName: u ? ((u.name||'회원')+' 담당자') : '로그인 필요',
       userMeta: u ? ((u.name||'')+' · '+this.typeLabel(u.type)) : '',
       userInitial: u && u.name ? u.name.slice(0,1) : '?',

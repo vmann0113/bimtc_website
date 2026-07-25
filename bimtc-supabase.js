@@ -40,7 +40,7 @@
       var sb = await ready();
       var res = await sb.auth.signUp({
         email: o.email, password: o.password,
-        options: { data: { type: o.type || 'exhibitor', name: o.name || '', country: o.country || '', category: o.category || '', interests: o.interests || [] } }
+        options: { data: { type: o.type || 'exhibitor', name: o.name || '', country: o.country || '', category: o.category || '', dept: o.dept || '', phone: o.phone || '', interests: o.interests || [] } }
       });
       if (res.error) return { ok: false, error: res.error.message };
       return { ok: true, user: res.data.user, session: res.data.session };
@@ -114,6 +114,12 @@
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     async listVisitors() { var sb = await ready(); var r = await sb.from('visitor_registrations').select('*').order('created_at', { ascending: false }); return r.data || []; },
+    async addInquiry(q) {
+      var sb = await ready();
+      var res = await sb.from('inquiries').insert({ name: q.name, org: q.org, email: q.email, category: q.category, message: q.message }).select().single();
+      return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
+    },
+    async listInquiries() { var sb = await ready(); var r = await sb.from('inquiries').select('*').order('created_at', { ascending: false }); return r.data || []; },
     async checkRegistration(email) {
       var sb = await ready();
       var r = await sb.rpc('check_registration', { p_email: email });
@@ -138,8 +144,14 @@
     async listPartners() {
       var sb = await ready();
       var u = (await sb.auth.getUser()).data.user;
+      var me = u ? (await sb.from('profiles').select('type').eq('id', u.id).maybeSingle()).data : null;
       var r = await sb.from('profiles').select('*');
-      var rows = (r.data || []).filter(function (p) { return !u || p.id !== u.id; });
+      var rows = (r.data || []).filter(function (p) {
+        if (u && p.id === u.id) return false;
+        if (p.type === 'visitor') return false;           // 방문객은 파트너 대상 아님
+        if (me && me.type) return p.type !== me.type;      // 상대 유형만 노출(참가기업↔바이어)
+        return p.type === 'exhibitor' || p.type === 'buyer';
+      });
       return rows;
     },
 
