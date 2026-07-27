@@ -2,7 +2,20 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BIMTC 2026 · 부산국제의료관광컨벤션 | MEDI × WELLNESS</title>
+<meta name="description" content="2026.11.13–14 BEXCO 제1전시장 3A홀. 병원·뷰티·웰니스·헬스케어 기업과 검증된 해외 바이어를 1:1로 잇는 아시아 대표 의료관광 컨벤션.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<link rel="apple-touch-icon" href="uploads/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BIMTC 2026">
+<meta property="og:title" content="BIMTC 2026 · 부산국제의료관광컨벤션 | MEDI × WELLNESS">
+<meta property="og:description" content="2026.11.13–14 BEXCO 제1전시장 3A홀. 병원·뷰티·웰니스·헬스케어 기업과 검증된 해외 바이어를 1:1로 잇는 아시아 대표 의료관광 컨벤션.">
+<meta property="og:image" content="uploads/keyvisual.png">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -12,40 +25,46 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;background:#16294F;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{margin:0;background:#16294F;word-break:keep-all;overflow-wrap:break-word;overflow-x:hidden;}
   ::selection{background:#25C281;color:#04261a;}
   input,textarea{font-family:'Pretendard',sans-serif;}
+  h1,h2,h3,p{text-wrap:pretty;}
 </style>
 <script src="bimtc-config.js"></script>
 <script src="bimtc-supabase.js"></script>
 <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=2dwxs72c2o"></script>
 </helmet>
 
-<div style="font-family:'Pretendard',sans-serif;background:#16294F;color:#fff;">
+<div style="font-family:'Pretendard',sans-serif;background:#16294F;color:#fff;overflow-x:hidden;">
 
   <div style="height:4px;background:linear-gradient(90deg,#5AB7F0,#25C281);"></div>
 
   <div style="background:#122043;border-bottom:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;">
+    <div style="max-width:1180px;margin:0 auto;padding:7px clamp(16px,4.5vw,32px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;">
       <div style="display:flex;align-items:center;gap:8px;">
         <span onClick="{{ goLogin }}" style="border:1px solid rgba(37,194,129,0.5);color:#25C281;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">{{ t.role_ex }}</span>
         <span onClick="{{ goLogin }}" style="border:1px solid rgba(90,183,240,0.45);color:#5AB7F0;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">{{ t.role_buyer }}</span>
       </div>
-      <div style="display:flex;align-items:center;gap:15px;">
+      <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
         <span onClick="{{ setKo }}" style="{{ koStyle }}">KOR</span>
         <span onClick="{{ setEn }}" style="{{ enStyle }}">ENG</span>
-        <span style="color:rgba(255,255,255,0.14);">|</span>
-        <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.u_access }}</span>
-        <span onClick="{{ goExhibition }}" style="cursor:pointer;">{{ t.u_floor }}</span>
-        <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
-        <span onClick="{{ goCheckReg }}" style="cursor:pointer;">{{ t.u_checkreg }}</span>
+        <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:15px;">
+            <span style="color:rgba(255,255,255,0.14);">|</span>
+            <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.u_access }}</span>
+            <span onClick="{{ goExhibition }}" style="cursor:pointer;">{{ t.u_floor }}</span>
+            <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
+            <span onClick="{{ goCheckReg }}" style="cursor:pointer;">{{ t.u_checkreg }}</span>
+          </div>
+        </sc-if>
       </div>
     </div>
   </div>
 
   <sc-if value="{{ teaserOn }}" hint-placeholder-val="{{ true }}">
     <div style="background:linear-gradient(90deg,#FF6B5A,#FF8A5A);">
-      <div style="max-width:1180px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-family:'Pretendard',sans-serif;">
+      <div style="max-width:1180px;margin:0 auto;padding:14px clamp(16px,4.5vw,32px);display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-family:'Pretendard',sans-serif;">
         <span style="font-size:15px;font-weight:800;color:#FF6B5A;background:#fff;padding:5px 14px;border-radius:999px;">COMING SOON</span>
         <span style="font-size:17px;color:#fff;font-weight:800;letter-spacing:-0.01em;">{{ t.teaser }}</span>
       </div>
@@ -54,7 +73,7 @@
 
   <sc-if value="{{ countdownOn }}" hint-placeholder-val="{{ false }}">
     <div style="background:linear-gradient(90deg,#FF6B5A,#FF8A5A);">
-      <div style="max-width:1180px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;font-family:'Pretendard',sans-serif;">
+      <div style="max-width:1180px;margin:0 auto;padding:14px clamp(16px,4.5vw,32px);display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;font-family:'Pretendard',sans-serif;">
         <span style="font-size:15px;font-weight:800;letter-spacing:0.02em;color:#FF6B5A;background:#fff;padding:5px 14px;border-radius:999px;">{{ ebLabel }}</span>
         <span style="font-size:16px;color:#fff;font-weight:700;">{{ t.cd_left }}</span>
         <span style="font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:0.01em;">{{ countdown }}</span>
@@ -64,33 +83,60 @@
   </sc-if>
 
   <header style="position:sticky;top:0;z-index:50;background:rgba(6,27,48,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.07);">
-    <div style="max-width:1180px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;">
+    <div style="max-width:1180px;margin:0 auto;padding:0 clamp(16px,4.5vw,32px);display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px;">
       <div onClick="{{ goHome }}" style="display:flex;align-items:center;gap:12px;cursor:pointer;">
         <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#5AB7F0,#25C281);position:relative;">
           <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15px;height:3.4px;background:#16294F;border-radius:2px;"></div>
           <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:3.4px;height:15px;background:#16294F;border-radius:2px;"></div>
         </div>
         <div style="display:flex;flex-direction:column;line-height:1.05;">
-          <span style="font-size:9.5px;letter-spacing:0.2em;color:#6b8aa6;font-weight:700;margin-bottom:4px;">BIMTC 2026</span>
+          <span style="font-size:clamp(9.5px,calc(13.63px - 0.35vw),11.5px);letter-spacing:0.2em;color:#6b8aa6;font-weight:700;margin-bottom:4px;">BIMTC 2026</span>
           <span style="font-weight:800;font-size:18px;letter-spacing:-0.005em;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 4px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
         </div>
       </div>
-      <nav style="display:flex;align-items:center;gap:30px;font-size:15px;font-weight:600;">
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <nav style="display:flex;align-items:center;gap:clamp(16px,2.4vw,30px);font-size:15px;font-weight:600;">
         <sc-for list="{{ navLinks }}" as="nl" hint-placeholder-count="5">
           <span onClick="{{ nl.onClick }}" style="{{ nl.style }}">{{ nl.label }}</span>
         </sc-for>
       </nav>
+      </sc-if>
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;gap:14px;">
         <div style="display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:9px 14px;width:160px;">
           <span style="position:relative;width:14px;height:14px;display:inline-block;flex-shrink:0;">
             <span style="position:absolute;width:9px;height:9px;border:1.6px solid #6b8aa6;border-radius:50%;top:0;left:0;"></span>
             <span style="position:absolute;width:5px;height:1.6px;background:#6b8aa6;transform:rotate(45deg);bottom:1px;right:-1px;"></span>
           </span>
-          <input placeholder="{{ t.u_search }}" style="background:transparent;border:none;outline:none;color:#fff;font-size:13px;width:100%;" />
+          <input placeholder="{{ t.u_search }}" style="background:transparent;border:none;outline:none;color:#fff;font-size:clamp(13px,calc(18.2px - 0.35vw),16px);width:100%;" />
         </div>
         <button onClick="{{ goVisit }}" style="background:#25C281;color:#04261a;border:none;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.u_prereg }}</button>
       </div>
+      </sc-if>
+      <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onClick="{{ goVisit }}" style="background:#25C281;color:#04261a;border:none;padding:10px 15px;border-radius:999px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ t.u_prereg }}</button>
+        <div onClick="{{ toggleMenu }}" role="button" aria-label="menu" style="width:44px;height:44px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;border-radius:11px;border:1px solid rgba(255,255,255,0.14);">
+          <span style="width:19px;height:2px;background:#dbe8f3;border-radius:2px;display:block;"></span>
+          <span style="width:19px;height:2px;background:#dbe8f3;border-radius:2px;display:block;"></span>
+          <span style="width:19px;height:2px;background:#dbe8f3;border-radius:2px;display:block;"></span>
+        </div>
+      </div>
+      </sc-if>
     </div>
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="border-top:1px solid rgba(255,255,255,0.08);background:rgba(6,27,48,0.98);padding:8px clamp(16px,4.5vw,32px) 18px;">
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ navLinks }}" as="nl" hint-placeholder-count="5">
+            <span onClick="{{ nl.onClick }}" style="{{ nl.mStyle }}">{{ nl.label }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
+          <span onClick="{{ goLogin }}" style="flex:1 1 45%;text-align:center;border:1px solid rgba(255,255,255,0.16);color:#bcd0e2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;padding:13px 10px;border-radius:10px;cursor:pointer;">{{ t.u_login }}</span>
+          <span onClick="{{ goCheckReg }}" style="flex:1 1 45%;text-align:center;border:1px solid rgba(255,255,255,0.16);color:#bcd0e2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;padding:13px 10px;border-radius:10px;cursor:pointer;">{{ t.u_checkreg }}</span>
+        </div>
+      </div>
+    </sc-if>
   </header>
 
   <!-- ================= HOME ================= -->
@@ -98,53 +144,53 @@
   <div>
   <sc-if value="{{ hasImportant }}" hint-placeholder-val="{{ false }}">
   <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <span style="background:#25C281;color:#04261a;font-family:'Pretendard',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;flex-shrink:0;">중요</span>
+    <div style="max-width:1180px;margin:0 auto;padding:12px clamp(16px,4.5vw,32px);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <span style="background:#25C281;color:#04261a;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);font-weight:700;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;flex-shrink:0;">중요</span>
       <span onClick="{{ goCommunity }}" style="flex:1;min-width:200px;font-size:14px;color:#cfe0ee;font-weight:500;cursor:pointer;">{{ importantTitle }}</span>
-      <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;flex-shrink:0;">{{ importantDate }}</span>
-      <span onClick="{{ goCommunity }}" style="font-size:13px;color:#25C281;font-weight:700;cursor:pointer;flex-shrink:0;">공지 전체 →</span>
+      <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;flex-shrink:0;">{{ importantDate }}</span>
+      <span onClick="{{ goCommunity }}" style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#25C281;font-weight:700;cursor:pointer;flex-shrink:0;">공지 전체 →</span>
     </div>
   </div>
   </sc-if>
 
   <section style="position:relative;overflow:hidden;background:linear-gradient(157deg,#6FB8D8 0%,#53BAA6 54%,#5CBB94 100%);">
     <div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 8%,rgba(255,255,255,0.35),rgba(255,255,255,0) 46%);"></div>
-    <div style="position:relative;max-width:1180px;margin:0 auto;padding:66px 32px 60px;display:grid;grid-template-columns:1.08fr 0.92fr;gap:52px;align-items:center;">
+    <div style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(36px,6.5vw,66px) clamp(16px,4.5vw,32px) clamp(33px,6vw,60px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:clamp(26px,2.36vw,52px);align-items:center;">
       <div>
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.15em;color:#173a63;font-weight:700;margin-bottom:20px;">BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</div>
-        <h1 style="font-size:55px;font-weight:800;line-height:1.13;letter-spacing:-0.025em;color:#183566;margin:0 0 22px;">{{ t.hero_over }}<br><span style="color:#FF6B5A;">{{ t.hero_busan }}</span>{{ t.hero_after }}</h1>
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.15em;color:#173a63;font-weight:700;margin-bottom:20px;">BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</div>
+        <h1 style="font-size:clamp(37px,6.11vw,55px);font-weight:800;line-height:1.13;letter-spacing:-0.025em;color:#183566;margin:0 0 22px;">{{ t.hero_over }}<br><span style="color:#FF6B5A;">{{ t.hero_busan }}</span>{{ t.hero_after }}</h1>
         <p style="font-size:18px;line-height:1.6;color:#1c3f63;margin:0 0 30px;max-width:480px;font-weight:500;">{{ t.hero_sub }}</p>
         <div style="display:flex;gap:12px;margin-bottom:34px;flex-wrap:wrap;">
           <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#2E90D6;flex-shrink:0;"></span>2026.11.13(FRI) – 11.14(SAT)</span>
           <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#11A37B;flex-shrink:0;"></span>{{ t.hero_venue }}</span>
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;">
-          <button onClick="{{ regEx }}" style="background:#183566;color:#fff;border:none;padding:19px 30px;border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:9px;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,53,102,0.45);">{{ t.reg_ex }}</button>
-          <button onClick="{{ regBuyer }}" style="background:#0B5FA5;color:#fff;border:none;padding:19px 30px;border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);">{{ t.reg_buyer }}</button>
-          <button onClick="{{ regVisitor }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px 30px;border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);background:#fff;">{{ t.reg_visitor }}</button>
+          <button onClick="{{ regEx }}" style="background:#183566;color:#fff;border:none;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:9px;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,53,102,0.45);">{{ t.reg_ex }}</button>
+          <button onClick="{{ regBuyer }}" style="background:#0B5FA5;color:#fff;border:none;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);">{{ t.reg_buyer }}</button>
+          <button onClick="{{ regVisitor }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);background:#fff;">{{ t.reg_visitor }}</button>
         </div>
       </div>
       <div style="position:relative;">
         <div style="border-radius:18px;overflow:hidden;background:#fff;border:1px solid rgba(255,255,255,0.7);box-shadow:0 24px 60px rgba(24,53,102,0.28);"><img src="uploads/keyvisual.png" alt="MEDI × WELLNESS · BIMTC 2026 키비주얼" style="width:100%;display:block;" /></div>
-        <div style="position:absolute;left:-22px;bottom:34px;background:#183566;color:#fff;border-radius:14px;padding:18px 22px;box-shadow:0 18px 40px rgba(24,53,102,0.4);">
-          <div style="font-family:'Pretendard',sans-serif;font-size:11px;letter-spacing:0.14em;color:#5CE0B4;margin-bottom:6px;font-weight:700;">COUNTDOWN</div>
-          <div style="font-size:34px;font-weight:800;letter-spacing:-0.02em;line-height:1;">D-154</div>
-          <div style="font-size:12px;color:#9fc0d6;margin-top:6px;">{{ t.countdown_days }}</div>
+        <div style="position:absolute;left:14px;bottom:clamp(14px,3vw,34px);background:#183566;color:#fff;border-radius:14px;padding:18px clamp(14px,4vw,22px);box-shadow:0 18px 40px rgba(24,53,102,0.4);">
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);letter-spacing:0.14em;color:#5CE0B4;margin-bottom:6px;font-weight:700;">COUNTDOWN</div>
+          <div style="font-size:clamp(23px,3.78vw,34px);font-weight:800;letter-spacing:-0.02em;line-height:1;">D-154</div>
+          <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9fc0d6;margin-top:6px;">{{ t.countdown_days }}</div>
         </div>
       </div>
     </div>
   </section>
 
   <section style="background:#1E3160;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
       <div style="text-align:center;margin-bottom:34px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;font-weight:700;margin-bottom:10px;">2025 REVIEW</div>
-        <h2 style="font-size:28px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0;">2025 BIMTC</h2>
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#25C281;font-weight:700;margin-bottom:10px;">2025 REVIEW</div>
+        <h2 style="font-size:clamp(22px,3.11vw,28px);font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0;">2025 BIMTC</h2>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:24px;">
         <sc-for list="{{ statsA }}" as="s" hint-placeholder-count="4">
           <div style="display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;">
-            <div style="font-family:'Pretendard',sans-serif;font-size:46px;font-weight:800;color:#25C281;letter-spacing:-0.03em;line-height:1;">{{ s.num }}</div>
+            <div style="font-family:'Pretendard',sans-serif;font-size:clamp(31px,5.11vw,46px);font-weight:800;color:#25C281;letter-spacing:-0.03em;line-height:1;">{{ s.num }}</div>
             <div style="font-size:14px;color:#9fc0d6;font-weight:600;">{{ s.label }}</div>
           </div>
         </sc-for>
@@ -153,11 +199,11 @@
   </section>
 
   <section style="background:#F4F8F6;color:#0A2236;">
-    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
-      <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">{{ t.who_over }}</div>
-      <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#0A2236;margin:0 0 44px;">{{ t.who_title }}</h2>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
-        <div style="border:1px solid #d9e7f4;border-radius:18px;padding:36px;background:linear-gradient(160deg,#F4F9FE,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(11,95,165,0.06);">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(50px,6.5vw,90px) clamp(16px,4.5vw,32px);">
+      <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">{{ t.who_over }}</div>
+      <h2 style="font-size:clamp(23px,3.78vw,34px);font-weight:800;letter-spacing:-0.02em;color:#0A2236;margin:0 0 44px;">{{ t.who_title }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:24px;">
+        <div style="border:1px solid #d9e7f4;border-radius:18px;padding:clamp(20px,4.5vw,36px);background:linear-gradient(160deg,#F4F9FE,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(11,95,165,0.06);">
           <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#9bb6cf;margin-bottom:18px;">01</div>
           <h3 style="font-size:22px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part1_title }}</h3>
           <p style="font-size:15px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part1_desc }}</p>
@@ -168,7 +214,7 @@
           </div>
           <div style="margin-top:auto;"><a onClick="{{ goBooth }}" style="color:#0B5FA5;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part1_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
         </div>
-        <div style="border:1px solid #cbe9dd;border-radius:18px;padding:36px;background:linear-gradient(160deg,#EFF9F4,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(17,163,123,0.06);">
+        <div style="border:1px solid #cbe9dd;border-radius:18px;padding:clamp(20px,4.5vw,36px);background:linear-gradient(160deg,#EFF9F4,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(17,163,123,0.06);">
           <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#9cccb9;margin-bottom:18px;">02</div>
           <h3 style="font-size:22px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part2_title }}</h3>
           <p style="font-size:15px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part2_desc }}</p>
@@ -179,7 +225,7 @@
           </div>
           <div style="margin-top:auto;"><a onClick="{{ goConsole }}" style="color:#0d8f6b;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;">{{ t.part2_cta }} <span style="font-family:'Pretendard',sans-serif;">→</span></a></div>
         </div>
-        <div style="border:1px solid #e2ddf3;border-radius:18px;padding:36px;background:linear-gradient(160deg,#F6F4FC,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(122,92,196,0.06);">
+        <div style="border:1px solid #e2ddf3;border-radius:18px;padding:clamp(20px,4.5vw,36px);background:linear-gradient(160deg,#F6F4FC,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(122,92,196,0.06);">
           <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#b3a6d6;margin-bottom:18px;">03</div>
           <h3 style="font-size:22px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part3_title }}</h3>
           <p style="font-size:15px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part3_desc }}</p>
@@ -195,13 +241,13 @@
   </section>
 
   <section style="background:#1E3160;border-top:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:84px 32px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(46px,6.5vw,84px) clamp(16px,4.5vw,32px);">
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:18px;margin-bottom:34px;">
         <div>
-          <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">SCHEDULE</div>
-          <h2 style="font-size:32px;font-weight:800;color:#fff;margin:0;letter-spacing:-0.02em;">{{ t.sched_title }}</h2>
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">SCHEDULE</div>
+          <h2 style="font-size:clamp(22px,3.56vw,32px);font-weight:800;color:#fff;margin:0;letter-spacing:-0.02em;">{{ t.sched_title }}</h2>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;font-family:'Pretendard',sans-serif;font-size:13px;">
+        <div style="display:flex;align-items:center;gap:8px;font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);">
           <span style="background:#25C281;color:#04261a;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;">{{ t.sf_all }}</span>
           <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">{{ t.sf_reg }}</span>
           <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">{{ t.sf_event }}</span>
@@ -209,8 +255,8 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <sc-for list="{{ scheduleB }}" as="s" hint-placeholder-count="6">
-          <div style="display:flex;align-items:center;gap:22px;padding:18px 24px;border:1px solid #cdd8e4;border-radius:14px;background:#e7edf3;box-shadow:0 2px 8px rgba(0,0,0,0.16);" style-hover="border-color:#25C281;background:#eef2f7;box-shadow:0 6px 16px rgba(37,194,129,0.15);">
-            <span style="width:148px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:13.5px;color:#5e7388;letter-spacing:-0.01em;">{{ s.date }}</span>
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px;padding:18px clamp(14px,4vw,24px);border:1px solid #cdd8e4;border-radius:14px;background:#e7edf3;box-shadow:0 2px 8px rgba(0,0,0,0.16);" style-hover="border-color:#25C281;background:#eef2f7;box-shadow:0 6px 16px rgba(37,194,129,0.15);">
+            <span style="width:148px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#5e7388;letter-spacing:-0.01em;">{{ s.date }}</span>
             {{ s.tagEl }}
             <span style="flex:1;min-width:160px;font-size:16.5px;font-weight:600;color:#0A2236;">{{ s.title }}</span>
             {{ s.statusEl }}
@@ -222,14 +268,14 @@
   </section>
 
   <section style="background:#254075;border-top:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(50px,6.5vw,90px) clamp(16px,4.5vw,32px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:clamp(28px,2.55vw,56px);align-items:center;">
       <div>
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">OVERVIEW</div>
-        <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 28px;">{{ t.over_title }}</h2>
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">OVERVIEW</div>
+        <h2 style="font-size:clamp(23px,3.78vw,34px);font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 28px;">{{ t.over_title }}</h2>
         <div style="display:flex;flex-direction:column;">
           <sc-for list="{{ overviewA }}" as="o" hint-placeholder-count="6">
             <div style="display:flex;gap:24px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
-              <div style="width:96px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12px;letter-spacing:0.08em;color:#6b8aa6;padding-top:2px;">{{ o.k }}</div>
+              <div style="width:96px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);letter-spacing:0.08em;color:#6b8aa6;padding-top:2px;">{{ o.k }}</div>
               <div style="font-size:16px;font-weight:600;color:#e3edf6;">{{ o.v }}</div>
             </div>
           </sc-for>
@@ -247,12 +293,12 @@
   </section>
 
   <section style="background:#16294F;">
-    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
-      <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">PROGRAM</div>
-      <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 44px;">{{ t.prog_title }}</h2>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(50px,6.5vw,90px) clamp(16px,4.5vw,32px);">
+      <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">PROGRAM</div>
+      <h2 style="font-size:clamp(23px,3.78vw,34px);font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0 0 44px;">{{ t.prog_title }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:20px;">
         <sc-for list="{{ programA }}" as="p" hint-placeholder-count="4">
-          <div style="border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;background:rgba(255,255,255,0.02);" style-hover="border-color:rgba(37,194,129,0.4);transform:translateY(-3px);">
+          <div style="border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px clamp(14px,4vw,24px);background:rgba(255,255,255,0.02);" style-hover="border-color:rgba(37,194,129,0.4);transform:translateY(-3px);">
             <div style="width:44px;height:44px;border-radius:11px;background:{{ p.bg }};display:flex;align-items:center;justify-content:center;margin-bottom:20px;">{{ p.icon }}</div>
             <h3 style="font-size:18px;font-weight:700;color:#fff;margin:0 0 10px;">{{ p.title }}</h3>
             <p style="font-size:14px;line-height:1.6;color:#9fc0d6;margin:0;">{{ p.desc }}</p>
@@ -263,38 +309,38 @@
   </section>
 
   <section style="background:#ffffff;color:#0A2236;">
-    <div style="max-width:1180px;margin:0 auto;padding:84px 32px;">
-      <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS & VENUE</div>
-      <h2 style="font-size:32px;font-weight:800;color:#0A2236;margin:0 0 36px;letter-spacing:-0.02em;">{{ t.access_title }}</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:18px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(46px,6.5vw,84px) clamp(16px,4.5vw,32px);">
+      <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS & VENUE</div>
+      <h2 style="font-size:clamp(22px,3.56vw,32px);font-weight:800;color:#0A2236;margin:0 0 36px;letter-spacing:-0.02em;">{{ t.access_title }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:24px;margin-bottom:18px;">
         <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
           <div id="bimtc-map-access" style="aspect-ratio:16/9;background:#dff1e9;"></div>
-          <div style="padding:26px 28px;">
+          <div style="padding:26px clamp(17px,4vw,28px);">
             <h3 style="font-size:19px;font-weight:800;margin:0 0 16px;color:#0A2236;">{{ t.access_way }}</h3>
             <div style="display:flex;flex-direction:column;gap:11px;">
-              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">KTX</span><span style="color:#33485e;">{{ t.acc_ktx }}</span></div>
-              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">AIR</span><span style="color:#33485e;">{{ t.acc_air }}</span></div>
-              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;width:58px;flex-shrink:0;">METRO</span><span style="color:#33485e;">{{ t.acc_metro }}</span></div>
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0d8f6b;width:58px;flex-shrink:0;">KTX</span><span style="color:#33485e;">{{ t.acc_ktx }}</span></div>
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0d8f6b;width:58px;flex-shrink:0;">AIR</span><span style="color:#33485e;">{{ t.acc_air }}</span></div>
+              <div style="display:flex;gap:14px;font-size:14.5px;"><span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0d8f6b;width:58px;flex-shrink:0;">METRO</span><span style="color:#33485e;">{{ t.acc_metro }}</span></div>
             </div>
             <a href="https://map.naver.com/p/search/부산 벡스코" target="_blank" style="display:inline-block;margin-top:20px;color:#0B5FA5;font-weight:700;font-size:14.5px;cursor:pointer;text-decoration:none;">{{ t.access_map }}</a>
           </div>
         </div>
         <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
-          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#6885a3;font-family:'Pretendard',sans-serif;font-size:13px;"><span style="background:#0B5FA5;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;">{{ t.floor_soon }}</span></div>
-          <div style="padding:26px 28px;">
+          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#6885a3;font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);"><span style="background:#0B5FA5;color:#fff;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;padding:5px 14px;border-radius:999px;">{{ t.floor_soon }}</span></div>
+          <div style="padding:26px clamp(17px,4vw,28px);">
             <h3 style="font-size:19px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.floor_title }}</h3>
             <p style="font-size:14.5px;line-height:1.6;color:#52677d;margin:0 0 20px;">{{ t.floor_soon_desc }}</p>
-            <button disabled style="background:#e6ebf2;color:#9aa9bd;border:none;padding:13px 22px;border-radius:10px;font-size:14.5px;font-weight:700;font-family:'Pretendard',sans-serif;cursor:not-allowed;">{{ t.floor_soon }}</button>
+            <button disabled style="background:#e6ebf2;color:#9aa9bd;border:none;padding:13px clamp(14px,4vw,22px);border-radius:10px;font-size:14.5px;font-weight:700;font-family:'Pretendard',sans-serif;cursor:not-allowed;">{{ t.floor_soon }}</button>
           </div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:24px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:18px;margin-top:24px;">
         <sc-for list="{{ quickLinksB }}" as="q" hint-placeholder-count="4">
-          <div onClick="{{ q.onClick }}" style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px 24px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#9fcabb;transform:translateY(-3px);">
+          <div onClick="{{ q.onClick }}" style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px clamp(14px,4vw,24px);cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#9fcabb;transform:translateY(-3px);">
             <div style="width:44px;height:44px;border-radius:12px;background:#EFF7F3;display:flex;align-items:center;justify-content:center;">{{ q.icon }}</div>
             <div style="font-size:17px;font-weight:800;color:#0A2236;">{{ q.title }}</div>
-            <div style="font-size:13px;line-height:1.55;color:#5e7388;">{{ q.desc }}</div>
-            <span style="margin-top:2px;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#0d8f6b;font-weight:600;">{{ q.go }}</span>
+            <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.55;color:#5e7388;">{{ q.desc }}</div>
+            <span style="margin-top:2px;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#0d8f6b;font-weight:600;">{{ q.go }}</span>
           </div>
         </sc-for>
       </div>
@@ -302,12 +348,12 @@
   </section>
 
   <section style="background:#16294F;border-top:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(50px,6.5vw,90px) clamp(16px,4.5vw,32px);">
       <div style="margin-bottom:36px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">EXHIBITORS</div>
-        <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0;">{{ t.exh_title }}</h2>
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">EXHIBITORS</div>
+        <h2 style="font-size:clamp(23px,3.78vw,34px);font-weight:800;letter-spacing:-0.02em;color:#fff;margin:0;">{{ t.exh_title }}</h2>
       </div>
-      <div style="border:1px dashed rgba(255,255,255,0.18);border-radius:16px;background:rgba(255,255,255,0.03);padding:70px 24px;text-align:center;">
+      <div style="border:1px dashed rgba(255,255,255,0.18);border-radius:16px;background:rgba(255,255,255,0.03);padding:clamp(39px,6.5vw,70px) clamp(14px,4vw,24px);text-align:center;">
         <h3 style="font-size:19px;font-weight:800;margin:0 0 10px;color:#fff;">{{ t.exh_soon }}</h3>
         <p style="font-size:14.5px;color:#9fc0d6;margin:0;line-height:1.6;">{{ t.exh_soon_desc }}</p>
       </div>
@@ -315,16 +361,16 @@
   </section>
 
   <section style="background:#1E3160;border-top:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:90px 32px;display:grid;grid-template-columns:1fr 1fr;gap:48px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(50px,6.5vw,90px) clamp(16px,4.5vw,32px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:clamp(24px,2.18vw,48px);">
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
           <h2 style="font-size:24px;font-weight:800;color:#fff;margin:0;">{{ t.notice_title }}</h2>
-          <a onClick="{{ goCommunity }}" style="font-family:'Pretendard',sans-serif;font-size:13px;color:#6b8aa6;cursor:pointer;text-decoration:none;">{{ t.more }}</a>
+          <a onClick="{{ goCommunity }}" style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#6b8aa6;cursor:pointer;text-decoration:none;">{{ t.more }}</a>
         </div>
         <div style="display:flex;flex-direction:column;">
           <sc-for list="{{ notices }}" as="n" hint-placeholder-count="4">
             <div onClick="{{ goCommunity }}" style="display:flex;gap:18px;padding:18px 0;border-top:1px solid rgba(255,255,255,0.08);align-items:baseline;cursor:pointer;">
-              <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;flex-shrink:0;width:74px;">{{ n.date }}</span>
+              <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;flex-shrink:0;width:74px;">{{ n.date }}</span>
               <span style="font-size:15.5px;color:#e3edf6;font-weight:500;line-height:1.45;">{{ n.title }}</span>
             </div>
           </sc-for>
@@ -336,7 +382,7 @@
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
           <h2 style="font-size:24px;font-weight:800;color:#fff;margin:0;">{{ t.press_title }}</h2>
-          <a onClick="{{ goCommunity }}" style="font-family:'Pretendard',sans-serif;font-size:13px;color:#6b8aa6;cursor:pointer;text-decoration:none;">{{ t.more }}</a>
+          <a onClick="{{ goCommunity }}" style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#6b8aa6;cursor:pointer;text-decoration:none;">{{ t.more }}</a>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px;">
           <sc-for list="{{ press }}" as="pr" hint-placeholder-count="3">
@@ -344,7 +390,7 @@
               <div style="width:88px;height:60px;border-radius:10px;flex-shrink:0;background:repeating-linear-gradient(135deg,#0A3A2C,#0A3A2C 10px,#0d4434 10px,#0d4434 20px);border:1px solid rgba(37,194,129,0.18);"></div>
               <div>
                 <div style="font-size:15px;font-weight:600;color:#e3edf6;line-height:1.4;margin-bottom:6px;">{{ pr.title }}</div>
-                <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;">{{ pr.src }}</div>
+                <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;">{{ pr.src }}</div>
               </div>
             </div>
           </sc-for>
@@ -357,10 +403,10 @@
   </section>
 
   <section style="background:#16294F;border-top:1px solid rgba(255,255,255,0.06);">
-    <div style="max-width:1180px;margin:0 auto;padding:48px 32px;">
-      <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:56px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(26px,6.5vw,48px) clamp(16px,4.5vw,32px);">
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:clamp(28px,2.55vw,56px);">
         <div style="text-align:center;">
-          <div style="font-family:'Pretendard',sans-serif;font-size:12px;letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_host }}</div>
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_host }}</div>
           <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:32px;">
             <img src="uploads/logo_host1.png" alt="부산광역시" style="height:34px;width:auto;object-fit:contain;opacity:0.92;" />
             <img src="uploads/logo_host2.png" alt="부산일보" style="height:30px;width:auto;object-fit:contain;opacity:0.92;" />
@@ -368,7 +414,7 @@
         </div>
         <div style="width:1px;align-self:stretch;background:rgba(255,255,255,0.1);"></div>
         <div style="text-align:center;">
-          <div style="font-family:'Pretendard',sans-serif;font-size:12px;letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_org }}</div>
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_org }}</div>
           <div style="display:flex;justify-content:center;align-items:center;">
             <img src="uploads/logo_org.png" alt="(사)부산권의료산업협의회" style="height:30px;width:auto;object-fit:contain;opacity:0.92;" />
           </div>
@@ -378,15 +424,15 @@
   </section>
 
   <section style="background:linear-gradient(115deg,#1E88C4 0%,#2FB6A6 58%,#3FC08F 100%);">
-    <div style="max-width:1180px;margin:0 auto;padding:76px 32px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);display:flex;align-items:center;justify-content:space-between;gap:clamp(20px,1.82vw,40px);flex-wrap:wrap;">
       <div>
-        <h2 style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin:0 0 12px;">{{ t.cta_band_title }}<br>{{ t.cta_band_title2 }}</h2>
+        <h2 style="font-size:clamp(24px,4.00vw,36px);font-weight:800;color:#fff;letter-spacing:-0.02em;margin:0 0 12px;">{{ t.cta_band_title }}<br>{{ t.cta_band_title2 }}</h2>
         <p style="font-size:16px;color:rgba(255,255,255,0.86);margin:0;">{{ t.cta_band_sub }}</p>
-        <p style="font-size:13.5px;color:rgba(255,255,255,0.7);margin:8px 0 0;">{{ t.cta_biz_note }}</p>
+        <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:rgba(255,255,255,0.7);margin:8px 0 0;">{{ t.cta_biz_note }}</p>
       </div>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
-        <button onClick="{{ goExhibit }}" style="background:#fff;color:#0A2236;border:none;padding:16px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_exhibit }}</button>
-        <button onClick="{{ goConsole }}" style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_biz }} →</button>
+        <button onClick="{{ goExhibit }}" style="background:#fff;color:#0A2236;border:none;padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_exhibit }}</button>
+        <button onClick="{{ goConsole }}" style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_biz }} →</button>
       </div>
     </div>
   </section>
@@ -397,36 +443,36 @@
   <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
   <div>
     <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">{{ t.ab_bc }}</div>
-        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.ab_title }}</h1>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.ab_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.ab_title }}</h1>
         <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">{{ t.ab_sub }}</p>
       </div>
     </div>
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:clamp(28px,2.55vw,56px);align-items:start;">
         <div>
-          <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">OVERVIEW</div>
-          <h2 style="font-size:30px;font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.ab_ov }}</h2>
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">OVERVIEW</div>
+          <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.ab_ov }}</h2>
           <div style="display:flex;flex-direction:column;border-top:1px solid #e6ebf2;">
             <sc-for list="{{ overviewA }}" as="o" hint-placeholder-count="6">
               <div style="display:flex;gap:20px;padding:15px 0;border-bottom:1px solid #eef2f7;">
-                <div style="width:84px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;padding-top:2px;">{{ o.k }}</div>
+                <div style="width:84px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;padding-top:2px;">{{ o.k }}</div>
                 <div style="font-size:15.5px;font-weight:600;color:#22384e;">{{ o.v }}</div>
               </div>
             </sc-for>
           </div>
-          <div style="margin-top:24px;padding:20px 22px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:14px;font-size:14px;line-height:1.7;color:#52677d;">
+          <div style="margin-top:24px;padding:20px clamp(14px,4vw,22px);background:#F4F8F6;border:1px solid #e2ece7;border-radius:14px;font-size:14px;line-height:1.7;color:#52677d;">
             {{ t.ab_intro }}
           </div>
         </div>
         <div>
           <div style="aspect-ratio:4/3;border-radius:16px;overflow:hidden;border:1px solid #dce6f2;margin-bottom:16px;"><img src="uploads/expo_hall.jpg" alt="BIMTC 전시장 전경" style="width:100%;height:100%;object-fit:cover;" /></div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:10px;">
             <sc-for list="{{ hallTags }}" as="h" hint-placeholder-count="4">
               <div style="background:#0A2236;color:#fff;border-radius:12px;padding:16px 12px;text-align:center;">
                 <div style="font-size:14px;font-weight:800;">{{ h.t }}</div>
-                <div style="font-size:11px;color:#9fb4c7;margin-top:5px;">{{ h.d }}</div>
+                <div style="font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#9fb4c7;margin-top:5px;">{{ h.d }}</div>
               </div>
             </sc-for>
           </div>
@@ -434,21 +480,21 @@
       </div>
     </section>
     <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
-      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">HISTORY</div>
-        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ab_hist }}</h2>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">HISTORY</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ab_hist }}</h2>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
-          <div style="display:flex;gap:16px;padding:14px 24px;background:#0A2236;color:#9fb4c7;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:600;">
+          <div style="display:flex;flex-wrap:wrap;gap:8px 16px;padding:14px clamp(14px,4vw,24px);background:#0A2236;color:#9fb4c7;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:600;">
             <span style="width:64px;flex-shrink:0;">{{ t.hist_year }}</span>
             <span style="width:64px;flex-shrink:0;">{{ t.hist_round }}</span>
             <span style="width:130px;flex-shrink:0;">{{ t.hist_date }}</span>
             <span style="flex:1;">{{ t.hist_scale }}</span>
           </div>
           <sc-for list="{{ historyRows }}" as="h" hint-placeholder-count="4">
-            <div style="display:flex;gap:16px;padding:16px 24px;border-top:1px solid #eef2f7;align-items:baseline;">
+            <div style="display:flex;flex-wrap:wrap;gap:8px 16px;padding:16px clamp(14px,4vw,24px);border-top:1px solid #eef2f7;align-items:baseline;">
               <span style="width:64px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:15px;font-weight:700;color:#0B5FA5;">{{ h.year }}</span>
               <span style="width:64px;flex-shrink:0;font-size:14px;font-weight:600;color:#33485e;">{{ h.round }}</span>
-              <span style="width:130px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:13px;color:#5e7388;">{{ h.date }}</span>
+              <span style="width:130px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7388;">{{ h.date }}</span>
               <span style="flex:1;font-size:14.5px;color:#33485e;">{{ h.scale }}</span>
             </div>
           </sc-for>
@@ -456,14 +502,14 @@
       </div>
     </section>
     <section style="background:#ffffff;color:#0A2236;border-top:1px solid #e6ebf2;">
-      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS</div>
-        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ab_access }}</h2>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ab_access }}</h2>
         <div id="bimtc-map-about" style="aspect-ratio:21/7;border-radius:16px;overflow:hidden;border:1px solid #cbe9dd;background:#dff1e9;margin-bottom:24px;"></div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:16px;">
           <sc-for list="{{ accessCards }}" as="a" hint-placeholder-count="3">
             <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:14px;padding:24px;">
-              <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#0d8f6b;font-weight:600;margin-bottom:10px;">{{ a.k }}</div>
+              <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0d8f6b;font-weight:600;margin-bottom:10px;">{{ a.k }}</div>
               <div style="font-size:14.5px;line-height:1.6;color:#33485e;">{{ a.v }}</div>
             </div>
           </sc-for>
@@ -477,19 +523,19 @@
   <sc-if value="{{ isExhibit }}" hint-placeholder-val="{{ false }}">
   <div>
     <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">{{ t.ex_bc }}</div>
-        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.ex_title2 }}</h1>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.ex_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.ex_title2 }}</h1>
         <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">{{ t.ex_sub2 }}</p>
       </div>
     </div>
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">WHY EXHIBIT</div>
-        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ex_benefit }}</h2>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">WHY EXHIBIT</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ex_benefit }}</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:16px;">
           <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="3">
-            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:30px 26px;">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:30px clamp(16px,4vw,26px);">
               <div style="width:44px;height:44px;border-radius:11px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin-bottom:18px;">{{ b.icon }}</div>
               <h3 style="font-size:18px;font-weight:800;margin:0 0 8px;">{{ b.t }}</h3>
               <p style="font-size:14px;line-height:1.6;color:#5e7388;margin:0;">{{ b.d }}</p>
@@ -499,22 +545,22 @@
       </div>
     </section>
     <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
-      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">BOOTH & FEE</div>
-        <h2 style="font-size:30px;font-weight:800;margin:0 0 8px;letter-spacing:-0.02em;">{{ t.ex_booth }}</h2>
-        <p style="font-size:13.5px;color:#0d8f6b;font-weight:600;margin:0 0 20px;">{{ boothNote }}</p>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">BOOTH & FEE</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 8px;letter-spacing:-0.02em;">{{ t.ex_booth }}</h2>
+        <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0d8f6b;font-weight:600;margin:0 0 20px;">{{ boothNote }}</p>
         <div style="display:flex;flex-direction:column;gap:16px;">
           <sc-for list="{{ boothTiers }}" as="b" hint-placeholder-count="3">
-            <div style="background:#fff;border:1px solid {{ b.border }};border-radius:16px;position:relative;overflow:hidden;display:flex;">
-              <sc-if value="{{ b.badge }}"><span style="position:absolute;top:16px;right:16px;z-index:2;font-family:'Pretendard',sans-serif;font-size:10.5px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:4px 9px;border-radius:999px;">{{ b.badge }}</span></sc-if>
-              <div style="width:300px;flex-shrink:0;background:#ffffff;border-right:1px solid #eef2f7;display:flex;align-items:center;justify-content:center;overflow:hidden;">{{ b.imgEl }}</div>
-              <div style="flex:1;padding:30px 32px;">
+            <div style="background:#fff;border:1px solid {{ b.border }};border-radius:16px;position:relative;overflow:hidden;display:flex;flex-wrap:wrap;">
+              <sc-if value="{{ b.badge }}"><span style="position:absolute;top:16px;right:16px;z-index:2;font-family:'Pretendard',sans-serif;font-size:clamp(10.5px,calc(14.63px - 0.35vw),12.5px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:4px 9px;border-radius:999px;">{{ b.badge }}</span></sc-if>
+              <div style="width:100%;max-width:300px;flex-shrink:0;background:#ffffff;border-right:1px solid #eef2f7;display:flex;align-items:center;justify-content:center;overflow:hidden;">{{ b.imgEl }}</div>
+              <div style="flex:1;min-width:min(240px,100%);padding:30px clamp(16px,4.5vw,32px);">
               <div style="font-size:20px;font-weight:800;margin:0 0 4px;">{{ b.name }}</div>
-              <div style="font-family:'Pretendard',sans-serif;font-size:13px;color:#8295ab;margin-bottom:14px;">{{ b.size }}</div>
-              <div style="font-size:27px;font-weight:800;color:#0B5FA5;letter-spacing:-0.02em;margin-bottom:18px;">{{ b.price }}</div>
+              <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:14px;">{{ b.size }}</div>
+              <div style="font-size:clamp(22px,3.00vw,27px);font-weight:800;color:#0B5FA5;letter-spacing:-0.02em;margin-bottom:18px;">{{ b.price }}</div>
               <div style="display:flex;flex-direction:column;gap:9px;">
                 <sc-for list="{{ b.feats }}" as="f" hint-placeholder-count="3">
-                  <div style="display:flex;gap:9px;font-size:13.5px;color:#33485e;"><span style="color:#11A37B;font-weight:800;">✓</span>{{ f }}</div>
+                  <div style="display:flex;gap:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#33485e;"><span style="color:#11A37B;font-weight:800;">✓</span>{{ f }}</div>
                 </sc-for>
               </div>
               </div>
@@ -524,31 +570,31 @@
       </div>
     </section>
     <section style="background:#ffffff;color:#0A2236;border-top:1px solid #e6ebf2;">
-      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">HOW TO APPLY</div>
-        <h2 style="font-size:30px;font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ex_process }}</h2>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">HOW TO APPLY</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ex_process }}</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:16px;margin-bottom:36px;">
           <sc-for list="{{ applyProcess }}" as="p" hint-placeholder-count="4">
-            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px 22px;">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px clamp(14px,4vw,22px);">
               <div style="font-family:'Pretendard',sans-serif;font-size:22px;font-weight:600;color:#c2cdda;margin-bottom:14px;">{{ p.no }}</div>
               <h3 style="font-size:16px;font-weight:800;margin:0 0 8px;">{{ p.t }}</h3>
-              <p style="font-size:13px;line-height:1.6;color:#5e7388;margin:0;">{{ p.d }}</p>
+              <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.6;color:#5e7388;margin:0;">{{ p.d }}</p>
             </div>
           </sc-for>
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;">
-          <button onClick="{{ goBooth }}" style="background:#0B5FA5;color:#fff;border:none;padding:16px 30px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.ex_apply_btn }} →</button>
-          <button onClick="{{ goConsole }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:16px 30px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.part2_cta }}</button>
+          <button onClick="{{ goBooth }}" style="background:#0B5FA5;color:#fff;border:none;padding:16px clamp(18px,4vw,30px);border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.ex_apply_btn }} →</button>
+          <button onClick="{{ goConsole }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:16px clamp(18px,4vw,30px);border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.part2_cta }}</button>
         </div>
       </div>
     </section>
     <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
-      <div style="max-width:1180px;margin:0 auto;padding:76px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">FAQ</div>
-        <h2 style="font-size:30px;font-weight:800;margin:0 0 28px;letter-spacing:-0.02em;">{{ t.ex_faq }}</h2>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">FAQ</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 28px;letter-spacing:-0.02em;">{{ t.ex_faq }}</h2>
         <div style="display:flex;flex-direction:column;gap:12px;">
           <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
-            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:22px 24px;">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:22px clamp(14px,4vw,24px);">
               <div style="display:flex;gap:12px;margin-bottom:8px;"><span style="font-family:'Pretendard',sans-serif;font-weight:700;color:#0B5FA5;">Q</span><span style="font-size:16px;font-weight:700;color:#0A2236;">{{ f.q }}</span></div>
               <div style="display:flex;gap:12px;"><span style="font-family:'Pretendard',sans-serif;font-weight:700;color:#11A37B;">A</span><span style="font-size:14.5px;line-height:1.65;color:#52677d;">{{ f.a }}</span></div>
             </div>
@@ -563,41 +609,41 @@
   <sc-if value="{{ isVisit }}" hint-placeholder-val="{{ false }}">
   <div>
     <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">{{ t.vi_bc }}</div>
-        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.vi_title }}</h1>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.vi_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.vi_title }}</h1>
         <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">{{ t.vi_sub }}</p>
       </div>
     </div>
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;display:grid;grid-template-columns:0.9fr 1.1fr;gap:48px;align-items:start;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(35px,6.5vw,64px) clamp(16px,4.5vw,32px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));gap:clamp(24px,2.18vw,48px);align-items:start;">
         <div>
-          <div style="font-family:'Pretendard',sans-serif;font-size:13px;letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">BENEFITS</div>
-          <h2 style="font-size:26px;font-weight:800;margin:0 0 20px;letter-spacing:-0.02em;">{{ t.vi_benefit }}</h2>
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">BENEFITS</div>
+          <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 20px;letter-spacing:-0.02em;">{{ t.vi_benefit }}</h2>
           <div style="display:flex;flex-direction:column;gap:14px;">
             <sc-for list="{{ visitBenefits }}" as="v" hint-placeholder-count="4">
               <div style="display:flex;gap:14px;align-items:flex-start;padding:16px 18px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:12px;">
-                <span style="width:26px;height:26px;flex-shrink:0;border-radius:8px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">{{ v.n }}</span>
-                <div><div style="font-size:15px;font-weight:700;color:#0A2236;margin-bottom:3px;">{{ v.t }}</div><div style="font-size:13.5px;line-height:1.55;color:#5e7388;">{{ v.d }}</div></div>
+                <span style="width:26px;height:26px;flex-shrink:0;border-radius:8px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);">{{ v.n }}</span>
+                <div><div style="font-size:15px;font-weight:700;color:#0A2236;margin-bottom:3px;">{{ v.t }}</div><div style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);line-height:1.55;color:#5e7388;">{{ v.d }}</div></div>
               </div>
             </sc-for>
           </div>
-          <div style="margin-top:20px;padding:18px 20px;border-radius:12px;background:#EAF2FC;border:1px solid #cfe0f2;font-size:13.5px;line-height:1.65;color:#33485e;">{{ t.vi_hours }}: <strong>2026.11.13–14, 10:00–18:00</strong><br>{{ t.vi_free }}</div>
+          <div style="margin-top:20px;padding:18px 20px;border-radius:12px;background:#EAF2FC;border:1px solid #cfe0f2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);line-height:1.65;color:#33485e;">{{ t.vi_hours }}: <strong>2026.11.13–14, 10:00–18:00</strong><br>{{ t.vi_free }}</div>
         </div>
-        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:34px;box-shadow:0 12px 34px rgba(15,36,64,0.05);">
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:clamp(19px,4.5vw,34px);box-shadow:0 12px 34px rgba(15,36,64,0.05);">
           <sc-if value="{{ visitClosed }}" hint-placeholder-val="{{ true }}">
             <div style="text-align:center;padding:26px 4px;">
               <div style="width:60px;height:60px;border-radius:15px;background:#FBF3E2;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;"><div style="width:24px;height:24px;border-radius:7px;border:3px solid #E0A23C;"></div></div>
               <h3 style="font-size:20px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.vi_soon }}</h3>
               <p style="font-size:14px;color:#5E7289;margin:0 0 22px;line-height:1.6;">{{ t.vi_soon_d }}</p>
               <div style="border-top:1px solid #eef2f7;padding-top:22px;text-align:left;">
-                <label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">{{ t.vi_check }}</label>
+                <label style="display:block;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;margin-bottom:8px;color:#33485e;">{{ t.vi_check }}</label>
                 <div style="display:flex;gap:10px;">
-                  <input value="{{ crEmail }}" onInput="{{ setCrEmail }}" onKeyDown="{{ crKey }}" placeholder="name@email.com" style="flex:1;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" />
-                  <button onClick="{{ checkReg }}" style="background:#0B5FA5;color:#fff;border:none;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">조회</button>
+                  <input value="{{ crEmail }}" onInput="{{ setCrEmail }}" onKeyDown="{{ crKey }}" placeholder="name@email.com" style="flex:1;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" />
+                  <button onClick="{{ checkReg }}" style="background:#0B5FA5;color:#fff;border:none;padding:12px clamp(14px,4vw,22px);border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">조회</button>
                 </div>
                 <sc-if value="{{ crSearched }}" hint-placeholder-val="{{ false }}">
-                  <div style="margin-top:14px;font-size:13.5px;color:{{ crMsgColor }};background:{{ crMsgBg }};border-radius:9px;padding:11px 14px;">{{ crMsg }}</div>
+                  <div style="margin-top:14px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:{{ crMsgColor }};background:{{ crMsgBg }};border-radius:9px;padding:11px 14px;">{{ crMsg }}</div>
                 </sc-if>
               </div>
             </div>
@@ -607,20 +653,20 @@
               <div style="width:64px;height:64px;border-radius:50%;background:#E7F6F0;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><div style="width:24px;height:13px;border-left:3px solid #11A37B;border-bottom:3px solid #11A37B;transform:rotate(-45deg);margin-top:-6px;"></div></div>
               <h3 style="font-size:22px;font-weight:800;margin:0 0 10px;">사전등록이 완료되었습니다</h3>
               <p style="font-size:14.5px;color:#5E7289;margin:0 0 24px;line-height:1.6;">등록하신 이메일로 입장 QR과 안내를 보내드립니다.<br>현장에서 QR을 제시하면 빠르게 입장하실 수 있습니다.</p>
-              <button onClick="{{ resetVisitor }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 26px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">추가 등록하기</button>
+              <button onClick="{{ resetVisitor }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px clamp(16px,4vw,26px);border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">추가 등록하기</button>
             </div>
           </sc-if>
           <sc-if value="{{ visitorForm }}" hint-placeholder-val="{{ false }}">
             <h3 style="font-size:20px;font-weight:800;margin:0 0 20px;">{{ t.vf_title }}</h3>
             <div style="display:flex;flex-direction:column;gap:16px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_name }}</label><input value="{{ vName }}" onInput="{{ setVName }}" placeholder="ooo" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_phone }}</label><input value="{{ vPhone }}" onInput="{{ setVPhone }}" placeholder="010-0000-0000" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_email }}</label><input value="{{ vEmail }}" onInput="{{ setVEmail }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-                <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_org }}</label><input value="{{ vOrg }}" onInput="{{ setVOrg }}" placeholder="{{ t.vf_org_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;">
+                <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_name }}</label><input value="{{ vName }}" onInput="{{ setVName }}" placeholder="ooo" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_phone }}</label><input value="{{ vPhone }}" onInput="{{ setVPhone }}" placeholder="010-0000-0000" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_email }}</label><input value="{{ vEmail }}" onInput="{{ setVEmail }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+                <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.vf_org }}</label><input value="{{ vOrg }}" onInput="{{ setVOrg }}" placeholder="{{ t.vf_org_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
               </div>
               <div>
-                <label style="display:block;font-size:13px;font-weight:700;margin-bottom:9px;color:#33485e;">{{ t.vf_interest }}</label>
+                <label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:9px;color:#33485e;">{{ t.vf_interest }}</label>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
                   <sc-for list="{{ interestChips }}" as="c" hint-placeholder-count="6">
                     <span onClick="{{ c.toggle }}" style="{{ c.style }}">{{ c.label }}</span>
@@ -628,14 +674,14 @@
                 </div>
               </div>
               <div>
-                <label style="display:block;font-size:13px;font-weight:700;margin-bottom:9px;color:#33485e;">{{ t.vf_day }}</label>
+                <label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:9px;color:#33485e;">{{ t.vf_day }}</label>
                 <div style="display:flex;gap:10px;">
                   <sc-for list="{{ visitDays }}" as="d" hint-placeholder-count="3">
                     <span onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</span>
                   </sc-for>
                 </div>
               </div>
-              <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:#5e7388;line-height:1.5;margin-top:4px;cursor:pointer;"><span style="width:18px;height:18px;flex-shrink:0;border:1.5px solid #b7c4d3;border-radius:5px;margin-top:1px;"></span>{{ t.vf_agree }}</label>
+              <label style="display:flex;gap:9px;align-items:flex-start;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7388;line-height:1.5;margin-top:4px;cursor:pointer;"><span style="width:18px;height:18px;flex-shrink:0;border:1.5px solid #b7c4d3;border-radius:5px;margin-top:1px;"></span>{{ t.vf_agree }}</label>
               <button onClick="{{ submitVisitor }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:15px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:6px;">{{ t.vf_submit }}</button>
             </div>
           </sc-if>
@@ -649,19 +695,19 @@
   <sc-if value="{{ isCheckReg }}" hint-placeholder-val="{{ false }}">
   <div>
     <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#9fc0d6;margin-bottom:12px;">{{ t.cr_bc }}</div>
-        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.cr_title }}</h1>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9fc0d6;margin-bottom:12px;">{{ t.cr_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.cr_title }}</h1>
         <p style="font-size:16px;color:#c3d6e6;margin:14px 0 0;">{{ t.cr_sub }}</p>
       </div>
     </div>
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:640px;margin:0 auto;padding:56px 32px;">
-        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:34px;box-shadow:0 12px 34px rgba(15,36,64,0.05);">
-          <label style="display:block;font-size:13.5px;font-weight:700;margin-bottom:8px;color:#33485e;">{{ t.lg_email }}</label>
+      <div style="max-width:640px;margin:0 auto;padding:clamp(31px,6.5vw,56px) clamp(16px,4.5vw,32px);">
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:clamp(19px,4.5vw,34px);box-shadow:0 12px 34px rgba(15,36,64,0.05);">
+          <label style="display:block;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;margin-bottom:8px;color:#33485e;">{{ t.lg_email }}</label>
           <div style="display:flex;gap:10px;">
-            <input value="{{ crEmail }}" onInput="{{ setCrEmail }}" onKeyDown="{{ crKey }}" placeholder="name@email.com" style="flex:1;padding:13px 15px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" />
-            <button onClick="{{ checkReg }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ t.cr_btn }}</button>
+            <input value="{{ crEmail }}" onInput="{{ setCrEmail }}" onKeyDown="{{ crKey }}" placeholder="name@email.com" style="flex:1;padding:13px 15px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" />
+            <button onClick="{{ checkReg }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px clamp(14px,4vw,24px);border-radius:10px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ t.cr_btn }}</button>
           </div>
 
           <sc-if value="{{ crSearched }}" hint-placeholder-val="{{ false }}">
@@ -673,19 +719,19 @@
                 </div>
                 <sc-for list="{{ crRows }}" as="r" hint-placeholder-count="1">
                   <div style="border:1px solid #e6ebf2;border-radius:12px;overflow:hidden;margin-bottom:12px;">
-                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">{{ t.cr_name }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.name }}</span></div>
-                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">{{ t.cr_org }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.org }}</span></div>
-                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">{{ t.cr_day }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.dayLabel }}</span></div>
-                    <div style="display:flex;gap:16px;padding:13px 18px;"><span style="width:88px;flex-shrink:0;font-size:13px;color:#8295ab;">{{ t.cr_field }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.fields }}</span></div>
+                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;">{{ t.cr_name }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.name }}</span></div>
+                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;">{{ t.cr_org }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.org }}</span></div>
+                    <div style="display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid #eef2f7;"><span style="width:88px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;">{{ t.cr_day }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.dayLabel }}</span></div>
+                    <div style="display:flex;gap:16px;padding:13px 18px;"><span style="width:88px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;">{{ t.cr_field }}</span><span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.fields }}</span></div>
                   </div>
                 </sc-for>
-                <p style="font-size:13px;color:#8295ab;margin:14px 0 0;line-height:1.6;">{{ t.cr_note }}</p>
+                <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin:14px 0 0;line-height:1.6;">{{ t.cr_note }}</p>
               </sc-if>
               <sc-if value="{{ crNotFound }}" hint-placeholder-val="{{ true }}">
                 <div style="padding:22px;border-radius:12px;background:#FCF3F2;border:1px solid #f3d6d2;">
                   <div style="font-size:15px;font-weight:700;color:#c0392b;margin-bottom:6px;">{{ t.cr_none }}</div>
-                  <div style="font-size:13.5px;color:#8a5a55;line-height:1.6;">{{ t.cr_none_d }}</div>
-                  <button onClick="{{ goVisit }}" style="margin-top:14px;background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cr_goreg }}</button>
+                  <div style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#8a5a55;line-height:1.6;">{{ t.cr_none_d }}</div>
+                  <button onClick="{{ goVisit }}" style="margin-top:14px;background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cr_goreg }}</button>
                 </div>
               </sc-if>
             </div>
@@ -700,9 +746,9 @@
   <sc-if value="{{ isExhibition }}" hint-placeholder-val="{{ false }}">
   <div>
     <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">{{ t.exb_bc }}</div>
-        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.exb_title }}</h1>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.exb_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.exb_title }}</h1>
         <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">{{ t.exb_sub }}</p>
         <div style="display:flex;gap:10px;margin-top:22px;">
           <sc-for list="{{ exTabs }}" as="t" hint-placeholder-count="3">
@@ -714,8 +760,8 @@
 
     <sc-if value="{{ exCompanies }}" hint-placeholder-val="{{ true }}">
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;">
-        <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:80px 24px;text-align:center;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(35px,6.5vw,64px) clamp(16px,4.5vw,32px);">
+        <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:clamp(44px,6.5vw,80px) clamp(14px,4vw,24px);text-align:center;">
           <div style="width:60px;height:60px;border-radius:15px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><div style="width:26px;height:20px;border-radius:4px;border:3px solid #0B5FA5;"></div></div>
           <h3 style="font-size:20px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.exb_soon_t }}</h3>
           <p style="font-size:14.5px;color:#5E7289;margin:0;line-height:1.6;">{{ t.exb_soon_d }}</p>
@@ -726,9 +772,9 @@
 
     <sc-if value="{{ exFloor }}" hint-placeholder-val="{{ false }}">
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;">
-        <h2 style="font-size:26px;font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.floor_title2 }}</h2>
-        <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:80px 24px;text-align:center;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(35px,6.5vw,64px) clamp(16px,4.5vw,32px);">
+        <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.floor_title2 }}</h2>
+        <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:clamp(44px,6.5vw,80px) clamp(14px,4vw,24px);text-align:center;">
           <div style="width:60px;height:60px;border-radius:15px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><div style="width:24px;height:24px;border-radius:6px;border:3px solid #0B5FA5;"></div></div>
           <h3 style="font-size:20px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.exb_floor_t }}</h3>
           <p style="font-size:14.5px;color:#5E7289;margin:0;line-height:1.6;">{{ t.exb_floor_d }}</p>
@@ -739,16 +785,16 @@
 
     <sc-if value="{{ exProgram }}" hint-placeholder-val="{{ false }}">
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:1180px;margin:0 auto;padding:64px 32px;">
-        <h2 style="font-size:26px;font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.exb_prog }}</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(35px,6.5vw,64px) clamp(16px,4.5vw,32px);">
+        <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.exb_prog }}</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:24px;">
           <sc-for list="{{ timetable }}" as="d" hint-placeholder-count="2">
             <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px;">
               <div style="font-size:18px;font-weight:800;margin-bottom:16px;color:#0B5FA5;">{{ d.day }}</div>
               <div style="display:flex;flex-direction:column;">
                 <sc-for list="{{ d.rows }}" as="r" hint-placeholder-count="4">
                   <div style="display:flex;gap:16px;padding:13px 0;border-top:1px solid #e6ebf2;">
-                    <span style="width:96px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#8295ab;">{{ r.time }}</span>
+                    <span style="width:96px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ r.time }}</span>
                     <span style="font-size:14.5px;font-weight:600;color:#22384e;">{{ r.title }}</span>
                   </div>
                 </sc-for>
@@ -766,9 +812,9 @@
   <sc-if value="{{ isCommunity }}" hint-placeholder-val="{{ false }}">
   <div>
     <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <div style="max-width:1180px;margin:0 auto;padding:52px 32px;">
-        <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#6b8aa6;margin-bottom:12px;">{{ t.co_bc }}</div>
-        <h1 style="font-size:40px;font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.co_title }}</h1>
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.co_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.co_title }}</h1>
         <div style="display:flex;gap:10px;margin-top:22px;">
           <sc-for list="{{ commTabs }}" as="t" hint-placeholder-count="3">
             <span onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</span>
@@ -777,32 +823,32 @@
       </div>
     </div>
     <section style="background:#ffffff;color:#0A2236;">
-      <div style="max-width:1180px;margin:0 auto;padding:56px 32px;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(31px,6.5vw,56px) clamp(16px,4.5vw,32px);">
 
         <sc-if value="{{ commEmpty }}" hint-placeholder-val="{{ false }}">
-          <div style="border:1px dashed #d3deea;border-radius:16px;padding:64px 24px;text-align:center;color:#8295ab;font-size:15px;">{{ t.co_empty }}</div>
+          <div style="border:1px dashed #d3deea;border-radius:16px;padding:clamp(35px,6.5vw,64px) clamp(14px,4vw,24px);text-align:center;color:#8295ab;font-size:15px;">{{ t.co_empty }}</div>
         </sc-if>
 
         <sc-if value="{{ commNotice }}" hint-placeholder-val="{{ true }}">
           <div style="border-top:2px solid #0A2236;">
             <sc-for list="{{ noticeList }}" as="n" hint-placeholder-count="6">
               <div style="display:flex;gap:24px;padding:20px 8px;border-bottom:1px solid #eef2f7;align-items:center;cursor:pointer;" style-hover="background:#F4F8F6;">
-                <span style="font-family:'Pretendard',sans-serif;font-size:12px;font-weight:600;color:#0d8f6b;width:52px;flex-shrink:0;">{{ n.tag }}</span>
+                <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:600;color:#0d8f6b;width:52px;flex-shrink:0;">{{ n.tag }}</span>
                 <span style="flex:1;font-size:15.5px;font-weight:600;color:#22384e;">{{ n.title }}</span>
-                <span style="font-family:'Pretendard',sans-serif;font-size:12.5px;color:#9aa9bd;flex-shrink:0;">{{ n.date }}</span>
+                <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#9aa9bd;flex-shrink:0;">{{ n.date }}</span>
               </div>
             </sc-for>
           </div>
         </sc-if>
 
         <sc-if value="{{ commPress }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:18px;">
             <sc-for list="{{ pressList }}" as="p" hint-placeholder-count="6">
               <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;cursor:pointer;" style-hover="border-color:#b9d3ea;transform:translateY(-3px);">
                 <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF7F2,#EAF7F2 12px,#dff1e9 12px,#dff1e9 24px);"></div>
-                <div style="padding:20px 22px;">
+                <div style="padding:20px clamp(14px,4vw,22px);">
                   <div style="font-size:15.5px;font-weight:700;line-height:1.45;color:#0A2236;margin-bottom:12px;">{{ p.title }}</div>
-                  <div style="display:flex;justify-content:space-between;font-family:'Pretendard',sans-serif;font-size:12px;color:#9aa9bd;"><span>{{ p.src }}</span><span>{{ p.date }}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;"><span>{{ p.src }}</span><span>{{ p.date }}</span></div>
                 </div>
               </div>
             </sc-for>
@@ -810,13 +856,13 @@
         </sc-if>
 
         <sc-if value="{{ commGallery }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:18px;">
             <sc-for list="{{ galleryList }}" as="g" hint-placeholder-count="6">
               <div style="border-radius:16px;overflow:hidden;border:1px solid #e6ebf2;cursor:pointer;" style-hover="transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,36,64,0.1);">
-                <div style="aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;align-items:center;justify-content:center;color:#8ba7c4;font-family:'Pretendard',sans-serif;font-size:12px;">PHOTO</div>
+                <div style="aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;align-items:center;justify-content:center;color:#8ba7c4;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);">PHOTO</div>
                 <div style="padding:16px 18px;background:#fff;">
                   <div style="font-size:15px;font-weight:700;color:#0A2236;margin-bottom:5px;">{{ g.title }}</div>
-                  <div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#9aa9bd;">{{ g.year }} · 사진 {{ g.count }}</div>
+                  <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;">{{ g.year }} · 사진 {{ g.count }}</div>
                 </div>
               </div>
             </sc-for>
@@ -824,11 +870,11 @@
         </sc-if>
 
         <sc-if value="{{ commLibrary }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:18px;">
             <sc-for list="{{ libraryList }}" as="d" hint-placeholder-count="3">
               <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:14px;">
                 <div style="width:46px;height:46px;border-radius:11px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:24px;border:2.5px solid #0B5FA5;border-radius:3px;"></div></div>
-                <div style="flex:1;"><div style="font-size:16px;font-weight:800;color:#0A2236;line-height:1.4;margin-bottom:4px;">{{ d.title }}</div><div style="font-family:'Pretendard',sans-serif;font-size:12px;color:#9aa9bd;">{{ d.meta }}</div></div>
+                <div style="flex:1;"><div style="font-size:16px;font-weight:800;color:#0A2236;line-height:1.4;margin-bottom:4px;">{{ d.title }}</div><div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;">{{ d.meta }}</div></div>
                 <a href="{{ d.href }}" target="_blank" style="background:#0B5FA5;color:#fff;text-decoration:none;text-align:center;padding:11px;border-radius:10px;font-size:14px;font-weight:700;">{{ lib_dl }} ↓</a>
               </div>
             </sc-for>
@@ -836,22 +882,22 @@
         </sc-if>
 
         <sc-if value="{{ commInquiryDone }}" hint-placeholder-val="{{ false }}">
-          <div style="border:1px solid #c7ebdc;background:#E7F6F0;border-radius:16px;padding:56px 24px;text-align:center;"><div style="font-size:16px;font-weight:700;color:#0d8f6b;">{{ inq_thanks }}</div></div>
+          <div style="border:1px solid #c7ebdc;background:#E7F6F0;border-radius:16px;padding:clamp(31px,6.5vw,56px) clamp(14px,4vw,24px);text-align:center;"><div style="font-size:16px;font-weight:700;color:#0d8f6b;">{{ inq_thanks }}</div></div>
         </sc-if>
         <sc-if value="{{ commInquiryForm }}" hint-placeholder-val="{{ false }}">
-          <div style="max-width:640px;background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:32px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-              <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_name }}</label><input value="{{ inq_name_v }}" onInput="{{ setInqName }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
-              <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_org }}</label><input value="{{ inq_org_v }}" onInput="{{ setInqOrg }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
-              <div style="grid-column:1 / -1;"><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_email }}</label><input value="{{ inq_email_v }}" onInput="{{ setInqEmail }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
+          <div style="max-width:640px;background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:clamp(18px,4.5vw,32px);">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:16px;margin-bottom:16px;">
+              <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_name }}</label><input value="{{ inq_name_v }}" onInput="{{ setInqName }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+              <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_org }}</label><input value="{{ inq_org_v }}" onInput="{{ setInqOrg }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+              <div style="grid-column:1 / -1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_email }}</label><input value="{{ inq_email_v }}" onInput="{{ setInqEmail }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
             </div>
-            <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;font-weight:700;margin-bottom:9px;color:#33485e;">{{ inq_cat }}</label>
+            <div style="margin-bottom:16px;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:9px;color:#33485e;">{{ inq_cat }}</label>
               <div style="display:flex;flex-wrap:wrap;gap:8px;">
                 <sc-for list="{{ inqCatChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</span></sc-for>
               </div>
             </div>
-            <div style="margin-bottom:18px;"><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_msg }}</label><textarea value="{{ inq_msg_v }}" onInput="{{ setInqMsg }}" style="width:100%;min-height:120px;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;resize:vertical;font-family:'Pretendard',sans-serif;"></textarea></div>
-            <button onClick="{{ submitInquiry }}" style="background:#0B5FA5;color:#fff;border:none;padding:14px 28px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ inq_submit }}</button>
+            <div style="margin-bottom:18px;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_msg }}</label><textarea value="{{ inq_msg_v }}" onInput="{{ setInqMsg }}" style="width:100%;min-height:120px;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;resize:vertical;font-family:'Pretendard',sans-serif;"></textarea></div>
+            <button onClick="{{ submitInquiry }}" style="background:#0B5FA5;color:#fff;border:none;padding:14px clamp(17px,4vw,28px);border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ inq_submit }}</button>
           </div>
         </sc-if>
 
@@ -862,15 +908,15 @@
 
   <!-- ================= LOGIN ================= -->
   <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
-  <div style="min-height:calc(100vh - 116px);background:repeating-linear-gradient(135deg,#16294F,#16294F 16px,#08223b 16px,#08223b 32px);display:flex;align-items:center;justify-content:center;padding:60px 24px;">
-    <div style="width:100%;max-width:420px;background:#fff;border-radius:20px;padding:40px 36px;box-shadow:0 30px 70px rgba(0,0,0,0.4);color:#0A2236;">
+  <div style="min-height:calc(100vh - 116px);background:repeating-linear-gradient(135deg,#16294F,#16294F 16px,#08223b 16px,#08223b 32px);display:flex;align-items:center;justify-content:center;padding:clamp(33px,6.5vw,60px) clamp(14px,4vw,24px);">
+    <div style="width:100%;max-width:420px;background:#fff;border-radius:20px;padding:40px clamp(22px,4vw,36px);box-shadow:0 30px 70px rgba(0,0,0,0.4);color:#0A2236;">
       <div style="text-align:center;margin-bottom:26px;">
         <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#0B5FA5,#11A37B);margin:0 auto 14px;position:relative;">
           <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:19px;height:4px;background:#fff;border-radius:2px;"></div>
           <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:4px;height:19px;background:#fff;border-radius:2px;"></div>
         </div>
         <h2 style="font-size:22px;font-weight:800;margin:0 0 6px;">{{ authTitle }}</h2>
-        <p style="font-size:13.5px;color:#8295ab;margin:0;">{{ t.lg_sub }}</p>
+        <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#8295ab;margin:0;">{{ t.lg_sub }}</p>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:20px;">
         <sc-for list="{{ loginRoles }}" as="r" hint-placeholder-count="2">
@@ -879,27 +925,27 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:14px;">
         <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
-          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_name }}</label><input value="{{ auName }}" onInput="{{ setAuName }}" placeholder="예) 굿모닝병원" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_dept }}</label><input value="{{ auDept }}" onInput="{{ setAuDept }}" placeholder="{{ t.lg_dept_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_country }}</label><input value="{{ auCountry }}" onInput="{{ setAuCountry }}" placeholder="예) 대한민국" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_phone }}</label>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_name }}</label><input value="{{ auName }}" onInput="{{ setAuName }}" placeholder="예) 굿모닝병원" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_dept }}</label><input value="{{ auDept }}" onInput="{{ setAuDept }}" placeholder="{{ t.lg_dept_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_country }}</label><input value="{{ auCountry }}" onInput="{{ setAuCountry }}" placeholder="예) 대한민국" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_phone }}</label>
             <div style="display:flex;gap:8px;">
-              <input value="{{ auDial }}" onInput="{{ setAuDial }}" placeholder="+82" style="width:76px;padding:12px 10px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;text-align:center;" />
-              <input value="{{ auPhone }}" onInput="{{ setAuPhone }}" inputmode="numeric" placeholder="010-0000-0000" style="flex:1;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" />
+              <input value="{{ auDial }}" onInput="{{ setAuDial }}" placeholder="+82" style="width:76px;padding:12px 10px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;text-align:center;" />
+              <input value="{{ auPhone }}" onInput="{{ setAuPhone }}" inputmode="numeric" placeholder="010-0000-0000" style="flex:1;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" />
             </div>
           </div>
         </sc-if>
-        <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_email }}</label><input value="{{ auEmail }}" onInput="{{ setAuEmail }}" onKeyDown="{{ authKey }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-        <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_pw }}</label><input type="password" value="{{ auPw }}" onInput="{{ setAuPw }}" onKeyDown="{{ authKey }}" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;color:#0F2440;outline:none;" /></div>
-        <sc-if value="{{ authError }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ authError }}</div></sc-if>
+        <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_email }}</label><input value="{{ auEmail }}" onInput="{{ setAuEmail }}" onKeyDown="{{ authKey }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+        <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_pw }}</label><input type="password" value="{{ auPw }}" onInput="{{ setAuPw }}" onKeyDown="{{ authKey }}" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+        <sc-if value="{{ authError }}" hint-placeholder-val="{{ false }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ authError }}</div></sc-if>
         <button onClick="{{ submitAuth }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:14px;border-radius:11px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:4px;">{{ authCta }}</button>
       </div>
-      <div style="display:flex;justify-content:center;gap:6px;margin-top:18px;font-size:13px;color:#5e7388;">
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:18px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7388;">
         <span>{{ authSwitchLabel }}</span>
         <span onClick="{{ toggleAuthMode }}" style="cursor:pointer;color:#0B5FA5;font-weight:700;">{{ authSwitchAction }}</span>
       </div>
       <div style="margin-top:22px;padding-top:20px;border-top:1px solid #eef2f7;text-align:center;">
-        <button onClick="{{ goAdmin }}" style="background:#F4F8F6;color:#5e7388;border:1px solid #e2ece7;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_admin }}</button>
+        <button onClick="{{ goAdmin }}" style="background:#F4F8F6;color:#5e7388;border:1px solid #e2ece7;padding:11px 20px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_admin }}</button>
       </div>
     </div>
   </div>
@@ -907,17 +953,17 @@
 
   <!-- ================= FOOTER (shared) ================= -->
   <footer style="background:#122043;color:#7d93a8;">
-    <div style="max-width:1180px;margin:0 auto;padding:60px 32px 40px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:36px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(33px,6.5vw,60px) clamp(16px,4.5vw,32px) 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:clamp(18px,1.64vw,36px);">
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
           <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5AB7F0,#25C281);"></div>
           <span style="font-weight:800;font-size:17px;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 3px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
         </div>
-        <p style="font-size:13px;line-height:1.7;margin:0 0 18px;color:#7d93a8;">{{ t.ft_office }}<br>{{ t.ft_addr }}<br>T. 051-461-4276~8 · F. 051-442-6006<br>E. bmia0528@naver.com</p>
+        <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.7;margin:0 0 18px;color:#7d93a8;">{{ t.ft_office }}<br>{{ t.ft_addr }}<br>T. 051-461-4276~8 · F. 051-442-6006<br>E. bmia0528@naver.com</p>
         <div style="display:flex;gap:8px;">
-          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:11px;color:#9fb4c7;cursor:pointer;">IG</span>
-          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:11px;color:#9fb4c7;cursor:pointer;">YT</span>
-          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:11px;color:#9fb4c7;cursor:pointer;">X</span>
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#9fb4c7;cursor:pointer;">IG</span>
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#9fb4c7;cursor:pointer;">YT</span>
+          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#9fb4c7;cursor:pointer;">X</span>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
@@ -943,7 +989,7 @@
       </div>
     </div>
     <div style="border-top:1px solid rgba(255,255,255,0.08);">
-      <div style="max-width:1180px;margin:0 auto;padding:18px 32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:'Pretendard',sans-serif;font-size:11.5px;color:#4f6a82;">
+      <div style="max-width:1180px;margin:0 auto;padding:18px clamp(16px,4.5vw,32px);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:'Pretendard',sans-serif;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#4f6a82;">
         <span>© 2026 BIMTC · BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</span>
         <span>{{ t.ft_legal }}</span>
       </div>
@@ -951,7 +997,7 @@
   </footer>
 
   <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:60;background:#0F2440;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,0.4);">{{ toast }}</div>
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:60;background:#0F2440;color:#fff;padding:14px clamp(14px,4vw,24px);border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,0.4);">{{ toast }}</div>
   </sc-if>
 
 </div>
@@ -964,7 +1010,7 @@ class Component extends DCLogic {
     authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
     auDept:'', auDial:'+82', auPhone:'',
     inqName:'', inqOrg:'', inqEmail:'', inqMsg:'', inqCat:'', inqDone:false,
-    isAdmin:false, now:Date.now() };
+    isAdmin:false, now:Date.now(), menuOpen:false, vw:(typeof window!=='undefined'?window.innerWidth:1280) };
 
   async submitInquiry(){
     if(!this.state.inqName || !this.state.inqEmail || !this.state.inqMsg){ alert(this.L('이름·이메일·문의 내용을 입력해 주세요.','Please enter name, email and message.')); return; }
@@ -977,13 +1023,14 @@ class Component extends DCLogic {
   setDial(e){ var v=(e&&e.target?e.target.value:''); v=v.replace(/[^0-9+]/g,''); if(v && v[0]!=='+') v='+'+v.replace(/\+/g,''); this.setState({ auDial: v }); }
   L(ko,en){ return this.state.lang==='en' ? en : ko; }
 
-  go(p){ this.setState({ page: p }); if(typeof window!=='undefined') window.scrollTo(0,0); setTimeout(()=>this.initMaps(),120); }
+  go(p){ this.setState({ page: p, menuOpen:false }); if(typeof window!=='undefined') window.scrollTo(0,0); setTimeout(()=>this.initMaps(),120); }
   componentDidMount(){
     setTimeout(()=>this.initMaps(),200);
+    if(typeof window!=='undefined'){ this._rz=()=>{ if(window.innerWidth!==this.state.vw) this.setState({ vw:window.innerWidth }); }; window.addEventListener('resize',this._rz); }
     this._tick = setInterval(()=>this.setState({ now:Date.now() }), 1000);
     (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u&&u.is_admin) this.setState({isAdmin:true}); }catch(e){} })();
   }
-  componentWillUnmount(){ if(this._tick) clearInterval(this._tick); }
+  componentWillUnmount(){ if(this._tick) clearInterval(this._tick); if(this._rz&&typeof window!=='undefined') window.removeEventListener('resize',this._rz); }
   initMaps(){
     if(typeof window==='undefined' || !window.naver || !window.naver.maps) return;
     const pos = new window.naver.maps.LatLng(35.16906, 129.13469);
@@ -994,9 +1041,9 @@ class Component extends DCLogic {
     draw('bimtc-map-access'); draw('bimtc-map-about');
   }
   flash(msg){ this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 2400); }
-  goConsole(){ if(this.gate('buyer')) window.location.href = 'bizmeeting.html'; }
+  goConsole(){ if(this.gate('buyer')) window.location.href = '비즈미팅 시스템.dc.html'; }
   visitOpen(){ const c=window.BIMTC_CONFIG; if(c && c.apply.visit && c.apply.visit.open) return true; return !!this.state.isAdmin; }
-  goBooth(){ if(this.gate('booth')) window.location.href = 'booth.html'; }
+  goBooth(){ if(this.gate('booth')) window.location.href = '부스 신청.dc.html'; }
   gate(kind){
     const cfg = window.BIMTC_CONFIG; if(!cfg) return true;
     if(cfg.apply[kind] && cfg.apply[kind].open) return true;
@@ -1004,7 +1051,7 @@ class Component extends DCLogic {
     this.flash((kind==='booth'?'부스':'바이어') + ' 신청은 오픈 예정입니다 · 오픈 시 공지·이메일로 안내드립니다');
     return false;
   }
-  goAdmin(){ if(typeof window!=='undefined') window.location.href = 'admin.html'; }
+  goAdmin(){ if(typeof window!=='undefined') window.location.href = '관리자 콘솔.dc.html'; }
 
   toggleVInterest(c){ this.setState(s=>{ const has=s.vInterests.includes(c); return { vInterests: has ? s.vInterests.filter(x=>x!==c) : [...s.vInterests, c] }; }); }
   async checkReg(){
@@ -1149,7 +1196,8 @@ class Component extends DCLogic {
     }catch(e){ teaser=true; }
 
     const navBase = "cursor:pointer;transition:color .15s;padding-bottom:2px;";
-    const navItem = (key,label)=>({ label, onClick: go(key), style: navBase + (p===key ? "color:#25C281;border-bottom:2px solid #25C281;" : "color:#bcd0e2;border-bottom:2px solid transparent;") });
+    const mNavBase = "cursor:pointer;font-size:16px;font-weight:700;padding:15px 2px;border-bottom:1px solid rgba(255,255,255,0.08);display:block;";
+    const navItem = (key,label)=>({ label, onClick: go(key), style: navBase + (p===key ? "color:#25C281;border-bottom:2px solid #25C281;" : "color:#bcd0e2;border-bottom:2px solid transparent;"), mStyle: mNavBase + (p===key ? "color:#25C281;" : "color:#dbe8f3;") });
     const navLinks = [ navItem('about',t.nav_about), navItem('exhibit',t.nav_exhibit), navItem('visit',t.nav_visit), navItem('exhibition',t.nav_exhibition), navItem('community',t.nav_community) ];
 
     const tagPill = (text, color) => React.createElement('span', { style: { fontFamily: "'Pretendard',sans-serif", fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', padding: '5px 0', width: '52px', textAlign: 'center', borderRadius: '6px', color: color, background: color + '22', flexShrink: 0 } }, text);
@@ -1179,7 +1227,7 @@ class Component extends DCLogic {
     ];
     const exhibitors = exhibitorsRaw.map(([name,country,cat,desc])=>({ name, country, cat, desc, catColor:catStyle[cat][0], catBg:catStyle[cat][1] }));
     const exFilterDef = [L('전체','All'),L('병원·의료','Hospital'),L('뷰티·성형','Beauty'),L('웰니스·헬스케어','Wellness')];
-    const exFilters = exFilterDef.map((l,i)=>({ label:l, style: (i===0? "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:700;background:#0B5FA5;color:#fff;" : "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;background:#fff;border:1px solid #d8e0ea;color:#5e7289;") }));
+    const exFilters = exFilterDef.map((l,i)=>({ label:l, style: (i===0? "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;background:#0B5FA5;color:#fff;" : "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:600;background:#fff;border:1px solid #d8e0ea;color:#5e7289;") }));
 
     // floor map cells
     const zoneColors = ['#cfe0f2','#cbe9dd','#e6dcf7','#f7e6cf'];
@@ -1201,7 +1249,7 @@ class Component extends DCLogic {
 
     const loginRoleDef = [ ['exhibitor',L('참가기업','Exhibitor')], ['buyer',L('바이어','Buyer')], ['visitor',L('방문객','Visitor')] ];
     const loginRoles = loginRoleDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({loginRole:k}),
-      style: "flex:1;padding:12px 6px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;text-align:center;" + (this.state.loginRole===k ? "background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;" : "background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;") }));
+      style: "flex:1;padding:12px 6px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;text-align:center;" + (this.state.loginRole===k ? "background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;" : "background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;") }));
 
     return {
       // routing
@@ -1211,6 +1259,9 @@ class Component extends DCLogic {
       koStyle:"cursor:pointer;font-weight:"+(en?'400':'600')+";color:"+(en?'#6b8aa6':'#25C281')+";",
       enStyle:"cursor:pointer;font-weight:"+(en?'600':'400')+";color:"+(en?'#25C281':'#6b8aa6')+";",
       navLinks,
+      wide: this.state.vw>=960, narrow: this.state.vw<960,
+      menuOpen: this.state.menuOpen && this.state.vw<960,
+      toggleMenu: ()=>this.setState(st=>({ menuOpen: !st.menuOpen })),
       goHome:go('home'), goAbout:go('about'), goExhibit:go('exhibit'), goVisit:go('visit'), goExhibition:go('exhibition'), goCommunity:go('community'), goLogin:go('login'), goCheckReg:go('checkreg'),
       crEmail:this.state.crEmail, setCrEmail:this.set('crEmail'),
       crKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.checkReg(); } },
@@ -1316,7 +1367,7 @@ class Component extends DCLogic {
       ],
       interestChips: [['건강검진','Check-up'],['성형·뷰티','Cosmetic'],['피부·레이저','Skin/Laser'],['웰니스','Wellness'],['치과','Dental'],['한방','Korean Med.'],['재활','Rehab'],['관광','Tourism']].map(([c,ce])=>({
         label:L(c,ce), toggle:()=>this.toggleVInterest(c),
-        style: "padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;" + (this.state.vInterests.includes(c) ? "background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;" : "border:1px solid #d3deea;background:#F4F8FD;color:#33485e;")
+        style: "padding:8px 14px;border-radius:999px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:600;cursor:pointer;" + (this.state.vInterests.includes(c) ? "background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;" : "border:1px solid #d3deea;background:#F4F8FD;color:#33485e;")
       })),
       visitDays: [['D1',L('11.13 (금)','Nov 13 (Fri)')],['D2',L('11.14 (토)','Nov 14 (Sat)')],['both',L('양일 모두','Both days')]].map(([k,l])=>({
         label:l, onClick:()=>this.setState({vDay:k}),
@@ -1340,7 +1391,7 @@ class Component extends DCLogic {
       inq_done:this.state.inqDone, inq_name_v:this.state.inqName, inq_org_v:this.state.inqOrg, inq_email_v:this.state.inqEmail, inq_msg_v:this.state.inqMsg, inq_cat_v:this.state.inqCat,
       setInqName:this.set('inqName'), setInqOrg:this.set('inqOrg'), setInqEmail:this.set('inqEmail'), setInqMsg:this.set('inqMsg'), setInqCat:(v)=>this.setState({inqCat:v}),
       submitInquiry:()=>this.submitInquiry(),
-      inqCatChips:(function(){ var cats=[L('참가(부스) 문의','Exhibitor / Booth'),L('바이어·비즈미팅 문의','Buyer / Meeting'),L('참관·사전등록 문의','Visitor / Registration'),L('기타','Other')]; var self=this; return cats.map(function(c){ return { label:c, onClick:()=>self.setState({inqCat:c}), style:"padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid "+(self.state.inqCat===c?'#0B5FA5':'#d3deea')+";background:"+(self.state.inqCat===c?'#EAF2FC':'#fff')+";color:"+(self.state.inqCat===c?'#0B5FA5':'#5E7289')+";" }; }); }).call(this),
+      inqCatChips:(function(){ var cats=[L('참가(부스) 문의','Exhibitor / Booth'),L('바이어·비즈미팅 문의','Buyer / Meeting'),L('참관·사전등록 문의','Visitor / Registration'),L('기타','Other')]; var self=this; return cats.map(function(c){ return { label:c, onClick:()=>self.setState({inqCat:c}), style:"padding:8px 14px;border-radius:999px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:600;cursor:pointer;border:1px solid "+(self.state.inqCat===c?'#0B5FA5':'#d3deea')+";background:"+(self.state.inqCat===c?'#EAF2FC':'#fff')+";color:"+(self.state.inqCat===c?'#0B5FA5':'#5E7289')+";" }; }); }).call(this),
       commInquiryDone:this.state.commTab==='inquiry'&&this.state.inqDone, commInquiryForm:this.state.commTab==='inquiry'&&!this.state.inqDone,
       inq_thanks:L('문의가 접수되었습니다. 사무국에서 이메일로 답변드립니다.','Your inquiry has been received. The secretariat will reply by email.'),
       commEmpty:(this.state.commTab==='notice'&&noticeList.length===0)||(this.state.commTab==='press'&&pressList.length===0)||(this.state.commTab==='gallery'&&galleryList.length===0),

@@ -2,7 +2,20 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>관리자 콘솔 · BIMTC 2026</title>
+<meta name="description" content="BIMTC 2026 사무국 관리자 콘솔.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<link rel="apple-touch-icon" href="uploads/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BIMTC 2026">
+<meta property="og:title" content="관리자 콘솔 · BIMTC 2026">
+<meta property="og:description" content="BIMTC 2026 사무국 관리자 콘솔.">
+<meta property="og:image" content="uploads/keyvisual.png">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -12,51 +25,53 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;background:#EEF1F6;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{margin:0;background:#EEF1F6;word-break:keep-all;overflow-wrap:break-word;overflow-x:hidden;}
   input,textarea{font-family:'Pretendard',sans-serif;}
+  h1,h2,h3,p{text-wrap:pretty;}
   ::selection{background:#0B5FA5;color:#fff;}
 </style>
 <script src="bimtc-supabase.js"></script>
 </helmet>
 
-<div style="font-family:'Pretendard',sans-serif;min-height:100vh;background:#EEF1F6;color:#0F2440;">
+<div style="font-family:'Pretendard',sans-serif;min-height:100vh;background:#EEF1F6;color:#0F2440;overflow-x:hidden;">
 
   <div style="position:sticky;top:0;z-index:40;background:#0A2236;color:#fff;">
     <div style="height:4px;background:linear-gradient(90deg,#0B5FA5,#11A37B);"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 26px;height:60px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;padding:9px clamp(14px,4vw,26px);min-height:60px;">
       <div style="display:flex;align-items:center;gap:11px;">
         <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#0B5FA5,#11A37B);position:relative;">
           <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:13px;height:3px;background:#fff;border-radius:2px;"></div>
           <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:3px;height:13px;background:#fff;border-radius:2px;"></div>
         </div>
         <span style="font-weight:800;font-size:16px;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 3px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
-        <span style="font-size:13px;font-weight:700;color:#9fb4c7;">관리자</span>
-        <span style="font-size:11px;color:#7f97ad;font-family:'Pretendard',sans-serif;border-left:1px solid rgba(255,255,255,0.15);padding-left:11px;">ADMIN CONSOLE</span>
+        <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#9fb4c7;">관리자</span>
+        <span style="font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#7f97ad;font-family:'Pretendard',sans-serif;border-left:1px solid rgba(255,255,255,0.15);padding-left:11px;">ADMIN CONSOLE</span>
       </div>
       <div style="display:flex;align-items:center;gap:16px;">
-        <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:#7f97ad;">2026.11.13–14 · D-154</span>
+        <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#7f97ad;">2026.11.13–14 · D-154</span>
         <div style="display:flex;align-items:center;gap:9px;">
-          <div style="width:30px;height:30px;border-radius:50%;background:#11A37B;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">사</div>
-          <span style="font-size:13px;font-weight:600;">{{ adminName }}</span>
+          <div style="width:30px;height:30px;border-radius:50%;background:#11A37B;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);">사</div>
+          <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:600;">{{ adminName }}</span>
         </div>
-        <span onClick="{{ doLogout }}" style="font-size:12.5px;color:#9fb4c7;cursor:pointer;">로그아웃</span>
-        <a href="booth-editor.html" style="font-size:12.5px;color:#9fb4c7;text-decoration:none;cursor:pointer;">부스 배치 편집 →</a>
-        <a href="index.html" style="font-size:12.5px;color:#9fb4c7;text-decoration:none;cursor:pointer;">사이트로 →</a>
+        <span onClick="{{ doLogout }}" style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#9fb4c7;cursor:pointer;">로그아웃</span>
+        <a href="booth-editor.html" style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#9fb4c7;text-decoration:none;cursor:pointer;">부스 배치 편집 →</a>
+        <a href="index.html" style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#9fb4c7;text-decoration:none;cursor:pointer;">사이트로 →</a>
       </div>
     </div>
   </div>
 
   <sc-if value="{{ gateLogin }}" hint-placeholder-val="{{ false }}">
     <div style="max-width:420px;margin:0 auto;padding:60px 24px;">
-      <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:36px 32px;box-shadow:0 20px 50px rgba(15,36,64,0.08);">
+      <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:36px clamp(16px,4.5vw,32px);box-shadow:0 20px 50px rgba(15,36,64,0.08);">
         <h1 style="font-size:21px;font-weight:800;margin:0 0 6px;">사무국 관리자 로그인</h1>
-        <p style="font-size:13.5px;color:#8295ab;margin:0 0 22px;">관리자 계정으로 로그인하세요.</p>
+        <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#8295ab;margin:0 0 22px;">관리자 계정으로 로그인하세요.</p>
         <div style="display:flex;flex-direction:column;gap:14px;">
-          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">이메일</label><input value="{{ liEmail }}" onInput="{{ setLiEmail }}" onKeyDown="{{ liKey }}" placeholder="admin@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
-          <div><label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#33485e;">비밀번호</label><input value="{{ liPw }}" onInput="{{ setLiPw }}" onKeyDown="{{ liKey }}" type="password" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;" /></div>
-          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ loginErr }}</div></sc-if>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">이메일</label><input value="{{ liEmail }}" onInput="{{ setLiEmail }}" onKeyDown="{{ liKey }}" placeholder="admin@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">비밀번호</label><input value="{{ liPw }}" onInput="{{ setLiPw }}" onKeyDown="{{ liKey }}" type="password" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ loginErr }}</div></sc-if>
           <button onClick="{{ doAdminLogin }}" style="width:100%;background:#16294F;color:#fff;border:none;padding:14px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:4px;">{{ loginLabel }}</button>
-          <a href="index.html" style="text-align:center;font-size:13px;color:#8295ab;text-decoration:none;">홈으로</a>
+          <a href="index.html" style="text-align:center;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;text-decoration:none;">홈으로</a>
         </div>
       </div>
     </div>
@@ -74,12 +89,12 @@
   <div style="display:flex;align-items:flex-start;max-width:1360px;margin:0 auto;">
 
     <aside style="position:sticky;top:64px;width:230px;flex-shrink:0;padding:22px 16px;height:calc(100vh - 64px);">
-      <div style="font-family:'Pretendard',sans-serif;font-size:11px;letter-spacing:0.12em;color:#9aa9bd;padding:6px 14px 12px;">운영 메뉴</div>
+      <div style="font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);letter-spacing:0.12em;color:#9aa9bd;padding:6px 14px 12px;">운영 메뉴</div>
       <div style="display:flex;flex-direction:column;gap:4px;">
         <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
           <div onClick="{{ n.onClick }}" style="{{ n.style }}">
             <span>{{ n.label }}</span>
-            <sc-if value="{{ n.badge }}"><span style="background:#E0533C;color:#fff;font-size:11px;font-weight:700;font-family:'Pretendard',sans-serif;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 6px;">{{ n.badge }}</span></sc-if>
+            <sc-if value="{{ n.badge }}"><span style="background:#E0533C;color:#fff;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);font-weight:700;font-family:'Pretendard',sans-serif;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 6px;">{{ n.badge }}</span></sc-if>
           </div>
         </sc-for>
       </div>
@@ -91,23 +106,23 @@
       <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">대시보드</h1>
         <p style="font-size:14px;color:#5E7289;margin:0 0 24px;">2026 부산국제의료관광컨벤션 운영 현황 요약입니다.</p>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:16px;margin-bottom:16px;">
           <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
             <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 24px;">
-              <div style="font-size:13px;color:#8295ab;font-weight:600;margin-bottom:10px;">{{ k.label }}</div>
-              <div style="font-family:'Pretendard',sans-serif;font-size:30px;font-weight:600;color:#0B5FA5;letter-spacing:-0.02em;line-height:1;">{{ k.value }}</div>
-              <div style="font-size:12px;color:{{ k.deltaColor }};margin-top:8px;font-weight:600;">{{ k.delta }}</div>
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;font-weight:600;margin-bottom:10px;">{{ k.label }}</div>
+              <div style="font-family:'Pretendard',sans-serif;font-size:clamp(22px,3.33vw,30px);font-weight:600;color:#0B5FA5;letter-spacing:-0.02em;line-height:1;">{{ k.value }}</div>
+              <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:{{ k.deltaColor }};margin-top:8px;font-weight:600;">{{ k.delta }}</div>
             </div>
           </sc-for>
         </div>
-        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px;">
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;">
             <div style="font-size:16px;font-weight:800;margin-bottom:18px;">최근 참가기업 신청</div>
             <div style="display:flex;flex-direction:column;">
               <sc-for list="{{ recentApps }}" as="a" hint-placeholder-count="4">
                 <div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid #eef2f7;">
-                  <div style="width:34px;height:34px;border-radius:9px;background:{{ a.avBg }};color:{{ a.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ a.ini }}</div>
-                  <div style="flex:1;"><div style="font-size:14.5px;font-weight:700;">{{ a.name }}</div><div style="font-size:12px;color:#8295ab;">{{ a.type }} · {{ a.date }}</div></div>
+                  <div style="width:34px;height:34px;border-radius:9px;background:{{ a.avBg }};color:{{ a.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ a.ini }}</div>
+                  <div style="flex:1;"><div style="font-size:14.5px;font-weight:700;">{{ a.name }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ a.type }} · {{ a.date }}</div></div>
                   {{ a.statusEl }}
                 </div>
               </sc-for>
@@ -132,7 +147,7 @@
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">참가기업 신청 관리</h1>
         <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">신청을 검토하고 승인/반려합니다. 승인 시 참가기업으로 확정됩니다.</p>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
-          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:200px;flex-shrink:0;">기업 / 담당자</span>
             <span style="width:58px;flex-shrink:0;">유형</span>
             <span style="flex:1;min-width:0;">관심분야</span>
@@ -142,21 +157,21 @@
           <sc-for list="{{ appsView }}" as="a" hint-placeholder-count="6">
             <div style="display:flex;gap:16px;padding:16px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
               <div style="width:200px;flex-shrink:0;display:flex;align-items:center;gap:11px;">
-                <div style="width:34px;height:34px;border-radius:9px;background:{{ a.avBg }};color:{{ a.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ a.ini }}</div>
-                <div style="min-width:0;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.name }}</div><div style="font-size:11.5px;color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.contact }}</div></div>
+                <div style="width:34px;height:34px;border-radius:9px;background:{{ a.avBg }};color:{{ a.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ a.ini }}</div>
+                <div style="min-width:0;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.name }}</div><div style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.contact }}</div></div>
               </div>
-              <span style="width:58px;flex-shrink:0;font-size:13px;color:#33485e;">{{ a.type }}</span>
-              <span style="flex:1;min-width:0;font-size:13px;color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.field }}</span>
-              <span style="width:52px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#8295ab;">{{ a.date }}</span>
+              <span style="width:58px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ a.type }}</span>
+              <span style="flex:1;min-width:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.field }}</span>
+              <span style="width:52px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ a.date }}</span>
               <div style="width:150px;flex-shrink:0;display:flex;justify-content:flex-end;white-space:nowrap;">
                 <sc-if value="{{ a.isPending }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex;gap:8px;">
-                    <button onClick="{{ a.approve }}" style="background:#11A37B;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인</button>
-                    <button onClick="{{ a.reject }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">반려</button>
+                    <button onClick="{{ a.approve }}" style="background:#11A37B;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인</button>
+                    <button onClick="{{ a.reject }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:8px 14px;border-radius:8px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">반려</button>
                   </div>
                 </sc-if>
-                <sc-if value="{{ a.isApproved }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;">승인됨</span></sc-if>
-                <sc-if value="{{ a.isRejected }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#97a4b6;background:#f1f4f8;padding:8px 14px;border-radius:8px;">반려됨</span></sc-if>
+                <sc-if value="{{ a.isApproved }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;">승인됨</span></sc-if>
+                <sc-if value="{{ a.isRejected }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#97a4b6;background:#f1f4f8;padding:8px 14px;border-radius:8px;">반려됨</span></sc-if>
               </div>
             </div>
           </sc-for>
@@ -168,7 +183,7 @@
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 신청 · 입금 승인</h1>
         <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">입금 확인 후 승인하면 해당 참가기업의 비즈미팅 매칭이 활성화됩니다.</p>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
-          <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+          <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:180px;flex-shrink:0;">기업 / 담당자</span>
             <span style="width:80px;flex-shrink:0;">부스</span>
             <span style="flex:1;min-width:0;">위치</span>
@@ -177,23 +192,63 @@
           </div>
           <sc-for list="{{ boothsView }}" as="b" hint-placeholder-count="4">
             <div style="display:flex;gap:14px;padding:15px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
-              <div style="width:180px;flex-shrink:0;min-width:0;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.company }}</div><div style="font-size:11.5px;color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.contact }} · {{ b.email }}</div></div>
-              <span style="width:80px;flex-shrink:0;font-size:13px;color:#33485e;">{{ b.type }} {{ b.count }}</span>
-              <span style="flex:1;min-width:0;font-size:12.5px;color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.ids }}</span>
-              <span style="width:120px;flex-shrink:0;text-align:right;font-size:13.5px;font-weight:700;color:#0B5FA5;">{{ b.total }}</span>
+              <div style="width:180px;flex-shrink:0;min-width:0;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.company }}</div><div style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.contact }} · {{ b.email }}</div></div>
+              <span style="width:80px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ b.type }} {{ b.count }}</span>
+              <span style="flex:1;min-width:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.ids }}</span>
+              <span style="width:120px;flex-shrink:0;text-align:right;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;color:#0B5FA5;">{{ b.total }}</span>
               <div style="width:150px;flex-shrink:0;display:flex;justify-content:flex-end;">
                 <sc-if value="{{ b.isPending }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex;gap:8px;">
-                    <button onClick="{{ b.approve }}" style="background:#11A37B;color:#fff;border:none;padding:8px 15px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인</button>
-                    <button onClick="{{ b.reject }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">반려</button>
+                    <button onClick="{{ b.approve }}" style="background:#11A37B;color:#fff;border:none;padding:8px 15px;border-radius:8px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인</button>
+                    <button onClick="{{ b.reject }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:8px 13px;border-radius:8px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">반려</button>
                   </div>
                 </sc-if>
-                <sc-if value="{{ b.isApproved }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;">승인됨</span></sc-if>
-                <sc-if value="{{ b.isRejected }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#97a4b6;background:#f1f4f8;padding:8px 14px;border-radius:8px;">반려됨</span></sc-if>
+                <sc-if value="{{ b.isApproved }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;">승인됨</span></sc-if>
+                <sc-if value="{{ b.isRejected }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#97a4b6;background:#f1f4f8;padding:8px 14px;border-radius:8px;">반려됨</span></sc-if>
               </div>
             </div>
           </sc-for>
         </div>
+      </sc-if>
+
+      <sc-if value="{{ isMembers }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">회원 명단</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 20px;">가입한 회원을 유형별로 확인합니다.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ memberTabs }}" as="mt" hint-placeholder-count="4">
+              <span onClick="{{ mt.onClick }}" style="{{ mt.style }}">{{ mt.label }}</span>
+            </sc-for>
+          </div>
+          <button onClick="{{ exportMembers }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
+        </div>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow-x:auto;">
+          <div style="min-width:760px;">
+          <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+            <span style="width:74px;flex-shrink:0;">유형</span>
+            <span style="width:170px;flex-shrink:0;">기관/기업명</span>
+            <span style="width:110px;flex-shrink:0;">소속</span>
+            <span style="flex:1;min-width:0;">이메일</span>
+            <span style="width:130px;flex-shrink:0;">연락처</span>
+            <span style="width:80px;flex-shrink:0;">국가</span>
+            <span style="width:74px;flex-shrink:0;">가입일</span>
+          </div>
+          <sc-for list="{{ membersView }}" as="m" hint-placeholder-count="6">
+            <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
+              <span style="width:74px;flex-shrink:0;"><span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;padding:4px 9px;border-radius:999px;background:{{ m.tagBg }};color:{{ m.tagColor }};">{{ m.typeLabel }}</span></span>
+              <span style="width:170px;flex-shrink:0;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.name }}</span>
+              <span style="width:110px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.dept }}</span>
+              <span style="flex:1;min-width:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.email }}</span>
+              <span style="width:130px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ m.phone }}</span>
+              <span style="width:80px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.country }}</span>
+              <span style="width:74px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ m.date }}</span>
+            </div>
+          </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ noMembers }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px dashed #d3deea;border-radius:14px;padding:40px;text-align:center;font-size:14px;color:#8295ab;margin-top:14px;">해당 유형의 회원이 없습니다.</div>
+        </sc-if>
       </sc-if>
 
       <sc-if value="{{ isReg }}" hint-placeholder-val="{{ false }}">
@@ -201,22 +256,22 @@
         <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">사전등록 현황입니다. CSV로 내보내 현장 명단으로 활용하세요.</p>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
           <div style="display:flex;gap:10px;">
-            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#0B5FA5;">{{ regTotal }}</span><span style="font-size:12px;color:#8295ab;margin-left:8px;">총 등록</span></div>
-            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#11A37B;">{{ regToday }}</span><span style="font-size:12px;color:#8295ab;margin-left:8px;">오늘</span></div>
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#0B5FA5;">{{ regTotal }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:8px;">총 등록</span></div>
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#11A37B;">{{ regToday }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:8px;">오늘</span></div>
           </div>
-          <button onClick="{{ exportCsv }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
+          <button onClick="{{ exportCsv }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
         </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
-          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:90px;">이름</span><span style="flex:1;">소속</span><span style="flex:1.2;">관심분야</span><span style="width:90px;">방문일</span><span style="width:120px;">등록일시</span>
           </div>
           <sc-for list="{{ regs }}" as="r" hint-placeholder-count="6">
             <div style="display:flex;gap:16px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
               <span style="width:90px;font-size:14px;font-weight:700;">{{ r.name }}</span>
-              <span style="flex:1;font-size:13.5px;color:#33485e;">{{ r.org }}</span>
-              <span style="flex:1.2;font-size:13px;color:#5e7289;">{{ r.field }}</span>
-              <span style="width:90px;font-size:13px;color:#33485e;">{{ r.day }}</span>
-              <span style="width:120px;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;">{{ r.at }}</span>
+              <span style="flex:1;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#33485e;">{{ r.org }}</span>
+              <span style="flex:1.2;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ r.field }}</span>
+              <span style="width:90px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ r.day }}</span>
+              <span style="width:120px;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ r.at }}</span>
             </div>
           </sc-for>
         </div>
@@ -230,18 +285,18 @@
           <sc-for list="{{ matchRows }}" as="m" hint-placeholder-count="4">
             <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
               <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
-                <div style="width:38px;height:38px;border-radius:10px;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ m.aIni }}</div>
-                <div><div style="font-size:14.5px;font-weight:700;">{{ m.a }}</div><div style="font-size:12px;color:#8295ab;">{{ m.aField }}</div></div>
+                <div style="width:38px;height:38px;border-radius:10px;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ m.aIni }}</div>
+                <div><div style="font-size:14.5px;font-weight:700;">{{ m.a }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ m.aField }}</div></div>
               </div>
               <div style="font-family:'Pretendard',sans-serif;color:#c2cdda;font-size:18px;">⇄</div>
               <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
-                <div style="width:38px;height:38px;border-radius:10px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">{{ m.bIni }}</div>
-                <div><div style="font-size:14.5px;font-weight:700;">{{ m.b }}</div><div style="font-size:12px;color:#8295ab;">{{ m.bField }}</div></div>
+                <div style="width:38px;height:38px;border-radius:10px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ m.bIni }}</div>
+                <div><div style="font-size:14.5px;font-weight:700;">{{ m.b }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ m.bField }}</div></div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-                <span style="font-size:12px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 11px;border-radius:999px;">적합도 {{ m.score }}</span>
-                <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#0d8f6b;">✓ 매칭됨</span></sc-if>
-                <sc-if value="{{ m.notDone }}" hint-placeholder-val="{{ true }}"><button onClick="{{ m.match }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">매칭 확정</button></sc-if>
+                <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 11px;border-radius:999px;">적합도 {{ m.score }}</span>
+                <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0d8f6b;">✓ 매칭됨</span></sc-if>
+                <sc-if value="{{ m.notDone }}" hint-placeholder-val="{{ true }}"><button onClick="{{ m.match }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">매칭 확정</button></sc-if>
               </div>
             </div>
           </sc-for>
@@ -252,7 +307,7 @@
       <sc-if value="{{ isLounge }}" hint-placeholder-val="{{ false }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">라운지 운영</h1>
         <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">테이블·시간 슬롯을 열고 닫아 예약 가능 여부를 관리합니다. 칸 클릭으로 제한 토글.</p>
-        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px;font-size:12.5px;color:#5E7289;">
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5E7289;">
           <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#fff;border:1px solid #d8e0ea;"></span>운영</span>
           <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#eef1f6;border:1px solid #d8e0ea;"></span>예약됨</span>
           <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px);border:1px solid #e9cf9a;"></span>제한(닫음)</span>
@@ -262,14 +317,14 @@
             <div style="display:flex;gap:6px;margin-bottom:6px;">
               <div style="width:52px;flex-shrink:0;"></div>
               <sc-for list="{{ tableHeaders }}" as="th" hint-placeholder-count="10">
-                <div style="flex:1;min-width:66px;text-align:center;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:600;color:#5E7289;padding:6px 0;">{{ th }}</div>
+                <div style="flex:1;min-width:66px;text-align:center;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:600;color:#5E7289;padding:6px 0;">{{ th }}</div>
               </sc-for>
             </div>
             <sc-for list="{{ loungeRows }}" as="row" hint-placeholder-count="12">
               <div style="display:flex;gap:6px;margin-bottom:6px;">
-                <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:'Pretendard',sans-serif;font-size:11px;color:#8295ab;">{{ row.time }}</div>
+                <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#8295ab;">{{ row.time }}</div>
                 <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="10">
-                  <div onClick="{{ c.onClick }}" style="flex:1;min-width:66px;height:32px;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:10px;font-weight:600;border-radius:6px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};cursor:{{ c.cursor }};">{{ c.label }}</div>
+                  <div onClick="{{ c.onClick }}" style="flex:1;min-width:66px;height:32px;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(10px,calc(14.13px - 0.35vw),12px);font-weight:600;border-radius:6px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};cursor:{{ c.cursor }};">{{ c.label }}</div>
                 </sc-for>
               </div>
             </sc-for>
@@ -290,20 +345,20 @@
           <div style="background:#E7F6F0;border:1px solid #c7ebdc;color:#0d8f6b;border-radius:12px;padding:14px 18px;font-size:14px;font-weight:600;margin-bottom:16px;">새 공지가 목록 맨 위에 등록되었습니다.</div>
         </sc-if>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
-          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:12px;color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+          <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:60px;">구분</span><span style="flex:1;">제목</span><span style="width:96px;">게시일</span><span style="width:80px;text-align:center;">노출</span><span style="width:60px;"></span>
           </div>
           <sc-for list="{{ cmsRows }}" as="c" hint-placeholder-count="5">
             <div style="display:flex;gap:16px;padding:15px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
-              <span style="width:60px;font-size:11.5px;font-weight:700;font-family:'Pretendard',sans-serif;color:#0d8f6b;">{{ c.tag }}</span>
+              <span style="width:60px;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;color:#0d8f6b;">{{ c.tag }}</span>
               <span style="flex:1;font-size:14.5px;font-weight:600;color:#22384e;">{{ c.title }}</span>
-              <span style="width:96px;font-family:'Pretendard',sans-serif;font-size:12.5px;color:#8295ab;">{{ c.date }}</span>
+              <span style="width:96px;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ c.date }}</span>
               <div style="width:80px;display:flex;justify-content:center;">
                 <div onClick="{{ c.toggle }}" style="width:40px;height:23px;border-radius:999px;background:{{ c.tglBg }};position:relative;cursor:pointer;transition:background .15s;">
                   <div style="position:absolute;top:2px;left:{{ c.tglLeft }};width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left .15s;"></div>
                 </div>
               </div>
-              <span style="width:60px;text-align:right;font-size:12.5px;color:#b0bccb;cursor:pointer;">편집</span>
+              <span style="width:60px;text-align:right;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#b0bccb;cursor:pointer;">편집</span>
             </div>
           </sc-for>
         </div>
@@ -323,6 +378,8 @@
 class Component extends DCLogic {
   state = {
     view: 'dash',
+    memberTab: 'all',
+    members: [],
     gate:'loading', liEmail:'', liPw:'', loginErr:'', loginBusy:false,
     user: null,
     apps: [],
@@ -358,13 +415,13 @@ class Component extends DCLogic {
     await this.reload();
   }
   async reload(){
-    const [apps, regs, matches, notices, resvs, booths] = await Promise.all([
+    const [apps, regs, matches, notices, resvs, booths, members] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
       window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
-      window.BimtcDB.listBoothApplications()
+      window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers()
     ]);
     const reserved={}; resvs.forEach(r=>{ reserved[r.table_idx+'-'+r.slot_idx]=1; });
-    this.setState({ apps, regs, matches, notices, reserved, booths });
+    this.setState({ apps, regs, matches, notices, reserved, booths, members });
   }
 
   typeLabel(t){ return t==='buyer' ? '바이어' : '참가기업'; }
@@ -404,6 +461,7 @@ class Component extends DCLogic {
       {k:'dash',label:'대시보드'},
       {k:'apps',label:'참가기업 신청',badge:pendingApps},
       {k:'booths',label:'부스 신청·승인',badge:pendingBooths},
+      {k:'members',label:'회원 명단'},
       {k:'reg',label:'사전등록 명단'},
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
       {k:'lounge',label:'라운지 운영'},
@@ -439,6 +497,25 @@ class Component extends DCLogic {
       on:c.published, tglBg:c.published?'#11A37B':'#cdd6e2', tglLeft:c.published?'18px':'2px', toggle:()=>this.toggleCms(c.id, !c.published) }));
 
     const won=(n)=>(n||0).toLocaleString('ko-KR')+'원';
+    const memberDef=[['all','전체'],['exhibitor','참가기업'],['buyer','바이어'],['visitor','방문객']];
+    const mTab=this.state.memberTab;
+    const allMembers=(this.state.members||[]).filter(p=>!p.is_admin);
+    const mCount=(k)=> k==='all' ? allMembers.length : allMembers.filter(p=>(p.type||'exhibitor')===k).length;
+    const memberTabs=memberDef.map(([k,l])=>({ label:l+' '+mCount(k), onClick:()=>this.setState({memberTab:k}),
+      style:"cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;"+(mTab===k?'background:#0B5FA5;color:#fff;':'background:#fff;border:1px solid #d8e0ea;color:#5e7289;') }));
+    const mColor={ exhibitor:['#E7F6F0','#0d8f6b','참가기업'], buyer:['#EAF2FC','#0B5FA5','바이어'], visitor:['#F3EEFB','#7a5cc4','방문객'] };
+    const filtered=allMembers.filter(p=> mTab==='all' ? true : (p.type||'exhibitor')===mTab);
+    const membersView=filtered.map(p=>{
+      const c=mColor[p.type]||mColor.exhibitor;
+      return { name:p.name||'-', dept:p.dept||'-', email:p.email||'-', phone:p.phone||'-', country:p.country||'-',
+        date:this.short(p.created_at), typeLabel:c[2], tagBg:c[0], tagColor:c[1] };
+    });
+    const exportMembers=()=>{
+      const rows=[['유형','기관/기업명','소속','이메일','연락처','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,m.name,m.dept,m.email,m.phone,m.country,m.date]));
+      const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+      a.download='BIMTC_회원명단_'+mTab+'.csv'; a.click();
+    };
     const boothsView=booths.map(b=>({ id:b.id, company:b.company||'(기업명)', contact:b.contact||'', email:b.email||'',
       type:b.booth_type==='space'?'독립부스':'조립부스', count:(b.booth_ids||[]).length, ids:(b.booth_ids||[]).join(', ')||'-',
       total:won(b.total), date:this.short(b.created_at), status:b.status,
@@ -451,8 +528,9 @@ class Component extends DCLogic {
     return {
       navItems:nav,
       adminName: this.state.user ? ('사무국 '+(this.state.user.name||this.state.user.email||'관리자')) : '사무국',
-      doLogout: async()=>{ await window.BimtcDB.logout(); window.location.href='index.html'; },
-      isDash:v==='dash',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',
+      doLogout: async()=>{ await window.BimtcDB.logout(); window.location.href='BIMTC 메인 개편.dc.html'; },
+      isDash:v==='dash',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',
+      memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       gateLogin:this.state.gate==='login', gateDenied:this.state.gate==='denied', gateReady:this.state.gate==='ready',
       liEmail:this.state.liEmail, liPw:this.state.liPw, loginErr:this.state.loginErr,
       setLiEmail:(e)=>this.setState({liEmail:e.target.value}), setLiPw:(e)=>this.setState({liPw:e.target.value}),
