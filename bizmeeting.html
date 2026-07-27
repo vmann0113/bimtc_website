@@ -533,7 +533,7 @@ class Component extends DCLogic {
   setView(v){ this.setState({ view:v }); }
   set(k){ return (e)=>this.setState({ [k]: (e && e.target) ? e.target.value : e }); }
   flash(msg){ this.setState({ toast:msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 2400); }
-  async doLogout(){ await window.BimtcDB.logout(); window.location.href='BIMTC 메인 개편.dc.html'; }
+  async doLogout(){ await window.BimtcDB.logout(); window.location.href='index.html'; }
 
   // ----- 파트너 미팅 요청: 날짜·시간 피커 -----
   async openPicker(partner){
