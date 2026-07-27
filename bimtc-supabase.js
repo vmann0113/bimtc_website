@@ -125,6 +125,12 @@
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     async listInquiries() { var sb = await ready(); var r = await sb.from('inquiries').select('*').order('created_at', { ascending: false }); return r.data || []; },
+    async deleteAccount() {
+      var sb = await ready();
+      var r = await sb.rpc('delete_my_account');
+      if (r.error) return { ok: false, error: r.error.message };
+      return { ok: true };
+    },
     async checkInquiries(email) {
       var sb = await ready();
       var r = await sb.rpc('check_inquiries', { p_email: email });

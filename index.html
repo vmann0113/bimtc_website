@@ -905,6 +905,16 @@
         <span>{{ authSwitchLabel }}</span>
         <span onClick="{{ toggleAuthMode }}" style="cursor:pointer;color:#0B5FA5;font-weight:700;">{{ authSwitchAction }}</span>
       </div>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:20px;padding:16px 18px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:12px;">
+          <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;line-height:1.6;margin-bottom:12px;">{{ myAccountLine }}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onClick="{{ doLogoutHere }}" style="flex:1 1 120px;background:#fff;color:#33485e;border:1px solid #dde5ee;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_logout }}</button>
+            <button onClick="{{ deleteAccount }}" style="flex:1 1 120px;background:#fff;color:#c0392b;border:1px solid #f0c8c2;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_withdraw }}</button>
+          </div>
+          <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:10px 0 0;line-height:1.6;">{{ t.lg_withdraw_note }}</p>
+        </div>
+      </sc-if>
       <div style="margin-top:22px;padding-top:20px;border-top:1px solid #eef2f7;text-align:center;">
         <button onClick="{{ goAdmin }}" style="background:#F4F8F6;color:#5e7388;border:1px solid #e2ece7;padding:11px 20px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_admin }}</button>
       </div>
@@ -1174,7 +1184,7 @@ class Component extends DCLogic {
     authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
     auDept:'', auDial:'+82', auPhone:'',
     inqName:'', inqOrg:'', inqEmail:'', inqMsg:'', inqCat:'', inqDone:false,
-    cqEmail:'', cqRows:[], cqSearched:false,
+    cqEmail:'', cqRows:[], cqSearched:false, me:null,
     isAdmin:false, now:Date.now(), menuOpen:false, vw:(typeof window!=='undefined'?window.innerWidth:1280) };
 
   async searchInquiries(){
@@ -1201,7 +1211,7 @@ class Component extends DCLogic {
     setTimeout(()=>this.initMaps(),200);
     if(typeof window!=='undefined'){ this._rz=()=>{ if(window.innerWidth!==this.state.vw) this.setState({ vw:window.innerWidth }); }; window.addEventListener('resize',this._rz); }
     this._tick = setInterval(()=>this.setState({ now:Date.now() }), 1000);
-    (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u&&u.is_admin) this.setState({isAdmin:true}); }catch(e){} })();
+    (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState({ me:u, isAdmin:!!u.is_admin, loginRole:(u.type||'exhibitor') }); }catch(e){} })();
   }
   componentWillUnmount(){ if(this._tick) clearInterval(this._tick); if(this._rz&&typeof window!=='undefined') window.removeEventListener('resize',this._rz); }
   initMaps(){
@@ -1222,9 +1232,9 @@ class Component extends DCLogic {
     window.scrollTo(0, top);
     if(Math.abs(window.pageYOffset - top) > 4 && n>0) setTimeout(()=>this.scrollToId(id, n-1), 80);
   }
-  goConsole(){ if(this.gate('buyer')) window.location.href = '비즈미팅 시스템.dc.html'; }
+  goConsole(){ if(this.gate('buyer')) window.location.href = 'bizmeeting.html'; }
   visitOpen(){ const c=window.BIMTC_CONFIG; if(c && c.apply.visit && c.apply.visit.open) return true; return !!this.state.isAdmin; }
-  goBooth(){ if(this.gate('booth')) window.location.href = '부스 신청.dc.html'; }
+  goBooth(){ if(this.gate('booth')) window.location.href = 'booth.html'; }
   gate(kind){
     const cfg = window.BIMTC_CONFIG; if(!cfg) return true;
     if(cfg.apply[kind] && cfg.apply[kind].open) return true;
@@ -1232,7 +1242,7 @@ class Component extends DCLogic {
     this.flash((kind==='booth'?'부스':'바이어') + ' 신청은 오픈 예정입니다 · 오픈 시 공지·이메일로 안내드립니다');
     return false;
   }
-  goAdmin(){ if(typeof window!=='undefined') window.location.href = '관리자 콘솔.dc.html'; }
+  goAdmin(){ if(typeof window!=='undefined') window.location.href = 'admin.html'; }
 
   toggleVInterest(c){ this.setState(s=>{ const has=s.vInterests.includes(c); return { vInterests: has ? s.vInterests.filter(x=>x!==c) : [...s.vInterests, c] }; }); }
   async checkReg(){
@@ -1276,12 +1286,40 @@ class Component extends DCLogic {
         if(sess0 && s.loginRole==='visitor'){ this.setState({authBusy:false, page:'visit', toast:this.L('가입이 완료되었습니다. 참관 사전등록을 진행해 주세요.','Signed up. Please complete visitor pre-registration.')}); return; }
         const sess = sess0;
         if(!sess){ this.setState({authBusy:false, authMode:'login', authError:'가입 완료! 이메일 인증 후 로그인해 주세요. (관리자가 이메일 인증을 꺼두면 즉시 로그인됩니다.)'}); return; }
-        this.goConsole(); return;
+        await this.afterAuth(); return;
       }
       res = await window.BimtcDB.login(s.auEmail, s.auPw);
       if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
-      this.goConsole();
+      await this.afterAuth();
     }catch(e){ this.setState({authBusy:false, authError:e.message}); }
+  }
+  typeName(t){
+    const en=this.state.lang==='en';
+    if(t==='buyer') return en?'Buyer':'바이어';
+    if(t==='visitor') return en?'Visitor':'방문객';
+    return en?'Exhibitor':'참가기업';
+  }
+  async afterAuth(){
+    const L=(ko,en)=>this.L(ko,en);
+    let me=null;
+    try{ me = await window.BimtcDB.currentUser(); }catch(e){}
+    this.setState({ authBusy:false, isAdmin: !!(me && me.is_admin), me: me||null });
+    if(me && !me.is_admin && me.type && me.type!==this.state.loginRole){
+      const real=this.typeName(me.type);
+      this.setState({ loginRole:me.type, authError:L('이 계정은 '+real+'으로 가입된 계정입니다. 유형을 '+real+'으로 선택한 뒤 로그인해 주세요.','This account is registered as '+real+'. Please select '+real+' and sign in again.') });
+      try{ await window.BimtcDB.logout(); }catch(e){}
+      this.setState({ me:null });
+      return;
+    }
+    if(me && me.is_admin){ this.goAdmin(); return; }
+    if(me && me.type==='visitor'){ this.setState({ page:'visit' }); this.flash(L('로그인되었습니다 · 참관 사전등록을 진행해 주세요','Signed in — please complete visitor pre-registration')); return; }
+    const cfg = window.BIMTC_CONFIG;
+    if(cfg && cfg.apply.buyer && !cfg.apply.buyer.open){
+      this.setState({ page:'home' });
+      this.flash(L('로그인되었습니다 · 비즈미팅 신청은 오픈 예정입니다','Signed in — business meeting applications open soon'));
+      return;
+    }
+    if(typeof window!=='undefined') window.location.href = 'bizmeeting.html';
   }
 
   renderVals(){
@@ -1367,6 +1405,8 @@ class Component extends DCLogic {
       exb_prog:L('프로그램 (시간표)','Program (Schedule)'),
       exb_prog_note:L('※ 프로그램은 사정에 따라 변경될 수 있습니다. 본 시간표는 예시가 포함된 기본계획입니다.','* The program is subject to change. This schedule is a draft plan including sample items.'),
       co_bc:L('HOME / 커뮤니티','HOME / Community'), co_title:L('커뮤니티','Community'), co_empty:L('등록된 게시물이 없습니다.','No posts yet.'),
+      lg_logout:L('로그아웃','Log out'), lg_withdraw:L('회원 탈퇴','Delete account'),
+      lg_withdraw_note:L('※ 탈퇴 시 계정과 프로필이 즉시 삭제되며 되돌릴 수 없습니다. 같은 이메일로 다시 가입할 수 있습니다.','* Deleting removes your account and profile permanently. You can sign up again with the same email.'),
       lg_title:L('BIMTC 로그인','BIMTC Login'), lg_sub:L('참가기업·바이어 회원 로그인','Exhibitor & Buyer member login'),
       lg_signup:L('회원가입','Sign up'), lg_login:L('로그인','Login'), lg_email:L('이메일','Email'), lg_pw:L('비밀번호','Password'),
       lg_name:L('기관/기업명','Company/Org'), lg_country:L('국가/지역','Country'),
@@ -1665,6 +1705,21 @@ class Component extends DCLogic {
 
       // login / auth
       loginRoles,
+      loggedIn: !!this.state.me,
+      myAccountLine: this.state.me ? (L('현재 로그인: ','Signed in: ')+(this.state.me.email||'')+' · '+(this.state.me.is_admin?L('관리자','Admin'):this.typeName(this.state.me.type))) : '',
+      doLogoutHere: async()=>{ try{ await window.BimtcDB.logout(); }catch(e){}; this.setState({ me:null, isAdmin:false, authError:'' }); this.flash(L('로그아웃되었습니다','Signed out')); },
+      deleteAccount: async()=>{
+        const email=(this.state.me&&this.state.me.email)||'';
+        if(!window.confirm(L('정말 탈퇴하시겠습니까? 계정과 프로필이 삭제되며 되돌릴 수 없습니다.','Delete your account? This cannot be undone.'))) return;
+        const res = await window.BimtcDB.deleteAccount();
+        if(!res || res.ok===false){
+          this.setState({ authError: L('탈퇴 처리에 실패했습니다. 사무국(bmia0528@naver.com)으로 문의해 주세요.','Account deletion failed. Please contact the secretariat.')+(res&&res.error?(' ('+res.error+')'):'') });
+          return;
+        }
+        try{ await window.BimtcDB.logout(); }catch(e){}
+        this.setState({ me:null, isAdmin:false, authMode:'signup', authError:'', auEmail:email, auPw:'' });
+        this.flash(L('탈퇴가 완료되었습니다 · 다시 가입하실 수 있습니다','Account deleted — you can sign up again'));
+      },
       isSignup: this.state.authMode==='signup',
       authTitle: this.state.authMode==='signup' ? L('BIMTC 회원가입','BIMTC Sign up') : L('BIMTC 로그인','BIMTC Login'),
       authSubtitle: this.state.authMode==='signup' ? '신규 가입' : '로그인',
