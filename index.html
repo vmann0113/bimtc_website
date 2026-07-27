@@ -42,18 +42,15 @@
 
   <div style="background:#122043;border-bottom:1px solid rgba(255,255,255,0.06);">
     <div style="max-width:1180px;margin:0 auto;padding:7px clamp(16px,4.5vw,32px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span onClick="{{ goLogin }}" style="border:1px solid rgba(37,194,129,0.5);color:#25C281;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">{{ t.role_ex }}</span>
-        <span onClick="{{ goLogin }}" style="border:1px solid rgba(90,183,240,0.45);color:#5AB7F0;padding:4px 11px;border-radius:999px;cursor:pointer;font-weight:600;">{{ t.role_buyer }}</span>
-      </div>
+      <div></div>
       <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
         <span onClick="{{ setKo }}" style="{{ koStyle }}">KOR</span>
         <span onClick="{{ setEn }}" style="{{ enStyle }}">ENG</span>
         <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;align-items:center;gap:15px;">
             <span style="color:rgba(255,255,255,0.14);">|</span>
-            <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.u_access }}</span>
-            <span onClick="{{ goExhibition }}" style="cursor:pointer;">{{ t.u_floor }}</span>
+            <span onClick="{{ goAccess }}" style="cursor:pointer;">{{ t.u_access }}</span>
+            <span onClick="{{ goFloor }}" style="cursor:pointer;">{{ t.u_floor }}</span>
             <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
             <span onClick="{{ goCheckReg }}" style="cursor:pointer;">{{ t.u_checkreg }}</span>
           </div>
@@ -158,7 +155,7 @@
     <div style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(36px,6.5vw,66px) clamp(16px,4.5vw,32px) clamp(33px,6vw,60px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:clamp(26px,2.36vw,52px);align-items:center;">
       <div>
         <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.15em;color:#173a63;font-weight:700;margin-bottom:20px;">BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</div>
-        <h1 style="font-size:clamp(37px,6.11vw,55px);font-weight:800;line-height:1.13;letter-spacing:-0.025em;color:#183566;margin:0 0 22px;">{{ t.hero_over }}<br><span style="color:#FF6B5A;">{{ t.hero_busan }}</span>{{ t.hero_after }}</h1>
+        <h1 style="font-size:clamp(37px,6.11vw,55px);font-weight:800;line-height:1.13;letter-spacing:-0.025em;color:#183566;margin:0 0 22px;">{{ t.hero_pre }}<span style="color:#0B5FA5;">{{ t.hero_biz }}</span>{{ t.hero_post }}<br><span style="color:#0B5FA5;">{{ t.hero_biz2 }}</span>{{ t.hero_l2a }}<span style="color:#FF6B5A;">{{ t.hero_busan }}</span>{{ t.hero_after }}</h1>
         <p style="font-size:18px;line-height:1.6;color:#1c3f63;margin:0 0 30px;max-width:480px;font-weight:500;">{{ t.hero_sub }}</p>
         <div style="display:flex;gap:12px;margin-bottom:34px;flex-wrap:wrap;">
           <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#2E90D6;flex-shrink:0;"></span>2026.11.13(FRI) – 11.14(SAT)</span>
@@ -174,7 +171,7 @@
         <div style="border-radius:18px;overflow:hidden;background:#fff;border:1px solid rgba(255,255,255,0.7);box-shadow:0 24px 60px rgba(24,53,102,0.28);"><img src="uploads/keyvisual.png" alt="MEDI × WELLNESS · BIMTC 2026 키비주얼" style="width:100%;display:block;" /></div>
         <div style="position:absolute;left:14px;bottom:clamp(14px,3vw,34px);background:#183566;color:#fff;border-radius:14px;padding:18px clamp(14px,4vw,22px);box-shadow:0 18px 40px rgba(24,53,102,0.4);">
           <div style="font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);letter-spacing:0.14em;color:#5CE0B4;margin-bottom:6px;font-weight:700;">COUNTDOWN</div>
-          <div style="font-size:clamp(23px,3.78vw,34px);font-weight:800;letter-spacing:-0.02em;line-height:1;">D-154</div>
+          <div style="font-size:clamp(23px,3.78vw,34px);font-weight:800;letter-spacing:-0.02em;line-height:1;">{{ t.ddayMain }}</div>
           <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9fc0d6;margin-top:6px;">{{ t.countdown_days }}</div>
         </div>
       </div>
@@ -246,11 +243,6 @@
         <div>
           <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#25C281;margin-bottom:14px;">SCHEDULE</div>
           <h2 style="font-size:clamp(22px,3.56vw,32px);font-weight:800;color:#fff;margin:0;letter-spacing:-0.02em;">{{ t.sched_title }}</h2>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);">
-          <span style="background:#25C281;color:#04261a;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;">{{ t.sf_all }}</span>
-          <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">{{ t.sf_reg }}</span>
-          <span style="border:1px solid rgba(255,255,255,0.16);color:#9fc0d6;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">{{ t.sf_event }}</span>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
@@ -431,8 +423,8 @@
         <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:rgba(255,255,255,0.7);margin:8px 0 0;">{{ t.cta_biz_note }}</p>
       </div>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
-        <button onClick="{{ goExhibit }}" style="background:#fff;color:#0A2236;border:none;padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_exhibit }}</button>
-        <button onClick="{{ goConsole }}" style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.cta_biz }} →</button>
+        <button onClick="{{ regEx }}" style="background:#fff;color:#0A2236;border:none;padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.reg_ex }}</button>
+        <button onClick="{{ regBuyer }}" style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.reg_buyer }} →</button>
       </div>
     </div>
   </section>
@@ -501,7 +493,7 @@
         </div>
       </div>
     </section>
-    <section style="background:#ffffff;color:#0A2236;border-top:1px solid #e6ebf2;">
+    <section id="ab-access" style="background:#ffffff;color:#0A2236;border-top:1px solid #e6ebf2;scroll-margin-top:90px;">
       <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
         <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS</div>
         <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 32px;letter-spacing:-0.02em;">{{ t.ab_access }}</h2>
@@ -588,7 +580,7 @@
         </div>
       </div>
     </section>
-    <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
+    <section id="ex-faq" style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;scroll-margin-top:90px;">
       <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
         <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">FAQ</div>
         <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 28px;letter-spacing:-0.02em;">{{ t.ex_faq }}</h2>
@@ -771,7 +763,7 @@
     </sc-if>
 
     <sc-if value="{{ exFloor }}" hint-placeholder-val="{{ false }}">
-    <section style="background:#ffffff;color:#0A2236;">
+    <section id="exb-floor" style="background:#ffffff;color:#0A2236;scroll-margin-top:90px;">
       <div style="max-width:1180px;margin:0 auto;padding:clamp(35px,6.5vw,64px) clamp(16px,4.5vw,32px);">
         <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.floor_title2 }}</h2>
         <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:clamp(44px,6.5vw,80px) clamp(14px,4vw,24px);text-align:center;">
@@ -802,6 +794,7 @@
             </div>
           </sc-for>
         </div>
+        <p style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);line-height:1.7;color:#8295ab;margin:20px 0 0;">{{ t.exb_prog_note }}</p>
       </div>
     </section>
     </sc-if>
@@ -869,38 +862,6 @@
           </div>
         </sc-if>
 
-        <sc-if value="{{ commLibrary }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:18px;">
-            <sc-for list="{{ libraryList }}" as="d" hint-placeholder-count="3">
-              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:14px;">
-                <div style="width:46px;height:46px;border-radius:11px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:24px;border:2.5px solid #0B5FA5;border-radius:3px;"></div></div>
-                <div style="flex:1;"><div style="font-size:16px;font-weight:800;color:#0A2236;line-height:1.4;margin-bottom:4px;">{{ d.title }}</div><div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;">{{ d.meta }}</div></div>
-                <a href="{{ d.href }}" target="_blank" style="background:#0B5FA5;color:#fff;text-decoration:none;text-align:center;padding:11px;border-radius:10px;font-size:14px;font-weight:700;">{{ lib_dl }} ↓</a>
-              </div>
-            </sc-for>
-          </div>
-        </sc-if>
-
-        <sc-if value="{{ commInquiryDone }}" hint-placeholder-val="{{ false }}">
-          <div style="border:1px solid #c7ebdc;background:#E7F6F0;border-radius:16px;padding:clamp(31px,6.5vw,56px) clamp(14px,4vw,24px);text-align:center;"><div style="font-size:16px;font-weight:700;color:#0d8f6b;">{{ inq_thanks }}</div></div>
-        </sc-if>
-        <sc-if value="{{ commInquiryForm }}" hint-placeholder-val="{{ false }}">
-          <div style="max-width:640px;background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:clamp(18px,4.5vw,32px);">
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:16px;margin-bottom:16px;">
-              <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_name }}</label><input value="{{ inq_name_v }}" onInput="{{ setInqName }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
-              <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_org }}</label><input value="{{ inq_org_v }}" onInput="{{ setInqOrg }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
-              <div style="grid-column:1 / -1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_email }}</label><input value="{{ inq_email_v }}" onInput="{{ setInqEmail }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
-            </div>
-            <div style="margin-bottom:16px;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:9px;color:#33485e;">{{ inq_cat }}</label>
-              <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                <sc-for list="{{ inqCatChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</span></sc-for>
-              </div>
-            </div>
-            <div style="margin-bottom:18px;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_msg }}</label><textarea value="{{ inq_msg_v }}" onInput="{{ setInqMsg }}" style="width:100%;min-height:120px;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;resize:vertical;font-family:'Pretendard',sans-serif;"></textarea></div>
-            <button onClick="{{ submitInquiry }}" style="background:#0B5FA5;color:#fff;border:none;padding:14px clamp(17px,4vw,28px);border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ inq_submit }}</button>
-          </div>
-        </sc-if>
-
       </div>
     </section>
   </div>
@@ -951,6 +912,206 @@
   </div>
   </sc-if>
 
+  <!-- ================= LIBRARY (자료실) ================= -->
+  <sc-if value="{{ isLibrary }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.lb_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.lb_title }}</h1>
+        <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">{{ t.lb_sub }}</p>
+      </div>
+    </div>
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:22px;">
+          <sc-for list="{{ libFiles }}" as="d" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;">
+              <div style="aspect-ratio:1/1.414;background:#EDF2F8;overflow:hidden;position:relative;">{{ d.thumbEl }}</div>
+              <div style="padding:22px clamp(16px,4vw,24px);display:flex;flex-direction:column;gap:16px;flex:1;">
+                <div style="flex:1;">
+                  <span style="display:inline-block;font-family:'Pretendard',sans-serif;font-size:clamp(10.5px,calc(14.63px - 0.35vw),12.5px);font-weight:700;letter-spacing:0.08em;color:#0d8f6b;background:#E7F6F0;padding:4px 10px;border-radius:999px;margin-bottom:11px;">{{ d.kind }}</span>
+                  <div style="font-size:17px;font-weight:800;color:#0A2236;line-height:1.4;margin-bottom:5px;">{{ d.title }}</div>
+                  <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;">{{ d.meta }}</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <a href="{{ d.href }}" target="_blank" rel="noopener" style="flex:1;background:#0B5FA5;color:#fff;text-decoration:none;text-align:center;padding:13px;border-radius:11px;font-size:14.5px;font-weight:800;">{{ t.lb_dl }} ↓</a>
+                  <a href="{{ d.href }}" target="_blank" rel="noopener" style="flex-shrink:0;background:#fff;color:#0B5FA5;border:1.5px solid #cfe0f0;text-decoration:none;text-align:center;padding:13px 16px;border-radius:11px;font-size:14.5px;font-weight:700;">{{ t.lb_view }}</a>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <p style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;margin:26px 0 0;">{{ t.lb_note }}</p>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= STAY & TOUR (숙박·관광 안내) ================= -->
+  <sc-if value="{{ isStay }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.st_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.st_title }}</h1>
+        <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">{{ t.st_sub }}</p>
+      </div>
+    </div>
+
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">STAY</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 8px;letter-spacing:-0.02em;">{{ t.st_hotel }}</h2>
+        <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#5e7388;margin:0 0 26px;">{{ t.st_hotel_sub }}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr));gap:16px;">
+          <sc-for list="{{ hotels }}" as="h" hint-placeholder-count="6">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:24px clamp(16px,4vw,24px);display:flex;flex-direction:column;gap:9px;">
+              <span style="align-self:flex-start;font-family:'Pretendard',sans-serif;font-size:clamp(10.5px,calc(14.63px - 0.35vw),12.5px);font-weight:700;color:#0B5FA5;background:#EAF2FC;padding:4px 10px;border-radius:999px;">{{ h.area }}</span>
+              <div style="font-size:17px;font-weight:800;color:#0A2236;">{{ h.name }}</div>
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.6;color:#5e7388;">{{ h.desc }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <p style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;margin:22px 0 0;">{{ t.st_hotel_note }}</p>
+      </div>
+    </section>
+
+    <section style="background:#F4F8F6;color:#0A2236;border-top:1px solid #e6ebf2;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">TOUR</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 8px;letter-spacing:-0.02em;">{{ t.st_tour }}</h2>
+        <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#5e7388;margin:0 0 26px;">{{ t.st_tour_sub }}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:16px;">
+          <sc-for list="{{ tours }}" as="s" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px clamp(16px,4vw,24px);">
+              <div style="font-size:17px;font-weight:800;color:#0A2236;margin-bottom:7px;">{{ s.name }}</div>
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.6;color:#5e7388;">{{ s.desc }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section style="background:#ffffff;color:#0A2236;border-top:1px solid #e6ebf2;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:#0d8f6b;margin-bottom:14px;">ACCESS</div>
+        <h2 style="font-size:clamp(22px,3.33vw,30px);font-weight:800;margin:0 0 26px;letter-spacing:-0.02em;">{{ t.st_transport }}</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px;">
+          <sc-for list="{{ accessWays }}" as="a" hint-placeholder-count="3">
+            <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px clamp(16px,4vw,24px);">
+              <div style="font-family:'Pretendard',sans-serif;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;letter-spacing:0.1em;color:#0d8f6b;margin-bottom:11px;">{{ a.from }}</div>
+              <div style="font-size:16.5px;font-weight:800;color:#0A2236;margin-bottom:9px;">{{ a.how }}</div>
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.65;color:#5e7388;">{{ a.detail }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px;">
+          <button onClick="{{ goAbout }}" style="background:#0B5FA5;color:#fff;border:none;padding:15px clamp(18px,4vw,28px);border-radius:11px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.st_map_btn }} →</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ================= CONTACT (문의하기) ================= -->
+  <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(29px,6.5vw,52px) clamp(16px,4.5vw,32px);">
+        <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;margin-bottom:12px;">{{ t.ct_bc }}</div>
+        <h1 style="font-size:clamp(27px,4.44vw,40px);font-weight:800;letter-spacing:-0.025em;margin:0;">{{ t.ct_title }}</h1>
+        <p style="font-size:16px;color:#aec5d8;margin:14px 0 0;">{{ t.ct_sub }}</p>
+      </div>
+    </div>
+
+    <section style="background:#ffffff;color:#0A2236;">
+      <div style="max-width:1180px;margin:0 auto;padding:clamp(42px,6.5vw,76px) clamp(16px,4.5vw,32px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:24px;align-items:start;">
+
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:clamp(20px,4.5vw,32px);">
+          <h2 style="font-size:20px;font-weight:800;margin:0 0 6px;">{{ t.ct_form }}</h2>
+          <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7388;margin:0 0 22px;line-height:1.6;">{{ t.ct_form_sub }}</p>
+          <sc-if value="{{ inqSent }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid #c7ebdc;background:#E7F6F0;border-radius:14px;padding:clamp(26px,6vw,40px) 20px;text-align:center;">
+              <div style="font-size:16px;font-weight:800;color:#0d8f6b;line-height:1.6;">{{ inq_thanks }}</div>
+              <span onClick="{{ resetInquiry }}" style="display:inline-block;margin-top:16px;font-size:14px;font-weight:700;color:#0B5FA5;cursor:pointer;text-decoration:underline;">{{ t.ct_again }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ inqOpen }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:16px;margin-bottom:16px;">
+                <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_name }}</label><input value="{{ inq_name_v }}" onInput="{{ setInqName }}" style="width:100%;padding:13px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+                <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_org }}</label><input value="{{ inq_org_v }}" onInput="{{ setInqOrg }}" style="width:100%;padding:13px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+                <div style="grid-column:1 / -1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_email }}</label><input value="{{ inq_email_v }}" onInput="{{ setInqEmail }}" placeholder="name@email.com" style="width:100%;padding:13px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+              </div>
+              <div style="margin-bottom:16px;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:9px;color:#33485e;">{{ inq_cat }}</label>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <sc-for list="{{ inqCatChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</span></sc-for>
+                </div>
+              </div>
+              <div style="margin-bottom:18px;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ inq_msg }}</label><textarea value="{{ inq_msg_v }}" onInput="{{ setInqMsg }}" style="width:100%;min-height:140px;padding:13px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;resize:vertical;font-family:'Pretendard',sans-serif;line-height:1.6;"></textarea></div>
+              <button onClick="{{ submitInquiry }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ inq_submit }}</button>
+              <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;margin:12px 0 0;line-height:1.6;">{{ t.ct_privacy }}</p>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:#0F2440;color:#dbe8f3;border-radius:18px;padding:clamp(20px,4.5vw,30px);">
+            <h2 style="font-size:19px;font-weight:800;margin:0 0 18px;color:#fff;">{{ t.ct_office }}</h2>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <sc-for list="{{ contactRows }}" as="c" hint-placeholder-count="4">
+                <div style="display:flex;gap:14px;align-items:baseline;">
+                  <span style="flex-shrink:0;width:58px;font-family:'Pretendard',sans-serif;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;letter-spacing:0.06em;color:#6b8aa6;">{{ c.k }}</span>
+                  <span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);line-height:1.6;color:#dbe8f3;">{{ c.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:18px;padding:clamp(20px,4.5vw,30px);">
+            <h2 style="font-size:19px;font-weight:800;margin:0 0 6px;color:#0A2236;">{{ t.ct_lookup }}</h2>
+            <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7388;margin:0 0 16px;line-height:1.6;">{{ t.ct_lookup_sub }}</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <input value="{{ cq_email_v }}" onInput="{{ setCqEmail }}" placeholder="name@email.com" style="flex:1 1 180px;padding:13px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;background:#fff;" />
+              <button onClick="{{ searchInquiries }}" style="background:#0F2440;color:#fff;border:none;padding:13px 22px;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.ct_search }}</button>
+            </div>
+            <sc-if value="{{ cqEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;border:1px dashed #cfdae6;border-radius:12px;padding:26px 16px;text-align:center;font-size:14px;color:#8295ab;">{{ t.ct_none }}</div>
+            </sc-if>
+            <sc-if value="{{ cqHas }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+                <sc-for list="{{ cqRows }}" as="r" hint-placeholder-count="2">
+                  <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:16px 18px;">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+                      <span style="font-size:13.5px;font-weight:800;color:#0B5FA5;">{{ r.category }}</span>
+                      <span style="font-family:'Pretendard',sans-serif;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#9aa9bd;">{{ r.date }}</span>
+                    </div>
+                    <div style="font-size:14px;line-height:1.6;color:#52677d;margin-bottom:10px;">{{ r.message }}</div>
+                    <span style="{{ r.statusStyle }}">{{ r.statusLabel }}</span>
+                    <sc-if value="{{ r.answer }}">
+                      <div style="margin-top:12px;background:#E7F6F0;border-radius:10px;padding:14px;font-size:14px;line-height:1.65;color:#0d6b52;">{{ r.answer }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <div onClick="{{ goFaq }}" style="background:#EAF2FC;border:1px solid #d3e4f5;border-radius:18px;padding:24px clamp(18px,4vw,28px);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;" style-hover="border-color:#0B5FA5;">
+            <div>
+              <div style="font-size:16.5px;font-weight:800;color:#0A2236;margin-bottom:4px;">{{ t.ct_faq_title }}</div>
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7388;">{{ t.ct_faq_sub }}</div>
+            </div>
+            <span style="font-size:15px;font-weight:800;color:#0B5FA5;white-space:nowrap;">{{ t.go }}</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
   <!-- ================= FOOTER (shared) ================= -->
   <footer style="background:#122043;color:#7d93a8;">
     <div style="max-width:1180px;margin:0 auto;padding:clamp(33px,6.5vw,60px) clamp(16px,4.5vw,32px) 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:clamp(18px,1.64vw,36px);">
@@ -961,9 +1122,12 @@
         </div>
         <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.7;margin:0 0 18px;color:#7d93a8;">{{ t.ft_office }}<br>{{ t.ft_addr }}<br>T. 051-461-4276~8 · F. 051-442-6006<br>E. bmia0528@naver.com</p>
         <div style="display:flex;gap:8px;">
-          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#9fb4c7;cursor:pointer;">IG</span>
-          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#9fb4c7;cursor:pointer;">YT</span>
-          <span style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#9fb4c7;cursor:pointer;">X</span>
+          <a href="https://www.instagram.com/bimtc_korea/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" style="width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;color:#9fb4c7;cursor:pointer;text-decoration:none;" style-hover="border-color:#25C281;color:#25C281;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.2"></rect><circle cx="12" cy="12" r="4.3"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"></circle></svg>
+          </a>
+          <a href="https://www.youtube.com/@BmiA_" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube" style="width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;color:#9fb4c7;cursor:pointer;text-decoration:none;" style-hover="border-color:#25C281;color:#25C281;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2.4" y="5.4" width="19.2" height="13.2" rx="4"></rect><path d="M10.6 9.4 L15.4 12 L10.6 14.6 Z" fill="currentColor" stroke="none"></path></svg>
+          </a>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
@@ -976,15 +1140,15 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
         <span style="color:#fff;font-weight:700;margin-bottom:5px;">{{ t.ft_info }}</span>
-        <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.u_access }}</span>
-        <span onClick="{{ goExhibition }}" style="cursor:pointer;">{{ t.ft_floormap }}</span>
-        <span onClick="{{ goCommunity }}" style="cursor:pointer;">{{ t.ft_lib }}</span>
-        <span onClick="{{ goAbout }}" style="cursor:pointer;">{{ t.ft_stay }}</span>
+        <span onClick="{{ goAccess }}" style="cursor:pointer;">{{ t.u_access }}</span>
+        <span onClick="{{ goFloor }}" style="cursor:pointer;">{{ t.ft_floormap }}</span>
+        <span onClick="{{ goLibrary }}" style="cursor:pointer;">{{ t.ft_lib }}</span>
+        <span onClick="{{ goStay }}" style="cursor:pointer;">{{ t.ft_stay }}</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
         <span style="color:#fff;font-weight:700;margin-bottom:5px;">{{ t.ft_support }}</span>
-        <span onClick="{{ goExhibit }}" style="cursor:pointer;">{{ t.ft_contact }}</span>
-        <span onClick="{{ goExhibit }}" style="cursor:pointer;">{{ t.ft_faq }}</span>
+        <span onClick="{{ goContact }}" style="cursor:pointer;">{{ t.ft_contact }}</span>
+        <span onClick="{{ goFaq }}" style="cursor:pointer;">{{ t.ft_faq }}</span>
         <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
       </div>
     </div>
@@ -1010,7 +1174,16 @@ class Component extends DCLogic {
     authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
     auDept:'', auDial:'+82', auPhone:'',
     inqName:'', inqOrg:'', inqEmail:'', inqMsg:'', inqCat:'', inqDone:false,
+    cqEmail:'', cqRows:[], cqSearched:false,
     isAdmin:false, now:Date.now(), menuOpen:false, vw:(typeof window!=='undefined'?window.innerWidth:1280) };
+
+  async searchInquiries(){
+    var email=(this.state.cqEmail||'').trim();
+    if(!email){ alert(this.L('이메일을 입력해 주세요.','Please enter your email.')); return; }
+    var rows=[];
+    try{ var r=await window.BimtcDB.checkInquiries(email); if(r&&r.ok) rows=r.rows||[]; }catch(e){}
+    this.setState({ cqRows:rows, cqSearched:true });
+  }
 
   async submitInquiry(){
     if(!this.state.inqName || !this.state.inqEmail || !this.state.inqMsg){ alert(this.L('이름·이메일·문의 내용을 입력해 주세요.','Please enter name, email and message.')); return; }
@@ -1041,6 +1214,14 @@ class Component extends DCLogic {
     draw('bimtc-map-access'); draw('bimtc-map-about');
   }
   flash(msg){ this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 2400); }
+  scrollToId(id, tries){
+    var n = tries==null ? 12 : tries;
+    var el = document.getElementById(id);
+    if(!el){ if(n>0) setTimeout(()=>this.scrollToId(id, n-1), 80); return; }
+    var top = Math.max(0, window.pageYOffset + el.getBoundingClientRect().top - 80);
+    window.scrollTo(0, top);
+    if(Math.abs(window.pageYOffset - top) > 4 && n>0) setTimeout(()=>this.scrollToId(id, n-1), 80);
+  }
   goConsole(){ if(this.gate('buyer')) window.location.href = '비즈미팅 시스템.dc.html'; }
   visitOpen(){ const c=window.BIMTC_CONFIG; if(c && c.apply.visit && c.apply.visit.open) return true; return !!this.state.isAdmin; }
   goBooth(){ if(this.gate('booth')) window.location.href = '부스 신청.dc.html'; }
@@ -1091,7 +1272,9 @@ class Component extends DCLogic {
       if(s.authMode==='signup'){
         res = await window.BimtcDB.signup({ email:s.auEmail, password:s.auPw, type:s.loginRole, name:s.auName, country:s.auCountry, dept:s.auDept, phone:(s.auDial+' '+s.auPhone).trim() });
         if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
-        const sess = res.session || ((await window.BimtcDB.client().auth.getSession()).data.session);
+        const sess0 = res.session || ((await window.BimtcDB.client().auth.getSession()).data.session);
+        if(sess0 && s.loginRole==='visitor'){ this.setState({authBusy:false, page:'visit', toast:this.L('가입이 완료되었습니다. 참관 사전등록을 진행해 주세요.','Signed up. Please complete visitor pre-registration.')}); return; }
+        const sess = sess0;
         if(!sess){ this.setState({authBusy:false, authMode:'login', authError:'가입 완료! 이메일 인증 후 로그인해 주세요. (관리자가 이메일 인증을 꺼두면 즉시 로그인됩니다.)'}); return; }
         this.goConsole(); return;
       }
@@ -1108,13 +1291,14 @@ class Component extends DCLogic {
     const t={
       nav_about:L('BIMTC 소개','About'), nav_exhibit:L('참가안내','Exhibit'), nav_visit:L('참관안내','Visit'), nav_exhibition:L('전시안내','Exhibition'), nav_community:L('커뮤니티','Community'),
       u_access:L('오시는 길','Directions'), u_floor:L('플로어맵','Floor Map'), u_login:L('로그인','Login'), u_checkreg:L('사전등록 확인','Check Registration'), u_search:L('검색','Search'), u_prereg:L('사전등록','Pre-register'),
-      hero_over:L('세계 의료관광 비즈니스가','Where the world\u2019s medical tourism'), hero_busan:L('부산','business'), hero_after:L('에서 만납니다',' meets in Busan'),
+      hero_pre:L('세계 의료관광 ','Where the world\u2019s medical tourism'), hero_biz:L('비즈니스',''), hero_post:L('가',''),
+      hero_biz2:L('','business'), hero_l2a:L('',' meets in '), hero_busan:L('부산','Busan'), hero_after:L('에서 만납니다',''),
       hero_sub:L('병원·뷰티·웰니스·헬스케어 기업과 검증된 바이어를 1:1로 잇는, 아시아 대표 의료관광 컨벤션.','Asia\u2019s leading medical tourism convention connecting hospitals, beauty, wellness & healthcare companies with verified buyers 1:1.'),
       hero_venue:L('BEXCO 제1전시장 3A홀, 부산','BEXCO Hall 3A, Busan'),
       cta_biz:L('바이어 비즈미팅 신청','Buyer Business Meeting'), cta_exhibit:L('참가기업 신청','Exhibitor Application'),
       cta_join:L('참가기업·바이어 회원가입','Join as Exhibitor/Buyer'), cta_visit:L('참관객 사전등록','Visitor Pre-register'),
       reg_ex:L('참가기업 등록','Register — Exhibitor'), reg_buyer:L('바이어 등록','Register — Buyer'), reg_visitor:L('방문객 등록','Register — Visitor'),
-      countdown_days:L('개막까지','to opening'),
+      countdown_days:L('개막까지','to opening'), ddayMain:'D-'+Math.max(0, Math.ceil((new Date('2026-11-13T00:00:00+09:00').getTime() - Date.now())/86400000)),
       review_over:L('2025 BIMTC','2025 BIMTC'), review_title:L('2025 BIMTC','2025 BIMTC Review'),
       who_over:L('WHO PARTICIPATES','WHO PARTICIPATES'), who_title:L('세 가지 길로 참여하세요','Three ways to participate'),
       part3_title:L('방문객으로 참여','Join as Visitor'), part3_desc:L('사전등록하면 대기 없이 빠르게 입장하고, 전시·프로그램·건강강좌를 자유롭게 관람할 수 있습니다.','Pre-register for fast-track entry and free access to exhibits, programs and health talks.'),
@@ -1144,6 +1328,22 @@ class Component extends DCLogic {
       ft_floormap:L('플로어맵·부스배치도','Floor Map · Booths'),
       ft_legal:L('개인정보처리방침 · 이메일무단수집거부 · 사이트맵','Privacy Policy · No Email Collection · Sitemap'),
       role_ex:L('참가기업','Exhibitor'), role_buyer:L('바이어','Buyer'),
+      lb_bc:L('HOME / 자료실','HOME / Downloads'), lb_title:L('자료실','Downloads'), lb_sub:L('2026 공식 브로슈어와 포스터를 내려받으실 수 있습니다.','Download the official 2026 brochure and poster.'),
+      lb_dl:L('다운로드','Download'), lb_view:L('미리보기','Preview'),
+      lb_note:L('* 자료는 사무국 사정에 따라 업데이트될 수 있습니다. 최신본을 확인해 주세요.','* Files may be updated by the secretariat. Please check for the latest version.'),
+      st_bc:L('HOME / 숙박·관광 안내','HOME / Stay & Tour'), st_title:L('숙박·관광 안내','Stay & Tour'), st_sub:L('BEXCO 인근 숙박과 부산 여행 정보를 안내합니다.','Accommodation near BEXCO and travel information in Busan.'),
+      st_hotel:L('BEXCO 인근 숙박','Hotels near BEXCO'), st_hotel_sub:L('센텀시티·해운대 권역은 BEXCO에서 도시철도 2호선 또는 차량으로 짧은 거리에 있습니다.','Centum City and Haeundae are a short ride from BEXCO on Metro Line 2.'),
+      st_hotel_note:L('* 요금·예약은 각 숙소로 직접 문의해 주세요. 공식 협약 호텔과 참가자 특별요금은 확정 후 공지합니다.','* Please contact each hotel directly for rates. Official partner hotels and special rates will be announced.'),
+      st_tour:L('부산 대표 관광지','Highlights of Busan'), st_tour_sub:L('행사 전후로 둘러보기 좋은 부산의 대표 명소입니다.','Places worth visiting before or after the convention.'),
+      st_transport:L('BEXCO 오시는 길','Getting to BEXCO'), st_map_btn:L('오시는 길 지도 보기','View location map'),
+      ct_bc:L('HOME / 문의하기','HOME / Contact'), ct_title:L('문의하기','Contact Us'), ct_sub:L('행사·참가·등록 관련 문의를 남겨주시면 사무국에서 확인 후 답변드립니다.','Leave your inquiry and the secretariat will reply.'),
+      ct_form:L('1:1 문의 접수','Submit an inquiry'), ct_form_sub:L('접수된 문의는 사무국에서 확인 후 입력하신 이메일로 답변드립니다.','We will reply to the email address you provide.'),
+      ct_privacy:L('* 문의 처리를 위해 이름·소속·이메일을 수집하며, 답변 완료 후 파기합니다.','* Your name, organization and email are collected to handle the inquiry only.'),
+      ct_again:L('추가 문의 남기기','Submit another inquiry'),
+      ct_office:L('사무국 연락처','Secretariat'),
+      ct_lookup:L('내 문의 확인','Check my inquiry'), ct_lookup_sub:L('문의 시 입력한 이메일로 접수 상태와 답변을 확인하실 수 있습니다.','Enter the email you used to check status and replies.'),
+      ct_search:L('조회','Search'), ct_none:L('해당 이메일로 접수된 문의가 없습니다.','No inquiries found for this email.'),
+      ct_faq_title:L('자주 묻는 질문','Frequently asked questions'), ct_faq_sub:L('참가·부스·사전등록 관련 답변을 먼저 확인해 보세요.','Check booth and registration answers first.'),
       sf_all:L('전체','All'), sf_reg:L('모집·등록','Apply·Register'), sf_event:L('행사·프로그램','Event·Program'), map_link:L('네이버 지도로 오시는 길 보기 →','View directions on Naver Map →'), map_naver:L('📍 네이버맵 길안내','📍 Naver Map'), map_kakao:L('📍 카카오맵 길안내','📍 Kakao Map'), floor_ph:L('[ 부스 배치도 · 플로어맵 ]','[ Booth Layout · Floor Map ]'),
       // sub-page breadcrumbs & headers
       ab_bc:L('HOME / BIMTC 소개','HOME / About'), ab_title:L('BIMTC 소개','About BIMTC'), ab_sub:L('부산국제의료관광컨벤션의 행사 개요와 걸어온 길을 소개합니다.','Overview and history of the Busan International Medical Tourism Convention.'),
@@ -1165,6 +1365,7 @@ class Component extends DCLogic {
       exb_soon_t:L('참가기업 정보 준비 중입니다','Exhibitor info coming soon'), exb_soon_d:L('참가기업 소개는 참가 신청 접수 후 순차적으로 공개될 예정입니다. 많은 관심 부탁드립니다.','Exhibitors will be introduced after applications open. Stay tuned.'),
       exb_floor_t:L('부스 배치도 준비 중입니다','Floor map coming soon'), exb_floor_d:L('전시장 부스 배치도는 참가 신청 오픈에 맞춰 공개될 예정입니다. 많은 관심 부탁드립니다.','The floor map will be released when applications open. Stay tuned.'), floor_title2:L('부스 배치도','Floor Map'),
       exb_prog:L('프로그램 (시간표)','Program (Schedule)'),
+      exb_prog_note:L('※ 프로그램은 사정에 따라 변경될 수 있습니다. 본 시간표는 예시가 포함된 기본계획입니다.','* The program is subject to change. This schedule is a draft plan including sample items.'),
       co_bc:L('HOME / 커뮤니티','HOME / Community'), co_title:L('커뮤니티','Community'), co_empty:L('등록된 게시물이 없습니다.','No posts yet.'),
       lg_title:L('BIMTC 로그인','BIMTC Login'), lg_sub:L('참가기업·바이어 회원 로그인','Exhibitor & Buyer member login'),
       lg_signup:L('회원가입','Sign up'), lg_login:L('로그인','Login'), lg_email:L('이메일','Email'), lg_pw:L('비밀번호','Password'),
@@ -1202,6 +1403,7 @@ class Component extends DCLogic {
 
     const tagPill = (text, color) => React.createElement('span', { style: { fontFamily: "'Pretendard',sans-serif", fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', padding: '5px 0', width: '52px', textAlign: 'center', borderRadius: '6px', color: color, background: color + '22', flexShrink: 0 } }, text);
     const statusPill = (text, color) => React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '7px', fontSize: '13px', fontWeight: 700, color: color, flexShrink: 0, width: '74px' } }, React.createElement('span', { style: { width: '6px', height: '6px', borderRadius: '50%', background: color } }), text);
+    const dleft = (iso)=>Math.max(0, Math.ceil((new Date(iso+'T00:00:00+09:00').getTime() - Date.now())/86400000));
     const sq = (c,r,fill)=>React.createElement('div',{style:{width:16,height:16,borderRadius:r||4,background:fill?c:'transparent',border:fill?'none':('2.5px solid '+c)}});
 
     // exhibition sub-tabs
@@ -1209,7 +1411,7 @@ class Component extends DCLogic {
     const pillTab = (active)=> "cursor:pointer;padding:9px 18px;border-radius:999px;font-size:14px;font-weight:700;" + (active ? "background:#25C281;color:#04261a;" : "background:rgba(255,255,255,0.06);color:#bcd0e2;border:1px solid rgba(255,255,255,0.14);");
     const exTabs = exTabDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({exTab:k}), style: pillTab(this.state.exTab===k) }));
 
-    const commTabDef = [ ['notice',L('공지사항','Notices')], ['press',L('보도기사','Press')], ['gallery',L('갤러리','Gallery')], ['library',L('자료실','Downloads')], ['inquiry',L('문의','Contact')] ];
+    const commTabDef = [ ['notice',L('공지사항','Notices')], ['press',L('보도기사','Press')], ['gallery',L('갤러리','Gallery')] ]; const _unusedCommTabs = [ ['library',L('자료실','Downloads')], ['inquiry',L('문의','Contact')] ];
     const commTabs = commTabDef.map(([k,l])=>({ label:l, onClick:()=>this.setState({commTab:k}), style: pillTab(this.state.commTab===k) }));
 
     // exhibitors (real names from existing site)
@@ -1254,6 +1456,69 @@ class Component extends DCLogic {
     return {
       // routing
       isHome:p==='home', isAbout:p==='about', isExhibit:p==='exhibit', isVisit:p==='visit', isExhibition:p==='exhibition', isCommunity:p==='community', isLogin:p==='login', isCheckReg:p==='checkreg',
+      isLibrary:p==='library', isStay:p==='stay', isContact:p==='contact',
+      goLibrary:go('library'), goStay:go('stay'), goContact:go('contact'),
+      goFloor:()=>{ this.setState({ exTab:'floor' }); this.go('exhibition'); setTimeout(()=>this.scrollToId('exb-floor'), 90); },
+      goAccess:()=>{ this.go('about'); setTimeout(()=>this.scrollToId('ab-access'), 90); },
+      goFaq:()=>{ this.go('exhibit'); setTimeout(()=>this.scrollToId('ex-faq'), 90); },
+      libFiles:[
+        { kind:'BROCHURE · KOR', title:L('2026 BIMTC 공식 브로슈어 (국문)','2026 BIMTC Brochure (KOR)'), meta:'PDF · 2026.07.27', href:'uploads/brochure_ko_0727.pdf',
+          thumbEl:React.createElement('div',{style:{position:'absolute',inset:0,background:'linear-gradient(150deg,#0B5FA5,#11A37B)',display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'26px 22px',color:'#fff'}},
+            React.createElement('div',{key:'a',style:{fontSize:'12px',letterSpacing:'0.18em',fontWeight:700,opacity:0.85}},'BIMTC 2026'),
+            React.createElement('div',{key:'b'},
+              React.createElement('div',{style:{fontSize:'27px',fontWeight:800,letterSpacing:'-0.02em',lineHeight:1.15}},'MEDI × WELLNESS'),
+              React.createElement('div',{style:{fontSize:'14px',marginTop:'8px',opacity:0.9,fontWeight:600}},'국문 브로슈어'))) },
+        { kind:'BROCHURE · ENG', title:L('2026 BIMTC 공식 브로슈어 (영문)','2026 BIMTC Brochure (ENG)'), meta:'PDF · 2026.07.27', href:'uploads/brochure_en_0727.pdf',
+          thumbEl:React.createElement('div',{style:{position:'absolute',inset:0,background:'linear-gradient(150deg,#16294F,#0B5FA5)',display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'26px 22px',color:'#fff'}},
+            React.createElement('div',{key:'a',style:{fontSize:'12px',letterSpacing:'0.18em',fontWeight:700,opacity:0.85}},'BIMTC 2026'),
+            React.createElement('div',{key:'b'},
+              React.createElement('div',{style:{fontSize:'27px',fontWeight:800,letterSpacing:'-0.02em',lineHeight:1.15}},'MEDI × WELLNESS'),
+              React.createElement('div',{style:{fontSize:'14px',marginTop:'8px',opacity:0.9,fontWeight:600}},'English Brochure'))) },
+        { kind:'POSTER', title:L('2026 BIMTC 공식 포스터','2026 BIMTC Official Poster'), meta:'PNG', href:'uploads/poster_2026.png',
+          thumbEl:React.createElement('img',{src:'uploads/poster_2026.png',alt:'BIMTC 2026 poster',style:{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top'}}) },
+      ],
+      hotels:[
+        { area:L('센텀시티','Centum City'), name:L('센텀 권역 호텔','Centum City area'), desc:L('BEXCO·신세계 센텀시티 인접. 도보 이동이 가능한 비즈니스 호텔이 모여 있습니다.','Business hotels within walking distance of BEXCO.') },
+        { area:L('해운대','Haeundae'), name:L('해운대 해변 권역','Haeundae Beach area'), desc:L('해운대해수욕장 인근 특급·비즈니스 호텔. BEXCO까지 도시철도 2호선 2~3정거장.','Upscale and business hotels near the beach, 2–3 Metro stops from BEXCO.') },
+        { area:L('마린시티','Marine City'), name:L('마린시티 권역','Marine City area'), desc:L('고층 오션뷰 숙소가 밀집. 광안대교 야경 조망이 가능합니다.','High-rise ocean-view stays with Gwangan Bridge views.') },
+        { area:L('광안리','Gwangalli'), name:L('광안리 권역','Gwangalli area'), desc:L('중소형 호텔·레지던스가 많아 합리적인 가격대. BEXCO까지 차량 15분 내외.','Mid-range hotels and residences, about 15 minutes by car to BEXCO.') },
+        { area:L('서면·부산역','Seomyeon · Busan Stn.'), name:L('도심 권역','Downtown area'), desc:L('KTX 부산역·서면 상권과 가까워 국내 이동이 편리합니다.','Convenient for KTX arrivals and downtown access.') },
+        { area:L('기장·오시리아','Osiria'), name:L('오시리아 관광단지','Osiria Tourism Complex'), desc:L('리조트형 숙소와 테마파크가 함께 있어 가족 동반 방문에 적합합니다.','Resort stays and theme parks, good for family visits.') },
+      ],
+      tours:[
+        { name:L('해운대해수욕장','Haeundae Beach'), desc:L('부산을 대표하는 해변. BEXCO에서 도시철도로 가깝습니다.','Busan\u2019s signature beach, a short Metro ride from BEXCO.') },
+        { name:L('광안리 · 광안대교','Gwangalli & Gwangan Bridge'), desc:L('해변 산책과 야경 명소. 주말 드론쇼가 열리기도 합니다.','Seaside walks and night views, with occasional drone shows.') },
+        { name:L('감천문화마을','Gamcheon Culture Village'), desc:L('산비탈을 따라 이어지는 색색의 마을. 사진 명소로 유명합니다.','A colorful hillside village and popular photo spot.') },
+        { name:L('자갈치시장 · 남포동','Jagalchi Market & Nampo-dong'), desc:L('한국 최대 수산시장과 원도심 먹거리·쇼핑 거리.','Korea\u2019s largest seafood market and the old downtown.') },
+        { name:L('태종대 · 흰여울문화마을','Taejongdae & Huinnyeoul'), desc:L('해안 절경과 바다를 마주한 골목길 산책 코스.','Coastal cliffs and seaside alley walks.') },
+        { name:L('온천 · 웰니스','Hot springs & wellness'), desc:L('동래·해운대 일대 온천과 스파에서 여정을 마무리해 보세요.','Hot springs and spas in Dongnae and Haeundae.') },
+      ],
+      accessWays:[
+        { from:L('김해국제공항','GIMHAE AIRPORT'), how:L('공항리무진 또는 도시철도','Limousine bus or Metro'), detail:L('공항리무진 해운대행 이용 시 BEXCO 인근 하차. 도시철도 이용 시 부산김해경전철 → 사상역 2호선 환승 → 센텀시티역.','Take the Haeundae-bound limousine bus, or the light rail to Sasan and transfer to Metro Line 2 for Centum City.') },
+        { from:L('KTX 부산역','KTX BUSAN STATION'), how:L('도시철도 1호선 → 2호선','Metro Line 1 → Line 2'), detail:L('부산역에서 1호선 탑승 후 서면역에서 2호선 환승, 센텀시티역 하차 (약 40분).','Line 1 from Busan Station, transfer at Seomyeon to Line 2, get off at Centum City (about 40 min).') },
+        { from:L('도시철도 · 자가용','METRO · CAR'), how:L('센텀시티역 하차 · BEXCO 주차장','Centum City Stn. · BEXCO parking'), detail:L('도시철도 2호선 센텀시티역과 BEXCO는 연결 통로로 이어집니다. 자가용 이용 시 BEXCO 주차장(유료)을 이용해 주세요.','Centum City Station connects directly to BEXCO. Paid parking is available on site.') },
+      ],
+      contactRows:[
+        { k:L('기관','ORG'), v:L('(사)부산권의료산업협의회 (BMIA)','Busan Medical Industry Association (BMIA)') },
+        { k:L('주소','ADDRESS'), v:L('부산광역시 동구 중앙대로 365, 3층','3F, 365 Jungang-daero, Dong-gu, Busan') },
+        { k:L('전화','TEL'), v:'051-461-4276~8' },
+        { k:L('팩스','FAX'), v:'051-442-6006' },
+        { k:L('이메일','EMAIL'), v:'bmia0528@naver.com' },
+        { k:L('운영시간','HOURS'), v:L('평일 09:00–18:00 (점심 12:00–13:00) · 주말·공휴일 휴무','Weekdays 09:00–18:00 (lunch 12:00–13:00)') },
+      ],
+      inqSent:p==='contact'&&this.state.inqDone, inqOpen:p==='contact'&&!this.state.inqDone,
+      resetInquiry:()=>this.setState({ inqDone:false, inqName:'', inqOrg:'', inqEmail:'', inqMsg:'' }),
+      cq_email_v:this.state.cqEmail, setCqEmail:this.set('cqEmail'),
+      searchInquiries:()=>this.searchInquiries(),
+      cqEmpty:this.state.cqSearched&&this.state.cqRows.length===0,
+      cqHas:this.state.cqRows.length>0,
+      cqRows:this.state.cqRows.map((r)=>{
+        var answered=!!r.answer;
+        return { category:r.category||L('일반 문의','General'), message:r.message||'', answer:r.answer||'',
+          date:(r.created_at||'').slice(0,10).replace(/-/g,'.'),
+          statusLabel: answered?L('답변 완료','Answered'):L('접수됨','Received'),
+          statusStyle: 'display:inline-block;font-family:\'Pretendard\',sans-serif;font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:999px;'+(answered?'color:#0d8f6b;background:#E7F6F0;':'color:#8a6d1f;background:#FBF2DC;') };
+      }),
       t,
       setKo:()=>{ try{localStorage.setItem('bimtc_lang','ko')}catch(e){}; this.setState({lang:'ko'}); }, setEn:()=>{ try{localStorage.setItem('bimtc_lang','en')}catch(e){}; this.setState({lang:'en'}); },
       koStyle:"cursor:pointer;font-weight:"+(en?'400':'600')+";color:"+(en?'#6b8aa6':'#25C281')+";",
@@ -1293,18 +1558,18 @@ class Component extends DCLogic {
         {title:L('바이어 비즈니스 상담회','Buyer Meetings'),desc:L('국내외 바이어와 참가기업의 1:1 매칭 상담','1:1 matched consultations with buyers'),bg:'#EAF7F2',icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.5px solid #11A37B'}})},
       ],
       scheduleB: [
-        { date:'2026.07.20 – 11.05', title:L('참관객 사전등록 접수','Visitor pre-registration'), tagEl:tagPill(L('등록','REG'),'#25C281'), statusEl:statusPill(L('진행중','Open'),'#25C281') },
-        { date:'~ 2026.09.30', title:L('참가기업 신청 마감','Exhibitor application deadline'), tagEl:tagPill(L('모집','APPLY'),'#2E90D6'), statusEl:statusPill('D-110','#2E90D6') },
-        { date:'~ 2026.10.16', title:L('바이어 비즈미팅 매칭 신청','Buyer meeting matching'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('접수중','Open'),'#25C281') },
+        { date:'2026.08.13 – 11.12', title:L('참관객 사전등록 접수','Visitor pre-registration'), tagEl:tagPill(L('등록','REG'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:L('추후 공개','TBA'), title:L('참가기업 신청 마감','Exhibitor application deadline'), tagEl:tagPill(L('모집','APPLY'),'#2E90D6'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:L('추후 공개','TBA'), title:L('바이어 비즈미팅 매칭 신청','Buyer meeting matching'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.13', title:L('개막식 & 의료관광 콘퍼런스','Opening & Conference'), tagEl:tagPill(L('행사','EVENT'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
-        { date:'2026.11.13 – 14', title:L('의료·뷰티·헬스케어 전시관 운영','Exhibition hall open'), tagEl:tagPill(L('전시','EXPO'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:'2026.11.13 – 14', title:L('메디컬·웰니스·국제관광·플레이 존 운영','Medical · Wellness · Global Tourism · Play zones'), tagEl:tagPill(L('전시','EXPO'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.14', title:L('웰니스 체험존 · 네트워킹 라운지','Wellness zone & networking'), tagEl:tagPill(L('부대','EXTRA'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
       ],
       quickLinksB: [
-        { title:t.ft_contact, desc:L('행사·참가·등록 관련 1:1 문의를 남겨주세요.','Leave a 1:1 inquiry about the event.'), onClick:go('exhibit'), go:t.go, icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.4px solid #0d8f6b'}}) },
-        { title:t.ft_faq, desc:L('참가 신청·사전등록 FAQ를 확인하세요.','Check application & registration FAQ.'), onClick:go('exhibit'), go:t.go, icon:sq('#0d8f6b',5,false) },
-        { title:L('자료실','Downloads'), desc:L('브로슈어·신청서·결과보고서 다운로드.','Brochures, forms & reports.'), onClick:go('community'), go:t.go, icon:React.createElement('div',{style:{width:15,height:15,background:'#0d8f6b',transform:'rotate(45deg)'}}) },
-        { title:t.ft_stay, desc:L('부산 호텔·관광 정보 안내.','Busan hotel & tour info.'), onClick:go('about'), go:t.go, icon:sq('#0d8f6b',5,true) },
+        { title:t.ft_contact, desc:L('행사·참가·등록 관련 1:1 문의를 남겨주세요.','Leave a 1:1 inquiry about the event.'), onClick:go('contact'), go:t.go, icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.4px solid #0d8f6b'}}) },
+        { title:t.ft_faq, desc:L('참가 신청·사전등록 FAQ를 확인하세요.','Check application & registration FAQ.'), onClick:()=>{ this.go('exhibit'); setTimeout(()=>this.scrollToId('ex-faq'), 90); }, go:t.go, icon:sq('#0d8f6b',5,false) },
+        { title:L('자료실','Downloads'), desc:L('공식 브로슈어·포스터 다운로드.','Official brochure & poster.'), onClick:go('library'), go:t.go, icon:React.createElement('div',{style:{width:15,height:15,background:'#0d8f6b',transform:'rotate(45deg)'}}) },
+        { title:t.ft_stay, desc:L('부산 호텔·관광 정보 안내.','Busan hotel & tour info.'), onClick:go('stay'), go:t.go, icon:sq('#0d8f6b',5,true) },
       ],
       logos: Array.from({length:12}),
       sponsors: ['보건복지부','문화체육관광부','한국관광공사','한국보건산업진흥원','부산경제진흥원','부산관광공사'],
@@ -1346,7 +1611,7 @@ class Component extends DCLogic {
         { no:'04', t:L('참가 확정·셋업','Confirm & Setup'), d:L('부스 셋업 및 비즈미팅 매칭 준비','Booth setup & meeting matching preparation') },
       ],
       faqs: [
-        { q:L('참가 신청 마감은 언제인가요?','When is the application deadline?'), a:L('2026년 9월 30일까지 온라인 신청을 완료해 주세요. 부스는 선착순 배정됩니다.','Apply online by Sep 30, 2026. Booths are assigned first-come, first-served.') },
+        { q:L('참가 신청 마감은 언제인가요?','When is the application deadline?'), a:L('추후 공지됩니다. 홈페이지를 참고해주세요.','To be announced. Please check this website for updates.') },
         { q:L('해외 기업도 참가할 수 있나요?','Can overseas companies participate?'), a:L('네, 해외 의료·웰니스·관광 기업도 참가 가능하며 통역·의전을 지원합니다.','Yes. Overseas medical, wellness & tourism companies can join, with interpretation & VIP support.') },
         { q:L('비즈미팅은 어떻게 신청하나요?','How do I apply for business meetings?'), a:L('참가 신청 후 비즈미팅 콘솔에서 관심분야를 등록하면 사무국이 매칭합니다.','After applying, register your interests in the meeting console and the secretariat will match you.') },
         { q:L('참가비에 무엇이 포함되나요?','What is included in the fee?'), a:L('부스 기본 장치, 참가증, 주차권, 온라인 기업 홍보가 포함됩니다. (부스 타입별 상이)','Basic booth fittings, badges, parking, and online promotion (varies by booth type).') },

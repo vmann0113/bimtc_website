@@ -332,6 +332,43 @@
         </div>
       </sc-if>
 
+      <!-- INQUIRIES -->
+      <sc-if value="{{ isInq }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">문의 관리</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 20px;">홈페이지 문의하기로 접수된 1:1 문의입니다. 답변을 저장하면 문의자가 사이트에서 확인할 수 있습니다.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ inqTabs }}" as="it" hint-placeholder-count="3">
+              <span onClick="{{ it.onClick }}" style="{{ it.style }}">{{ it.label }}</span>
+            </sc-for>
+          </div>
+          <button onClick="{{ exportInquiries }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ inqView }}" as="q" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:20px 22px;">
+              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin-bottom:12px;">
+                <span style="{{ q.statusStyle }}">{{ q.statusLabel }}</span>
+                <span style="font-size:13px;font-weight:700;color:#0B5FA5;background:#EAF2FC;padding:4px 10px;border-radius:999px;">{{ q.category }}</span>
+                <span style="font-size:15px;font-weight:800;color:#0F2440;">{{ q.name }}</span>
+                <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ q.org }}</span>
+                <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ q.email }}</span>
+                <span style="margin-left:auto;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ q.date }}</span>
+              </div>
+              <div style="background:#F7F9FC;border-radius:12px;padding:16px 18px;font-size:14.5px;line-height:1.7;color:#33485e;white-space:pre-wrap;margin-bottom:14px;">{{ q.message }}</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
+                <textarea value="{{ q.draft }}" onInput="{{ q.setDraft }}" placeholder="답변을 입력하세요" style="flex:1 1 320px;min-height:74px;padding:12px 14px;border:1px solid #d8e0ea;border-radius:11px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;resize:vertical;font-family:'Pretendard',sans-serif;line-height:1.6;"></textarea>
+                <button onClick="{{ q.save }}" style="background:#0F2440;color:#fff;border:none;padding:14px 22px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">답변 저장</button>
+                <a href="{{ q.mailto }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #cfe0f0;padding:13px 20px;border-radius:11px;font-size:15px;font-weight:700;text-decoration:none;white-space:nowrap;">메일로 답장</a>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ noInq }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px dashed #d3deea;border-radius:14px;padding:40px;text-align:center;font-size:14px;color:#8295ab;">접수된 문의가 없습니다.</div>
+        </sc-if>
+      </sc-if>
+
       <!-- CMS -->
       <sc-if value="{{ isCms }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px;">
@@ -380,6 +417,7 @@ class Component extends DCLogic {
     view: 'dash',
     memberTab: 'all',
     members: [],
+    inquiries: [], inqTab: 'open', inqDrafts: {},
     gate:'loading', liEmail:'', liPw:'', loginErr:'', loginBusy:false,
     user: null,
     apps: [],
@@ -415,13 +453,23 @@ class Component extends DCLogic {
     await this.reload();
   }
   async reload(){
-    const [apps, regs, matches, notices, resvs, booths, members] = await Promise.all([
+    const [apps, regs, matches, notices, resvs, booths, members, inquiries] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
       window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
-      window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers()
+      window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers(),
+      window.BimtcDB.listInquiries().catch(()=>[])
     ]);
     const reserved={}; resvs.forEach(r=>{ reserved[r.table_idx+'-'+r.slot_idx]=1; });
-    this.setState({ apps, regs, matches, notices, reserved, booths, members });
+    this.setState({ apps, regs, matches, notices, reserved, booths, members, inquiries: inquiries||[] });
+  }
+
+  async saveAnswer(id){
+    const text=(this.state.inqDrafts[id]||'').trim();
+    if(!text){ this.flash('답변 내용을 입력하세요'); return; }
+    const r=await window.BimtcDB.setInquiryAnswer(id, text);
+    if(r && r.ok===false){ this.flash('저장 실패: '+r.error); return; }
+    await this.reload();
+    this.flash('답변을 저장했습니다');
   }
 
   typeLabel(t){ return t==='buyer' ? '바이어' : '참가기업'; }
@@ -465,8 +513,33 @@ class Component extends DCLogic {
       {k:'reg',label:'사전등록 명단'},
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
       {k:'lounge',label:'라운지 운영'},
+      {k:'inq',label:'문의 관리',badge:(this.state.inquiries||[]).filter(q=>!q.answer).length},
       {k:'cms',label:'공지·콘텐츠'},
     ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>this.setState({view:n.k})}));
+
+    const inquiries=this.state.inquiries||[];
+    const iTab=this.state.inqTab;
+    const iCount=(k)=> k==='all' ? inquiries.length : k==='open' ? inquiries.filter(q=>!q.answer).length : inquiries.filter(q=>!!q.answer).length;
+    const inqTabs=[['open','미답변'],['done','답변 완료'],['all','전체']].map(([k,l])=>({ label:l+' '+iCount(k), onClick:()=>this.setState({inqTab:k}),
+      style:"cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;"+(iTab===k?'background:#0B5FA5;color:#fff;':'background:#fff;border:1px solid #dde5ee;color:#5e7289;') }));
+    const inqView=inquiries.filter(q=> iTab==='all' ? true : iTab==='open' ? !q.answer : !!q.answer).map(q=>{
+      const answered=!!q.answer;
+      return { id:q.id, name:q.name||'(이름 없음)', org:q.org||'', email:q.email||'', category:q.category||'일반 문의',
+        message:q.message||'', date:this.shortTime(q.created_at),
+        statusLabel: answered?'답변 완료':'미답변',
+        statusStyle: 'font-size:13px;font-weight:700;padding:4px 11px;border-radius:999px;'+(answered?'color:#0d8f6b;background:#E7F6F0;':'color:#E0533C;background:#FBE9E5;'),
+        draft: (this.state.inqDrafts[q.id] !== undefined) ? this.state.inqDrafts[q.id] : (q.answer||''),
+        setDraft: (e)=>{ const val=e && e.target ? e.target.value : e; this.setState(st=>({ inqDrafts:{...st.inqDrafts, [q.id]:val} })); },
+        save: ()=>this.saveAnswer(q.id),
+        mailto: 'mailto:'+(q.email||'')+'?subject='+encodeURIComponent('[BIMTC 2026] 문의 답변드립니다')+'&body='+encodeURIComponent('안녕하세요, '+(q.name||'')+'님.\n2026 부산국제의료관광컨벤션 사무국입니다.\n\n문의 내용:\n'+(q.message||'')+'\n\n답변:\n') };
+    });
+    const exportInquiries=()=>{
+      const head=['접수일시','유형','이름','소속','이메일','문의내용','상태','답변'];
+      const rows=inquiries.map(q=>[this.shortTime(q.created_at), q.category||'', q.name||'', q.org||'', q.email||'', (q.message||'').replace(/\n/g,' '), q.answer?'답변 완료':'미답변', (q.answer||'').replace(/\n/g,' ')]);
+      const csv=[head].concat(rows).map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bimtc_inquiries.csv'; a.click();
+    };
 
     const statusPill=(t,c)=>React.createElement('span',{style:{fontSize:'12px',fontWeight:700,color:c,background:c+'1e',padding:'4px 10px',borderRadius:'999px',flexShrink:0}},t);
     const mapApp=(a)=>({ id:a.id, name:a.org_name||'(기업명 없음)', contact:a.contact||'', type:this.typeLabel(a.applicant_type),
@@ -528,7 +601,8 @@ class Component extends DCLogic {
     return {
       navItems:nav,
       adminName: this.state.user ? ('사무국 '+(this.state.user.name||this.state.user.email||'관리자')) : '사무국',
-      doLogout: async()=>{ await window.BimtcDB.logout(); window.location.href='BIMTC 메인 개편.dc.html'; },
+      doLogout: async()=>{ await window.BimtcDB.logout(); window.location.href='index.html'; },
+      isInq:v==='inq', inqTabs, inqView, noInq:inqView.length===0, exportInquiries,
       isDash:v==='dash',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',
       memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       gateLogin:this.state.gate==='login', gateDenied:this.state.gate==='denied', gateReady:this.state.gate==='ready',

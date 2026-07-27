@@ -74,6 +74,11 @@
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     async isAdmin() { var u = await this.currentUser(); return !!(u && u.is_admin); },
+    async listMembers() {
+      var sb = await ready();
+      var r = await sb.from('profiles').select('*').order('created_at', { ascending: false });
+      return r.data || [];
+    },
     async getLayout() {
       var sb = await ready();
       var r = await sb.from('site_settings').select('value').eq('key', 'booth_layout').maybeSingle();
@@ -120,6 +125,17 @@
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     async listInquiries() { var sb = await ready(); var r = await sb.from('inquiries').select('*').order('created_at', { ascending: false }); return r.data || []; },
+    async checkInquiries(email) {
+      var sb = await ready();
+      var r = await sb.rpc('check_inquiries', { p_email: email });
+      if (r.error) return { ok: false, error: r.error.message };
+      return { ok: true, rows: r.data || [] };
+    },
+    async setInquiryAnswer(id, answer) {
+      var sb = await ready();
+      var r = await sb.from('inquiries').update({ answer: answer, status: 'answered' }).eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     async checkRegistration(email) {
       var sb = await ready();
       var r = await sb.rpc('check_registration', { p_email: email });
@@ -166,6 +182,12 @@
     async partnerBusy(partnerId) {
       var sb = await ready();
       var busy = {};
+      var rpc = await sb.rpc('partner_busy', { p_partner: partnerId });
+      if (!rpc.error) {
+        (rpc.data || []).forEach(function (x) { busy[x.day + '-' + x.slot_idx] = 1; });
+        return busy;
+      }
+      // RPC 미설치 환경 폴백 (본인 관련 행만 보임)
       var mr = await sb.from('match_requests').select('day,slot_idx,status,from_profile,to_profile').or('from_profile.eq.' + partnerId + ',to_profile.eq.' + partnerId);
       (mr.data || []).forEach(function (x) { if (x.day != null && x.slot_idx != null && x.status !== 'declined') busy[x.day + '-' + x.slot_idx] = 1; });
       var rv = await sb.from('reservations').select('day,slot_idx,owner_profile,guest_profile').or('owner_profile.eq.' + partnerId + ',guest_profile.eq.' + partnerId);
