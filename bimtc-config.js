@@ -22,8 +22,8 @@
        ISO 날짜(현지시간). 지나면 자동으로 다음 단계로 넘어갑니다. */
     countdownEnabled: false,
     earlyBird: [
-      { key: 'phase1', label: '1차 조기신청', end: '2026-06-30T23:59:59', discountRate: 0.20 },
-      { key: 'phase2', label: '2차 조기신청', end: '2026-08-04T23:59:59', discountRate: 0.10 }
+      { key: 'phase1', label: '1차 조기신청', end: '2026-09-30T23:59:59', discountRate: 0.20 },
+      { key: 'phase2', label: '2차 조기신청', end: '2026-10-31T23:59:59', discountRate: 0.10 }
     ],
 
     /* 3) 기존(직전) 참가업체 — 연속참가 할인 대상(본 행사 1회 이상 참여업체 10% 추가). */
@@ -67,16 +67,41 @@
     contact: { office: '(사)부산권의료산업협의회', tel: '051-461-4276~8', email: 'bmia0528@naver.com' }
   };
 
-  // 현재 유효한 얼리버드 단계 계산
+  // 접수중인 얼리버드: 관리자가 '켜기'한 단계 (접수 오픈의 기준)
+  CONFIG.earlyBirdLive = function () {
+    for (var i = 0; i < CONFIG.earlyBird.length; i++) {
+      var p = CONFIG.earlyBird[i];
+      if (CONFIG.earlyBirdOverride[p.key] === 'on') return p;
+    }
+    // 수동 오픈 상태라면 날짜 기준 단계 표시
+    if (CONFIG.apply && CONFIG.apply.booth && CONFIG.apply.booth.open) return CONFIG.currentEarlyBird();
+    return null;
+  };
+  // 현재 유효한 얼리버드 단계 계산 (관리자 온/오프 오버라이드 우선, 기본은 날짜 기준)
+  // CONFIG.earlyBirdOverride = { phase1:'on'|'off'|'auto', phase2:... } — DB(site_settings.early_bird)에서 로드됨
+  CONFIG.earlyBirdOverride = CONFIG.earlyBirdOverride || window.__bimtcEbOv || {};
   CONFIG.currentEarlyBird = function () {
     var now = Date.now();
     for (var i = 0; i < CONFIG.earlyBird.length; i++) {
-      if (now <= new Date(CONFIG.earlyBird[i].end).getTime()) return CONFIG.earlyBird[i];
+      var p = CONFIG.earlyBird[i];
+      var mode = CONFIG.earlyBirdOverride[p.key] || 'auto';
+      if (mode === 'on') return p;
+      if (mode === 'off') continue;
+      if (now <= new Date(p.end).getTime()) return p;
     }
     return null; // 얼리버드 종료
   };
+  // DB 설정을 로드해 오버라이드 적용 (부스신청·홈 페이지가 mount 시 호출)
+  CONFIG.loadEarlyBirdOverride = async function () {
+    try {
+      if (!window.BimtcDB || !window.BimtcDB.getEarlyBird) return null;
+      var v = await window.BimtcDB.getEarlyBird();
+      if (v && typeof v === 'object') { CONFIG.earlyBirdOverride = v; window.__bimtcEbOv = v; }
+      return CONFIG.earlyBirdOverride;
+    } catch (e) { return null; }
+  };
 
-  // 배치도를 평면 셀 배열로 전개 (신청 화면이 사용)
+  // 배치도를 평면 셀 배열로 전개 (구버전 폴백용)
   CONFIG.boothCells = function () {
     var out = [];
     CONFIG.boothLayout.zones.forEach(function (z) {
@@ -95,6 +120,40 @@
     });
     return out;
   };
+
+  /* 0813 배치도(사무국 제작 이미지) 기반 기본 배치. 셀 1칸 = 3m×3m 부스.
+     좌·우 벽면 라인 29칸(좌측 하단 3칸은 비즈니스 존), 상단 STAGE+행사공간,
+     중앙 3열×2칸 폭 블록 5단(3+3+3+3+4), 하단 아일랜드 2×2 × 4개 — 총 167부스.
+     부스 배치 편집(관리자)에서 수정 후 저장하면 이 기본값 대신 DB 배치가 사용됩니다. */
+  CONFIG.blueprintLayout = (function () {
+    var zones = [
+      { key: 'z1', name: '메디컬존', color: '#8FC784' },
+      { key: 'z2', name: '관광웰니스존', color: '#BBDCEF' },
+      { key: 'z4', name: '플레잉존', color: '#F2B33D' },
+      { key: 'z5', name: '독립부스 구역 (전화 문의)', color: '#9AA7B5' }
+    ];
+    var cells = {};
+    function put(r, c, t, z) { cells[r + '_' + c] = z ? { t: t, z: z } : { t: t }; }
+    function block(r0, r1, c0, c1, z) { for (var r = r0; r <= r1; r++) for (var c = c0; c <= c1; c++) put(r, c, 'sell', z); }
+    var r;
+    for (r = 0; r <= 1; r++) for (var c1 = 4; c1 <= 7; c1++) put(r, c1, 'stage');    // STAGE
+    for (r = 2; r <= 4; r++) for (var c2 = 3; c2 <= 8; c2++) put(r, c2, 'seating');  // 행사 공간
+    // 좌·우 벽면 라인 (r2~28): 최상단 2칸(양쪽)은 부스 없음 · 플레잉 9 · 관광웰니스 9 · 메디컬 나머지
+    for (r = 2; r <= 28; r++) {
+      var z = r <= 10 ? 'z4' : r <= 19 ? 'z2' : 'z1';
+      if (r >= 26) { put(r, 0, 'biz'); } else { put(r, 0, 'sell', z); }  // 좌측 하단 3칸 = 비즈니스
+      put(r, 11, 'sell', z === 'z1' || r >= 26 ? 'z1' : z);              // 우측은 끝까지 판매
+    }
+    // 중앙 블록: 3열(각 2칸 폭) × 5단 (3+3+3+3+4행)
+    var bands = [[8, 10, 'z4'], [12, 14, 'z2'], [16, 18, 'z2'], [20, 22, 'z1'], [24, 27, 'z1']];
+    bands.forEach(function (b) {
+      [[2, 3], [5, 6], [8, 9]].forEach(function (cc) { block(b[0], b[1], cc[0], cc[1], b[2]); });
+    });
+    // 하단 아일랜드 2×2 × 4 = 독립부스 구역 (온라인 선택 불가 · 사무국 전화 배정) — 렌더러가 +0.5칸 이동해 중앙 정렬
+    [[0, 1], [3, 4], [6, 7], [9, 10]].forEach(function (cc) { block(30, 31, cc[0], cc[1], 'z5'); });
+    return { rows: 35, cols: 12, zones: zones, cells: cells, doors: { B10: 1 },
+      typeColors: { stage: '#c3c8cf', seating: '#A8CE6B', biz: '#D284C7' }, special: [], blueprint: '0813' };
+  })();
 
   window.BIMTC_CONFIG = CONFIG;
 })();

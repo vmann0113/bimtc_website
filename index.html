@@ -28,7 +28,8 @@
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   body{margin:0;background:#16294F;word-break:keep-all;overflow-wrap:break-word;overflow-x:hidden;}
   ::selection{background:#25C281;color:#04261a;}
-  input,textarea{font-family:'Pretendard',sans-serif;}
+  :root{color-scheme:light;}
+  input,textarea,select{font-family:'Pretendard',sans-serif;background-color:#fff;}
   h1,h2,h3,p{text-wrap:pretty;}
 </style>
 <script src="bimtc-config.js"></script>
@@ -62,8 +63,11 @@
   <sc-if value="{{ teaserOn }}" hint-placeholder-val="{{ true }}">
     <div style="background:linear-gradient(90deg,#FF6B5A,#FF8A5A);">
       <div style="max-width:1180px;margin:0 auto;padding:14px clamp(16px,4.5vw,32px);display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-family:'Pretendard',sans-serif;">
-        <span style="font-size:15px;font-weight:800;color:#FF6B5A;background:#fff;padding:5px 14px;border-radius:999px;">COMING SOON</span>
-        <span style="font-size:17px;color:#fff;font-weight:800;letter-spacing:-0.01em;">{{ t.teaser }}</span>
+        <span style="font-size:15px;font-weight:800;color:#FF6B5A;background:#fff;padding:5px 14px;border-radius:999px;">{{ ebStripBadge }}</span>
+        <span style="font-size:17px;color:#fff;font-weight:800;letter-spacing:-0.01em;">{{ ebStripText }}</span>
+        <sc-if value="{{ ebStripOpen }}" hint-placeholder-val="{{ false }}">
+          <a href="{{ ebStripHref }}" style="font-size:14px;font-weight:800;color:#FF6B5A;background:#fff;padding:7px 16px;border-radius:999px;text-decoration:none;font-family:'Pretendard',sans-serif;">{{ t.eb_strip_cta }}</a>
+        </sc-if>
       </div>
     </div>
   </sc-if>
@@ -766,10 +770,52 @@
     <section id="exb-floor" style="background:#ffffff;color:#0A2236;scroll-margin-top:90px;">
       <div style="max-width:1180px;margin:0 auto;padding:clamp(35px,6.5vw,64px) clamp(16px,4.5vw,32px);">
         <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.floor_title2 }}</h2>
-        <div style="border:1px dashed #d3deea;border-radius:16px;background:#F7F9FC;padding:clamp(44px,6.5vw,80px) clamp(14px,4vw,24px);text-align:center;">
-          <div style="width:60px;height:60px;border-radius:15px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><div style="width:24px;height:24px;border-radius:6px;border:3px solid #0B5FA5;"></div></div>
-          <h3 style="font-size:20px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.exb_floor_t }}</h3>
-          <p style="font-size:14.5px;color:#5E7289;margin:0;line-height:1.6;">{{ t.exb_floor_d }}</p>
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="flex:1;min-width:min(320px,100%);max-width:440px;">
+            <div style="{{ floorBoxStyle }}">
+              <sc-for list="{{ floorFixtures }}" as="f" hint-placeholder-count="3">
+                <div style="{{ f.style }}">{{ f.label }}</div>
+              </sc-for>
+              <sc-for list="{{ floorCells }}" as="b" hint-placeholder-count="40">
+                <div onClick="{{ b.onClick }}" style="{{ b.style }}"></div>
+              </sc-for>
+              <sc-for list="{{ floorDoors }}" as="d" hint-placeholder-count="2">
+                <div style="{{ d.style }}"><span style="{{ d.gapStyle }}"></span><span style="{{ d.labelStyle }}">{{ d.label }}</span><span style="{{ d.arrowStyle }}">↑</span></div>
+              </sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;">
+              <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ t.floor_scale }}</span>
+              <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ t.floor_click_hint }}</span>
+            </div>
+          </div>
+          <div style="flex:1;min-width:min(300px,100%);display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ floorZones }}" as="z" hint-placeholder-count="5">
+              <div onClick="{{ z.onClick }}" style="{{ z.cardStyle }}">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span style="width:16px;height:16px;border-radius:5px;background:{{ z.color }};flex-shrink:0;"></span>
+                  <span style="font-size:15px;font-weight:800;color:#0A2236;flex:1;">{{ z.name }}</span>
+                  <span style="font-size:12.5px;font-weight:700;color:#0B5FA5;">{{ z.countLabel }}</span>
+                  <span style="font-size:13px;color:#8295ab;transition:transform .15s;transform:rotate({{ z.arrowDeg }}deg);">▾</span>
+                </div>
+                <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5E7289;line-height:1.6;margin:7px 0 0 26px;">{{ z.desc }}</div>
+                <sc-if value="{{ z.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin:12px 0 2px 26px;">
+                    <sc-if value="{{ z.hasCompanies }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                        <sc-for list="{{ z.companies }}" as="c" hint-placeholder-count="3">
+                          <span style="font-size:12.5px;font-weight:700;color:#0A2236;background:#F0F5FA;border:1px solid #dde5ee;border-radius:999px;padding:5px 12px;">{{ c }}</span>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ z.noCompanies }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12.5px;color:#8295ab;background:#F7F9FC;border:1px dashed #d3deea;border-radius:9px;padding:9px 12px;">{{ t.floor_soon }}</div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            <a href="booth.html" style="display:block;text-align:center;background:#0B5FA5;color:#fff;text-decoration:none;padding:13px;border-radius:11px;font-size:14.5px;font-weight:800;font-family:'Pretendard',sans-serif;">{{ t.floor_apply_cta }}</a>
+          </div>
         </div>
       </div>
     </section>
@@ -879,13 +925,37 @@
         <h2 style="font-size:22px;font-weight:800;margin:0 0 6px;">{{ authTitle }}</h2>
         <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#8295ab;margin:0;">{{ t.lg_sub }}</p>
       </div>
+      <sc-if value="{{ showRoles }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;gap:8px;margin-bottom:20px;">
         <sc-for list="{{ loginRoles }}" as="r" hint-placeholder-count="2">
           <button onClick="{{ r.onClick }}" style="{{ r.style }}">{{ r.label }}</button>
         </sc-for>
       </div>
+      </sc-if>
       <div style="display:flex;flex-direction:column;gap:14px;">
-        <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ isBuyerSignup }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:800;letter-spacing:0.06em;color:#0d8f6b;margin:2px 0 -4px;">{{ t.lgb_sec_about }}</div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_last }}</label><input value="{{ auLast }}" onInput="{{ setAuLast }}" placeholder="{{ t.lgb_last_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+            <div style="flex:1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_first }}</label><input value="{{ auFirst }}" onInput="{{ setAuFirst }}" placeholder="{{ t.lgb_first_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          </div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_country }}</label><input value="{{ auCountry }}" onInput="{{ setAuCountry }}" placeholder="예) United Arab Emirates" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_company }}</label><input value="{{ auName }}" onInput="{{ setAuName }}" placeholder="{{ t.lgb_company_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_industry }}</label><input value="{{ auIndustry }}" onInput="{{ setAuIndustry }}" placeholder="{{ t.lgb_industry_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_job }}</label><input value="{{ auJob }}" onInput="{{ setAuJob }}" placeholder="{{ t.lgb_job_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+            <div style="flex:1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_dept }}</label><input value="{{ auDept }}" onInput="{{ setAuDept }}" placeholder="{{ t.lgb_dept_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+          </div>
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:800;letter-spacing:0.06em;color:#0d8f6b;margin:8px 0 -4px;">{{ t.lgb_sec_contact }}</div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_mobile }}</label>
+            <div style="display:flex;gap:8px;">
+              <input value="{{ auDial }}" onInput="{{ setAuDial }}" placeholder="+82" style="width:76px;padding:12px 10px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;text-align:center;" />
+              <input value="{{ auPhone }}" onInput="{{ setAuPhone }}" inputmode="numeric" placeholder="010-0000-0000" style="flex:1;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" />
+            </div>
+          </div>
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_land }}</label><input value="{{ auLand }}" onInput="{{ setAuLand }}" placeholder="051-000-0000" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+        </sc-if>
+        <sc-if value="{{ isStdSignup }}" hint-placeholder-val="{{ false }}">
           <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_name }}</label><input value="{{ auName }}" onInput="{{ setAuName }}" placeholder="예) 굿모닝병원" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
           <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_dept }}</label><input value="{{ auDept }}" onInput="{{ setAuDept }}" placeholder="{{ t.lg_dept_ph }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
           <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_country }}</label><input value="{{ auCountry }}" onInput="{{ setAuCountry }}" placeholder="예) 대한민국" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
@@ -896,11 +966,35 @@
             </div>
           </div>
         </sc-if>
+        <sc-if value="{{ showEmailField }}" hint-placeholder-val="{{ true }}">
         <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_email }}</label><input value="{{ auEmail }}" onInput="{{ setAuEmail }}" onKeyDown="{{ authKey }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+        </sc-if>
+        <sc-if value="{{ isBuyerSignup }}" hint-placeholder-val="{{ false }}">
+          <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lgb_email2 }}</label><input value="{{ auEmail2 }}" onInput="{{ setAuEmail2 }}" placeholder="name@email.com" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+        </sc-if>
+        <sc-if value="{{ showPwField }}" hint-placeholder-val="{{ true }}">
         <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ t.lg_pw }}</label><input type="password" value="{{ auPw }}" onInput="{{ setAuPw }}" onKeyDown="{{ authKey }}" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;" /></div>
+        </sc-if>
+        <sc-if value="{{ isBuyerSignup }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ toggleAgree }}" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:12px 14px;background:#F7F9FC;border:1px solid #e3eaf2;border-radius:10px;">
+            <div style="{{ agreeBoxStyle }}"><sc-if value="{{ auAgree }}" hint-placeholder-val="{{ false }}"><span style="color:#fff;font-size:12px;font-weight:800;line-height:1;">✓</span></sc-if></div>
+            <span style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#33485e;line-height:1.55;">{{ t.lgb_agree }}</span>
+          </div>
+        </sc-if>
         <sc-if value="{{ authError }}" hint-placeholder-val="{{ false }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;">{{ authError }}</div></sc-if>
+        <sc-if value="{{ authInfo }}" hint-placeholder-val="{{ false }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#0d6b4f;background:#E7F6F0;border:1px solid #c7ebdc;border-radius:8px;padding:9px 12px;line-height:1.6;">{{ authInfo }}</div></sc-if>
         <button onClick="{{ submitAuth }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:14px;border-radius:11px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:4px;">{{ authCta }}</button>
       </div>
+      <sc-if value="{{ isLoginMode }}" hint-placeholder-val="{{ true }}">
+        <div style="text-align:center;margin-top:14px;">
+          <span onClick="{{ goForgot }}" style="cursor:pointer;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;text-decoration:underline;">{{ t.lg_forgot }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isForgotMode }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;margin-top:14px;">
+          <span onClick="{{ backToLogin }}" style="cursor:pointer;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#0B5FA5;font-weight:700;">← {{ t.lg_back_login }}</span>
+        </div>
+      </sc-if>
       <div style="display:flex;justify-content:center;gap:6px;margin-top:18px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7388;">
         <span>{{ authSwitchLabel }}</span>
         <span onClick="{{ toggleAuthMode }}" style="cursor:pointer;color:#0B5FA5;font-weight:700;">{{ authSwitchAction }}</span>
@@ -909,9 +1003,20 @@
         <div style="margin-top:20px;padding:16px 18px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:12px;">
           <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;line-height:1.6;margin-bottom:12px;">{{ myAccountLine }}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onClick="{{ toggleProfileEdit }}" style="flex:1 1 120px;background:#0B5FA5;color:#fff;border:none;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_edit }}</button>
             <button onClick="{{ doLogoutHere }}" style="flex:1 1 120px;background:#fff;color:#33485e;border:1px solid #dde5ee;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_logout }}</button>
             <button onClick="{{ deleteAccount }}" style="flex:1 1 120px;background:#fff;color:#c0392b;border:1px solid #f0c8c2;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_withdraw }}</button>
           </div>
+          <sc-if value="{{ profileEditOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+              <div><label style="display:block;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;margin-bottom:5px;color:#33485e;">{{ t.lg_name }}</label><input value="{{ peName }}" onInput="{{ setPeName }}" style="width:100%;padding:11px 13px;border:1px solid #d8e0ea;border-radius:9px;font-size:14.5px;outline:none;" /></div>
+              <div><label style="display:block;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;margin-bottom:5px;color:#33485e;">{{ t.lg_dept }}</label><input value="{{ peDept }}" onInput="{{ setPeDept }}" style="width:100%;padding:11px 13px;border:1px solid #d8e0ea;border-radius:9px;font-size:14.5px;outline:none;" /></div>
+              <div><label style="display:block;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;margin-bottom:5px;color:#33485e;">{{ t.lg_phone }}</label><input value="{{ pePhone }}" onInput="{{ setPePhone }}" style="width:100%;padding:11px 13px;border:1px solid #d8e0ea;border-radius:9px;font-size:14.5px;outline:none;" /></div>
+              <div><label style="display:block;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;margin-bottom:5px;color:#33485e;">{{ t.lg_country }}</label><input value="{{ peCountry }}" onInput="{{ setPeCountry }}" style="width:100%;padding:11px 13px;border:1px solid #d8e0ea;border-radius:9px;font-size:14.5px;outline:none;" /></div>
+              <div><label style="display:block;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;margin-bottom:5px;color:#33485e;">{{ t.lg_newpw }}</label><input type="password" value="{{ pePw }}" onInput="{{ setPePw }}" placeholder="{{ t.lg_newpw_ph }}" style="width:100%;padding:11px 13px;border:1px solid #d8e0ea;border-radius:9px;font-size:14.5px;outline:none;" /></div>
+              <button onClick="{{ saveProfile }}" style="background:#11A37B;color:#fff;border:none;padding:12px;border-radius:10px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ profileSaveLabel }}</button>
+            </div>
+          </sc-if>
           <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:10px 0 0;line-height:1.6;">{{ t.lg_withdraw_note }}</p>
         </div>
       </sc-if>
@@ -1183,6 +1288,7 @@ class Component extends DCLogic {
     crEmail:'', crSearched:false, crRows:[],
     authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
     auDept:'', auDial:'+82', auPhone:'',
+    auFirst:'', auLast:'', auJob:'', auIndustry:'', auLand:'', auEmail2:'', auAgree:false,
     inqName:'', inqOrg:'', inqEmail:'', inqMsg:'', inqCat:'', inqDone:false,
     cqEmail:'', cqRows:[], cqSearched:false, me:null,
     isAdmin:false, now:Date.now(), menuOpen:false, vw:(typeof window!=='undefined'?window.innerWidth:1280) };
@@ -1209,8 +1315,22 @@ class Component extends DCLogic {
   go(p){ this.setState({ page: p, menuOpen:false }); if(typeof window!=='undefined') window.scrollTo(0,0); setTimeout(()=>this.initMaps(),120); }
   componentDidMount(){
     setTimeout(()=>this.initMaps(),200);
+    (async()=>{ try{
+      for(let i=0;i<25&&!window.BIMTC_CONFIG;i++) await new Promise(r=>setTimeout(r,200));
+      const C=window.BIMTC_CONFIG;
+      const m=(location.search||'').match(/[?&]eb=(phase1|phase2|none)/); // 미리보기 전용 강제 스위치
+      if(m&&C){ C.earlyBirdOverride=m[1]==='none'?{phase1:'off',phase2:'off'}:{[m[1]]:'on'}; window.__bimtcEbOv=C.earlyBirdOverride; C.loadEarlyBirdOverride=async()=>C.earlyBirdOverride; this.forceUpdate(); return; }
+      if(C&&C.loadEarlyBirdOverride){ await C.loadEarlyBirdOverride(); this.forceUpdate(); }
+    }catch(e){} })();
+    (async()=>{ try{
+      const lay=await window.BimtcDB.getLayout().catch(()=>null);
+      const ex=window.BimtcDB.listPublicExhibitors?await window.BimtcDB.listPublicExhibitors():[];
+      this.setState({ pubLayout:lay, pubExhibitors:ex||[] });
+    }catch(e){} })();
     if(typeof window!=='undefined'){ this._rz=()=>{ if(window.innerWidth!==this.state.vw) this.setState({ vw:window.innerWidth }); }; window.addEventListener('resize',this._rz); }
     this._tick = setInterval(()=>this.setState({ now:Date.now() }), 1000);
+    if(typeof location!=='undefined' && location.hash==='#signup'){ this.setState({ page:'login', authMode:'signup' }); }
+    if(typeof location!=='undefined' && /type=recovery/.test(location.hash||'')){ this.setState({ page:'login', authMode:'setpw', authError:'', authInfo:this.L('본인 확인이 완료되었습니다. 새 비밀번호를 입력해 주세요.','Identity verified — please enter a new password.') }); }
     (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState({ me:u, isAdmin:!!u.is_admin, loginRole:(u.type||'exhibitor') }); }catch(e){} })();
   }
   componentWillUnmount(){ if(this._tick) clearInterval(this._tick); if(this._rz&&typeof window!=='undefined') window.removeEventListener('resize',this._rz); }
@@ -1274,13 +1394,45 @@ class Component extends DCLogic {
     }catch(e){ this.flash('오류: '+e.message); }
   }
   async submitAuth(){
-    const s=this.state;
+    const s=this.state; const L=(ko,en)=>this.L(ko,en);
+    if(s.authMode==='forgot'){
+      if(!s.auEmail){ this.setState({authError:L('가입하신 이메일을 입력해 주세요.','Please enter your registered email.')}); return; }
+      this.setState({authBusy:true, authError:'', authInfo:''});
+      const r=await window.BimtcDB.resetPassword(s.auEmail);
+      this.setState({authBusy:false, authError:r.ok?'':r.error, authInfo:r.ok?L('비밀번호 재설정 메일을 보냈습니다. 메일함(스팸함 포함)에서 링크를 열어 새 비밀번호를 설정해 주세요.','Password-reset email sent. Open the link in your inbox (check spam) to set a new password.'):''});
+      return;
+    }
+    if(s.authMode==='setpw'){
+      if(!s.auPw || s.auPw.length<6){ this.setState({authError:L('새 비밀번호를 6자 이상 입력해 주세요.','New password must be at least 6 characters.')}); return; }
+      this.setState({authBusy:true, authError:'', authInfo:''});
+      const r=await window.BimtcDB.updatePassword(s.auPw);
+      if(!r.ok){ this.setState({authBusy:false, authError:r.error}); return; }
+      this.setState({authBusy:false, authMode:'login', auPw:'', authInfo:L('비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.','Password changed. Please sign in with your new password.')});
+      try{ await window.BimtcDB.logout(); }catch(e){}
+      this.setState({ me:null, isAdmin:false });
+      return;
+    }
     if(!s.auEmail || !s.auPw){ this.setState({authError:'이메일과 비밀번호를 입력해 주세요.'}); return; }
     this.setState({authBusy:true, authError:''});
     try{
       let res;
       if(s.authMode==='signup'){
-        res = await window.BimtcDB.signup({ email:s.auEmail, password:s.auPw, type:s.loginRole, name:s.auName, country:s.auCountry, dept:s.auDept, phone:(s.auDial+' '+s.auPhone).trim() });
+        if(s.loginRole==='buyer'){
+          const need=this.L('필수 항목을 입력해 주세요: ','Please fill in the required fields: ');
+          const miss=[];
+          if(!s.auLast||!s.auFirst) miss.push(this.L('성명','Name'));
+          if(!s.auCountry) miss.push(this.L('국가','Country'));
+          if(!s.auName) miss.push(this.L('회사명','Company Name'));
+          if(!s.auIndustry) miss.push(this.L('업종','Industry'));
+          if(!s.auJob) miss.push(this.L('직책','Job Title'));
+          if(!s.auDept) miss.push(this.L('부서명','Department'));
+          if(!s.auPhone) miss.push(this.L('휴대전화','Mobile Phone'));
+          if(miss.length){ this.setState({authBusy:false, authError:need+miss.join(', ')}); return; }
+          if((s.auEmail2||'').trim().toLowerCase()!==(s.auEmail||'').trim().toLowerCase()){ this.setState({authBusy:false, authError:this.L('이메일 주소가 서로 일치하지 않습니다.','Email addresses do not match.')}); return; }
+          if(!s.auAgree){ this.setState({authBusy:false, authError:this.L('개인정보처리방침 동의가 필요합니다.','Please agree to the Privacy Policy.')}); return; }
+        }
+        res = await window.BimtcDB.signup({ email:s.auEmail, password:s.auPw, type:s.loginRole, name:s.auName, country:s.auCountry, dept:s.auDept, phone:(s.auDial+' '+s.auPhone).trim(),
+          firstName:s.auFirst, lastName:s.auLast, jobTitle:s.auJob, industry:s.auIndustry, landline:s.auLand });
         if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
         const sess0 = res.session || ((await window.BimtcDB.client().auth.getSession()).data.session);
         if(sess0 && s.loginRole==='visitor'){ this.setState({authBusy:false, page:'visit', toast:this.L('가입이 완료되었습니다. 참관 사전등록을 진행해 주세요.','Signed up. Please complete visitor pre-registration.')}); return; }
@@ -1322,6 +1474,80 @@ class Component extends DCLogic {
     if(typeof window!=='undefined') window.location.href = 'bizmeeting.html';
   }
 
+  ebStripVals(){
+    const L=(ko,en)=>this.L(ko,en);
+    const C=window.BIMTC_CONFIG;
+    const m0=(typeof location!=='undefined'?(location.search||''):'').match(/[?&]eb=(phase1|phase2|none)/);
+    let ebKey=m0?m0[1]:null;
+    try{ if(ebKey) sessionStorage.setItem('bimtc_eb_preview',ebKey); else ebKey=sessionStorage.getItem('bimtc_eb_preview'); }catch(e){} // 미리보기 스위치가 가입·이동 후에도 유지되도록
+    let eb;
+    if(ebKey&&C){ eb=ebKey==='none'?null:(C.earlyBird||[]).find(p=>p.key===ebKey); } // 미리보기 강제 스위치 (렌더 시점 평가)
+    else eb=C&&C.earlyBirdLive&&C.earlyBirdLive(); // 관리자가 ON 했거나 접수가 수동 오픈된 경우에만 '접수중'
+    if(!eb) return { ebStripBadge:'COMING SOON', ebStripText:L('곧 1차 얼리버드가 시작됩니다! 많은 기대 부탁드립니다','1st Early-bird starts soon! Stay tuned'), ebStripOpen:false };
+    const rate=Math.round((eb.discountRate||0)*100);
+    const end=(eb.end||'').slice(5,10).replace('-','/');
+    const m=(typeof location!=='undefined'?(location.search||''):'').match(/[?&]eb=(phase1|phase2|none)/);
+    return { ebStripBadge:'NOW OPEN', ebStripHref:'booth.html'+(m?('?eb='+m[1]):''),
+      ebStripText:L(eb.label+' 접수중 · 부스비 '+rate+'% 할인'+(end?' (~'+end+')':''), (eb.labelEn||eb.label)+' now open · '+rate+'% off booth fees'+(end?' (until '+end+')':'')),
+      ebStripOpen:true };
+  }
+  floorVals(){
+    const L=(ko,en)=>this.L(ko,en);
+    const CFG=window.BIMTC_CONFIG;
+    const Lay=(this.state.pubLayout&&this.state.pubLayout.zones)?this.state.pubLayout:(CFG&&CFG.blueprintLayout);
+    if(!Lay||!Lay.cells) return { floorCells:[], floorFixtures:[], floorDoors:[], floorZones:[], floorBoxStyle:'' };
+    const zmap={}; Lay.zones.forEach(z=>zmap[z.key]=z);
+    const TC=Lay.typeColors||{};
+    const TYPEC={ common:TC.common||'#E0A23C', organizer:TC.organizer||'#64748b', biz:TC.biz||'#7a5cc4', restroom:TC.restroom||'#2E90D6', stage:TC.stage||'#0f766e', seating:TC.seating||'#a3b8cc', lounge:TC.lounge||'#a3d977' };
+    const FIXLABEL={ stage:'STAGE', seating:L('객석 · 휴게공간','SEATING · LOUNGE'), biz:'', common:L('공용 공간','Common area'), organizer:L('주최측 운영','Organizer'), restroom:L('화장실','Restroom'), lounge:L('휴게공간','Lounge') };
+    const cw=100/Lay.cols, rh=100/Lay.rows;
+    const entries=Object.keys(Lay.cells).map(k=>{ const p=k.split('_'); return { r:+p[0], c:+p[1], cell:Lay.cells[k] }; }).filter(e=>e.cell);
+    const fixBox={};
+    entries.forEach(e=>{ if(e.cell.t!=='sell'&&e.cell.t!=='aisle'&&e.cell.t!=='clear'){ const b=fixBox[e.cell.t]||(fixBox[e.cell.t]={r0:e.r,r1:e.r,c0:e.c,c1:e.c}); if(e.r<b.r0)b.r0=e.r; if(e.r>b.r1)b.r1=e.r; if(e.c<b.c0)b.c0=e.c; if(e.c>b.c1)b.c1=e.c; } });
+    const ZPRE={ z1:'M', z2:'W', z3:'G', z4:'P', z5:'S' };
+    const openKey=this.state.floorZoneOpen;
+    const openZone=(k)=>this.setState({ floorZoneOpen: openKey===k?null:k });
+    const floorCells=entries.filter(e=>e.cell.t==='sell').map(e=>{
+      const zc=(zmap[e.cell.z]&&zmap[e.cell.z].color)||'#cdd8e4';
+      const xoff=e.cell.z==='z5'?0.5:0;
+      const zk=e.cell.z;
+      return { onClick:()=>openZone(zk),
+        style:"position:absolute;left:"+((e.c+xoff)*cw)+"%;top:"+(e.r*rh)+"%;width:"+cw+"%;height:"+rh+"%;box-sizing:border-box;border-radius:3px;border:1px solid rgba(255,255,255,0.8);background:"+zc+(zk==='z5'?';opacity:0.55':'')+";cursor:pointer;" };
+    });
+    const floorFixtures=Object.keys(fixBox).map(t=>{ const b=fixBox[t];
+      return { label:(FIXLABEL[t]===undefined?t:FIXLABEL[t]),
+        style:"position:absolute;left:"+(b.c0*cw)+"%;top:"+(b.r0*rh)+"%;width:"+((b.c1-b.c0+1)*cw)+"%;height:"+((b.r1-b.r0+1)*rh)+"%;box-sizing:border-box;background:"+(TYPEC[t]||'#cbd5e1')+";color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0.08em;border-radius:4px;font-family:'Pretendard',sans-serif;" }; });
+    const floorDoors=Object.keys(Lay.doors||{}).map(k=>{ const col=+k.slice(1);
+      return { label:L('출입구','ENTRANCE'),
+        style:"position:absolute;left:"+(col*cw)+"%;bottom:-3px;width:"+(cw*2)+"%;display:flex;flex-direction:column;align-items:center;z-index:3;font-family:'Pretendard',sans-serif;",
+        labelStyle:"font-size:10.5px;font-weight:800;color:#16294F;letter-spacing:0.1em;margin-bottom:1px;position:relative;z-index:4;",
+        arrowStyle:"font-size:15px;line-height:0.9;color:#16294F;font-weight:800;margin-bottom:-3px;position:relative;z-index:4;",
+        gapStyle:"width:100%;height:10px;background:#fff;display:block;" }; });
+    const ZDESC={
+      z1:L('의료기관, 의료기기 등 메디컬 분야 전시공간','Medical institutions & devices'),
+      z2:L('힐링·테라피 등 의료관광 서비스와 국내외 관광 전문 서비스 분야 전시공간','Healing & therapy services and tourism services'),
+      z4:L('푸드, 놀이, 체험 등 부대 프로그램 공간','Food, play & hands-on programs'),
+      z5:L('독립부스 전용 구역','Space-only booth area'),
+    };
+    const exh=this.state.pubExhibitors||[];
+    const compsFor=(pre)=>{ const set=new Set(); exh.forEach(a=>{ (a.booth_ids||[]).forEach(id=>{ if(String(id).indexOf(pre+'-')===0) set.add(a.company); }); }); return [...set]; };
+    const floorZones=Lay.zones.map(z=>{
+      const pre=ZPRE[z.key]||'';
+      const comps=pre?compsFor(pre):[];
+      const open=openKey===z.key;
+      return { name:z.name, color:z.color, desc:ZDESC[z.key]||'',
+        countLabel:comps.length?L('참가기업 '+comps.length+'곳','Exhibitors: '+comps.length):'',
+        open, hasCompanies:open&&comps.length>0, noCompanies:open&&comps.length===0, companies:comps,
+        arrowDeg:open?180:0, onClick:()=>openZone(z.key),
+        cardStyle:"background:#fff;border:1px solid "+(open?'#0B5FA5':'#e6ebf2')+";border-radius:14px;padding:15px 17px;cursor:pointer;transition:border-color .15s;" };
+    });
+    floorZones.push({ name:L('비즈니스존','Business Zone'), color:TYPEC.biz,
+      desc:L('바이어 미팅은 자체 부스 내 진행이 원칙이나, 일정 중복·공간 부족 등 특별한 사정 시 이용할 수 있는 공용 미팅라운지 공간','Shared meeting lounge for overlapping schedules'),
+      countLabel:'', open:false, hasCompanies:false, noCompanies:false, companies:[], arrowDeg:0, onClick:()=>{},
+      cardStyle:"background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 17px;" });
+    return { floorCells, floorFixtures, floorDoors, floorZones,
+      floorBoxStyle:"position:relative;width:100%;aspect-ratio:"+Lay.cols+" / "+Lay.rows+";background:#fff;border:2px solid #b7c4d4;border-radius:8px;" };
+  }
   renderVals(){
     const p = this.state.page;
     const L=(ko,en)=>this.state.lang==='en'?en:ko;
@@ -1359,6 +1585,7 @@ class Component extends DCLogic {
       cta_biz_note:L('※ 비즈미팅은 참가기업·바이어만 이용할 수 있으며, 방문객은 비즈미팅 사용이 불가합니다.','※ Business meetings are for exhibitors & buyers only. Visitors cannot use the meeting service.'),
       cd_left:L('마감까지','ends in'), cd_discount:L('할인 마감','off, ends'),
       teaser:L('곧 1차 얼리버드가 시작됩니다! 많은 기대 부탁드립니다','1st Early-bird starts soon! Stay tuned'),
+      eb_strip_cta:L('부스 신청하기 →','Apply now →'),
       ft_quick:L('바로가기','Quick Links'), ft_info:L('이용안내','Information'), ft_support:L('고객지원','Support'),
       ft_lib:L('자료실 다운로드','Downloads'), ft_stay:L('숙박·관광 안내','Stay & Tour'), ft_contact:L('문의하기','Contact'), ft_faq:L('자주 묻는 질문','FAQ'),
       go:L('바로가기 →','Go →'), spons_host:L('주최','HOSTS'), spons_org:L('주관','ORGANIZER'),
@@ -1403,14 +1630,30 @@ class Component extends DCLogic {
       exb_soon_t:L('참가기업 정보 준비 중입니다','Exhibitor info coming soon'), exb_soon_d:L('참가기업 소개는 참가 신청 접수 후 순차적으로 공개될 예정입니다. 많은 관심 부탁드립니다.','Exhibitors will be introduced after applications open. Stay tuned.'),
       exb_floor_t:L('부스 배치도 준비 중입니다','Floor map coming soon'), exb_floor_d:L('전시장 부스 배치도는 참가 신청 오픈에 맞춰 공개될 예정입니다. 많은 관심 부탁드립니다.','The floor map will be released when applications open. Stay tuned.'), floor_title2:L('부스 배치도','Floor Map'),
       exb_prog:L('프로그램 (시간표)','Program (Schedule)'),
+      floor_scale:L('1칸 = 3m × 3m (1부스) · BEXCO 제1전시장 3A홀','1 cell = 3m × 3m (1 booth) · BEXCO Hall 3A'),
+      floor_click_hint:L('존을 클릭하면 참가기업을 확인할 수 있습니다','Click a zone to see its exhibitors'),
+      floor_soon:L('참가기업 확정 후 공개됩니다.','Exhibitors will be listed once confirmed.'),
+      floor_apply_cta:L('부스 신청하기 →','Apply for a booth →'),
       exb_prog_note:L('※ 프로그램은 사정에 따라 변경될 수 있습니다. 본 시간표는 예시가 포함된 기본계획입니다.','* The program is subject to change. This schedule is a draft plan including sample items.'),
       co_bc:L('HOME / 커뮤니티','HOME / Community'), co_title:L('커뮤니티','Community'), co_empty:L('등록된 게시물이 없습니다.','No posts yet.'),
       lg_logout:L('로그아웃','Log out'), lg_withdraw:L('회원 탈퇴','Delete account'),
+      lg_forgot:L('비밀번호를 잊으셨나요?','Forgot your password?'), lg_back_login:L('로그인으로 돌아가기','Back to login'),
+      lg_edit:L('회원정보 수정','Edit profile'), lg_newpw:L('새 비밀번호 (변경 시에만 입력)','New password (only to change)'), lg_newpw_ph:L('변경하지 않으면 비워두세요','Leave blank to keep current'),
       lg_withdraw_note:L('※ 탈퇴 시 계정과 프로필이 즉시 삭제되며 되돌릴 수 없습니다. 같은 이메일로 다시 가입할 수 있습니다.','* Deleting removes your account and profile permanently. You can sign up again with the same email.'),
       lg_title:L('BIMTC 로그인','BIMTC Login'), lg_sub:L('참가기업·바이어 회원 로그인','Exhibitor & Buyer member login'),
       lg_signup:L('회원가입','Sign up'), lg_login:L('로그인','Login'), lg_email:L('이메일','Email'), lg_pw:L('비밀번호','Password'),
       lg_name:L('기관/기업명','Company/Org'), lg_country:L('국가/지역','Country'),
       lg_dept:L('소속명','Affiliation'), lg_dept_ph:L('예) 마케팅팀 / 소속 부서·기관','e.g. Marketing team / department'), lg_phone:L('연락처','Phone'),
+      lgb_sec_about:L('ABOUT YOU · 기본 정보','ABOUT YOU'), lgb_sec_contact:L('CONTACT DETAILS · 연락처','CONTACT DETAILS'),
+      lgb_first:L('이름 (First Name)','First Name'), lgb_first_ph:L('예) Gildong','e.g. Sarah'),
+      lgb_last:L('성 (Last Name)','Last Name'), lgb_last_ph:L('예) Hong','e.g. Chen'),
+      lgb_company:L('회사명','Company Name'), lgb_company_ph:L('예) OOO Travel Agency','e.g. OOO Travel Agency'),
+      lgb_industry:L('업종 (Industry / Business Type)','Company Industry / Business Type'), lgb_industry_ph:L('예) 여행사, 의료관광 에이전시','e.g. Travel agency, Medical tourism agency'),
+      lgb_job:L('직책','Job Title'), lgb_job_ph:L('예) Manager','e.g. Manager'),
+      lgb_dept:L('부서명','Department Name'), lgb_dept_ph:L('예) Overseas Sales','e.g. Overseas Sales'),
+      lgb_mobile:L('휴대전화','Mobile Phone'), lgb_land:L('회사 전화 (선택사항)','Company Landline (Optional)'),
+      lgb_email2:L('이메일 주소 확인','Confirm Email Address'),
+      lgb_agree:L('개인정보처리방침을 읽었으며 이에 동의합니다. (필수)','I confirm that I have read and agree to the Privacy Policy. (Required)'),
       lg_admin:L('사무국(관리자) 로그인 →','Secretariat (Admin) Login →'), lg_have:L('이미 계정이 있으신가요? 로그인','Already have an account? Login'), lg_no:L('계정이 없으신가요? 회원가입','No account? Sign up'),
       acc_ktx:L('부산역 → 지하철 30분, 센텀시티역 하차','Busan Stn → 30 min by metro, Centum City Stn'),
       acc_air:L('김해국제공항 → 리무진버스 약 50분','Gimhae Int\u2019l Airport → approx. 50 min by limousine bus'),
@@ -1471,13 +1714,7 @@ class Component extends DCLogic {
     const exFilterDef = [L('전체','All'),L('병원·의료','Hospital'),L('뷰티·성형','Beauty'),L('웰니스·헬스케어','Wellness')];
     const exFilters = exFilterDef.map((l,i)=>({ label:l, style: (i===0? "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;background:#0B5FA5;color:#fff;" : "cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:600;background:#fff;border:1px solid #d8e0ea;color:#5e7289;") }));
 
-    // floor map cells
-    const zoneColors = ['#cfe0f2','#cbe9dd','#e6dcf7','#f7e6cf'];
-    const floorCells = Array.from({length:40}).map((_,i)=>{
-      const z = i%4; const isAisle = (i%8===3);
-      return { bg: isAisle ? '#eef1f6' : zoneColors[z], label: isAisle ? '' : ('B'+(i+1)) };
-    });
-    const zoneLegend = [ {c:'#cfe0f2',t:'의료관광관'},{c:'#cbe9dd',t:'의료체험관'},{c:'#e6dcf7',t:'의료산업관'},{c:'#f7e6cf',t:'관광상품관'} ];
+
 
     const timetable = [
       { day:L('11.13 (금)','Nov 13 (Fri)'), rows:[ {time:'10:00',title:L('개막식 · 개회 선언','Opening Ceremony')}, {time:'11:00',title:L('국제 심포지엄 (Session 1)','Intl. Symposium (Session 1)')}, {time:'13:00',title:L('바이어 비즈니스 상담회','Buyer Business Meetings')}, {time:'15:00',title:L('명의 초청 건강강좌','Health Lecture by Top Doctors')}, {time:'16:30',title:L('의료 체험 프로그램','Medical Experience Program')} ] },
@@ -1680,7 +1917,9 @@ class Component extends DCLogic {
       })),
 
       // exhibition sub-tabs
-      exTabs, exFilters, exhibitors, zoneLegend, floorCells, timetable,
+      exTabs, exFilters, exhibitors, timetable,
+      ...this.floorVals(),
+      ...this.ebStripVals(),
       exCompanies:this.state.exTab==='companies', exFloor:this.state.exTab==='floor', exProgram:this.state.exTab==='program',
 
       // community
@@ -1721,15 +1960,45 @@ class Component extends DCLogic {
         this.flash(L('탈퇴가 완료되었습니다 · 다시 가입하실 수 있습니다','Account deleted — you can sign up again'));
       },
       isSignup: this.state.authMode==='signup',
-      authTitle: this.state.authMode==='signup' ? L('BIMTC 회원가입','BIMTC Sign up') : L('BIMTC 로그인','BIMTC Login'),
+      isLoginMode: this.state.authMode==='login',
+      isForgotMode: this.state.authMode==='forgot',
+      showEmailField: this.state.authMode!=='setpw',
+      showPwField: this.state.authMode!=='forgot',
+      showRoles: this.state.authMode==='login'||this.state.authMode==='signup',
+      goForgot: ()=>this.setState({ authMode:'forgot', authError:'', authInfo:'' }),
+      backToLogin: ()=>this.setState({ authMode:'login', authError:'', authInfo:'' }),
+      authInfo: this.state.authInfo||'',
+      authTitle: this.state.authMode==='signup' ? L('BIMTC 회원가입','BIMTC Sign up') : this.state.authMode==='forgot' ? L('비밀번호 찾기','Reset Password') : this.state.authMode==='setpw' ? L('새 비밀번호 설정','Set New Password') : L('BIMTC 로그인','BIMTC Login'),
       authSubtitle: this.state.authMode==='signup' ? '신규 가입' : '로그인',
-      authCta: this.state.authBusy ? L('처리 중…','Processing…') : (this.state.authMode==='signup' ? L('가입하고 시작하기 →','Sign up →') : L('로그인 →','Login →')),
+      authCta: this.state.authBusy ? L('처리 중…','Processing…') : (this.state.authMode==='signup' ? L('가입하고 시작하기 →','Sign up →') : this.state.authMode==='forgot' ? L('재설정 메일 보내기','Send reset email') : this.state.authMode==='setpw' ? L('비밀번호 변경하기','Change password') : L('로그인 →','Login →')),
       authError: this.state.authError,
       authSwitchLabel: this.state.authMode==='signup' ? L('이미 계정이 있으신가요?','Already have an account?') : L('아직 회원이 아니신가요?','Not a member yet?'),
       authSwitchAction: this.state.authMode==='signup' ? L('로그인','Login') : L('회원가입','Sign up'),
-      toggleAuthMode: ()=>this.setState({ authMode: this.state.authMode==='signup'?'login':'signup', authError:'' }),
+      toggleAuthMode: ()=>this.setState({ authMode: this.state.authMode==='signup'?'login':'signup', authError:'', authInfo:'' }),
+      profileEditOpen: !!this.state.profileEditOpen,
+      toggleProfileEdit: ()=>{ const me=this.state.me||{}; this.setState({ profileEditOpen:!this.state.profileEditOpen, peName:me.name||'', peDept:me.dept||'', pePhone:me.phone||'', peCountry:me.country||'', pePw:'' }); },
+      peName:this.state.peName||'', peDept:this.state.peDept||'', pePhone:this.state.pePhone||'', peCountry:this.state.peCountry||'', pePw:this.state.pePw||'',
+      setPeName:this.set('peName'), setPeDept:this.set('peDept'), setPePhone:this.set('pePhone'), setPeCountry:this.set('peCountry'), setPePw:this.set('pePw'),
+      profileSaveLabel: this.state.peSaving ? L('저장 중…','Saving…') : L('저장하기','Save changes'),
+      saveProfile: async()=>{
+        this.setState({peSaving:true});
+        const r=await window.BimtcDB.updateProfile({ name:this.state.peName, dept:this.state.peDept, phone:this.state.pePhone, country:this.state.peCountry });
+        let pwMsg='';
+        if(r.ok && this.state.pePw){ const p=await window.BimtcDB.updatePassword(this.state.pePw); pwMsg=p.ok?'':(' · '+p.error); }
+        this.setState({peSaving:false});
+        if(!r.ok){ this.flash(L('저장 실패: ','Save failed: ')+r.error); return; }
+        try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState({me:u}); }catch(e){}
+        this.setState({profileEditOpen:false, pePw:''});
+        this.flash(L('회원정보가 저장되었습니다','Profile updated')+pwMsg);
+      },
       auName:this.state.auName, auCountry:this.state.auCountry, auEmail:this.state.auEmail, auPw:this.state.auPw,
       auDept:this.state.auDept, auDial:this.state.auDial, auPhone:this.state.auPhone,
+      auFirst:this.state.auFirst, auLast:this.state.auLast, auJob:this.state.auJob, auIndustry:this.state.auIndustry, auLand:this.state.auLand, auEmail2:this.state.auEmail2, auAgree:this.state.auAgree,
+      setAuFirst:this.set('auFirst'), setAuLast:this.set('auLast'), setAuJob:this.set('auJob'), setAuIndustry:this.set('auIndustry'), setAuLand:this.set('auLand'), setAuEmail2:this.set('auEmail2'),
+      toggleAgree:()=>this.setState({ auAgree: !this.state.auAgree }),
+      agreeBoxStyle:'flex-shrink:0;width:20px;height:20px;border-radius:6px;margin-top:1px;display:flex;align-items:center;justify-content:center;'+(this.state.auAgree?'background:#11A37B;border:1px solid #11A37B;':'background:#fff;border:1.5px solid #c6d2e0;'),
+      isBuyerSignup: this.state.authMode==='signup' && this.state.loginRole==='buyer',
+      isStdSignup: this.state.authMode==='signup' && this.state.loginRole!=='buyer',
       setAuDept:this.set('auDept'), setAuDial:(e)=>this.setDial(e), setAuPhone:(e)=>this.setPhone(e),
       setAuName:this.set('auName'), setAuCountry:this.set('auCountry'), setAuEmail:this.set('auEmail'), setAuPw:this.set('auPw'),
       authKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.submitAuth(); } },

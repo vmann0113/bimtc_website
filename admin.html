@@ -27,7 +27,8 @@
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   body{margin:0;background:#EEF1F6;word-break:keep-all;overflow-wrap:break-word;overflow-x:hidden;}
-  input,textarea{font-family:'Pretendard',sans-serif;}
+  :root{color-scheme:light;}
+  input,textarea,select{font-family:'Pretendard',sans-serif;background-color:#fff;}
   h1,h2,h3,p{text-wrap:pretty;}
   ::selection{background:#0B5FA5;color:#fff;}
 </style>
@@ -106,6 +107,31 @@
       <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">대시보드</h1>
         <p style="font-size:14px;color:#5E7289;margin:0 0 24px;">2026 부산국제의료관광컨벤션 운영 현황 요약입니다.</p>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 24px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px;">
+            <div style="font-size:16px;font-weight:800;">얼리버드(조기신청) 접수 제어</div>
+            <span style="{{ ebNowStyle }}">{{ ebNowLabel }}</span>
+          </div>
+          <p style="font-size:13px;color:#8295ab;margin:0 0 16px;line-height:1.6;">켜기: 마감일과 무관하게 즉시 할인 적용 · 끄기: 즉시 중단 · 자동: 마감일 기준 (1차 2026-09-30 / 2차 2026-10-31). 변경은 저장 즉시 홈페이지·부스 신청 견적에 반영됩니다.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <sc-for list="{{ ebRows }}" as="p" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:13px 16px;border:1px solid #eef2f7;border-radius:12px;">
+                <div>
+                  <div style="font-size:14.5px;font-weight:800;">{{ p.label }} <span style="font-weight:700;color:#0d8f6b;">{{ p.rate }}</span></div>
+                  <div style="font-size:12.5px;color:#8295ab;margin-top:2px;">{{ p.sub }}</div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <sc-for list="{{ p.modes }}" as="m" hint-placeholder-count="3">
+                    <button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ ebDirty }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ saveEb }}" style="margin-top:14px;background:#0B5FA5;color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ ebSaveLabel }}</button>
+          </sc-if>
+        </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:16px;margin-bottom:16px;">
           <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
             <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 24px;">
@@ -369,6 +395,37 @@
         </sc-if>
       </sc-if>
 
+      <!-- NOTIFICATIONS -->
+      <sc-if value="{{ isNoti }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">알림함</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 20px;">부스 신청 접수·승인, 비즈미팅 요청·수락, 문의 답변 시 자동으로 쌓이는 발송 대기 알림입니다. [메일 열기]를 누르면 내용이 채워진 메일이 열립니다.</p>
+        <sc-if value="{{ noNoti }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:34px;text-align:center;color:#8295ab;font-size:14.5px;">발송 대기 중인 알림이 없습니다. (알림 자동 생성은 [v6] SQL 실행 후 동작합니다)</div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ notiView }}" as="n" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:13px;padding:16px 18px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <span style="{{ n.tagStyle }}">{{ n.tag }}</span>
+                  <span style="font-size:14.5px;font-weight:800;color:#0F2440;">{{ n.title }}</span>
+                </div>
+                <span style="font-size:12.5px;color:#9aa9bd;">{{ n.date }}</span>
+              </div>
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5E7289;line-height:1.65;margin-bottom:10px;">{{ n.to }} · {{ n.body }}</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <a href="{{ n.mailHref }}" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:9px 15px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Pretendard',sans-serif;">메일 열기</a>
+                <a href="{{ n.smsHref }}" style="background:#fff;color:#0d6b4f;border:1px solid #bcd9cc;text-decoration:none;padding:9px 15px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Pretendard',sans-serif;">문자 열기</a>
+                <button onClick="{{ n.markSent }}" style="background:#fff;color:#5E7289;border:1px solid #dde5ee;padding:9px 15px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">발송 완료 처리</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ hasSentNoti }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px;font-size:13px;color:#9aa9bd;">발송 완료 {{ sentNotiCount }}건은 목록에서 숨겨집니다.</div>
+        </sc-if>
+      </sc-if>
+
       <!-- CMS -->
       <sc-if value="{{ isCms }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px;">
@@ -436,6 +493,13 @@ class Component extends DCLogic {
   async componentDidMount(){
     try{
       const u = await window.BimtcDB.currentUser();
+      const isPreview = /[?&]preview=1/.test(location.search);
+      if(isPreview && (!u || !u.is_admin)){
+        this.setState({ gate:'ready', user: u || { name:'미리보기 (읽기전용)', email:'preview@bimtc', is_admin:false } });
+        try{ await this.reload(); }catch(e){}
+        this.flash('미리보기 모드 — 관리자 로그인 없이 UI만 표시되며, 데이터는 권한상 비어 보일 수 있습니다');
+        return;
+      }
       if(!u){ this.setState({ gate:'login' }); return; }
       if(!u.is_admin){ this.setState({ gate:'denied', user:u }); return; }
       this.setState({ gate:'ready', user:u });
@@ -452,15 +516,55 @@ class Component extends DCLogic {
     this.setState({ loginBusy:false, gate:'ready', user:u });
     await this.reload();
   }
+  ebVals(){
+    const PHASES=[
+      {key:'phase1',label:'1차 조기신청',rate:'20% 할인',end:'2026-09-30'},
+      {key:'phase2',label:'2차 조기신청',rate:'10% 할인',end:'2026-10-31'}
+    ];
+    const ov=this.state.ebOverride||{};
+    const now=Date.now();
+    // 현재 적용 단계 계산 (config와 동일 로직)
+    let active=null;
+    for(const p of PHASES){
+      const m=ov[p.key]||'auto';
+      if(m==='on'){ active=p; break; }
+      if(m==='off') continue;
+      if(now<=new Date(p.end+'T23:59:59').getTime()){ active=p; break; }
+    }
+    const MODES=[['auto','자동'],['on','켜기'],['off','끄기']];
+    return {
+      ebRows:PHASES.map(p=>{
+        const cur=ov[p.key]||'auto';
+        return { label:p.label, rate:p.rate, sub:'마감일 '+p.end+' · 현재 모드: '+(cur==='auto'?'자동(날짜 기준)':cur==='on'?'켜기(강제 적용)':'끄기(중단)'),
+          modes:MODES.map(([k,l])=>({ label:l,
+            onClick:()=>this.setState({ ebOverride:{...ov,[p.key]:k}, ebDirty:true }),
+            style:'padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Pretendard\',sans-serif;border:1px solid '+(cur===k?(k==='off'?'#E0533C':'#0B5FA5'):'#dde5ee')+';background:'+(cur===k?(k==='off'?'#E0533C':'#0B5FA5'):'#fff')+';color:'+(cur===k?'#fff':'#5E7289')+';' })) };
+      }),
+      ebNowLabel: active?('현재 적용중: '+active.label+' · '+active.rate):'현재 얼리버드 없음 (정상가 적용)',
+      ebNowStyle:'font-size:13px;font-weight:800;padding:5px 12px;border-radius:999px;background:'+(active?'#E7F6F0':'#eef1f6')+';color:'+(active?'#0d8f6b':'#5E7289')+';',
+      ebDirty:!!this.state.ebDirty,
+      ebSaveLabel:this.state.ebSaving?'저장 중…':'저장하고 즉시 반영',
+      saveEb:async()=>{
+        this.setState({ebSaving:true});
+        const r=await window.BimtcDB.saveEarlyBird(this.state.ebOverride||{});
+        this.setState({ebSaving:false});
+        if(!r.ok){ this.flash('저장 실패: '+r.error); return; }
+        this.setState({ebDirty:false});
+        this.flash('저장 완료 — 홈페이지·부스 신청에 즉시 반영됩니다');
+      }
+    };
+  }
   async reload(){
-    const [apps, regs, matches, notices, resvs, booths, members, inquiries] = await Promise.all([
+    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
       window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
       window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers(),
-      window.BimtcDB.listInquiries().catch(()=>[])
+      window.BimtcDB.listInquiries().catch(()=>[]),
+      window.BimtcDB.listNotifications().catch(()=>[])
     ]);
     const reserved={}; resvs.forEach(r=>{ reserved[r.table_idx+'-'+r.slot_idx]=1; });
-    this.setState({ apps, regs, matches, notices, reserved, booths, members, inquiries: inquiries||[] });
+    let eb=null; try{ eb=await window.BimtcDB.getEarlyBird(); }catch(e){}
+    this.setState({ apps, regs, matches, notices, reserved, booths, members, inquiries: inquiries||[], notifications: notifications||[], ebOverride: eb||{}, ebDirty:false });
   }
 
   async saveAnswer(id){
@@ -514,6 +618,7 @@ class Component extends DCLogic {
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
       {k:'lounge',label:'라운지 운영'},
       {k:'inq',label:'문의 관리',badge:(this.state.inquiries||[]).filter(q=>!q.answer).length},
+      {k:'noti',label:'알림함',badge:(this.state.notifications||[]).filter(n=>n.status==='pending').length},
       {k:'cms',label:'공지·콘텐츠'},
     ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>this.setState({view:n.k})}));
 
@@ -603,9 +708,25 @@ class Component extends DCLogic {
       adminName: this.state.user ? ('사무국 '+(this.state.user.name||this.state.user.email||'관리자')) : '사무국',
       doLogout: async()=>{ await window.BimtcDB.logout(); window.location.href='index.html'; },
       isInq:v==='inq', inqTabs, inqView, noInq:inqView.length===0, exportInquiries,
+      isNoti:v==='noti',
+      notiView:(this.state.notifications||[]).filter(n=>n.status==='pending').map(n=>{
+        const TAGS={booth_received:['부스 접수','#EAF2FC','#0B5FA5'],booth_approved:['부스 승인','#E7F6F0','#0d8f6b'],meeting_request:['미팅 요청','#F3EEFB','#7a5cc4'],meeting_accepted:['미팅 수락','#E7F6F0','#0d8f6b'],inquiry_answered:['문의 답변','#FBF6E9','#b78a3c']};
+        const tg=TAGS[n.event]||[n.event,'#eef1f6','#5E7289'];
+        const d=new Date(n.created_at);
+        return { id:n.id, tag:tg[0], tagStyle:'font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;background:'+tg[1]+';color:'+tg[2]+';',
+          title:n.title||'', to:(n.recipient_name||'')+' <'+(n.recipient_email||'')+'>', body:(n.body||'').slice(0,120),
+          date:(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),
+          mailHref:'mailto:'+encodeURIComponent(n.recipient_email||'')+'?subject='+encodeURIComponent(n.title||'')+'&body='+encodeURIComponent(n.body||''),
+          smsHref:'sms:?&body='+encodeURIComponent((n.title||'')+' — '+(n.body||'')),
+          markSent:async()=>{ await window.BimtcDB.setNotificationStatus(n.id,'sent'); this.setState({notifications:(this.state.notifications||[]).map(x=>x.id===n.id?{...x,status:'sent'}:x)}); this.flash('발송 완료로 처리했습니다'); } };
+      }),
+      noNoti:(this.state.notifications||[]).filter(n=>n.status==='pending').length===0,
+      hasSentNoti:(this.state.notifications||[]).some(n=>n.status==='sent'),
+      sentNotiCount:(this.state.notifications||[]).filter(n=>n.status==='sent').length,
       isDash:v==='dash',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',
       memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       gateLogin:this.state.gate==='login', gateDenied:this.state.gate==='denied', gateReady:this.state.gate==='ready',
+      ...this.ebVals(),
       liEmail:this.state.liEmail, liPw:this.state.liPw, loginErr:this.state.loginErr,
       setLiEmail:(e)=>this.setState({liEmail:e.target.value}), setLiPw:(e)=>this.setState({liPw:e.target.value}),
       liKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.doAdminLogin(); } },

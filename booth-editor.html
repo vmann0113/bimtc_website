@@ -26,7 +26,8 @@
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   body{margin:0;background:#EEF1F6;word-break:keep-all;overflow-wrap:break-word;overflow-x:hidden;}
-  input{font-family:'Pretendard',sans-serif;}
+  :root{color-scheme:light;}
+  input,textarea,select{font-family:'Pretendard',sans-serif;background-color:#fff;}
   h1,h2,h3,p{text-wrap:pretty;}
   ::selection{background:#0B5FA5;color:#fff;}
 </style>
@@ -127,6 +128,8 @@
 
       <button onClick="{{ save }}" style="background:#0B5FA5;color:#fff;border:none;padding:15px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ saveLabel }}</button>
       <button onClick="{{ reload }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:11px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">저장본 다시 불러오기</button>
+      <button onClick="{{ resetBlueprint }}" style="background:#fff;color:#b78a3c;border:1px solid #ecd9b0;padding:11px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">기본 배치도(0813)로 초기화</button>
+      <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:2px 0 0;line-height:1.6;">신청 접수 상황에 따라 존 크기·부스 구성이 바뀌면 이 화면에서 다시 칠해 저장하세요. 저장 즉시 부스 신청 화면에 반영됩니다.</p>
     </div>
 
     <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;">
@@ -136,16 +139,16 @@
       </div>
       <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:0 0 16px;">각 칸을 클릭하면 현재 브러시 유형으로 바뀝니다. 판매 부스 번호는 행(A·B…)+열 순번으로 자동 부여됩니다.</p>
       <div style="overflow-x:auto;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:{{ gridMinWidth }};">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:{{ gridMinWidth }};">
           <sc-for list="{{ grid }}" as="row" hint-placeholder-count="6">
-            <div style="display:flex;gap:5px;align-items:center;">
+            <div style="display:flex;gap:2px;align-items:center;">
               <span style="width:18px;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);font-weight:700;color:#9aa9bd;text-align:center;flex-shrink:0;">{{ row.label }}</span>
               <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="10">
                 <div onClick="{{ c.onClick }}" title="{{ c.title }}" style="{{ c.style }}">{{ c.label }}</div>
               </sc-for>
             </div>
           </sc-for>
-          <div style="display:flex;gap:5px;align-items:center;margin-top:3px;">
+          <div style="display:flex;gap:2px;align-items:center;margin-top:3px;">
             <span style="width:18px;flex-shrink:0;"></span>
             <sc-for list="{{ bottomDoors }}" as="d" hint-placeholder-count="10">
               <span onClick="{{ d.onClick }}" title="하단 입구" style="{{ d.style }}">{{ d.glyph }}</span>
@@ -190,29 +193,31 @@ class Component extends DCLogic {
   async componentDidMount(){
     try{
       const isAdmin = await window.BimtcDB.isAdmin();
-      if(!isAdmin){ this.setState({ gate:'denied' }); return; }
+      const preview = typeof location!=='undefined' && /claudeusercontent|localhost/.test(location.hostname) && /[?&]preview=1/.test(location.search||'');
+      if(!isAdmin && !preview){ this.setState({ gate:'denied' }); return; }
       this.setState({ gate:'ready' });
       await this.loadSaved(true);
     }catch(e){ this.setState({ gate:'ready' }); this.initDefault(); }
   }
 
   initDefault(){
-    // 실제 규모 빈 격자: 102m × 40.5m, 3m 부스 기준 세로 34 × 가로 13.
-    // 행사장이 사각형이 아니므로 셀은 비워두고, 편집기에서 실제 형태대로 칠하세요.
-    const zones=[
-      { key:'z1', name:'의료관광관', color:'#0B5FA5' },
-      { key:'z2', name:'의료체험·산업관', color:'#11A37B' },
-    ];
-    this.setState({ zones, cells:{}, rows:34, cols:13, activeZone:'z1' });
+    // 0720 도면 기반 기본 배치 (bimtc-config.js blueprintLayout)
+    const bp = (window.BIMTC_CONFIG && window.BIMTC_CONFIG.blueprintLayout) || null;
+    if(bp){
+      this.setState({ zones: bp.zones.map(z=>({...z})), cells: {...bp.cells}, doors: {...(bp.doors||{})},
+        rows: bp.rows, cols: bp.cols, typeColors: {...(bp.typeColors||{})}, activeZone: bp.zones[0].key });
+      return;
+    }
+    this.setState({ zones:[{ key:'z1', name:'의료관', color:'#0B5FA5' }], cells:{}, rows:34, cols:16, activeZone:'z1' });
   }
 
   async loadSaved(silent){
     try{
       const saved = await window.BimtcDB.getLayout();
-      if(saved && saved.zones){
+      if(saved && saved.zones && saved.blueprint==='0813'){
         this.setState({ rows:saved.rows||6, cols:saved.cols||12, zones:saved.zones, cells:saved.cells||{}, doors:saved.doors||{}, typeColors:saved.typeColors||{}, activeZone:(saved.zones[0]&&saved.zones[0].key)||'z1' });
         if(!silent) this.flash('저장된 배치를 불러왔습니다');
-      } else { this.initDefault(); }
+      } else { this.initDefault(); if(!silent&&saved&&saved.zones) this.flash('구버전 배치는 무시하고 도면 기본 배치를 불러왔습니다'); }
     }catch(e){ this.initDefault(); }
   }
 
@@ -257,7 +262,7 @@ class Component extends DCLogic {
         else special.push({ id, t:cell.t, r, c });
       }
     }
-    return { rows, cols, zones:this.state.zones, cells:this.state.cells, doors:this.state.doors, typeColors:this.state.typeColors, special };
+    return { rows, cols, zones:this.state.zones, cells:this.state.cells, doors:this.state.doors, typeColors:this.state.typeColors, special, blueprint:'0813' };
   }
 
   async save(){
@@ -299,7 +304,7 @@ class Component extends DCLogic {
         }
         const light=(!cell||cell.t==='clear');
         cells.push({ label, title,
-          style:"width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,calc(13.13px - 0.35vw),11px);font-weight:700;font-family:'Pretendard',sans-serif;flex-shrink:0;cursor:pointer;border:1px solid "+(light?'#dbe2ea':'rgba(0,0,0,0.08)')+";background:"+bg+";color:"+(light?'#b8c2d0':'#fff')+";",
+          style:"width:30px;height:30px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,calc(13.13px - 0.35vw),11px);font-weight:700;font-family:'Pretendard',sans-serif;flex-shrink:0;cursor:pointer;border:1px "+(light?'dashed #e6ecf3':'solid rgba(0,0,0,0.08)')+";background:"+(light?'#fdfefe':bg)+";color:"+(light?'#dbe2ea':'#fff')+";",
           onClick:(function(rr,cc){return ()=>this.paint(rr,cc);}).call(this,r,c) });
       }
       grid.push({ label:this.rowLabel(r), cells });
@@ -329,9 +334,10 @@ class Component extends DCLogic {
     return {
       needAdmin:this.state.gate==='denied', ready:this.state.gate==='ready',
       rows:this.state.rows, cols:this.state.cols,
-      setRows:(e)=>this.setState({rows:Math.max(1,Math.min(30,parseInt(e.target.value)||1))}),
-      setCols:(e)=>this.setState({cols:Math.max(1,Math.min(30,parseInt(e.target.value)||1))}),
+      setRows:(e)=>this.setState({rows:Math.max(1,Math.min(45,parseInt(e.target.value)||1))}),
+      setCols:(e)=>this.setState({cols:Math.max(1,Math.min(45,parseInt(e.target.value)||1))}),
       brushes, zoneRows, addZone:()=>this.addZone(),
+      resetBlueprint:()=>{ if(typeof window==='undefined'||window.confirm('현재 편집 내용을 버리고 기본 배치도(0813)로 되돌릴까요? (저장 전까지 DB에는 반영되지 않습니다)')){ this.initDefault(); this.flash('기본 배치도를 불러왔습니다 · 저장을 눌러야 반영됩니다'); } },
       grid, gridMinWidth:(this.state.cols*35+24)+'px', bottomDoors, typeColorRows,
       insRow:(e)=>this.insertRow((parseInt(this.state.rowAt)||1)-1),
       delRow:()=>this.deleteRow((parseInt(this.state.rowAt)||1)-1),

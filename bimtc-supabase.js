@@ -23,7 +23,11 @@
     if (_ready) return _ready;
     _ready = (async function () {
       if (!window.supabase) {
-        await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
+        try {
+          await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+        } catch (e) {
+          await loadScript('https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+        }
       }
       _client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
       return _client;
@@ -40,7 +44,7 @@
       var sb = await ready();
       var res = await sb.auth.signUp({
         email: o.email, password: o.password,
-        options: { data: { type: o.type || 'exhibitor', name: o.name || '', country: o.country || '', category: o.category || '', dept: o.dept || '', phone: o.phone || '', interests: o.interests || [] } }
+        options: { data: { type: o.type || 'exhibitor', name: o.name || '', country: o.country || '', category: o.category || '', dept: o.dept || '', phone: o.phone || '', interests: o.interests || [], first_name: o.firstName || '', last_name: o.lastName || '', job_title: o.jobTitle || '', industry: o.industry || '', landline: o.landline || '' } }
       });
       if (res.error) return { ok: false, error: res.error.message };
       return { ok: true, user: res.data.user, session: res.data.session };
@@ -52,6 +56,32 @@
       return { ok: true, user: res.data.user, session: res.data.session };
     },
     async logout() { var sb = await ready(); await sb.auth.signOut(); },
+    async resetPassword(email) {
+      var sb = await ready();
+      var base = location.origin + location.pathname.replace(/[^\/]*$/, '') ;
+      var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
+    async updatePassword(pw) {
+      var sb = await ready();
+      var r = await sb.auth.updateUser({ password: pw });
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
+    async updateProfile(fields) {
+      var sb = await ready();
+      var u = (await sb.auth.getUser()).data.user;
+      if (!u) return { ok: false, error: '로그인이 필요합니다' };
+      var r = await sb.from('profiles').update(fields).eq('id', u.id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
+    async myBoothApplications() {
+      var sb = await ready();
+      var u = (await sb.auth.getUser()).data.user; if (!u) return [];
+      var r = await sb.from('booth_applications').select('*').eq('profile_id', u.id).order('created_at', { ascending: false });
+      return r.data || [];
+    },
+    async listNotifications() { var sb = await ready(); var r = await sb.from('notification_queue').select('*').order('created_at', { ascending: false }); return r.error ? [] : (r.data || []); },
+    async setNotificationStatus(id, status) { var sb = await ready(); var r = await sb.from('notification_queue').update({ status: status }).eq('id', id); return r.error ? { ok: false, error: r.error.message } : { ok: true }; },
     // ---------- 부스 신청 / 견적 ----------
     async takenBooths() {
       var sb = await ready();
@@ -84,6 +114,22 @@
       var r = await sb.from('site_settings').select('value').eq('key', 'booth_layout').maybeSingle();
       return (r.data && r.data.value) ? r.data.value : null;
     },
+    async getEarlyBird() {
+      var sb = await ready();
+      var r = await sb.from('site_settings').select('value').eq('key', 'early_bird').maybeSingle();
+      return (r.data && r.data.value) ? r.data.value : null;
+    },
+    async saveEarlyBird(obj) {
+      var sb = await ready();
+      var r = await sb.from('site_settings').upsert({ key: 'early_bird', value: obj, updated_at: new Date().toISOString() });
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
+    // 홈페이지 공개용: 승인된 참가기업만 (public_exhibitors 뷰 — [v8] SQL)
+    async listPublicExhibitors() {
+      var sb = await ready();
+      var r = await sb.from('public_exhibitors').select('*');
+      return r.error ? [] : (r.data || []);
+    },
     async saveLayout(obj) {
       var sb = await ready();
       var r = await sb.from('site_settings').upsert({ key: 'booth_layout', value: obj, updated_at: new Date().toISOString() }).select().single();
@@ -115,14 +161,14 @@
       var sb = await ready();
       var res = await sb.from('visitor_registrations').insert({
         name: v.name, phone: v.phone, email: v.email, org: v.org, interests: v.interests || [], visit_day: v.day || 'both'
-      }).select().single();
-      return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
+      });
+      return res.error ? { ok: false, error: res.error.message } : { ok: true };
     },
     async listVisitors() { var sb = await ready(); var r = await sb.from('visitor_registrations').select('*').order('created_at', { ascending: false }); return r.data || []; },
     async addInquiry(q) {
       var sb = await ready();
-      var res = await sb.from('inquiries').insert({ name: q.name, org: q.org, email: q.email, category: q.category, message: q.message }).select().single();
-      return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
+      var res = await sb.from('inquiries').insert({ name: q.name, org: q.org, email: q.email, category: q.category, message: q.message });
+      return res.error ? { ok: false, error: res.error.message } : { ok: true };
     },
     async listInquiries() { var sb = await ready(); var r = await sb.from('inquiries').select('*').order('created_at', { ascending: false }); return r.data || []; },
     async deleteAccount() {
