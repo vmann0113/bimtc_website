@@ -14,7 +14,7 @@
     apply: {
       booth: { open: false, comingLabel: '부스 신청 오픈 예정' },
       buyer: { open: false, comingLabel: '바이어 신청 오픈 예정' },
-      visit: { open: false, comingLabel: '사전등록 오픈 예정' }
+      visit: { open: true, comingLabel: '사전등록 오픈 예정' }
     },
 
     /* 2) 얼리버드 단계 — 상단 카운트다운 타이머가 가장 가까운 마감을 표시합니다.
