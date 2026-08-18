@@ -866,8 +866,8 @@ class Component extends DCLogic {
 
     // 기존업체 검색
     const q=(this.state.retQuery||'').trim();
-    const matches=q ? CFG.returningCompanies.filter(n=>n.replace(/\s/g,'').includes(q.replace(/\s/g,''))) : CFG.returningCompanies;
-    const suggestions=matches.slice(0,8).map(n=>({ name:n, onClick:()=>this.pickReturning(n) }));
+    const matches=(q ? CFG.returningCompanies.filter(n=>n.replace(/\s/g,'').toLowerCase().includes(q.replace(/\s/g,'').toLowerCase())) : CFG.returningCompanies.slice()).sort((a,b)=>a.localeCompare(b,'ko'));
+    const suggestions=matches.map(n=>({ name:n, onClick:()=>this.pickReturning(n) }));
     const showSuggest=this.state.participation==='returning' && q.length>0 && this.state.retCompany!==q && matches.length>0;
     const noMatch=this.state.participation==='returning' && q.length>0 && matches.length===0;
 
