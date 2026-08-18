@@ -1477,9 +1477,10 @@ class Component extends DCLogic {
   ebStripVals(){
     const L=(ko,en)=>this.L(ko,en);
     const C=window.BIMTC_CONFIG;
-    const m0=(typeof location!=='undefined'?(location.search||''):'').match(/[?&]eb=(phase1|phase2|none)/);
+    const pvHost=typeof location!=='undefined' && /claudeusercontent|localhost/.test(location.hostname); // 미리보기 도메인에서만 eb= 스위치 허용
+    const m0=pvHost?(location.search||'').match(/[?&]eb=(phase1|phase2|none)/):null;
     let ebKey=m0?m0[1]:null;
-    try{ if(ebKey) sessionStorage.setItem('bimtc_eb_preview',ebKey); else ebKey=sessionStorage.getItem('bimtc_eb_preview'); }catch(e){} // 미리보기 스위치가 가입·이동 후에도 유지되도록
+    if(pvHost){ try{ if(ebKey) sessionStorage.setItem('bimtc_eb_preview',ebKey); else ebKey=sessionStorage.getItem('bimtc_eb_preview'); }catch(e){} } // 미리보기 스위치가 가입·이동 후에도 유지되도록
     let eb;
     if(ebKey&&C){ eb=ebKey==='none'?null:(C.earlyBird||[]).find(p=>p.key===ebKey); } // 미리보기 강제 스위치 (렌더 시점 평가)
     else eb=C&&C.earlyBirdLive&&C.earlyBirdLive(); // 관리자가 ON 했거나 접수가 수동 오픈된 경우에만 '접수중'

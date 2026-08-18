@@ -556,9 +556,10 @@ class Component extends DCLogic {
       for(let i=0;i<25&&!(window.BIMTC_CONFIG&&window.BimtcDB);i++) await new Promise(r=>setTimeout(r,200));
       const u = await window.BimtcDB.currentUser();
       const isAdmin = !!(u && u.is_admin);
-      const ebm=(location.search||'').match(/[?&]eb=(phase1|phase2|none)/); // 미리보기 전용 강제 스위치 (홈과 동일)
+      const pvHost = typeof location!=='undefined' && /claudeusercontent|localhost/.test(location.hostname); // 미리보기 도메인에서만 eb= 스위치 허용
+      const ebm=pvHost?(location.search||'').match(/[?&]eb=(phase1|phase2|none)/):null;
       let ebKey=ebm?ebm[1]:null;
-      try{ if(ebKey) sessionStorage.setItem('bimtc_eb_preview',ebKey); else ebKey=sessionStorage.getItem('bimtc_eb_preview'); }catch(e){}
+      if(pvHost){ try{ if(ebKey) sessionStorage.setItem('bimtc_eb_preview',ebKey); else ebKey=sessionStorage.getItem('bimtc_eb_preview'); }catch(e){} }
       if(ebKey){ this.cfg().earlyBirdOverride=ebKey==='none'?{phase1:'off',phase2:'off'}:{[ebKey]:'on'}; window.__bimtcEbOv=this.cfg().earlyBirdOverride; this.cfg().loadEarlyBirdOverride=async()=>this.cfg().earlyBirdOverride; }
       else try{ if(this.cfg().loadEarlyBirdOverride) await this.cfg().loadEarlyBirdOverride(); }catch(e){}
       const ebOn = Object.values(this.cfg().earlyBirdOverride||{}).indexOf('on')>=0; // 관리자 얼리버드 ON = 접수 오픈
