@@ -219,9 +219,23 @@
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#0B5FA5;font-weight:700;margin-bottom:5px;">승인 · 입금대기</div><div style="font-size:19px;font-weight:800;color:#0B5FA5;">{{ bcAwait }}</div></div>
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#0d8f6b;font-weight:700;margin-bottom:5px;">입금완료</div><div style="font-size:19px;font-weight:800;color:#0d8f6b;">{{ bcPaid }}</div></div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
           <sc-for list="{{ boothFilters }}" as="bft" hint-placeholder-count="5"><span onClick="{{ bft.onClick }}" style="{{ bft.style }}">{{ bft.label }}</span></sc-for>
+          <span style="flex:1;"></span>
+          <button onClick="{{ toggleMap }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ mapBtnLabel }}</button>
         </div>
+        <sc-if value="{{ mapOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:18px;margin-bottom:16px;">
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
+              <sc-for list="{{ mapLegend }}" as="lg" hint-placeholder-count="4"><span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#5E7289;font-weight:600;"><span style="{{ lg.sw }}"></span>{{ lg.l }}</span></sc-for>
+            </div>
+            <div style="{{ mapBoxStyle }}">
+              <sc-for list="{{ mapFixtures }}" as="mf" hint-placeholder-count="2"><div style="{{ mf.style }}">{{ mf.label }}</div></sc-for>
+              <sc-for list="{{ mapCells }}" as="mc" hint-placeholder-count="40"><div onClick="{{ mc.onClick }}" title="{{ mc.title }}" style="{{ mc.style }}">{{ mc.label }}</div></sc-for>
+            </div>
+            <p style="font-size:12.5px;color:#8295ab;margin:10px 0 0;">색칠된 부스에 마우스를 올리면 기업명·상태가 표시되고, 클릭하면 아래 목록에서 해당 신청의 상세가 열립니다.</p>
+          </div>
+        </sc-if>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
           <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:180px;flex-shrink:0;">기업 / 담당자</span>
@@ -607,6 +621,7 @@ class Component extends DCLogic {
     ]);
     const reserved={}; resvs.forEach(r=>{ reserved[r.table_idx+'-'+r.slot_idx]=1; });
     let eb=null; try{ eb=await window.BimtcDB.getEarlyBird(); }catch(e){}
+    try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
     this.setState({ apps, regs, matches, notices, reserved, booths, members, inquiries: inquiries||[], notifications: notifications||[], ebOverride: eb||{}, ebDirty:false });
   }
 
@@ -631,6 +646,39 @@ class Component extends DCLogic {
   async confirmMatch(id){ await window.BimtcDB.setRequestStatus(id,'accepted'); await this.reload(); this.flash('매칭을 확정했습니다'); }
   async approveBooth(id){ await window.BimtcDB.setBoothStatus(id,'approved'); await this.reload(); this.flash('부스 신청을 승인했습니다 · 비즈미팅 활성화'); }
   async rejectBooth(id){ await window.BimtcDB.setBoothStatus(id,'rejected'); await this.reload(); this.flash('부스 신청을 반려했습니다'); }
+  adminMap(){
+    const CFG=window.BIMTC_CONFIG||{};
+    const Lay=(this.state.layoutMap&&this.state.layoutMap.zones)?this.state.layoutMap:CFG.blueprintLayout;
+    if(!Lay||!Lay.cells) return { mapCells:[], mapFixtures:[], mapBoxStyle:'display:none;', mapLegend:[] };
+    const idApp={};
+    (this.state.booths||[]).filter(b=>b.status!=='rejected').forEach(b=>(b.booth_ids||[]).forEach(id=>{ idApp[id]={company:b.company||'',status:b.status,paid:!!b.paid,appId:b.id}; }));
+    const entries=Object.keys(Lay.cells).map(k=>{const p=k.split('_');return {r:+p[0],c:+p[1],cell:Lay.cells[k]};}).filter(e=>e.cell);
+    const cw=100/Lay.cols, rh=100/Lay.rows;
+    const fixBox={};
+    entries.forEach(e=>{ if(e.cell.t!=='sell'&&e.cell.t!=='aisle'&&e.cell.t!=='clear'){ const b=fixBox[e.cell.t]||(fixBox[e.cell.t]={r0:e.r,r1:e.r,c0:e.c,c1:e.c}); if(e.r<b.r0)b.r0=e.r; if(e.r>b.r1)b.r1=e.r; if(e.c<b.c0)b.c0=e.c; if(e.c>b.c1)b.c1=e.c; } });
+    const TC=Lay.typeColors||{};
+    const TYPEC={common:TC.common||'#E0A23C',organizer:TC.organizer||'#64748b',biz:TC.biz||'#7a5cc4',restroom:TC.restroom||'#2E90D6',stage:TC.stage||'#0f766e',seating:TC.seating||'#a3b8cc',lounge:TC.lounge||'#a3d977'};
+    const FIX={stage:'STAGE',seating:'객석·휴게',biz:'',common:'공용',organizer:'주최측',restroom:'화장실',lounge:'휴게'};
+    const mapFixtures=Object.keys(fixBox).map(t=>{const b=fixBox[t];return {label:FIX[t]===undefined?t:FIX[t],style:"position:absolute;left:"+(b.c0*cw)+"%;top:"+(b.r0*rh)+"%;width:"+((b.c1-b.c0+1)*cw)+"%;height:"+((b.r1-b.r0+1)*rh)+"%;background:"+(TYPEC[t]||'#cbd5e1')+";opacity:0.5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;border-radius:4px;font-family:'Pretendard',sans-serif;"};});
+    const ZPRE={z1:'M',z2:'W',z3:'G',z4:'P',z5:'S'};
+    const sells=entries.filter(e=>e.cell.t==='sell').sort((a,b)=>(a.c-b.c)||(b.r-a.r));
+    const zcnt={}; const mapCells=[];
+    sells.forEach(e=>{
+      const pre=ZPRE[e.cell.z]||'B'; zcnt[pre]=(zcnt[pre]||0)+1;
+      const id=pre+'-'+String(zcnt[pre]).padStart(2,'0');
+      const app=idApp[id];
+      const xoff=e.cell.z==='z5'?0.5:0;
+      let bg='#eef2f7', color='#b6c2d1', extra='';
+      if(app){ bg=app.paid?'#11A37B':(app.status==='approved'?'#0B5FA5':'#E0A23C'); color='#fff'; extra='cursor:pointer;'; }
+      const t=app?(id+' · '+app.company+(app.paid?' — 입금완료':(app.status==='approved'?' — 승인·입금대기':' — 접수(미승인)'))):id+' (빈 부스)';
+      mapCells.push({ id, label:String(zcnt[pre]), title:t,
+        style:"position:absolute;left:"+((e.c+xoff)*cw)+"%;top:"+(e.r*rh)+"%;width:"+cw+"%;height:"+rh+"%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:'Pretendard',sans-serif;border-radius:2px;border:1px solid #fff;background:"+bg+";color:"+color+";"+extra,
+        onClick:app?(()=>this.setState({boothFilter:'all',boothDetailId:app.appId,mapOpen:true})):(()=>{}) });
+    });
+    return { mapCells, mapFixtures,
+      mapBoxStyle:'position:relative;width:100%;max-width:430px;aspect-ratio:'+Lay.cols+' / '+Lay.rows+';background:#fff;border:1.5px solid #d8e0ea;border-radius:8px;',
+      mapLegend:[{c:'#E0A23C',l:'접수(미승인)'},{c:'#0B5FA5',l:'승인·입금대기'},{c:'#11A37B',l:'입금완료'},{c:'#eef2f7',l:'빈 부스'}].map(x=>({l:x.l,sw:'display:inline-block;width:14px;height:14px;border-radius:4px;background:'+x.c+';border:1px solid #d8e0ea;'})) };
+  }
   boothDetail(b){
     const won=(v)=>((v||0).toLocaleString())+'원';
     const ap=b.applicant||{};
@@ -845,6 +893,11 @@ class Component extends DCLogic {
       liKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.doAdminLogin(); } },
       doAdminLogin:()=>this.doAdminLogin(), loginLabel:this.state.loginBusy?'로그인 중…':'로그인',
       boothsView, pendingBooths, dlAllLogos, dlAllLogosLabel:'로고 전체 다운로드 (ZIP)',
+      mapOpen:!!this.state.mapOpen,
+      toggleMap:()=>this.setState({mapOpen:!this.state.mapOpen}),
+      mapBtnLabel:this.state.mapOpen?'플로어맵 닫기 ▲':'플로어맵으로 보기 ▼',
+      mapCells:this.adminMap().mapCells, mapFixtures:this.adminMap().mapFixtures,
+      mapBoxStyle:this.adminMap().mapBoxStyle, mapLegend:this.adminMap().mapLegend,
       bcTotal:booths.filter(b=>b.status!=='rejected').length+'건',
       bcBoothN:booths.filter(b=>b.status!=='rejected').reduce((s,b)=>s+((b.booth_ids||[]).length),0)+'개',
       bcPending:booths.filter(b=>b.status==='submitted').length+'건',
