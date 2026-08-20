@@ -52,7 +52,7 @@
             <span style="color:rgba(255,255,255,0.14);">|</span>
             <span onClick="{{ goAccess }}" style="cursor:pointer;">{{ t.u_access }}</span>
             <span onClick="{{ goFloor }}" style="cursor:pointer;">{{ t.u_floor }}</span>
-            <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
+            <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ navLoginLabel }}</span>
             <span onClick="{{ goCheckReg }}" style="cursor:pointer;">{{ t.u_checkreg }}</span>
           </div>
         </sc-if>
@@ -133,7 +133,7 @@
           </sc-for>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
-          <span onClick="{{ goLogin }}" style="flex:1 1 45%;text-align:center;border:1px solid rgba(255,255,255,0.16);color:#bcd0e2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;padding:13px 10px;border-radius:10px;cursor:pointer;">{{ t.u_login }}</span>
+          <span onClick="{{ goLogin }}" style="flex:1 1 45%;text-align:center;border:1px solid rgba(255,255,255,0.16);color:#bcd0e2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;padding:13px 10px;border-radius:10px;cursor:pointer;">{{ navLoginLabel }}</span>
           <span onClick="{{ goCheckReg }}" style="flex:1 1 45%;text-align:center;border:1px solid rgba(255,255,255,0.16);color:#bcd0e2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;padding:13px 10px;border-radius:10px;cursor:pointer;">{{ t.u_checkreg }}</span>
         </div>
       </div>
@@ -925,6 +925,7 @@
         <h2 style="font-size:22px;font-weight:800;margin:0 0 6px;">{{ authTitle }}</h2>
         <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#8295ab;margin:0;">{{ t.lg_sub }}</p>
       </div>
+      <sc-if value="{{ showAuthForm }}" hint-placeholder-val="{{ true }}">
       <sc-if value="{{ showRoles }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;gap:8px;margin-bottom:20px;">
         <sc-for list="{{ loginRoles }}" as="r" hint-placeholder-count="2">
@@ -999,6 +1000,7 @@
         <span>{{ authSwitchLabel }}</span>
         <span onClick="{{ toggleAuthMode }}" style="cursor:pointer;color:#0B5FA5;font-weight:700;">{{ authSwitchAction }}</span>
       </div>
+      </sc-if>
       <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
         <div style="margin-top:20px;padding:16px 18px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:12px;">
           <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;line-height:1.6;margin-bottom:12px;">{{ myAccountLine }}</div>
@@ -1264,7 +1266,7 @@
         <span style="color:#fff;font-weight:700;margin-bottom:5px;">{{ t.ft_support }}</span>
         <span onClick="{{ goContact }}" style="cursor:pointer;">{{ t.ft_contact }}</span>
         <span onClick="{{ goFaq }}" style="cursor:pointer;">{{ t.ft_faq }}</span>
-        <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ t.u_login }}</span>
+        <span onClick="{{ goLogin }}" style="cursor:pointer;">{{ navLoginLabel }}</span>
       </div>
     </div>
     <div style="border-top:1px solid rgba(255,255,255,0.08);">
@@ -1955,7 +1957,9 @@ class Component extends DCLogic {
 
       // login / auth
       loginRoles,
-      loggedIn: !!this.state.me,
+      loggedIn: !!this.state.me && this.state.authMode!=='setpw',
+      showAuthForm: !this.state.me || this.state.authMode==='setpw',
+      navLoginLabel: this.state.me ? L('내 정보','My Account') : L('로그인','Login'),
       myAccountLine: this.state.me ? (L('현재 로그인: ','Signed in: ')+(this.state.me.email||'')+' · '+(this.state.me.is_admin?L('관리자','Admin'):this.typeName(this.state.me.type))) : '',
       doLogoutHere: async()=>{ try{ await window.BimtcDB.logout(); }catch(e){}; this.setState({ me:null, isAdmin:false, authError:'' }); this.flash(L('로그아웃되었습니다','Signed out')); },
       deleteAccount: async()=>{
@@ -1979,7 +1983,7 @@ class Component extends DCLogic {
       goForgot: ()=>this.setState({ authMode:'forgot', authError:'', authInfo:'' }),
       backToLogin: ()=>this.setState({ authMode:'login', authError:'', authInfo:'' }),
       authInfo: this.state.authInfo||'',
-      authTitle: this.state.authMode==='signup' ? L('BIMTC 회원가입','BIMTC Sign up') : this.state.authMode==='forgot' ? L('비밀번호 찾기','Reset Password') : this.state.authMode==='setpw' ? L('새 비밀번호 설정','Set New Password') : L('BIMTC 로그인','BIMTC Login'),
+      authTitle: (this.state.me && this.state.authMode!=='setpw') ? L('내 정보','My Account') : this.state.authMode==='signup' ? L('BIMTC 회원가입','BIMTC Sign up') : this.state.authMode==='forgot' ? L('비밀번호 찾기','Reset Password') : this.state.authMode==='setpw' ? L('새 비밀번호 설정','Set New Password') : L('BIMTC 로그인','BIMTC Login'),
       authSubtitle: this.state.authMode==='signup' ? '신규 가입' : '로그인',
       authCta: this.state.authBusy ? L('처리 중…','Processing…') : (this.state.authMode==='signup' ? L('가입하고 시작하기 →','Sign up →') : this.state.authMode==='forgot' ? L('재설정 메일 보내기','Send reset email') : this.state.authMode==='setpw' ? L('비밀번호 변경하기','Change password') : L('로그인 →','Login →')),
       authError: this.state.authError,
