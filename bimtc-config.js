@@ -11,6 +11,8 @@
 
     /* 1) 신청 오픈 여부 — false 이면 버튼이 '오픈 예정'으로 표시됩니다.
        관리자(is_admin) 계정은 오픈 전에도 신청 기능을 테스트할 수 있습니다. */
+    /* 정식 오픈 일시 — 이 시각이 되면 아래 open:false 여도 자동으로 전부 오픈됩니다. */
+    launchAt: '2026-08-21T15:00:00',
     apply: {
       booth: { open: false, comingLabel: '부스 신청 오픈 예정' },
       buyer: { open: false, comingLabel: '바이어 신청 오픈 예정' },
@@ -74,6 +76,21 @@
     contact: { office: '(사)부산권의료산업협의회', tel: '051-461-4276~8', email: 'bmia0528@naver.com' }
   };
 
+  // 정식 오픈 시각 도달 시 자동 오픈 (접속 시점 판정 + 열려있는 페이지도 시각 도달 시 자동 전환)
+  CONFIG.isLaunched = function () { return Date.now() >= new Date(CONFIG.launchAt).getTime(); };
+  CONFIG.applyLaunch = function () {
+    if (!CONFIG.isLaunched()) return false;
+    CONFIG.apply.booth.open = true;
+    CONFIG.apply.buyer.open = true;
+    CONFIG.apply.visit.open = true;
+    CONFIG.countdownEnabled = true;
+    return true;
+  };
+  if (!CONFIG.applyLaunch()) {
+    var __ms = new Date(CONFIG.launchAt).getTime() - Date.now();
+    if (__ms < 26 * 3600 * 1000) setTimeout(function () { CONFIG.applyLaunch(); try { window.dispatchEvent(new Event('bimtc-launch')); } catch (e) {} }, __ms + 1000);
+  }
+
   // 접수중인 얼리버드: 관리자가 '켜기'한 단계 (접수 오픈의 기준)
   CONFIG.earlyBirdLive = function () {
     for (var i = 0; i < CONFIG.earlyBird.length; i++) {
@@ -103,7 +120,15 @@
     try {
       if (!window.BimtcDB || !window.BimtcDB.getEarlyBird) return null;
       var v = await window.BimtcDB.getEarlyBird();
-      if (v && typeof v === 'object') { CONFIG.earlyBirdOverride = v; window.__bimtcEbOv = v; }
+      if (v && typeof v === 'object') {
+        // 정식 오픈 후: 오픈 '이전'에 저장해 둔 전체 off(사전 잠금용)는 무시하고 날짜 기준(auto)으로 전환.
+        // 오픈 이후 관리자가 다시 off 로 저장한 경우(updated_at이 오픈 시각 이후)는 그대로 존중.
+        var keys = Object.keys(v);
+        var allOff = keys.length > 0 && keys.every(function (k) { return v[k] === 'off'; });
+        var ts = window.__bimtcEbOvTs ? new Date(window.__bimtcEbOvTs).getTime() : 0;
+        if (CONFIG.isLaunched() && allOff && ts && ts < new Date(CONFIG.launchAt).getTime()) v = { phase1: 'auto', phase2: 'auto' };
+        CONFIG.earlyBirdOverride = v; window.__bimtcEbOv = v;
+      }
       return CONFIG.earlyBirdOverride;
     } catch (e) { return null; }
   };

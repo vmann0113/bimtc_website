@@ -206,14 +206,20 @@
 
       <!-- BOOTH APPLICATIONS -->
       <sc-if value="{{ isBooths }}" hint-placeholder-val="{{ false }}">
-        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 신청 · 입금 승인</h1>
-        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">입금 확인 후 승인하면 해당 참가기업의 비즈미팅 매칭이 활성화됩니다.</p>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px;">
+          <div>
+            <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 신청 · 입금 승인</h1>
+            <p style="font-size:14px;color:#5E7289;margin:0;">입금 확인 후 승인하면 해당 참가기업의 비즈미팅 매칭이 활성화됩니다.</p>
+          </div>
+          <button onClick="{{ dlAllLogos }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ dlAllLogosLabel }}</button>
+        </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
           <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:180px;flex-shrink:0;">기업 / 담당자</span>
             <span style="width:80px;flex-shrink:0;">부스</span>
             <span style="flex:1;min-width:0;">위치</span>
             <span style="width:120px;flex-shrink:0;text-align:right;">입금액</span>
+            <span style="width:44px;flex-shrink:0;text-align:center;">로고</span>
             <span style="width:150px;flex-shrink:0;text-align:right;">상태 / 승인</span>
           </div>
           <sc-for list="{{ boothsView }}" as="b" hint-placeholder-count="4">
@@ -222,6 +228,10 @@
               <span style="width:80px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ b.type }} {{ b.count }}</span>
               <span style="flex:1;min-width:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.ids }}</span>
               <span style="width:120px;flex-shrink:0;text-align:right;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;color:#0B5FA5;">{{ b.total }}</span>
+              <span style="width:44px;flex-shrink:0;text-align:center;">
+                <sc-if value="{{ b.hasLogo }}" hint-placeholder-val="{{ false }}"><a href="{{ b.logoHref }}" target="_blank" download title="{{ b.logoTitle }}" style="font-size:13px;font-weight:800;color:#0B5FA5;text-decoration:none;background:#EAF2FC;border-radius:7px;padding:5px 9px;">↓</a></sc-if>
+                <sc-if value="{{ b.noLogo }}" hint-placeholder-val="{{ true }}"><span style="color:#c3cedb;font-size:13px;">-</span></sc-if>
+              </span>
               <div style="width:150px;flex-shrink:0;display:flex;justify-content:flex-end;">
                 <sc-if value="{{ b.isPending }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex;gap:8px;">
@@ -698,7 +708,30 @@ class Component extends DCLogic {
       type:b.booth_type==='space'?'독립부스':'조립부스', count:(b.booth_ids||[]).length, ids:(b.booth_ids||[]).join(', ')||'-',
       total:won(b.total), date:this.short(b.created_at), status:b.status,
       isPending:b.status==='submitted', isApproved:b.status==='approved', isRejected:b.status==='rejected',
+      hasLogo:!!b.logo_url, noLogo:!b.logo_url, logoHref:b.logo_url||'', logoTitle:b.logo_name||'',
       approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id) }));
+    const dlAllLogos=async()=>{
+      const list=(this.state.booths||[]).filter(b=>b.logo_url&&b.status!=='rejected');
+      if(!list.length){ this.flash('다운로드할 로고가 없습니다'); return; }
+      this.flash('로고 '+list.length+'건 압축 중…');
+      try{
+        if(!window.JSZip){ await new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+        const zip=new window.JSZip(); let ok=0;
+        for(const b of list){
+          try{
+            const r=await fetch(b.logo_url); if(!r.ok) continue;
+            const blob=await r.blob();
+            const ext=(b.logo_name&&b.logo_name.match(/\.[A-Za-z0-9]+$/))?b.logo_name.match(/\.[A-Za-z0-9]+$/)[0]:(b.logo_url.match(/\.[A-Za-z0-9]+$/)||['.bin'])[0];
+            const safe=String(b.company||'기업').replace(/[\\/:*?"<>|]/g,'_');
+            zip.file(safe+ext, blob); ok++;
+          }catch(e){}
+        }
+        if(!ok){ this.flash('로고 파일을 가져오지 못했습니다'); return; }
+        const out=await zip.generateAsync({type:'blob'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(out); a.download='BIMTC_참가기업_로고모음.zip'; a.click();
+        this.flash('로고 '+ok+'건 다운로드 완료');
+      }catch(e){ this.flash('압축 실패: '+e.message); }
+    };
 
     const regs=regsData.map(r=>({ name:r.name||'ooo', org:r.org||'개인', field:(r.interests||[]).join('·'),
       day: r.visit_day==='D1'?'11.13':r.visit_day==='D2'?'11.14':'양일', at:this.shortTime(r.created_at) }));
@@ -731,7 +764,7 @@ class Component extends DCLogic {
       setLiEmail:(e)=>this.setState({liEmail:e.target.value}), setLiPw:(e)=>this.setState({liPw:e.target.value}),
       liKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.doAdminLogin(); } },
       doAdminLogin:()=>this.doAdminLogin(), loginLabel:this.state.loginBusy?'로그인 중…':'로그인',
-      boothsView, pendingBooths,
+      boothsView, pendingBooths, dlAllLogos, dlAllLogosLabel:'로고 전체 다운로드 (ZIP)',
       toast:this.state.toast,
 
       kpis:[

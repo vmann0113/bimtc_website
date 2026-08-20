@@ -26,7 +26,7 @@
 <style>
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
-  body{margin:0;background:#16294F;word-break:keep-all;overflow-wrap:break-word;overflow-x:hidden;}
+  body{margin:0;background:#16294F;word-break:keep-all;overflow-wrap:break-word;overflow-x:clip;}
   ::selection{background:#25C281;color:#04261a;}
   :root{color-scheme:light;}
   input,textarea,select{font-family:'Pretendard',sans-serif;background-color:#fff;}
@@ -37,7 +37,7 @@
 <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=2dwxs72c2o"></script>
 </helmet>
 
-<div style="font-family:'Pretendard',sans-serif;background:#16294F;color:#fff;overflow-x:hidden;">
+<div style="font-family:'Pretendard',sans-serif;background:#16294F;color:#fff;overflow-x:clip;">
 
   <div style="height:4px;background:linear-gradient(90deg,#5AB7F0,#25C281);"></div>
 
@@ -788,7 +788,7 @@
               <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ t.floor_click_hint }}</span>
             </div>
           </div>
-          <div style="flex:1;min-width:min(300px,100%);display:flex;flex-direction:column;gap:10px;">
+          <div style="flex:1;min-width:min(300px,100%);display:flex;flex-direction:column;gap:10px;position:sticky;top:90px;">
             <sc-for list="{{ floorZones }}" as="z" hint-placeholder-count="5">
               <div onClick="{{ z.onClick }}" style="{{ z.cardStyle }}">
                 <div style="display:flex;align-items:center;gap:10px;">
@@ -1314,6 +1314,7 @@ class Component extends DCLogic {
 
   go(p){ this.setState({ page: p, menuOpen:false }); if(typeof window!=='undefined') window.scrollTo(0,0); setTimeout(()=>this.initMaps(),120); }
   componentDidMount(){
+    window.addEventListener('bimtc-launch',()=>{ try{ location.reload(); }catch(e){} }); // 오픈 시각 도달 시 자동 전환
     setTimeout(()=>this.initMaps(),200);
     (async()=>{ try{
       for(let i=0;i<25&&!window.BIMTC_CONFIG;i++) await new Promise(r=>setTimeout(r,200));
@@ -1466,9 +1467,18 @@ class Component extends DCLogic {
     if(me && me.is_admin){ this.goAdmin(); return; }
     if(me && me.type==='visitor'){ this.setState({ page:'visit' }); this.flash(L('로그인되었습니다 · 참관 사전등록을 진행해 주세요','Signed in — please complete visitor pre-registration')); return; }
     const cfg = window.BIMTC_CONFIG;
-    if(cfg && cfg.apply.buyer && !cfg.apply.buyer.open){
+    if(me && me.type==='exhibitor'){
+      // 참가기업: 부스 신청이 열려 있으면 곧장 신청 페이지로
+      const ebOn = cfg && Object.values(cfg.earlyBirdOverride||{}).indexOf('on')>=0;
+      const boothOpen = cfg && ((cfg.apply.booth && cfg.apply.booth.open) || ebOn);
+      if(boothOpen){ if(typeof window!=='undefined') window.location.href = 'booth.html'; return; }
       this.setState({ page:'home' });
-      this.flash(L('로그인되었습니다 · 비즈미팅 신청은 오픈 예정입니다','Signed in — business meeting applications open soon'));
+      this.flash(L('로그인되었습니다 · 부스 신청 오픈 시 바로 신청하실 수 있습니다','Signed in — booth application opens soon'));
+      return;
+    }
+    if(me && me.type==='buyer'){
+      this.setState({ page:'home' });
+      this.flash(L('로그인되었습니다 · 비즈매칭 오픈 일정은 추후 안내드립니다','Signed in — business matching schedule will be announced later'));
       return;
     }
     if(typeof window!=='undefined') window.location.href = 'bizmeeting.html';
@@ -1484,7 +1494,7 @@ class Component extends DCLogic {
     let eb;
     if(ebKey&&C){ eb=ebKey==='none'?null:(C.earlyBird||[]).find(p=>p.key===ebKey); } // 미리보기 강제 스위치 (렌더 시점 평가)
     else eb=C&&C.earlyBirdLive&&C.earlyBirdLive(); // 관리자가 ON 했거나 접수가 수동 오픈된 경우에만 '접수중'
-    if(!eb) return { ebStripBadge:'COMING SOON', ebStripText:L('곧 1차 얼리버드가 시작됩니다! 많은 기대 부탁드립니다','1st Early-bird starts soon! Stay tuned'), ebStripOpen:false };
+    if(!eb) return { ebStripBadge:'COMING SOON', ebStripText:L('8월 21일(금) 15:00 부스 신청·사전등록 오픈 · 1차 얼리버드 20% 할인','Booth application & pre-registration open Aug 21 (Fri) 15:00 · 1st Early-bird 20% off'), ebStripOpen:false };
     const rate=Math.round((eb.discountRate||0)*100);
     const end=(eb.end||'').slice(5,10).replace('-','/');
     const m=(typeof location!=='undefined'?(location.search||''):'').match(/[?&]eb=(phase1|phase2|none)/);
@@ -1621,7 +1631,7 @@ class Component extends DCLogic {
       ex_apply_btn:L('부스 신청하기','Apply for Booth'), booth_deadline:L('* 신청기한: 2026년 추후 공지까지 (선착순 접수). VAT 별도.','* Deadline: TBA in 2026 (first-come). VAT excluded.'),
       vi_bc:L('HOME / 참관안내 · 사전등록','HOME / Visit · Pre-register'), vi_title:L('참관안내 · 사전등록','Visit & Pre-registration'), vi_sub:L('사전등록하면 대기 없이 빠르게 입장하고 다양한 혜택을 받을 수 있습니다.','Pre-register for fast entry and exclusive benefits.'),
       vi_benefit:L('사전등록 혜택','Benefits'), vi_hours:L('관람 시간','Hours'), vi_free:L('입장료: 무료 (사전등록 권장)','Admission: Free (pre-registration recommended)'),
-      vi_soon:L('사전등록 오픈 예정','Pre-registration coming soon'), vi_soon_d:L('참관객 사전등록은 곧 오픈됩니다. 오픈 일정은 공지사항으로 안내드립니다.','Visitor pre-registration opens soon. The schedule will be announced in Notices.'),
+      vi_soon:L('사전등록 오픈 예정','Pre-registration coming soon'), vi_soon_d:L('참관객 사전등록은 8월 21일(금) 15:00에 오픈됩니다.','Visitor pre-registration opens on Aug 21 (Fri) at 15:00.'),
       vf_title:L('참관객 사전등록','Visitor Pre-registration'), vf_name:L('이름','Name'), vf_phone:L('연락처','Phone'), vf_email:L('이메일','Email'), vf_org:L('소속 (선택)','Affiliation (optional)'), vf_org_ph:L('기관/회사명','Organization'), vf_interest:L('관심 분야','Interests'), vf_day:L('방문 예정일','Visit day'), vf_agree:L('개인정보 수집·이용에 동의합니다. (사전등록 및 행사 안내 목적)','I agree to the collection & use of personal data (for registration & event info).'), vf_submit:L('사전등록 완료 →','Complete registration →'), vi_check:L('이미 등록하셨나요? 사전등록 확인','Already registered? Check registration'),
       cr_bc:L('HOME / 사전등록 확인','HOME / Check Registration'), cr_title:L('사전등록 확인','Check Registration'), cr_sub:L('등록 시 입력한 이메일로 사전등록 내역을 조회합니다.','Look up your pre-registration by the email you registered with.'), cr_btn:L('조회','Search'), cr_found:L('사전등록이 확인되었습니다','Registration confirmed'),
       cr_name:L('이름','Name'), cr_org:L('소속','Org'), cr_day:L('방문 예정일','Visit day'), cr_field:L('관심 분야','Interests'),
@@ -1836,8 +1846,8 @@ class Component extends DCLogic {
         {title:L('바이어 비즈니스 상담회','Buyer Meetings'),desc:L('국내외 바이어와 참가기업의 1:1 매칭 상담','1:1 matched consultations with buyers'),bg:'#EAF7F2',icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.5px solid #11A37B'}})},
       ],
       scheduleB: [
-        { date:'2026.08.13 – 11.12', title:L('참관객 사전등록 접수','Visitor pre-registration'), tagEl:tagPill(L('등록','REG'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
-        { date:L('추후 공개','TBA'), title:L('참가기업 신청 마감','Exhibitor application deadline'), tagEl:tagPill(L('모집','APPLY'),'#2E90D6'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:'2026.08.21 – 11.12', title:L('참관객 사전등록 접수 (8.21 15:00 오픈)','Visitor pre-registration (opens Aug 21, 15:00)'), tagEl:tagPill(L('등록','REG'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:L('2026.08.21 15:00 오픈','Opens 2026.08.21 15:00'), title:L('참가기업 부스 신청 접수 (마감 추후 공지)','Exhibitor booth application (deadline TBA)'), tagEl:tagPill(L('모집','APPLY'),'#2E90D6'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:L('추후 공개','TBA'), title:L('바이어 비즈미팅 매칭 신청','Buyer meeting matching'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.13', title:L('개막식 & 의료관광 콘퍼런스','Opening & Conference'), tagEl:tagPill(L('행사','EVENT'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.13 – 14', title:L('메디컬·웰니스·국제관광·플레이 존 운영','Medical · Wellness · Global Tourism · Play zones'), tagEl:tagPill(L('전시','EXPO'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },

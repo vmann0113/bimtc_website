@@ -64,7 +64,7 @@
     <div class="no-print" style="max-width:560px;margin:0 auto;padding:80px 24px;text-align:center;">
       <div style="width:66px;height:66px;border-radius:16px;background:#FBF3E2;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;"><div style="width:26px;height:26px;border-radius:7px;border:3px solid #E0A23C;"></div></div>
       <h1 style="font-size:24px;font-weight:800;margin:0 0 10px;letter-spacing:-0.02em;">{{ closed_t }}</h1>
-      <p style="font-size:14.5px;color:#5E7289;margin:0 0 28px;line-height:1.6;">{{ closed_d }}</p>
+      <p style="font-size:14.5px;color:#5E7289;margin:0 0 28px;line-height:1.7;">{{ closed_d1 }}<br>{{ closed_d2 }}</p>
       <a href="index.html" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;">{{ homeLabel }}</a>
     </div>
   </sc-if>
@@ -368,6 +368,18 @@
           <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ f_tel }}</label><input value="{{ tel }}" onInput="{{ setTel }}" placeholder="051-000-0000" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
           <div><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ f_fax }}</label><input value="{{ fax }}" onInput="{{ setFax }}" placeholder="051-000-0000" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ f_homepage }}</label><input value="{{ homepage }}" onInput="{{ setHomepage }}" placeholder="https://" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);outline:none;" /></div>
+          <div style="grid-column:1 / -1;">
+            <label style="display:block;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;margin-bottom:7px;color:#33485e;">{{ f_logo }}</label>
+            <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ false }}">
+              <div style="display:inline-flex;align-items:center;gap:10px;background:#E7F6F0;border:1px solid #c7ebdc;border-radius:10px;padding:11px 14px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;color:#0d8f6b;">✓ {{ logoName }}<span onClick="{{ clearLogo }}" style="cursor:pointer;color:#8aa;font-weight:400;">✕</span></div>
+            </sc-if>
+            <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}">
+              <input type="file" accept=".ai,.eps,.pdf,.svg,.png,.jpg,.jpeg,.zip" onChange="{{ pickLogo }}" disabled="{{ logoBusy }}" style="width:100%;padding:11px 14px;border:1.5px dashed #b9c9db;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);background:#fff;color:#33485e;" />
+              <sc-if value="{{ logoBusy }}" hint-placeholder-val="{{ false }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#0B5FA5;font-weight:700;margin-top:6px;">{{ logoBusyLabel }}</div></sc-if>
+            </sc-if>
+            <div style="border:1.5px solid #ecd9b0;background:#FBF6E9;border-radius:10px;padding:11px 14px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#7a6636;line-height:1.65;font-weight:700;margin-top:8px;">{{ f_logo_warn }}</div>
+            <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:7px 0 0;line-height:1.6;">{{ f_logo_note }}</p>
+          </div>
         </div>
 
         <div style="font-size:14px;font-weight:800;margin:24px 0 12px;color:#33485e;">{{ f_sec_contact }}</div>
@@ -502,8 +514,20 @@ class Component extends DCLogic {
     boothType:'package', selected:[], addons:{}, taken:{}, famTour:null, layout:null,
     company:'', companyEn:'', ceo:'', ceoEn:'', addr:'', tel:'', fax:'', homepage:'',
     bizno:'', bizType:'', bizItem:'', items:'', dept:'', contact:'', email:'', phone:'',
-    submitting:false, done:false, invoiceNo:'', formError:'', toast:null
+    submitting:false, done:false, invoiceNo:'', formError:'', toast:null,
+    logoUrl:'', logoName:'', logoBusy:false
   };
+
+  async pickLogo(e){
+    const f=e.target&&e.target.files&&e.target.files[0]; if(!f) return;
+    if(f.size>30*1024*1024){ this.flash(this.L('파일이 너무 큽니다 (최대 30MB)','File too large (max 30MB)')); return; }
+    this.setState({logoBusy:true});
+    const r=await window.BimtcDB.uploadLogo(f);
+    this.setState({logoBusy:false});
+    if(!r.ok){ this.flash(this.L('로고 업로드 실패: ','Logo upload failed: ')+r.error); return; }
+    this.setState({logoUrl:r.url, logoName:f.name});
+    this.flash(this.L('로고 파일이 업로드되었습니다','Logo file uploaded'));
+  }
 
   ADDONS = [
     { key:'elec_1p', name:'전기 단상 220V (60Hz)', unit:'kW', price:60000 },
@@ -540,6 +564,7 @@ class Component extends DCLogic {
     }catch(e){ this.setState({nlBusy:false,nlError:e.message}); }
   }
   async componentDidMount(){
+    window.addEventListener('bimtc-launch',()=>{ try{ location.reload(); }catch(e){} }); // 오픈 시각 도달 시 자동 전환
     const picker = typeof location!=='undefined' && /[?&]picker=1/.test(location.search||'');
     this._isPicker = picker;
     (async()=>{ try{ if(window.BIMTC_CONFIG&&window.BIMTC_CONFIG.loadEarlyBirdOverride){ await window.BIMTC_CONFIG.loadEarlyBirdOverride(); this.forceUpdate(); } }catch(e){} })();
@@ -586,7 +611,7 @@ class Component extends DCLogic {
     if(this._onFocus) window.removeEventListener('focus', this._onFocus);
   }
 
-  DRAFT_KEYS=['participation','retQuery','retCompany','boothType','selected','addons','famTour','company','companyEn','ceo','ceoEn','addr','tel','fax','homepage','bizno','bizType','bizItem','items','dept','contact','email','phone','step'];
+  DRAFT_KEYS=['participation','retQuery','retCompany','boothType','selected','addons','famTour','company','companyEn','ceo','ceoEn','addr','tel','fax','homepage','bizno','bizType','bizItem','items','dept','contact','email','phone','step','logoUrl','logoName'];
   saveDraft(){
     const d={}; this.DRAFT_KEYS.forEach(k=>d[k]=this.state[k]);
     try{ localStorage.setItem('bimtc_booth_draft', JSON.stringify({v:1, ts:Date.now(), data:d})); this.flash(this.state.lang==='en'?'Draft saved — reopen this page to continue':'임시저장되었습니다 · 이 브라우저에서 다시 열면 이어서 작성됩니다'); }
@@ -721,6 +746,15 @@ class Component extends DCLogic {
     if(err){ this.setState({formError:err}); this.flash(err); return; }
     if(this.state.submitting) return;
     this.setState({submitting:true, formError:''});
+    // 제출 직전 최신 판매 현황 재확인 (동시 신청 충돌 예방 1차)
+    if((this.state.selected||[]).length){
+      try{
+        const fresh=await window.BimtcDB.takenBooths();
+        const conf=this.state.selected.filter(id=>fresh[id]);
+        if(conf.length){ this.boothConflict(conf, fresh); return; }
+        this.setState({taken:fresh});
+      }catch(e){}
+    }
     const c=this.calc();
     const no=this.state.invoiceNo||this.genNo();
     const res=await window.BimtcDB.addBoothApplication({
@@ -729,15 +763,28 @@ class Component extends DCLogic {
       subtotal:c.subtotal, vat:c.vat, total:c.total,
       fam_tour:this.state.famTour===true, returning_company:this.state.retCompany||null,
       discount:c.discount, early_bird:c.eb?c.eb.key:null,
+      logo_url:this.state.logoUrl||null, logo_name:this.state.logoName||null,
       applicant:{ companyEn:this.state.companyEn, ceo:this.state.ceo, ceoEn:this.state.ceoEn, addr:this.state.addr,
         tel:this.state.tel, fax:this.state.fax, homepage:this.state.homepage, dept:this.state.dept,
         items:this.state.items, bizno:this.state.bizno, bizType:this.state.bizType, bizItem:this.state.bizItem }
     });
     this.setState({submitting:false});
-    if(!res.ok){ this.flash(this.L('신청 실패: ','Submission failed: ')+res.error); return; }
+    if(!res.ok){
+      const m=String(res.error||'').match(/BOOTH_TAKEN:([A-Za-z0-9,\- ]+)/); // 서버측 차단 (동시 신청 충돌 예방 2차)
+      if(m){ const conf=m[1].split(',').map(s=>s.trim()); let fresh=this.state.taken; try{ fresh=await window.BimtcDB.takenBooths(); }catch(e){} this.boothConflict(conf, fresh); return; }
+      this.flash(this.L('신청 실패: ','Submission failed: ')+res.error); return;
+    }
     this.setState({ done:true, invoiceNo:no });
     try{ localStorage.removeItem('bimtc_booth_draft'); }catch(e){}
     this.flash(this.L('부스 신청이 접수되었습니다','Your booth application has been received'));
+  }
+
+  boothConflict(conflictIds, freshTaken){
+    // 방금 다른 업체가 선점한 부스: 선택 해제 + 지도 갱신 + STEP 2로 복귀
+    const remain=(this.state.selected||[]).filter(id=>conflictIds.indexOf(id)<0);
+    this.setState({ submitting:false, taken:freshTaken||this.state.taken, selected:remain, step:2,
+      formError:this.L('선택하신 부스 중 방금 다른 업체가 신청을 완료한 부스가 있습니다: ','Some booths were just taken by another applicant: ')+conflictIds.join(', ') });
+    this.flash(this.L('이미 신청된 부스: ','Already taken: ')+conflictIds.join(', ')+this.L(' — 다른 부스를 선택해 주세요',' — please pick different booths'));
   }
 
   renderVals(){
@@ -904,7 +951,9 @@ class Component extends DCLogic {
         try{ await navigator.clipboard.writeText(txt); this.flash(L('계좌번호가 복사되었습니다','Account number copied')); }
         catch(e){ try{ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); this.flash(L('계좌번호가 복사되었습니다','Account number copied')); }catch(e2){ this.flash(txt); } }
       },
-      closed_t:L('부스 신청 오픈 예정','Booth Application Coming Soon'), closed_d:L('부스 온라인 신청은 곧 오픈됩니다. 오픈 일정은 공지사항과 이메일로 안내드립니다.','Online booth applications open soon. Schedule will be announced via Notices and email.'),
+      closed_t:L('부스 신청 오픈 예정','Booth Application Coming Soon'),
+      closed_d1:L('부스 온라인 신청은 8월 21일(금) 15:00에 오픈됩니다.','Online booth applications open on Aug 21 (Fri) at 15:00.'),
+      closed_d2:L('오픈과 동시에 1차 얼리버드 20% 할인이 적용됩니다.','The 1st early-bird 20% discount applies from open.'),
       done_t:L('부스 신청이 접수되었습니다','Your application has been received'), done_inv:L('인보이스 번호','Invoice No.'), done_total:L('총','Total'), done_d:L('사무국의 입금 확인·승인 후 비즈미팅 매칭이 활성화됩니다. 인보이스를 지금 다운로드하실 수 있습니다.','Business meeting matching activates after the secretariat confirms payment. You can download the invoice now.'), dl_inv:L('인보이스 다운로드 (PDF)','Download Invoice (PDF)'),
       adminTestMsg:L('관리자 테스트 모드 · 신청이 아직 공개 오픈되지 않았습니다. 사무국 계정으로 기능을 점검 중입니다.','Admin test mode · Applications are not publicly open yet. Testing with a secretariat account.'),
       setKo:()=>{ try{localStorage.setItem('bimtc_lang','ko')}catch(e){}; this.setState({lang:'ko'}); },
@@ -1004,6 +1053,12 @@ class Component extends DCLogic {
       setCompany:this.set('company'), setBizno:this.set('bizno'), setContact:this.set('contact'), setEmail:this.set('email'), setPhone:this.set('phone'),
       setCompanyEn:this.set('companyEn'), setCeo:this.set('ceo'), setCeoEn:this.set('ceoEn'), setAddr:this.set('addr'), setTel:this.set('tel'), setFax:this.set('fax'), setHomepage:this.set('homepage'),
       setBizType:this.set('bizType'), setBizItem:this.set('bizItem'), setItems:this.set('items'), setDept:this.set('dept'),
+      f_logo:L('기업 로고 파일','Company Logo File'),
+      f_logo_note:L('참가기업 리스트 게시 및 부스 상호 현수막 제작에 사용됩니다. 최대 30MB. 지금 없으면 추후 사무국 이메일(bmia0528@naver.com)로 제출 가능합니다.','Used for the exhibitor list and booth signage banner production. Max 30MB. You may also submit later via bmia0528@naver.com.'),
+      f_logo_warn:L('⚠ 반드시 AI·EPS·PDF·SVG 등 벡터 원본 파일로 올려주세요. JPG·PNG 등 이미지 파일은 크게 인쇄하는 부스 상호 현수막에서 로고가 깨져 보일 수 있습니다.','⚠ Please upload a vector original (AI·EPS·PDF·SVG). JPG/PNG images may look pixelated on the large-format booth signage banner.'),
+      hasLogo:!!this.state.logoUrl, noLogo:!this.state.logoUrl, logoName:this.state.logoName,
+      pickLogo:(e)=>this.pickLogo(e), clearLogo:()=>this.setState({logoUrl:'',logoName:''}),
+      logoBusy:this.state.logoBusy, logoBusyLabel:L('업로드 중…','Uploading…'),
       formError:this.state.formError,
       homeLabel:L('홈으로','Home'),
       loggedIn: !!this.state.me,

@@ -90,6 +90,17 @@
       (r.data || []).forEach(function (row) { (row.booth_ids || []).forEach(function (id) { set[id] = 1; }); });
       return set;
     },
+    async uploadLogo(file) {
+      var sb = await ready();
+      var u = (await sb.auth.getUser()).data.user;
+      if (!u) return { ok: false, error: '로그인이 필요합니다' };
+      var ext = (file.name.match(/\.[A-Za-z0-9]+$/) || [''])[0].toLowerCase();
+      var path = u.id + '/' + Date.now() + ext;
+      var r = await sb.storage.from('logos').upload(path, file, { upsert: false });
+      if (r.error) return { ok: false, error: r.error.message };
+      var pub = sb.storage.from('logos').getPublicUrl(path);
+      return { ok: true, url: pub.data.publicUrl, name: file.name };
+    },
     async addBoothApplication(a) {
       var sb = await ready();
       var u = (await sb.auth.getUser()).data.user;
@@ -99,6 +110,7 @@
         subtotal: a.subtotal, vat: a.vat, total: a.total,
         fam_tour: !!a.fam_tour, returning_company: a.returning_company || null,
         discount: a.discount || 0, early_bird: a.early_bird || null,
+        logo_url: a.logo_url || null, logo_name: a.logo_name || null,
         applicant: a.applicant || {}
       }).select().single();
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
@@ -116,7 +128,8 @@
     },
     async getEarlyBird() {
       var sb = await ready();
-      var r = await sb.from('site_settings').select('value').eq('key', 'early_bird').maybeSingle();
+      var r = await sb.from('site_settings').select('value, updated_at').eq('key', 'early_bird').maybeSingle();
+      if (r.data && r.data.updated_at) window.__bimtcEbOvTs = r.data.updated_at; // 저장 시각 (오픈 전 잠금값 판별용)
       return (r.data && r.data.value) ? r.data.value : null;
     },
     async saveEarlyBird(obj) {
