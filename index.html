@@ -1513,7 +1513,7 @@ class Component extends DCLogic {
     }
     if(me && me.type==='buyer'){
       this.setState({ page:'home' });
-      this.flash(L('로그인되었습니다 · 비즈매칭 오픈 일정은 추후 안내드립니다','Signed in — business matching schedule will be announced later'));
+      this.flash(L('로그인되었습니다 · 비즈매칭 신청은 2차 얼리버드 마감(10/31) 이후 오픈 예정입니다','Signed in — matching applications open after the 2nd early-bird ends (Oct 31)'));
       return;
     }
     if(typeof window!=='undefined') window.location.href = 'bizmeeting.html';
@@ -1905,9 +1905,9 @@ class Component extends DCLogic {
       scheduleB: [
         { date:'2026.08.21 – 11.12', title:L('참관객 사전등록 접수 (8.21 15:00 오픈)','Visitor pre-registration (opens Aug 21, 15:00)'), tagEl:tagPill(L('등록','REG'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:L('2026.08.21 15:00 오픈','Opens 2026.08.21 15:00'), title:L('참가기업 부스 신청 접수 (마감 추후 공지)','Exhibitor booth application (deadline TBA)'), tagEl:tagPill(L('모집','APPLY'),'#2E90D6'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
-        { date:L('추후 공개','TBA'), title:L('바이어 비즈미팅 매칭 신청','Buyer meeting matching'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:L('2026.10.31 이후','After 2026.10.31'), title:L('바이어 비즈미팅 매칭 신청 (2차 얼리버드 마감 후 오픈)','Buyer meeting matching (opens after 2nd early-bird)'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.13', title:L('개막식 & 의료관광 콘퍼런스','Opening & Conference'), tagEl:tagPill(L('행사','EVENT'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
-        { date:'2026.11.13 – 14', title:L('메디컬·웰니스·국제관광·플레이 존 운영','Medical · Wellness · Global Tourism · Play zones'), tagEl:tagPill(L('전시','EXPO'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        { date:'2026.11.13 – 14', title:L('메디컬·관광웰니스·플레잉 존 운영','Medical · Tourism & Wellness · Playing zones'), tagEl:tagPill(L('전시','EXPO'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.14', title:L('웰니스 체험존 · 네트워킹 라운지','Wellness zone & networking'), tagEl:tagPill(L('부대','EXTRA'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
       ],
       quickLinksB: [
