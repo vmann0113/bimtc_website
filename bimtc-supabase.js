@@ -150,6 +150,7 @@
     },
     async listBoothApplications() { var sb = await ready(); var r = await sb.from('booth_applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
     async setBoothStatus(id, status) { var sb = await ready(); await sb.from('booth_applications').update({ status: status }).eq('id', id); },
+    async setBoothPaid(id, on) { var sb = await ready(); var r = await sb.from('booth_applications').update({ paid: on, paid_at: on ? new Date().toISOString() : null }).eq('id', id); return !r.error; },
     async myApprovedBooths() {
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return { count: 0, approved: 0 };
       var r = await sb.from('booth_applications').select('status').eq('profile_id', u.id);

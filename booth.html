@@ -968,8 +968,8 @@ class Component extends DCLogic {
       dup_continue:L('추가로 신청 계속하기 →','Continue with additional application →'),
       dupApps:(this.state.prevApps||[]).map(a=>{
         const st=a.status||'submitted';
-        const map={submitted:[L('접수됨','Submitted'),'#EAF2FC','#0B5FA5'],approved:[L('승인 완료','Approved'),'#E7F6F0','#0d8f6b'],rejected:[L('반려','Rejected'),'#FDF0ED','#E0533C']};
-        const m=map[st]||map.submitted;
+        const map={submitted:[L('접수됨 · 검토중','Submitted'),'#EAF2FC','#0B5FA5'],approved:[L('승인 완료 · 입금 대기','Approved · payment due'),'#FBF6E9','#b78a3c'],rejected:[L('반려','Rejected'),'#FDF0ED','#E0533C']};
+        const m=a.paid?[L('입금 확인 완료','Payment confirmed'),'#E7F6F0','#0d8f6b']:(map[st]||map.submitted);
         return { booths:(a.booth_ids&&a.booth_ids.length)?a.booth_ids.join(', '):L('독립부스','Space-only'),
           date:(a.created_at||'').slice(0,10), total:(a.total||0).toLocaleString()+L('원',' KRW'),
           statusLabel:m[0], badgeStyle:'font-size:12.5px;font-weight:800;padding:6px 13px;border-radius:999px;background:'+m[1]+';color:'+m[2]+';white-space:nowrap;' };
@@ -1072,8 +1072,8 @@ class Component extends DCLogic {
       myAppsNote:L('※ 승인은 사무국 검토 후 처리되며, 변경·취소는 사무국(T. 051-461-4276~8)으로 연락해 주세요.','* Approval follows secretariat review. For changes or cancellation, contact the secretariat (051-461-4276~8).'),
       myAppRows:(this.state.myApps||[]).map(a=>{
         const st=a.status||'pending';
-        const SL={pending:[L('접수·검토중','Under review'),'#FBF6E9','#b78a3c'],approved:[L('승인 완료','Approved'),'#E7F6F0','#0d8f6b'],cancelled:[L('취소됨','Cancelled'),'#fdecea','#c0392b']};
-        const s=SL[st]||SL.pending;
+        const SL={pending:[L('접수·검토중','Under review'),'#FBF6E9','#b78a3c'],submitted:[L('접수·검토중','Under review'),'#FBF6E9','#b78a3c'],approved:[L('승인 완료 · 입금 대기','Approved · payment due'),'#EAF2FC','#0B5FA5'],rejected:[L('반려됨','Rejected'),'#fdecea','#c0392b'],cancelled:[L('취소됨','Cancelled'),'#fdecea','#c0392b']};
+        const s=a.paid?[L('입금 확인 완료 · 참가 확정','Payment confirmed'),'#E7F6F0','#0d8f6b']:(SL[st]||SL.pending);
         const d=new Date(a.created_at);
         return { title:(a.booth_type==='space'?L('독립부스','Space Only'):L('조립부스','Package Booth'))+((a.booth_ids||[]).length?' · '+(a.booth_ids||[]).join(', '):''),
           statusLabel:s[0], badgeStyle:'font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:'+s[1]+';color:'+s[2]+';',

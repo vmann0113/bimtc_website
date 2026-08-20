@@ -104,12 +104,24 @@
       </sc-if>
       <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;gap:14px;">
-        <div style="display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:9px 14px;width:160px;">
-          <span style="position:relative;width:14px;height:14px;display:inline-block;flex-shrink:0;">
-            <span style="position:absolute;width:9px;height:9px;border:1.6px solid #6b8aa6;border-radius:50%;top:0;left:0;"></span>
-            <span style="position:absolute;width:5px;height:1.6px;background:#6b8aa6;transform:rotate(45deg);bottom:1px;right:-1px;"></span>
-          </span>
-          <input placeholder="{{ t.u_search }}" style="background:transparent;border:none;outline:none;color:#fff;font-size:clamp(13px,calc(18.2px - 0.35vw),16px);width:100%;" />
+        <div style="position:relative;width:190px;">
+          <div style="display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:9px 14px;">
+            <span style="position:relative;width:14px;height:14px;display:inline-block;flex-shrink:0;">
+              <span style="position:absolute;width:9px;height:9px;border:1.6px solid #6b8aa6;border-radius:50%;top:0;left:0;"></span>
+              <span style="position:absolute;width:5px;height:1.6px;background:#6b8aa6;transform:rotate(45deg);bottom:1px;right:-1px;"></span>
+            </span>
+            <input value="{{ searchQ }}" onInput="{{ setSearchQ }}" placeholder="{{ searchPh }}" style="background:transparent;border:none;outline:none;color:#fff;font-size:clamp(13px,calc(18.2px - 0.35vw),16px);width:100%;" />
+          </div>
+          <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(4,16,32,0.35);overflow:hidden;z-index:40;">
+              <sc-for list="{{ searchHits }}" as="sh" hint-placeholder-count="3">
+                <div onClick="{{ sh.onClick }}" style="padding:11px 15px;font-size:13.5px;font-weight:700;color:#22384e;cursor:pointer;border-bottom:1px solid #f0f3f7;" style-hover="background:#F4F8FC;color:#0B5FA5;">{{ sh.label }}</div>
+              </sc-for>
+              <sc-if value="{{ searchNoHit }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:11px 15px;font-size:13px;color:#8295ab;">{{ searchNoHitMsg }}</div>
+              </sc-if>
+            </div>
+          </sc-if>
         </div>
         <button onClick="{{ goVisit }}" style="background:#25C281;color:#04261a;border:none;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.u_prereg }}</button>
       </div>
@@ -817,6 +829,25 @@
             <a href="booth.html" style="display:block;text-align:center;background:#0B5FA5;color:#fff;text-decoration:none;padding:13px;border-radius:11px;font-size:14.5px;font-weight:800;font-family:'Pretendard',sans-serif;">{{ t.floor_apply_cta }}</a>
           </div>
         </div>
+        <sc-if value="{{ exbListOn }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:34px;">
+            <h3 style="font-size:clamp(17px,2.22vw,20px);font-weight:800;margin:0 0 14px;letter-spacing:-0.02em;">{{ exbListTitle }}</h3>
+            <div style="border:1px solid #e6ebf2;border-radius:14px;overflow:hidden;">
+              <div style="display:flex;gap:16px;padding:12px 20px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+                <span style="width:130px;flex-shrink:0;">{{ exbListColBooth }}</span><span style="flex:1;">{{ exbListColCompany }}</span>
+              </div>
+              <sc-for list="{{ exbListRows }}" as="xr" hint-placeholder-count="4">
+                <div style="display:flex;gap:16px;padding:13px 20px;border-bottom:1px solid #eef2f7;align-items:center;">
+                  <span style="width:130px;flex-shrink:0;font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0B5FA5;">{{ xr.booths }}</span>
+                  <span style="flex:1;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:600;color:#22384e;">{{ xr.company }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ exbListEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:24px 20px;color:#8295ab;font-size:14px;">{{ exbListEmptyMsg }}</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
       </div>
     </section>
     </sc-if>
@@ -1336,6 +1367,7 @@ class Component extends DCLogic {
     if(typeof location!=='undefined' && /type=recovery/.test(location.hash||'')){ this.setState({ page:'login', authMode:'setpw', authError:'', authInfo:this.L('본인 확인이 완료되었습니다. 새 비밀번호를 입력해 주세요.','Identity verified — please enter a new password.') }); }
     (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState({ me:u, isAdmin:!!u.is_admin, loginRole:(u.type||'exhibitor') }); }catch(e){} })();
     (async()=>{ try{ const ns=await window.BimtcDB.publishedNotices(); if(ns&&ns.length) this.setState({ dbNotices:ns }); }catch(e){} })();
+    (async()=>{ try{ const xs=await window.BimtcDB.listPublicExhibitors(); if(xs&&xs.length) this.setState({ pubExhibitors:xs }); }catch(e){} })();
   }
   componentWillUnmount(){ if(this._tick) clearInterval(this._tick); if(this._rz&&typeof window!=='undefined') window.removeEventListener('resize',this._rz); }
   initMaps(){
@@ -1504,6 +1536,28 @@ class Component extends DCLogic {
     return { ebStripBadge:'NOW OPEN', ebStripHref:'booth.html'+(m?('?eb='+m[1]):''),
       ebStripText:L(eb.label+' 접수중 · 부스비 '+rate+'% 할인'+(end?' (~'+end+')':''), (eb.labelEn||eb.label)+' now open · '+rate+'% off booth fees'+(end?' (until '+end+')':'')),
       ebStripOpen:true };
+  }
+  searchVals(){
+    const L=(ko,en)=>this.L(ko,en);
+    const q=(this.state.searchQ||'').trim().toLowerCase();
+    if(!q) return { hits:[], noHit:false };
+    const jump=(fn)=>()=>{ this.setState({searchQ:''}); fn(); };
+    const defs=[
+      [L('부스 신청 (참가기업)','Booth application'),'부스 신청 참가기업 얼리버드 할인 조립 독립 booth apply exhibitor early',()=>this.goBooth()],
+      [L('참관객 사전등록','Visitor pre-registration'),'사전등록 참관 방문 무료 입장 등록 visit register pre free',()=>this.go('visit')],
+      [L('비즈미팅 (바이어 매칭)','Business meetings'),'비즈미팅 바이어 매칭 상담 미팅 business meeting buyer match',()=>this.goConsole()],
+      [L('부스 배치도 (플로어맵)','Floor map'),'배치도 플로어맵 부스 위치 지도 floor map layout booth',()=>{ this.setState({exTab:'floor'}); this.go('exhibition'); setTimeout(()=>this.scrollToId('exb-floor'),90); }],
+      [L('오시는 길 (BEXCO)','Directions'),'오시는 길 벡스코 위치 교통 주차 지하철 bexco directions access',()=>{ this.go('about'); setTimeout(()=>this.scrollToId('ab-access'),90); }],
+      [L('공지사항','Notices'),'공지 공지사항 소식 notice news',()=>{ this.setState({commTab:'notice'}); this.go('community'); }],
+      [L('자료실 (브로슈어)','Downloads'),'자료실 브로슈어 포스터 다운로드 brochure poster download',()=>this.go('library')],
+      [L('문의하기','Contact us'),'문의 질문 연락 사무국 contact inquiry question',()=>this.go('contact')],
+      [L('숙박·관광 안내','Stay & tour'),'숙박 호텔 관광 여행 hotel stay tour travel',()=>this.go('stay')],
+      [L('참가안내 (참가비)','Exhibit guide'),'참가안내 참가비 부스 타입 가격 요금 fee price exhibit guide',()=>this.go('exhibit')],
+      [L('행사 개요 (BIMTC 소개)','About BIMTC'),'소개 개요 행사 일정 about overview schedule',()=>this.go('about')],
+      [L('로그인 / 내 정보','Login / My account'),'로그인 회원가입 내정보 계정 login sign account',()=>this.go('login')]
+    ];
+    const hits=defs.filter(d=>(d[0]+' '+d[1]).toLowerCase().indexOf(q)>=0).slice(0,6).map(d=>({label:d[0], onClick:jump(d[2])}));
+    return { hits, noHit:hits.length===0 };
   }
   floorVals(){
     const L=(ko,en)=>this.L(ko,en);
@@ -1840,7 +1894,7 @@ class Component extends DCLogic {
         {k:L('주최','Hosts'),v:L('부산광역시 · 부산일보사','Busan Metropolitan City · Busan Ilbo')},
         {k:L('주관','Organizer'),v:L('(사)부산권의료산업협의회 (BMIA)','Busan Medical Industry Association (BMIA)')},
         {k:L('규모','Scale'),v:L('100개사 200부스 규모','100 companies · 200 booths')},
-        {k:L('전시관','Zones'),v:L('메디컬존 · 웰니스존 · 국제관광존 · 플레이존','Medical · Wellness · Global Tour · Play')},
+        {k:L('전시관','Zones'),v:L('메디컬존 · 관광웰니스존 · 플레잉존 · 독립부스 구역','Medical · Tourism & Wellness · Playing · Space-only')},
       ],
       programA: [
         {title:L('전시행사','Exhibition'),desc:L('의료관광·체험·산업·관광 4개 전시관 부스 운영','Four themed zones: medical, experience, industry & tourism'),bg:'#EAF2FB',icon:sq('#0B5FA5',4,true)},
@@ -1870,7 +1924,7 @@ class Component extends DCLogic {
       hasImportant: noticeList.length>0, importantTitle: noticeList.length>0?noticeList[0].title:'', importantDate: noticeList.length>0?noticeList[0].date:'',
 
       // about
-      hallTags: [ {t:L('메디컬존','Medical'),d:'MEDICAL'}, {t:L('웰니스존','Wellness'),d:'WELLNESS'}, {t:L('국제관광존','Global Tour'),d:'GLOBAL TOUR'}, {t:L('플레이존','Play'),d:'PLAY'} ],
+      hallTags: [ {t:L('메디컬존','Medical'),d:'MEDICAL'}, {t:L('관광웰니스존','Tourism & Wellness'),d:'TOURISM · WELLNESS'}, {t:L('플레잉존','Playing'),d:'PLAYING'}, {t:L('독립부스 구역','Space-only'),d:'SPACE-ONLY'} ],
       historyRows: [
         { year:'2026', round:L('예정','Planned'), date:'11.13 – 11.14', scale:L('BEXCO 제1전시장 3A홀 · 100개사 200부스 (준비 중)','BEXCO Hall 3A · 100 cos. 200 booths (in preparation)') },
         { year:'2025', round:L('개최','Held'), date:'—', scale:L('131개사 207부스 · 바이어 77명 · 상담 396건 · 관람객 65,202명','131 cos. 207 booths · 77 buyers · 396 meetings · 65,202 visitors') },
@@ -1898,8 +1952,8 @@ class Component extends DCLogic {
       applyProcess: [
         { no:'01', t:L('회원가입 · 온라인 신청','Sign up & Apply Online'), d:L('참가기업 가입 후 신청서 작성, 배치도에서 부스 위치 직접 선택','Sign up, fill out the form & pick your booth on the floor map') },
         { no:'02', t:L('견적 확인','Check Your Quote'), d:L('신청 즉시 화면에서 견적서(할인 적용)와 입금 계좌 확인','Instant on-screen quote with discounts & payment account') },
-        { no:'03', t:L('참가비 입금','Payment'), d:L('안내된 계좌로 참가비 입금','Transfer the fee to the given account') },
-        { no:'04', t:L('승인 · 참가 확정','Approval & Confirmation'), d:L('사무국 입금 확인 후 참가 확정, 비즈미팅 매칭 활성화','Confirmed after payment check; business matching unlocked') },
+        { no:'03', t:L('사무국 승인 · 입금','Approval & Payment'), d:L('사무국 승인 확인 후 안내 계좌로 참가비 입금','After approval, transfer the fee to the given account') },
+        { no:'04', t:L('입금 확인 · 참가 확정','Confirmation'), d:L('입금 확인 후 참가 확정, 비즈미팅 매칭 활성화','Confirmed after payment check; business matching unlocked') },
       ],
       faqs: [
         { q:L('참가 신청 마감은 언제인가요?','When is the application deadline?'), a:L('추후 공지됩니다. 홈페이지를 참고해주세요.','To be announced. Please check this website for updates.') },
@@ -1931,7 +1985,19 @@ class Component extends DCLogic {
       })),
 
       // exhibition sub-tabs
+      searchQ:this.state.searchQ||'',
+      setSearchQ:(e)=>this.setState({searchQ:e.target.value}),
+      searchPh:L('바로가기 검색','Quick search'),
+      searchOpen:!!(this.state.searchQ||'').trim(),
+      searchNoHitMsg:L('결과 없음 — 예: 부스, 사전등록, 오시는 길','No results — try: booth, register, directions'),
+      searchHits:this.searchVals().hits, searchNoHit:this.searchVals().noHit,
       exTabs, exFilters, exhibitors, timetable,
+      exbListOn:(()=>{ const C=window.BIMTC_CONFIG; if(!C||!C.earlyBird||!C.earlyBird[0]) return false; const e1=new Date((C.earlyBird[0].end||'2026-09-30')+'T23:59:59+09:00'); return Date.now()>e1.getTime(); })(),
+      exbListTitle:L('참가기업 배치 리스트','Exhibitor Placement List'),
+      exbListColBooth:L('부스 위치','Booth'), exbListColCompany:L('기업명','Company'),
+      exbListRows:(this.state.pubExhibitors||[]).map(x=>({booths:(x.booth_ids||[]).join(', ')||'-', company:x.company||''})),
+      exbListEmpty:(this.state.pubExhibitors||[]).length===0,
+      exbListEmptyMsg:L('확정된 참가기업이 아직 없습니다.','No confirmed exhibitors yet.'),
       ...this.floorVals(),
       ...this.ebStripVals(),
       exCompanies:this.state.exTab==='companies', exFloor:this.state.exTab==='floor', exProgram:this.state.exTab==='program',
