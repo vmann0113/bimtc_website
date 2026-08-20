@@ -871,7 +871,7 @@
         <sc-if value="{{ commNotice }}" hint-placeholder-val="{{ true }}">
           <div style="border-top:2px solid #0A2236;">
             <sc-for list="{{ noticeList }}" as="n" hint-placeholder-count="6">
-              <div style="display:flex;gap:24px;padding:20px 8px;border-bottom:1px solid #eef2f7;align-items:center;cursor:pointer;" style-hover="background:#F4F8F6;">
+              <div style="display:flex;gap:24px;padding:20px 8px;border-bottom:1px solid #eef2f7;align-items:center;">
                 <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:600;color:#0d8f6b;width:52px;flex-shrink:0;">{{ n.tag }}</span>
                 <span style="flex:1;font-size:15.5px;font-weight:600;color:#22384e;">{{ n.title }}</span>
                 <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#9aa9bd;flex-shrink:0;">{{ n.date }}</span>
@@ -883,7 +883,7 @@
         <sc-if value="{{ commPress }}" hint-placeholder-val="{{ false }}">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:18px;">
             <sc-for list="{{ pressList }}" as="p" hint-placeholder-count="6">
-              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;cursor:pointer;" style-hover="border-color:#b9d3ea;transform:translateY(-3px);">
+              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
                 <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF7F2,#EAF7F2 12px,#dff1e9 12px,#dff1e9 24px);"></div>
                 <div style="padding:20px clamp(14px,4vw,22px);">
                   <div style="font-size:15.5px;font-weight:700;line-height:1.45;color:#0A2236;margin-bottom:12px;">{{ p.title }}</div>
@@ -1335,6 +1335,7 @@ class Component extends DCLogic {
     if(typeof location!=='undefined' && location.hash==='#signup'){ this.setState({ page:'login', authMode:'signup' }); }
     if(typeof location!=='undefined' && /type=recovery/.test(location.hash||'')){ this.setState({ page:'login', authMode:'setpw', authError:'', authInfo:this.L('본인 확인이 완료되었습니다. 새 비밀번호를 입력해 주세요.','Identity verified — please enter a new password.') }); }
     (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState({ me:u, isAdmin:!!u.is_admin, loginRole:(u.type||'exhibitor') }); }catch(e){} })();
+    (async()=>{ try{ const ns=await window.BimtcDB.publishedNotices(); if(ns&&ns.length) this.setState({ dbNotices:ns }); }catch(e){} })();
   }
   componentWillUnmount(){ if(this._tick) clearInterval(this._tick); if(this._rz&&typeof window!=='undefined') window.removeEventListener('resize',this._rz); }
   initMaps(){
@@ -1735,7 +1736,7 @@ class Component extends DCLogic {
     ];
 
     // community data
-    const noticeList = [];
+    const noticeList = (this.state.dbNotices||[]).map(n=>({ date:(n.published_at||n.created_at||'').slice(0,10).replace(/-/g,'.'), title:n.title, tag:n.tag||'', body:n.body||'' }));
     const pressList = [];
     const galleryList = [];
 
@@ -1895,10 +1896,10 @@ class Component extends DCLogic {
       ],
       boothNote: L('조기 신청 할인: 1차 20% · 2차 10% / 재참가 10% · 신규참가 10% (부스면적 비용 한정, 중복 적용 가능)','Early-bird: 1st 20% / 2nd 10% · Returning 10% · New 10% (booth area cost only, stackable)'),
       applyProcess: [
-        { no:'01', t:L('온라인 참가 신청','Online Application'), d:L('홈페이지에서 신청서 작성·접수','Fill out & submit the form online') },
-        { no:'02', t:L('인보이스 수령','Receive Invoice'), d:L('사무국으로부터 인보이스 수령','Receive the invoice from the secretariat') },
-        { no:'03', t:L('부스 배정','Booth Assignment'), d:L('사무국 검토 후 부스 위치 배정','Booth location assigned after review') },
-        { no:'04', t:L('참가 확정·셋업','Confirm & Setup'), d:L('부스 셋업 및 비즈미팅 매칭 준비','Booth setup & meeting matching preparation') },
+        { no:'01', t:L('회원가입 · 온라인 신청','Sign up & Apply Online'), d:L('참가기업 가입 후 신청서 작성, 배치도에서 부스 위치 직접 선택','Sign up, fill out the form & pick your booth on the floor map') },
+        { no:'02', t:L('견적 확인','Check Your Quote'), d:L('신청 즉시 화면에서 견적서(할인 적용)와 입금 계좌 확인','Instant on-screen quote with discounts & payment account') },
+        { no:'03', t:L('참가비 입금','Payment'), d:L('안내된 계좌로 참가비 입금','Transfer the fee to the given account') },
+        { no:'04', t:L('승인 · 참가 확정','Approval & Confirmation'), d:L('사무국 입금 확인 후 참가 확정, 비즈미팅 매칭 활성화','Confirmed after payment check; business matching unlocked') },
       ],
       faqs: [
         { q:L('참가 신청 마감은 언제인가요?','When is the application deadline?'), a:L('추후 공지됩니다. 홈페이지를 참고해주세요.','To be announced. Please check this website for updates.') },

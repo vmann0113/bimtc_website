@@ -453,16 +453,25 @@
             <span style="width:60px;">구분</span><span style="flex:1;">제목</span><span style="width:96px;">게시일</span><span style="width:80px;text-align:center;">노출</span><span style="width:60px;"></span>
           </div>
           <sc-for list="{{ cmsRows }}" as="c" hint-placeholder-count="5">
-            <div style="display:flex;gap:16px;padding:15px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
-              <span style="width:60px;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;color:#0d8f6b;">{{ c.tag }}</span>
-              <span style="flex:1;font-size:14.5px;font-weight:600;color:#22384e;">{{ c.title }}</span>
-              <span style="width:96px;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ c.date }}</span>
-              <div style="width:80px;display:flex;justify-content:center;">
-                <div onClick="{{ c.toggle }}" style="width:40px;height:23px;border-radius:999px;background:{{ c.tglBg }};position:relative;cursor:pointer;transition:background .15s;">
-                  <div style="position:absolute;top:2px;left:{{ c.tglLeft }};width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left .15s;"></div>
+            <div style="display:flex;gap:16px;padding:15px 24px;border-bottom:1px solid #eef2f7;align-items:center;flex-wrap:wrap;">
+              <sc-if value="{{ c.isEdit }}" hint-placeholder-val="{{ false }}">
+                <input value="{{ c.editTag }}" onInput="{{ c.setTag }}" style="width:70px;padding:9px 10px;border:1px solid #b9d3ea;border-radius:8px;font-size:13px;font-weight:700;color:#0d8f6b;outline:none;font-family:'Pretendard',sans-serif;" />
+                <input value="{{ c.editTitle }}" onInput="{{ c.setTitle }}" onKeyDown="{{ c.editKey }}" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid #b9d3ea;border-radius:8px;font-size:14.5px;font-weight:600;color:#22384e;outline:none;font-family:'Pretendard',sans-serif;" />
+                <button onClick="{{ c.save }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">저장</button>
+                <button onClick="{{ c.cancel }}" style="background:#fff;color:#5E7289;border:1px solid #dde5ee;padding:9px 14px;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">취소</button>
+                <button onClick="{{ c.del }}" style="background:#fff;color:#c0392b;border:1px solid #f0c8c2;padding:9px 14px;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
+              </sc-if>
+              <sc-if value="{{ c.notEdit }}" hint-placeholder-val="{{ true }}">
+                <span style="width:60px;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;color:#0d8f6b;">{{ c.tag }}</span>
+                <span style="flex:1;font-size:14.5px;font-weight:600;color:#22384e;">{{ c.title }}</span>
+                <span style="width:96px;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ c.date }}</span>
+                <div style="width:80px;display:flex;justify-content:center;">
+                  <div onClick="{{ c.toggle }}" style="width:40px;height:23px;border-radius:999px;background:{{ c.tglBg }};position:relative;cursor:pointer;transition:background .15s;">
+                    <div style="position:absolute;top:2px;left:{{ c.tglLeft }};width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left .15s;"></div>
+                  </div>
                 </div>
-              </div>
-              <span style="width:60px;text-align:right;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#b0bccb;cursor:pointer;">편집</span>
+                <span onClick="{{ c.startEdit }}" style="width:60px;text-align:right;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#0B5FA5;font-weight:700;cursor:pointer;">편집</span>
+              </sc-if>
             </div>
           </sc-for>
         </div>
@@ -601,6 +610,13 @@ class Component extends DCLogic {
   toggleCell(ti,si){ const k=ti+'-'+si; if(this.state.reserved[k]) { this.flash('이미 예약된 슬롯입니다'); return; } this.setState(s=>{ const r={...s.restricted}; if(r[k])delete r[k]; else r[k]=1; return {restricted:r}; }); }
   async addNotice(){ await window.BimtcDB.addNotice({tag:'신규', title:'새 공지사항 (제목을 입력하세요)', published:true}); await this.reload(); this.setState({cmsFlash:true}); this.flash('새 공지를 등록했습니다'); }
   async toggleCms(id, on){ await window.BimtcDB.toggleNotice(id, on); await this.reload(); }
+  async saveNotice(id){
+    const t=(this.state.editTitle||'').trim();
+    if(!t){ this.flash('제목을 입력해 주세요'); return; }
+    const ok=await window.BimtcDB.updateNotice(id,{ title:t, tag:(this.state.editTag||'안내').trim() });
+    await this.reload(); this.setState({editingId:null});
+    this.flash(ok?'공지가 저장되었습니다':'저장 실패 (권한 확인)');
+  }
   exportCsv(){
     const rows=[['이름','소속','관심분야','방문일','등록일시']].concat(this.state.regs.map(r=>[r.name||'', r.org||'', (r.interests||[]).join(' '), r.visit_day||'', r.created_at||'']));
     const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
@@ -682,7 +698,15 @@ class Component extends DCLogic {
     })}));
 
     const cmsRows=notices.map(c=>({ id:c.id, tag:c.tag||'안내', title:c.title, date:(c.published_at||'').replace(/-/g,'.'),
-      on:c.published, tglBg:c.published?'#11A37B':'#cdd6e2', tglLeft:c.published?'18px':'2px', toggle:()=>this.toggleCms(c.id, !c.published) }));
+      on:c.published, tglBg:c.published?'#11A37B':'#cdd6e2', tglLeft:c.published?'18px':'2px', toggle:()=>this.toggleCms(c.id, !c.published),
+      isEdit:this.state.editingId===c.id, notEdit:this.state.editingId!==c.id,
+      editTag:this.state.editTag, editTitle:this.state.editTitle,
+      setTag:(e)=>this.setState({editTag:e.target.value}), setTitle:(e)=>this.setState({editTitle:e.target.value}),
+      editKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.saveNotice(c.id); } },
+      startEdit:()=>this.setState({editingId:c.id, editTag:c.tag||'안내', editTitle:c.title}),
+      cancel:()=>this.setState({editingId:null}),
+      save:()=>this.saveNotice(c.id),
+      del:async()=>{ if(typeof window!=='undefined'&&!window.confirm('이 공지를 삭제할까요?')) return; const ok=await window.BimtcDB.deleteNotice(c.id); await this.reload(); this.setState({editingId:null}); this.flash(ok?'공지를 삭제했습니다':'삭제 실패 (권한 확인)'); } }));
 
     const won=(n)=>(n||0).toLocaleString('ko-KR')+'원';
     const memberDef=[['all','전체'],['exhibitor','참가기업'],['buyer','바이어'],['visitor','방문객']];

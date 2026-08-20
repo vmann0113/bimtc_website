@@ -314,7 +314,9 @@
     async publishedNotices() { var sb = await ready(); var r = await sb.from('notices').select('*').eq('published', true).order('published_at', { ascending: false }); return r.data || []; },
     async listNotices() { var sb = await ready(); var r = await sb.from('notices').select('*').order('published_at', { ascending: false }); return r.data || []; },
     async addNotice(n) { var sb = await ready(); var res = await sb.from('notices').insert({ tag: n.tag, title: n.title, published: n.published !== false }).select().single(); return res.data; },
-    async toggleNotice(id, on) { var sb = await ready(); await sb.from('notices').update({ published: on }).eq('id', id); }
+    async toggleNotice(id, on) { var sb = await ready(); await sb.from('notices').update({ published: on }).eq('id', id); },
+    async updateNotice(id, fields) { var sb = await ready(); var r = await sb.from('notices').update(fields).eq('id', id); return !r.error; },
+    async deleteNotice(id) { var sb = await ready(); var r = await sb.from('notices').delete().eq('id', id); return !r.error; }
   };
 
   window.BimtcDB = DB;
