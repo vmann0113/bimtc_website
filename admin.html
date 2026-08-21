@@ -283,13 +283,16 @@
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">이메일</label><input value="{{ bEditEmail }}" onInput="{{ setBEEmail }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부스 타입</label><select value="{{ bEditType }}" onChange="{{ setBEType }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;background:#fff;"><option value="package">조립부스</option><option value="space">독립부스</option></select></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부스 위치 (쉼표로 구분)</label><input value="{{ bEditIds }}" onInput="{{ setBEIds }}" placeholder="예: S-09, S-10, S-11, S-12" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">얼리버드 할인</label><select value="{{ bEditEb }}" onChange="{{ setBEEb }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;background:#fff;"><option value="">없음</option><option value="phase1">1차 얼리버드 (20%)</option><option value="phase2">2차 얼리버드 (10%)</option></select></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">재참가 할인 (10%)</label><select value="{{ bEditRet }}" onChange="{{ setBERet }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;background:#fff;"><option value="n">미적용</option><option value="y">적용</option></select></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부가서비스 금액 (원 · 할인 미적용)</label><input value="{{ bEditAddon }}" onInput="{{ setBEAddon }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">공급가액 (원)</label><input value="{{ bEditSub }}" onInput="{{ setBESub }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부가세 (원)</label><input value="{{ bEditVat }}" onInput="{{ setBEVat }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">합계 (원)</label><input value="{{ bEditTotal }}" onInput="{{ setBETotal }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
                   </div>
                   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
                     <button onClick="{{ saveAppEdit }}" style="background:#0B5FA5;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">저장</button>
-                    <button onClick="{{ calcBE }}" style="background:#fff;color:#0d8f6b;border:1.5px solid #c7ebdc;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">공급가 기준 부가세·합계 자동계산</button>
+                    <button onClick="{{ calcBE }}" style="background:#fff;color:#0d8f6b;border:1.5px solid #c7ebdc;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">금액 자동계산 (부스단가 × 개수 − 할인 + 부가서비스)</button>
                     <button onClick="{{ cancelAppEdit }}" style="background:#fff;color:#5E7289;border:1px solid #dde5ee;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">취소</button>
                   </div>
                   <p style="font-size:12px;color:#8a6d2f;margin:10px 0 0;">부스 위치를 바꾸면 다른 업체와의 중복 여부가 자동 검사됩니다. 부가서비스·팸투어 변경은 참가기업이 직접 수정하거나 사무국 문의로 처리하세요.</p>
@@ -656,6 +659,8 @@ class Component extends DCLogic {
     ]);
     const reserved={}; resvs.forEach(r=>{ reserved[r.table_idx+'-'+r.slot_idx]=1; });
     let eb=null; try{ eb=await window.BimtcDB.getEarlyBird(); }catch(e){}
+    // 오픈 전 잠금값(전부 끄기, 오픈 시각 이전 저장) → 자동 모드로 해석 (공개 사이트와 동일 규칙)
+    if(eb){ try{ const C=window.BIMTC_CONFIG; const keys=Object.keys(eb); const allOff=keys.length>0&&keys.every(k=>eb[k]==='off'); const ts=window.__bimtcEbOvTs?new Date(window.__bimtcEbOvTs).getTime():0; if(C&&C.isLaunched&&C.isLaunched()&&allOff&&ts&&ts<new Date(C.launchAt).getTime()) eb={phase1:'auto',phase2:'auto'}; }catch(e){} }
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
     this.setState({ apps, regs, matches, notices, reserved, booths, members, inquiries: inquiries||[], notifications: notifications||[], ebOverride: eb||{}, ebDirty:false });
   }
@@ -730,7 +735,7 @@ class Component extends DCLogic {
     const e=this.state.bEdit; if(!e) return;
     const ids=(e.boothIds||'').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
     const num=(v)=>{ const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
-    const r=await window.BimtcDB.adminUpdateApplication(e.id,{ company:e.company, contact:e.contact, phone:e.phone, email:e.email, booth_type:e.boothType, booth_ids:ids, subtotal:num(e.subtotal), vat:num(e.vat), total:num(e.total) });
+    const r=await window.BimtcDB.adminUpdateApplication(e.id,{ company:e.company, contact:e.contact, phone:e.phone, email:e.email, booth_type:e.boothType, booth_ids:ids, subtotal:num(e.subtotal), vat:num(e.vat), total:num(e.total), discount:num(e.discount), early_bird:e.ebKey||null, returning_company:e.retOn==='y'?(e.retName||'(재참가)'):null });
     if(!r.ok){ const m=String(r.error||'').match(/BOOTH_TAKEN:([A-Za-z0-9,\- ]+)/); this.flash(m?('⚠ 이미 다른 업체가 신청한 부스: '+m[1]):('저장 실패: '+r.error)); return; }
     await this.reload(); this.setState({bEdit:null}); this.flash('신청 정보가 수정되었습니다');
   }
@@ -930,7 +935,7 @@ class Component extends DCLogic {
       toggleDetail:()=>this.setState({boothDetailId:this.state.boothDetailId===b.id?null:b.id}),
       detailRows:this.boothDetail(b),
       editing:!!(this.state.bEdit&&this.state.bEdit.id===b.id), notEditing:!(this.state.bEdit&&this.state.bEdit.id===b.id),
-      startEdit:()=>this.setState({boothDetailId:b.id, bEdit:{id:b.id, company:b.company||'', contact:b.contact||'', phone:b.phone||'', email:b.email||'', boothType:b.booth_type||'package', boothIds:(b.booth_ids||[]).join(', '), subtotal:String(b.subtotal||0), vat:String(b.vat||0), total:String(b.total||0)}}),
+      startEdit:()=>{ const CFG=window.BIMTC_CONFIG||{}; const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[b.booth_type])||0; const bc=unit*((b.booth_ids||[]).length); const addon=Math.max(0,(b.subtotal||0)-bc+(b.discount||0)); this.setState({boothDetailId:b.id, bEdit:{id:b.id, company:b.company||'', contact:b.contact||'', phone:b.phone||'', email:b.email||'', boothType:b.booth_type||'package', boothIds:(b.booth_ids||[]).join(', '), subtotal:String(b.subtotal||0), vat:String(b.vat||0), total:String(b.total||0), ebKey:b.early_bird||'', retOn:b.returning_company?'y':'n', retName:b.returning_company||'', addonAmt:String(addon), discount:String(b.discount||0)}}); },
       printInv:()=>this.printInvoice(b),
       approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id) }));
     const dlAllLogos=async()=>{
@@ -1004,7 +1009,26 @@ class Component extends DCLogic {
       bEditSub:(this.state.bEdit||{}).subtotal||'', setBESub:this.setBE('subtotal'),
       bEditVat:(this.state.bEdit||{}).vat||'', setBEVat:this.setBE('vat'),
       bEditTotal:(this.state.bEdit||{}).total||'', setBETotal:this.setBE('total'),
-      calcBE:()=>{ const e=this.state.bEdit; if(!e) return; const num=(v)=>{ const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; }; const sub=num(e.subtotal); const vat=Math.round(sub*0.1); const o=Object.assign({},e,{vat:String(vat), total:String(sub+vat)}); this.setState({bEdit:o}); },
+      bEditEb:(this.state.bEdit||{}).ebKey||'', setBEEb:this.setBE('ebKey'),
+      bEditRet:(this.state.bEdit||{}).retOn||'n', setBERet:this.setBE('retOn'),
+      bEditAddon:(this.state.bEdit||{}).addonAmt||'', setBEAddon:this.setBE('addonAmt'),
+      bEditDisc:(this.state.bEdit||{}).discount||'0',
+      calcBE:()=>{ const e=this.state.bEdit; if(!e) return;
+        const num=(v)=>{ const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
+        const CFG=window.BIMTC_CONFIG||{};
+        const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[e.boothType])||0;
+        const ids=(e.boothIds||'').split(',').map(s=>s.trim()).filter(Boolean);
+        const boothCost=unit*ids.length;
+        let rate=0; const ebDef=(CFG.earlyBird||[]).find(p=>p.key===e.ebKey);
+        if(ebDef) rate+=ebDef.discountRate;
+        if(e.retOn==='y') rate+=(CFG.returningDiscountRate||0.1);
+        const disc=Math.round(boothCost*rate);
+        const addon=num(e.addonAmt);
+        const sub=boothCost-disc+addon;
+        const vat=Math.round(sub*0.1);
+        this.setState({bEdit:Object.assign({},e,{subtotal:String(sub), vat:String(vat), total:String(sub+vat), discount:String(disc)})});
+        this.flash('부스 '+ids.length+'개 × '+unit.toLocaleString()+'원 − 할인 '+disc.toLocaleString()+'원 ('+Math.round(rate*100)+'%) + 부가서비스 '+addon.toLocaleString()+'원 (할인 미적용)');
+      },
       saveAppEdit:()=>this.saveAppEdit(), cancelAppEdit:()=>this.setState({bEdit:null}),
       mapCells:this.adminMap().mapCells, mapFixtures:this.adminMap().mapFixtures,
       mapBoxStyle:this.adminMap().mapBoxStyle, mapLegend:this.adminMap().mapLegend,
