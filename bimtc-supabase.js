@@ -164,6 +164,13 @@
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
     async listBoothApplications() { var sb = await ready(); var r = await sb.from('booth_applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
+    async adminUpdateApplication(id, fields) {
+      var sb = await ready();
+      var r = await sb.from('booth_applications').update(fields).eq('id', id).select();
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '수정 권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true, row: r.data[0] };
+    },
     async setBoothStatus(id, status) { var sb = await ready(); await sb.from('booth_applications').update({ status: status }).eq('id', id); },
     async setBoothPaid(id, on) { var sb = await ready(); var r = await sb.from('booth_applications').update({ paid: on, paid_at: on ? new Date().toISOString() : null }).eq('id', id); return !r.error; },
     async myApprovedBooths() {

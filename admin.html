@@ -210,7 +210,7 @@
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px;">
           <div>
             <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 신청 · 입금 승인</h1>
-            <p style="font-size:14px;color:#5E7289;margin:0;">입금 확인 후 승인하면 해당 참가기업의 비즈미팅 매칭이 활성화됩니다.</p>
+            <p style="font-size:14px;color:#5E7289;margin:0;">신청 검토 후 승인·반려를 처리하고, 입금 확인 시 입금완료를 체크하세요. 비즈미팅 매칭은 매칭 오픈(10/31 이후) 시 승인 기업에 한해 활성화됩니다.</p>
           </div>
           <button onClick="{{ dlAllLogos }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ dlAllLogosLabel }}</button>
         </div>
@@ -268,6 +268,33 @@
                   <div style="display:flex;gap:10px;font-size:13.5px;line-height:1.5;"><span style="color:#8295ab;width:88px;flex-shrink:0;font-family:'Pretendard',sans-serif;">{{ dr.k }}</span><span style="color:#22384e;font-weight:600;word-break:break-all;">{{ dr.v }}</span></div>
                 </sc-for>
               </div>
+              <sc-if value="{{ b.notEditing }}" hint-placeholder-val="{{ true }}">
+                <div style="background:#F7F9FC;border-bottom:1px solid #eef2f7;padding:0 24px 18px;display:flex;gap:10px;flex-wrap:wrap;">
+                  <button onClick="{{ b.startEdit }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:9px 16px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">신청 정보 수정</button>
+                  <button onClick="{{ b.printInv }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 16px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">인보이스 출력 · PDF 저장</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.editing }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#FFFDF5;border-bottom:1px solid #eef2f7;padding:16px 24px 20px;">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">기업명</label><input value="{{ bEditCompany }}" onInput="{{ setBECompany }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">담당자</label><input value="{{ bEditContact }}" onInput="{{ setBEContact }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">연락처</label><input value="{{ bEditPhone }}" onInput="{{ setBEPhone }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">이메일</label><input value="{{ bEditEmail }}" onInput="{{ setBEEmail }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부스 타입</label><select value="{{ bEditType }}" onChange="{{ setBEType }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;background:#fff;"><option value="package">조립부스</option><option value="space">독립부스</option></select></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부스 위치 (쉼표로 구분)</label><input value="{{ bEditIds }}" onInput="{{ setBEIds }}" placeholder="예: S-09, S-10, S-11, S-12" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">공급가액 (원)</label><input value="{{ bEditSub }}" onInput="{{ setBESub }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부가세 (원)</label><input value="{{ bEditVat }}" onInput="{{ setBEVat }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">합계 (원)</label><input value="{{ bEditTotal }}" onInput="{{ setBETotal }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                  </div>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+                    <button onClick="{{ saveAppEdit }}" style="background:#0B5FA5;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">저장</button>
+                    <button onClick="{{ calcBE }}" style="background:#fff;color:#0d8f6b;border:1.5px solid #c7ebdc;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">공급가 기준 부가세·합계 자동계산</button>
+                    <button onClick="{{ cancelAppEdit }}" style="background:#fff;color:#5E7289;border:1px solid #dde5ee;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">취소</button>
+                  </div>
+                  <p style="font-size:12px;color:#8a6d2f;margin:10px 0 0;">부스 위치를 바꾸면 다른 업체와의 중복 여부가 자동 검사됩니다. 부가서비스·팸투어 변경은 참가기업이 직접 수정하거나 사무국 문의로 처리하세요.</p>
+                </div>
+              </sc-if>
             </sc-if>
           </sc-for>
         </div>
@@ -652,7 +679,7 @@ class Component extends DCLogic {
   async approve(id){ await window.BimtcDB.setApplicationStatus(id,'approved'); await this.reload(); this.flash('참가기업으로 승인했습니다'); }
   async reject(id){ await window.BimtcDB.setApplicationStatus(id,'rejected'); await this.reload(); this.flash('신청을 반려했습니다'); }
   async confirmMatch(id){ await window.BimtcDB.setRequestStatus(id,'accepted'); await this.reload(); this.flash('매칭을 확정했습니다'); }
-  async approveBooth(id){ await window.BimtcDB.setBoothStatus(id,'approved'); await this.reload(); this.flash('부스 신청을 승인했습니다 · 비즈미팅 활성화'); }
+  async approveBooth(id){ await window.BimtcDB.setBoothStatus(id,'approved'); await this.reload(); this.flash('부스 신청을 승인했습니다'); }
   async rejectBooth(id){ await window.BimtcDB.setBoothStatus(id,'rejected'); await this.reload(); this.flash('부스 신청을 반려했습니다'); }
   adminMap(){
     const CFG=window.BIMTC_CONFIG||{};
@@ -697,6 +724,52 @@ class Component extends DCLogic {
     return { mapCells, mapFixtures,
       mapBoxStyle:'position:relative;width:100%;aspect-ratio:'+Lay.cols+' / '+Lay.rows+';background:#fff;border:1.5px solid #d8e0ea;border-radius:8px;',
       mapLegend:(modal.mode==='one'?legendOne:legendAll).map(x=>({l:x.l,sw:'display:inline-block;width:14px;height:14px;border-radius:4px;background:'+x.c+';border:1px solid #d8e0ea;'})) };
+  }
+  setBE(field){ return (e)=>{ const o=Object.assign({},this.state.bEdit); o[field]=e.target.value; this.setState({bEdit:o}); }; }
+  async saveAppEdit(){
+    const e=this.state.bEdit; if(!e) return;
+    const ids=(e.boothIds||'').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+    const num=(v)=>{ const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
+    const r=await window.BimtcDB.adminUpdateApplication(e.id,{ company:e.company, contact:e.contact, phone:e.phone, email:e.email, booth_type:e.boothType, booth_ids:ids, subtotal:num(e.subtotal), vat:num(e.vat), total:num(e.total) });
+    if(!r.ok){ const m=String(r.error||'').match(/BOOTH_TAKEN:([A-Za-z0-9,\- ]+)/); this.flash(m?('⚠ 이미 다른 업체가 신청한 부스: '+m[1]):('저장 실패: '+r.error)); return; }
+    await this.reload(); this.setState({bEdit:null}); this.flash('신청 정보가 수정되었습니다');
+  }
+  printInvoice(b){
+    const won=(v)=>((v||0).toLocaleString())+'원';
+    const CFG=window.BIMTC_CONFIG||{};
+    const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[b.booth_type])||0;
+    const n=(b.booth_ids||[]).length; const boothCost=unit*n;
+    const disc=b.discount||0;
+    const addonTotal=Math.max(0,(b.subtotal||0)-boothCost+disc);
+    const ad=b.addons||{}; const adNames=Object.keys(ad).filter(k=>ad[k]).map(k=>k+(ad[k]===true?'':' ×'+ad[k])).join(', ');
+    const no='BIMTC-'+String(b.id||'').replace(/-/g,'').slice(0,8).toUpperCase();
+    const d=new Date(); const today=d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate();
+    const ap=b.applicant||{};
+    const row=(k,v)=>'<tr><td style="padding:6px 10px;color:#5E7289;border-bottom:1px solid #eef2f7;width:120px;">'+k+'</td><td style="padding:6px 10px;border-bottom:1px solid #eef2f7;font-weight:600;">'+(v||'-')+'</td></tr>';
+    const item=(name,qty,amt)=>'<tr><td style="padding:9px 10px;border-bottom:1px solid #e6ebf2;">'+name+'</td><td style="padding:9px 10px;text-align:center;border-bottom:1px solid #e6ebf2;">'+qty+'</td><td style="padding:9px 10px;text-align:right;border-bottom:1px solid #e6ebf2;">'+amt+'</td></tr>';
+    let items=item(b.booth_type==='space'?'독립부스 (Space Only)':'조립부스 (Package Booth)', n+'개', won(boothCost));
+    if(adNames) items+=item('부가서비스: '+adNames,'-',won(addonTotal));
+    if(b.fam_tour) items+=item('팸투어 참가','-','-');
+    if(disc){ let dl='할인'; const parts=[]; if(b.early_bird) parts.push(b.early_bird==='phase1'?'1차 얼리버드':'2차 얼리버드'); if(b.returning_company) parts.push('재참가'); if(parts.length) dl+=' ('+parts.join(' + ')+')'; items+=item(dl,'-','− '+won(disc)); }
+    const html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>INVOICE '+no+'</title></head><body style="font-family:Pretendard,-apple-system,sans-serif;color:#0F2440;max-width:720px;margin:0 auto;padding:36px 28px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #0B5FA5;padding-bottom:14px;">'
+      +'<div><div style="font-size:26px;font-weight:800;">INVOICE · 인보이스</div><div style="font-size:13px;color:#5E7289;margin-top:4px;">2026 부산국제의료관광컨벤션 (BIMTC) 부스 참가</div></div>'
+      +'<div style="text-align:right;font-size:13px;color:#5E7289;">No. '+no+'<br>발행일 '+today+'</div></div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:13.5px;margin-top:18px;">'
+      +row('기업명',b.company)+row('대표자',ap.ceo)+row('사업자번호',ap.bizno)+row('주소',ap.addr)+row('담당자',(b.contact||'')+(b.phone?' · '+b.phone:''))+row('이메일',b.email)+row('부스 위치',(b.booth_ids||[]).join(', '))
+      +'</table>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:13.5px;margin-top:22px;"><thead><tr style="background:#F0F5FA;"><th style="padding:9px 10px;text-align:left;">항목</th><th style="padding:9px 10px;text-align:center;width:80px;">수량</th><th style="padding:9px 10px;text-align:right;width:150px;">금액</th></tr></thead><tbody>'+items+'</tbody></table>'
+      +'<div style="margin-left:auto;width:280px;font-size:14px;margin-top:14px;">'
+      +'<div style="display:flex;justify-content:space-between;padding:5px 0;color:#5E7289;"><span>공급가액</span><span style="font-weight:700;color:#0F2440;">'+won(b.subtotal)+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;padding:5px 0;color:#5E7289;border-bottom:1px solid #e6ebf2;"><span>부가세 (10%)</span><span style="font-weight:700;color:#0F2440;">'+won(b.vat)+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;padding:9px 0;font-size:16px;font-weight:800;"><span>합계 (최종 입금액)</span><span style="color:#0B5FA5;">'+won(b.total)+'</span></div></div>'
+      +'<div style="margin-top:26px;background:#F0F5FA;border-radius:10px;padding:14px 16px;font-size:13.5px;"><b>입금 계좌</b> · 부산은행 101-2008-3507-06 (예금주: (사)부산권의료산업협의회 손영신)</div>'
+      +'<div style="margin-top:18px;font-size:12px;color:#8295ab;line-height:1.7;">(사)부산권의료산업협의회 · 부산광역시 동구 중앙대로 365, 3층 · T. 051-461-4276~8 · F. 051-442-6006 · bmia0528@naver.com</div>'
+      +'</body></html>';
+    const w=window.open('','_blank');
+    if(!w){ this.flash('팝업이 차단되었습니다 — 브라우저에서 팝업을 허용해 주세요'); return; }
+    w.document.write(html); w.document.close();
+    setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 400);
   }
   boothDetail(b){
     const won=(v)=>((v||0).toLocaleString())+'원';
@@ -856,6 +929,9 @@ class Component extends DCLogic {
       isDetail:this.state.boothDetailId===b.id, detailBtn:this.state.boothDetailId===b.id?'닫기':'상세',
       toggleDetail:()=>this.setState({boothDetailId:this.state.boothDetailId===b.id?null:b.id}),
       detailRows:this.boothDetail(b),
+      editing:!!(this.state.bEdit&&this.state.bEdit.id===b.id), notEditing:!(this.state.bEdit&&this.state.bEdit.id===b.id),
+      startEdit:()=>this.setState({boothDetailId:b.id, bEdit:{id:b.id, company:b.company||'', contact:b.contact||'', phone:b.phone||'', email:b.email||'', boothType:b.booth_type||'package', boothIds:(b.booth_ids||[]).join(', '), subtotal:String(b.subtotal||0), vat:String(b.vat||0), total:String(b.total||0)}}),
+      printInv:()=>this.printInvoice(b),
       approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id) }));
     const dlAllLogos=async()=>{
       const list=(this.state.booths||[]).filter(b=>b.logo_url&&b.status!=='rejected');
@@ -919,6 +995,17 @@ class Component extends DCLogic {
       eatClick:(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); },
       mapModalTitle:(this.state.mapModal&&this.state.mapModal.mode==='one')?((this.state.mapModal.company||'')+' — 부스 위치'):'부스 신청현황 (판매현황)',
       mapModalNote:(this.state.mapModal&&this.state.mapModal.mode==='one')?'주황(코랄)으로 표시된 칸이 이 기업이 신청한 부스입니다.':'색칠된 부스에 마우스를 올리면 기업명·상태가 표시되고, 클릭하면 해당 신청의 상세가 열립니다.',
+      bEditCompany:(this.state.bEdit||{}).company||'', setBECompany:this.setBE('company'),
+      bEditContact:(this.state.bEdit||{}).contact||'', setBEContact:this.setBE('contact'),
+      bEditPhone:(this.state.bEdit||{}).phone||'', setBEPhone:this.setBE('phone'),
+      bEditEmail:(this.state.bEdit||{}).email||'', setBEEmail:this.setBE('email'),
+      bEditType:(this.state.bEdit||{}).boothType||'package', setBEType:this.setBE('boothType'),
+      bEditIds:(this.state.bEdit||{}).boothIds||'', setBEIds:this.setBE('boothIds'),
+      bEditSub:(this.state.bEdit||{}).subtotal||'', setBESub:this.setBE('subtotal'),
+      bEditVat:(this.state.bEdit||{}).vat||'', setBEVat:this.setBE('vat'),
+      bEditTotal:(this.state.bEdit||{}).total||'', setBETotal:this.setBE('total'),
+      calcBE:()=>{ const e=this.state.bEdit; if(!e) return; const num=(v)=>{ const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; }; const sub=num(e.subtotal); const vat=Math.round(sub*0.1); const o=Object.assign({},e,{vat:String(vat), total:String(sub+vat)}); this.setState({bEdit:o}); },
+      saveAppEdit:()=>this.saveAppEdit(), cancelAppEdit:()=>this.setState({bEdit:null}),
       mapCells:this.adminMap().mapCells, mapFixtures:this.adminMap().mapFixtures,
       mapBoxStyle:this.adminMap().mapBoxStyle, mapLegend:this.adminMap().mapLegend,
       bcTotal:booths.filter(b=>b.status!=='rejected').length+'건',
