@@ -688,15 +688,37 @@ class Component extends DCLogic {
     }
     return used.every(Boolean);
   }
+  groupCount(ids){
+    if(ids.length<2) return ids.length?1:0;
+    const {map,solid}=this.sellMap();
+    const pos=ids.map(id=>map[id]).filter(Boolean);
+    if(pos.length!==ids.length) return 1;
+    const adj=(a,b)=>{
+      const dr=Math.abs(a.r-b.r), dc=Math.abs(a.c-b.c);
+      if(dc===0){ if(dr===1) return true; if(dr===2) return !solid[((a.r+b.r)/2)+'_'+a.c]; return false; }
+      if(dr===0&&(dc===1||(dc===2&&!solid[a.r+'_'+((a.c+b.c)/2)]))){
+        const emptyAbove=!solid[(a.r-1)+'_'+a.c]&&!solid[(b.r-1)+'_'+b.c];
+        const emptyBelow=!solid[(a.r+1)+'_'+a.c]&&!solid[(b.r+1)+'_'+b.c];
+        return emptyAbove||emptyBelow;
+      }
+      return false;
+    };
+    const comp=pos.map(()=>-1); let n=0;
+    for(let i=0;i<pos.length;i++){
+      if(comp[i]>=0) continue;
+      comp[i]=n; const q=[i];
+      while(q.length){ const cur=q.pop(); for(let j=0;j<pos.length;j++){ if(comp[j]<0&&adj(pos[cur],pos[j])){ comp[j]=n; q.push(j); } } }
+      n++;
+    }
+    return n;
+  }
   toggleBooth(id, disabled){
     if(disabled || this.state.taken[id]) { this.flash(this.L('⚠ 이미 신청된 부스입니다','⚠ This booth is already taken')); return; }
     const has=this.state.selected.includes(id);
     const next=has?this.state.selected.filter(x=>x!==id):[...this.state.selected,id];
-    if(next.length>1 && !this.connectedOK(next)){
-      this.flash(has
-        ?this.L('중간 부스를 빼면 선택이 나뉩니다 · 부스는 서로 이어진 형태로만 신청할 수 있습니다','Removing a middle booth splits your selection — booths must stay connected')
-        :this.L('⚠ 먼저 선택하신 부스와 연결할 수 없는 위치입니다','⚠ This booth cannot be combined with your current selection'));
-      return;
+    if(next.length>1){
+      const g=this.groupCount(next);
+      if(g>1) this.flash(this.L('현재 '+g+'개 구역으로 나뉜 선택입니다 (예: 4개+2개) · 떨어진 위치도 한 신청에 담을 수 있습니다','Selection spans '+g+' separate areas — split placements are allowed in one application'));
     }
     this.setState({ selected:next });
   }
@@ -1000,7 +1022,7 @@ class Component extends DCLogic {
       openPicker:()=>{ this._pickSnap=[...this.state.selected]; this.setState({pickerModal:true}); },
       clearSel:()=>this.setState({selected:[]}),
       picker_title:L('부스 위치 선택','Select Booth Location'),
-      picker_desc:L('원하는 부스를 클릭해 선택한 뒤 저장을 누르세요. 회색은 이미 신청된 부스입니다. 2개 이상 선택은 같은 열로 이어진 부스만 가능하며(통로 건너 포함), 같은 행은 앞이나 뒤가 통로로 트인 위치에서만 가능합니다.','Click booths to select, then save. Grey booths are taken. Multiple booths must run along the same column (across an aisle is fine); side-by-side booths in a row are only possible where the row opens onto an aisle.'),
+      picker_desc:L('원하는 부스를 클릭해 선택한 뒤 저장을 누르세요. 회색은 이미 신청된 부스입니다. 서로 떨어진 위치도 함께 선택할 수 있습니다 (예: 4개+2개 분리 배치).','Click booths to select, then save. Grey booths are taken. You may combine separate locations in one application (e.g. 4 + 2 split placement).'),
       picker_save:L('저장하고 닫기','Save & close'),
       picker_save_n:L('선택 저장하고 닫기','Save selection & close')+(c.count?' ('+c.count+')':''),
       picker_cancel:L('취소','Cancel'),

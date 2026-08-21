@@ -1033,7 +1033,13 @@
       </div>
       </sc-if>
       <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
-        <div style="margin-top:20px;padding:16px 18px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:12px;">
+        <sc-if value="{{ showApplyCta }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:20px;padding:16px 18px;background:#EAF2FC;border:1px solid #c9ddf2;border-radius:12px;">
+            <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;line-height:1.65;margin-bottom:12px;">{{ applyCtaMsg }}</div>
+            <button onClick="{{ applyCtaGo }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ applyCtaBtn }}</button>
+          </div>
+        </sc-if>
+        <div style="margin-top:14px;padding:16px 18px;background:#F4F8F6;border:1px solid #e2ece7;border-radius:12px;">
           <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;line-height:1.6;margin-bottom:12px;">{{ myAccountLine }}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button onClick="{{ toggleProfileEdit }}" style="flex:1 1 120px;background:#0B5FA5;color:#fff;border:none;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.lg_edit }}</button>
@@ -1537,6 +1543,26 @@ class Component extends DCLogic {
       ebStripText:L(eb.label+' 접수중 · 부스비 '+rate+'% 할인'+(end?' (~'+end+')':''), (eb.labelEn||eb.label)+' now open · '+rate+'% off booth fees'+(end?' (until '+end+')':'')),
       ebStripOpen:true };
   }
+  applyCta(){
+    const L=(ko,en)=>this.L(ko,en);
+    const me=this.state.me;
+    if(!me||this.state.authMode==='setpw') return {on:false,msg:'',btn:'',go:()=>{}};
+    const C=window.BIMTC_CONFIG||{};
+    const ebOn=Object.values(C.earlyBirdOverride||{}).indexOf('on')>=0;
+    const boothOpen=(C.apply&&C.apply.booth&&C.apply.booth.open)||ebOn;
+    if(me.type==='exhibitor') return { on:true,
+      msg: boothOpen? L('아직 부스 신청 내역이 없습니다. 지금 바로 원하는 위치를 선택해 신청하세요 — 1차 얼리버드 20% 할인이 적용됩니다.','No booth application yet. Pick your booth now — the 1st early-bird 20% discount applies.')
+        : L('부스 신청은 8월 21일(금) 15:00에 오픈됩니다. 오픈 후 이곳 또는 상단 배너의 버튼으로 신청하실 수 있으며, 1차 얼리버드 20% 할인이 적용됩니다.','Booth applications open Aug 21 (Fri) 15:00. You can apply from here or the top banner, with the 1st early-bird 20% discount.'),
+      btn: boothOpen? L('부스 신청하기','Apply for a Booth') : L('부스 신청 안내 보기','See Booth Application Guide'),
+      go: boothOpen? ()=>{ if(typeof window!=='undefined') window.location.href='booth.html'; } : ()=>this.go('exhibit') };
+    if(me.type==='buyer') return { on:true,
+      msg:L('바이어 회원 가입이 완료되었습니다. 비즈매칭(참가기업과의 1:1 미팅) 신청은 2차 얼리버드 마감(10/31) 이후 오픈 예정이며, 오픈 시 이메일과 공지로 안내드립니다.','Your buyer account is ready. Business-matching applications open after Oct 31 — we will notify you by email and notice.'),
+      btn:L('행사 안내 보기','See Event Guide'), go:()=>this.go('about') };
+    if(me.type==='visitor') return { on:true,
+      msg:L('참관객 사전등록을 하시면 현장에서 대기 없이 바로 입장하실 수 있습니다.','Pre-register to skip the line and enter directly on site.'),
+      btn:L('사전등록 하러 가기','Go to Pre-registration'), go:()=>this.go('visit') };
+    return {on:false,msg:'',btn:'',go:()=>{}};
+  }
   searchVals(){
     const L=(ko,en)=>this.L(ko,en);
     const q=(this.state.searchQ||'').trim().toLowerCase();
@@ -2025,6 +2051,7 @@ class Component extends DCLogic {
       // login / auth
       loginRoles,
       loggedIn: !!this.state.me && this.state.authMode!=='setpw',
+      showApplyCta:this.applyCta().on, applyCtaMsg:this.applyCta().msg, applyCtaBtn:this.applyCta().btn, applyCtaGo:this.applyCta().go,
       showAuthForm: !this.state.me || this.state.authMode==='setpw',
       navLoginLabel: this.state.me ? L('내 정보','My Account') : L('로그인','Login'),
       myAccountLine: this.state.me ? (L('현재 로그인: ','Signed in: ')+(this.state.me.email||'')+' · '+(this.state.me.is_admin?L('관리자','Admin'):this.typeName(this.state.me.type))) : '',
