@@ -689,7 +689,7 @@
                   </sc-for>
                 </div>
               </div>
-              <label style="display:flex;gap:9px;align-items:flex-start;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7388;line-height:1.5;margin-top:4px;cursor:pointer;"><span style="width:18px;height:18px;flex-shrink:0;border:1.5px solid #b7c4d3;border-radius:5px;margin-top:1px;"></span>{{ t.vf_agree }}</label>
+              <label onClick="{{ toggleViAgree }}" style="display:flex;gap:9px;align-items:flex-start;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7388;line-height:1.5;margin-top:4px;cursor:pointer;"><span style="{{ viAgreeBoxStyle }}"><sc-if value="{{ viAgree }}" hint-placeholder-val="{{ false }}"><span style="color:#fff;font-size:11px;font-weight:800;line-height:1;">✓</span></sc-if></span>{{ t.vf_agree }}</label>
               <button onClick="{{ submitVisitor }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:15px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;margin-top:6px;">{{ t.vf_submit }}</button>
             </div>
           </sc-if>
@@ -1432,11 +1432,12 @@ class Component extends DCLogic {
   async submitVisitor(){
     const s=this.state;
     if(!s.vName || !s.vEmail){ this.flash('이름과 이메일을 입력해 주세요'); return; }
+    if(!s.viAgree){ this.flash(this.L('개인정보 수집·이용 동의에 체크해 주세요','Please agree to the privacy terms')); return; }
     this.flash('등록 중…');
     try{
       const res = await window.BimtcDB.addVisitor({ name:s.vName, phone:s.vPhone, email:s.vEmail, org:s.vOrg, interests:s.vInterests, day:s.vDay });
       if(!res.ok){ this.flash('등록 실패: '+res.error); return; }
-      this.setState({ visitorDone:true, vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both' });
+      this.setState({ visitorDone:true, vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both', viAgree:false });
       this.flash('사전등록이 완료되었습니다'); if(typeof window!=='undefined') window.scrollTo(0,0);
     }catch(e){ this.flash('오류: '+e.message); }
   }
@@ -2008,6 +2009,9 @@ class Component extends DCLogic {
       vName:this.state.vName, vPhone:this.state.vPhone, vEmail:this.state.vEmail, vOrg:this.state.vOrg,
       setVName:this.set('vName'), setVPhone:this.set('vPhone'), setVEmail:this.set('vEmail'), setVOrg:this.set('vOrg'),
       submitVisitor:()=>this.submitVisitor(),
+      viAgree:!!this.state.viAgree,
+      toggleViAgree:()=>this.setState({ viAgree:!this.state.viAgree }),
+      viAgreeBoxStyle:'width:18px;height:18px;flex-shrink:0;border-radius:5px;margin-top:1px;display:flex;align-items:center;justify-content:center;'+(this.state.viAgree?'background:#11A37B;border:1.5px solid #11A37B;':'border:1.5px solid #b7c4d3;background:#fff;'),
       resetVisitor:()=>this.setState({visitorDone:false}),
       visitBenefits: [
         { n:'1', t:L('현장 대기 없이 빠른 입장','Fast entry, no waiting'), d:L('사전등록 QR로 현장 등록 절차를 건너뜁니다.','Skip on-site registration with your QR code.') },
