@@ -432,6 +432,9 @@
       </div>
       </sc-if>
 
+      <sc-if value="{{ draftWarnOn }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FDF0ED;border:1.5px solid #f0c8c2;border-radius:11px;padding:12px 16px;margin-bottom:12px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#c0392b;line-height:1.6;">{{ draftWarnMsg }}</div>
+      </sc-if>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;">
         <button onClick="{{ prevStep }}" style="{{ prevBtnStyle }}">← {{ prevLabel }}</button>
         <button onClick="{{ saveDraft }}" style="background:#fff;color:#0d6b4f;border:1px solid #bcd9cc;padding:12px 20px;border-radius:11px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ draftLabel }}</button>
@@ -614,14 +617,14 @@ class Component extends DCLogic {
   DRAFT_KEYS=['participation','retQuery','retCompany','boothType','selected','addons','famTour','company','companyEn','ceo','ceoEn','addr','tel','fax','homepage','bizno','bizType','bizItem','items','dept','contact','email','phone','step','logoUrl','logoName'];
   saveDraft(){
     const d={}; this.DRAFT_KEYS.forEach(k=>d[k]=this.state[k]);
-    try{ localStorage.setItem('bimtc_booth_draft', JSON.stringify({v:1, ts:Date.now(), data:d})); this.flash(this.state.lang==='en'?'Draft saved — reopen this page to continue':'임시저장되었습니다 · 이 브라우저에서 다시 열면 이어서 작성됩니다'); }
+    try{ localStorage.setItem('bimtc_booth_draft', JSON.stringify({v:1, ts:Date.now(), data:d})); this.setState({draftOnly:true}); this.flash(this.state.lang==='en'?'⚠ Draft saved — NOT submitted yet. Press "Submit Application" at STEP 4 to complete.':'⚠ 임시저장만 된 상태입니다 · 아직 접수 전! STEP 4에서 [부스 신청 제출]을 눌러야 신청이 완료됩니다'); }
     catch(e){ this.flash(this.state.lang==='en'?'Draft save failed':'임시저장에 실패했습니다'); }
   }
   loadDraft(){
     try{
       const raw=localStorage.getItem('bimtc_booth_draft'); if(!raw) return;
       const d=JSON.parse(raw);
-      if(d&&d.data){ this.setState(d.data); this.flash(this.state.lang==='en'?'Draft restored':'임시저장본을 불러왔습니다 · 이어서 작성하세요'); }
+      if(d&&d.data){ this.setState(Object.assign({},d.data,{draftOnly:true})); this.flash(this.state.lang==='en'?'Draft restored — not submitted yet':'임시저장본을 불러왔습니다 · 아직 접수 전이니 STEP 4에서 제출을 완료해 주세요'); }
     }catch(e){}
   }
   profileMap(){
@@ -1041,6 +1044,8 @@ class Component extends DCLogic {
       nextBtnStyle:navBtn+"background:#16294F;color:#fff;border:none;visibility:"+(step<4?'visible':'hidden')+";",
       prevLabel:step>1?stepNames[step-2]:'', nextLabel:step<4?stepNames[step]:'',
       saveDraft:()=>this.saveDraft(), draftLabel:L('임시저장','Save draft'),
+      draftWarnOn:!!this.state.draftOnly&&!this.state.done,
+      draftWarnMsg:L('⚠ 임시저장은 접수가 아닙니다 — STEP 4 견적 확인 화면 맨 아래 [부스 신청 제출] 버튼을 눌러야 신청이 완료됩니다.','⚠ A draft is NOT a submission — press [Submit Application] at the bottom of STEP 4 to complete your application.'),
       notAllOk:!allOk,
       incompleteMsg:L('아직 완료되지 않은 단계가 있습니다: ','Incomplete steps: ')+stepOk.slice(0,3).map((ok,i)=>ok?null:('STEP '+(i+1)+' '+stepNames[i])).filter(Boolean).join(' · ')+L(' — 모든 단계를 완료해야 제출할 수 있습니다.',' — complete all steps to submit.'),
       submitBtnStyle:"flex:1 1 220px;padding:14px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;border:none;"+(allOk?"background:#0B5FA5;color:#fff;cursor:pointer;":"background:#c9d4e0;color:#f4f7fa;cursor:not-allowed;"),
