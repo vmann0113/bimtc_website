@@ -144,7 +144,10 @@
                 <span style="{{ a.badgeStyle }}">{{ a.statusLabel }}</span>
               </div>
               <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5E7289;line-height:1.7;">{{ a.detail }}</div>
-              <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;margin-top:5px;">{{ a.date }}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:5px;">
+                <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;">{{ a.date }}</span>
+                <sc-if value="{{ a.canEdit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.edit }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ a.editLabel }}</button></sc-if>
+              </div>
             </div>
           </sc-for>
         </div>
@@ -775,6 +778,7 @@ class Component extends DCLogic {
     if((this.state.selected||[]).length){
       try{
         const fresh=await window.BimtcDB.takenBooths();
+        (this.state.editOrigIds||[]).forEach(id=>{ delete fresh[id]; }); // 수정 시 본인 기존 부스는 충돌 아님
         const conf=this.state.selected.filter(id=>fresh[id]);
         if(conf.length){ this.boothConflict(conf, fresh); return; }
         this.setState({taken:fresh});
@@ -782,7 +786,7 @@ class Component extends DCLogic {
     }
     const c=this.calc();
     const no=this.state.invoiceNo||this.genNo();
-    const res=await window.BimtcDB.addBoothApplication({
+    const payload={
       company:this.state.company, contact:this.state.contact, email:this.state.email, phone:this.state.phone,
       booth_type:this.state.boothType, booth_ids:this.state.selected, addons:this.state.addons,
       subtotal:c.subtotal, vat:c.vat, total:c.total,
@@ -792,16 +796,35 @@ class Component extends DCLogic {
       applicant:{ companyEn:this.state.companyEn, ceo:this.state.ceo, ceoEn:this.state.ceoEn, addr:this.state.addr,
         tel:this.state.tel, fax:this.state.fax, homepage:this.state.homepage, dept:this.state.dept,
         items:this.state.items, bizno:this.state.bizno, bizType:this.state.bizType, bizItem:this.state.bizItem }
-    });
+    };
+    const res=this.state.editAppId
+      ? await window.BimtcDB.updateBoothApplication(this.state.editAppId, payload)
+      : await window.BimtcDB.addBoothApplication(payload);
     this.setState({submitting:false});
     if(!res.ok){
       const m=String(res.error||'').match(/BOOTH_TAKEN:([A-Za-z0-9,\- ]+)/); // 서버측 차단 (동시 신청 충돌 예방 2차)
       if(m){ const conf=m[1].split(',').map(s=>s.trim()); let fresh=this.state.taken; try{ fresh=await window.BimtcDB.takenBooths(); }catch(e){} this.boothConflict(conf, fresh); return; }
       this.flash(this.L('신청 실패: ','Submission failed: ')+res.error); return;
     }
-    this.setState({ done:true, invoiceNo:no });
+    const wasEdit=!!this.state.editAppId;
+    this.setState({ done:true, invoiceNo:no, editAppId:null, editOrigIds:null });
     try{ localStorage.removeItem('bimtc_booth_draft'); }catch(e){}
-    this.flash(this.L('부스 신청이 접수되었습니다','Your booth application has been received'));
+    this.flash(wasEdit?this.L('신청 내용이 수정되었습니다','Your application has been updated'):this.L('부스 신청이 접수되었습니다','Your booth application has been received'));
+  }
+
+  startEditApp(a){
+    const ap=a.applicant||{};
+    const taken=Object.assign({},this.state.taken);
+    (a.booth_ids||[]).forEach(id=>{ delete taken[id]; });
+    this.setState({ editAppId:a.id, editOrigIds:(a.booth_ids||[]).slice(), gate:'open', step:1, done:false, myAppsOpen:false,
+      participation:a.returning_company?'returning':'new', retCompany:a.returning_company||'', retQuery:a.returning_company||'',
+      boothType:a.booth_type||'package', selected:(a.booth_ids||[]).slice(), addons:a.addons||{},
+      famTour:a.fam_tour===true?true:(a.fam_tour===false?false:null),
+      company:a.company||'', contact:a.contact||'', email:a.email||'', phone:a.phone||'',
+      companyEn:ap.companyEn||'', ceo:ap.ceo||'', ceoEn:ap.ceoEn||'', addr:ap.addr||'', tel:ap.tel||'', fax:ap.fax||'',
+      homepage:ap.homepage||'', dept:ap.dept||'', items:ap.items||'', bizno:ap.bizno||'', bizType:ap.bizType||'', bizItem:ap.bizItem||'',
+      logoUrl:a.logo_url||'', logoName:a.logo_name||'', taken, formError:'' });
+    this.flash(this.L('신청 내용을 불러왔습니다 · 수정 후 STEP 4에서 [수정 내용 제출]을 눌러 주세요','Loaded — edit and press Submit Changes at STEP 4'));
   }
 
   boothConflict(conflictIds, freshTaken){
@@ -1096,7 +1119,7 @@ class Component extends DCLogic {
       closeMyApps: ()=>this.setState({myAppsOpen:false}),
       myAppsEmpty: Array.isArray(this.state.myApps)&&this.state.myApps.length===0,
       myAppsEmptyMsg:L('접수된 부스 신청이 없습니다. 신청서를 제출하면 이곳에서 승인 상태를 확인할 수 있습니다.','No applications yet. Submit an application to track its status here.'),
-      myAppsNote:L('※ 승인은 사무국 검토 후 처리되며, 변경·취소는 사무국(T. 051-461-4276~8)으로 연락해 주세요.','* Approval follows secretariat review. For changes or cancellation, contact the secretariat (051-461-4276~8).'),
+      myAppsNote:L('※ 입금 확인 전까지는 직접 수정할 수 있습니다 (승인 상태 유지). 수정으로 금액이 변경되면 변경된 금액 기준으로 입금해 주세요. 입금 후 변경·취소는 사무국(T. 051-461-4276~8)으로 연락해 주세요.','* Editable until payment is confirmed (approval is kept). If the total changes, pay the updated amount. After payment, contact the secretariat for cancellation, contact the secretariat (051-461-4276~8).'),
       myAppRows:(this.state.myApps||[]).map(a=>{
         const st=a.status||'pending';
         const SL={pending:[L('접수·검토중','Under review'),'#FBF6E9','#b78a3c'],submitted:[L('접수·검토중','Under review'),'#FBF6E9','#b78a3c'],approved:[L('승인 완료 · 입금 대기','Approved · payment due'),'#EAF2FC','#0B5FA5'],rejected:[L('반려됨','Rejected'),'#fdecea','#c0392b'],cancelled:[L('취소됨','Cancelled'),'#fdecea','#c0392b']};
@@ -1105,7 +1128,9 @@ class Component extends DCLogic {
         return { title:(a.booth_type==='space'?L('독립부스','Space Only'):L('조립부스','Package Booth'))+((a.booth_ids||[]).length?' · '+(a.booth_ids||[]).join(', '):''),
           statusLabel:s[0], badgeStyle:'font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:'+s[1]+';color:'+s[2]+';',
           detail:L('합계 ','Total ')+this.won(a.total||0)+(a.fam_tour?(' · '+L('팸투어 참가','Fam tour')):''),
-          date:d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate() };
+          date:d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate(),
+          canEdit:(st==='submitted'||st==='pending'||st==='approved')&&!a.paid, editLabel:L('신청 내용 수정하기','Edit application'),
+          edit:()=>this.startEditApp(a) };
       }),
       hallLabel:L('BEXCO 제1전시장 3A홀','BEXCO Exhibition Hall 1 · Hall 3A'),
       cellScaleLabel:L('1칸 = 3m × 3m','1 cell = 3m × 3m'),
@@ -1148,7 +1173,7 @@ class Component extends DCLogic {
       profileLoadLabel:L('회원가입 정보 불러오기','Load my sign-up info'),
       profileLoadDesc:L('항목이 자동 입력됩니다. 나머지 항목은 추가로 기입해 주세요.','will be filled automatically. Please complete the remaining fields.'),
       submit:()=>this.submit(), downloadInvoice:()=>this.downloadInvoice(),
-      submitLabel:this.state.submitting?L('접수 중…','Submitting…'):L('부스 신청 제출','Submit Application'),
+      submitLabel:this.state.submitting?L('접수 중…','Submitting…'):(this.state.editAppId?L('수정 내용 제출','Submit Changes'):L('부스 신청 제출','Submit Application')),
       invoiceNo:this.state.invoiceNo||L('(제출 후 발급)','(issued after submission)'),
       today:d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate(),
       boothIdsLabel:this.state.selected.length?this.state.selected.join(', '):'-',

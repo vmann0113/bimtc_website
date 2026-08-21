@@ -115,6 +115,21 @@
       }).select().single();
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
+    async updateBoothApplication(id, a) {
+      var sb = await ready();
+      var r = await sb.from('booth_applications').update({
+        company: a.company, contact: a.contact, email: a.email, phone: a.phone,
+        booth_type: a.booth_type, booth_ids: a.booth_ids || [], addons: a.addons || {},
+        subtotal: a.subtotal, vat: a.vat, total: a.total,
+        fam_tour: !!a.fam_tour, returning_company: a.returning_company || null,
+        discount: a.discount || 0, early_bird: a.early_bird || null,
+        logo_url: a.logo_url || null, logo_name: a.logo_name || null,
+        applicant: a.applicant || {}
+      }).eq('id', id).select();
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '수정할 수 없는 상태입니다 (입금완료·반려된 신청은 사무국으로 연락해 주세요)' };
+      return { ok: true, row: r.data[0] };
+    },
     async isAdmin() { var u = await this.currentUser(); return !!(u && u.is_admin); },
     async listMembers() {
       var sb = await ready();
