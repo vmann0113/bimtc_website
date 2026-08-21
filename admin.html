@@ -714,7 +714,7 @@ class Component extends DCLogic {
     rows.push({k:'팸투어', v:b.fam_tour?'신청':'미신청'});
     if(b.returning_company) rows.push({k:'재참가(작년)', v:b.returning_company});
     if(b.early_bird) rows.push({k:'얼리버드', v:b.early_bird==='phase1'?'1차 (20%)':'2차 (10%)'});
-    if(b.discount) rows.push({k:'할인율', v:Math.round((b.discount||0)*100)+'%'});
+    if(b.discount) rows.push({k:'할인 금액', v:'− '+won(b.discount)+(b.returning_company?' (재참가 10% 포함)':'')});
     rows.push({k:'공급가', v:won(b.subtotal)});
     rows.push({k:'부가세', v:won(b.vat)});
     rows.push({k:'합계', v:won(b.total)});
