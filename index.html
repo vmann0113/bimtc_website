@@ -789,7 +789,7 @@
                 <div style="{{ f.style }}">{{ f.label }}</div>
               </sc-for>
               <sc-for list="{{ floorCells }}" as="b" hint-placeholder-count="40">
-                <div onClick="{{ b.onClick }}" style="{{ b.style }}"></div>
+                <div onClick="{{ b.onClick }}" title="{{ b.title }}" style="{{ b.style }}">{{ b.num }}</div>
               </sc-for>
               <sc-for list="{{ floorDoors }}" as="d" hint-placeholder-count="2">
                 <div style="{{ d.style }}"><span style="{{ d.gapStyle }}"></span><span style="{{ d.labelStyle }}">{{ d.label }}</span><span style="{{ d.arrowStyle }}">↑</span></div>
@@ -798,6 +798,10 @@
             <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;">
               <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ t.floor_scale }}</span>
               <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ t.floor_click_hint }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:6px;">
+              <span style="width:14px;height:14px;border-radius:4px;background:#33475c;border:1px solid #fff;box-shadow:0 0 0 1px #d8e0ea;flex-shrink:0;"></span>
+              <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#5E7289;font-weight:600;">{{ floorTakenLegend }}</span>
             </div>
           </div>
           <div style="flex:1;min-width:min(300px,100%);display:flex;flex-direction:column;gap:10px;position:sticky;top:90px;">
@@ -1374,6 +1378,7 @@ class Component extends DCLogic {
     (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState({ me:u, isAdmin:!!u.is_admin, loginRole:(u.type||'exhibitor') }); }catch(e){} })();
     (async()=>{ try{ const ns=await window.BimtcDB.publishedNotices(); if(ns&&ns.length) this.setState({ dbNotices:ns }); }catch(e){} })();
     (async()=>{ try{ const xs=await window.BimtcDB.listPublicExhibitors(); if(xs&&xs.length) this.setState({ pubExhibitors:xs }); }catch(e){} })();
+    (async()=>{ try{ const tk=await window.BimtcDB.takenBooths(); if(tk) this.setState({ takenMap:tk }); }catch(e){} })();
   }
   componentWillUnmount(){ if(this._tick) clearInterval(this._tick); if(this._rz&&typeof window!=='undefined') window.removeEventListener('resize',this._rz); }
   initMaps(){
@@ -1601,12 +1606,20 @@ class Component extends DCLogic {
     const ZPRE={ z1:'M', z2:'W', z3:'G', z4:'P', z5:'S' };
     const openKey=this.state.floorZoneOpen;
     const openZone=(k)=>this.setState({ floorZoneOpen: openKey===k?null:k });
-    const floorCells=entries.filter(e=>e.cell.t==='sell').map(e=>{
+    const taken=this.state.takenMap||{};
+    const sells=entries.filter(e=>e.cell.t==='sell').sort((a,b)=>(a.c-b.c)||(b.r-a.r));
+    const zcnt={};
+    const floorCells=sells.map(e=>{
+      const pre=ZPRE[e.cell.z]||'B'; zcnt[pre]=(zcnt[pre]||0)+1;
+      const bid=pre+'-'+String(zcnt[pre]).padStart(2,'0');
+      const isTaken=!!taken[bid];
       const zc=(zmap[e.cell.z]&&zmap[e.cell.z].color)||'#cdd8e4';
       const xoff=e.cell.z==='z5'?0.5:0;
       const zk=e.cell.z;
-      return { onClick:()=>openZone(zk),
-        style:"position:absolute;left:"+((e.c+xoff)*cw)+"%;top:"+(e.r*rh)+"%;width:"+cw+"%;height:"+rh+"%;box-sizing:border-box;border-radius:3px;border:1px solid rgba(255,255,255,0.8);background:"+zc+(zk==='z5'?';opacity:0.55':'')+";cursor:pointer;" };
+      return { onClick:()=>openZone(zk), title:bid+(isTaken?' · '+L('신청 완료','Taken'):''), num:String(zcnt[pre]),
+        style:"position:absolute;left:"+((e.c+xoff)*cw)+"%;top:"+(e.r*rh)+"%;width:"+cw+"%;height:"+rh+"%;box-sizing:border-box;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:'Pretendard',sans-serif;"+(isTaken
+          ?"border:1px solid #fff;background:#33475c;color:#fff;cursor:pointer;"
+          :"border:1px solid rgba(255,255,255,0.8);background:"+zc+(zk==='z5'?';opacity:0.55':'')+";color:rgba(255,255,255,0.85);cursor:pointer;") };
     });
     const floorFixtures=Object.keys(fixBox).map(t=>{ const b=fixBox[t];
       return { label:(FIXLABEL[t]===undefined?t:FIXLABEL[t]),
@@ -1624,7 +1637,7 @@ class Component extends DCLogic {
       z5:L('독립부스 전용 구역','Space-only booth area'),
     };
     const exh=this.state.pubExhibitors||[];
-    const compsFor=(pre)=>{ const set=new Set(); exh.forEach(a=>{ (a.booth_ids||[]).forEach(id=>{ if(String(id).indexOf(pre+'-')===0) set.add(a.company); }); }); return [...set]; };
+    const compsFor=(pre)=>{ const m={}; exh.forEach(a=>{ const ids=(a.booth_ids||[]).filter(id=>String(id).indexOf(pre+'-')===0); if(ids.length){ const k=a.company||''; (m[k]=m[k]||[]).push(...ids); } }); return Object.keys(m).map(k=>{ const ids=m[k].sort(); return ids.join(', ')+' · '+k; }); };
     const floorZones=Lay.zones.map(z=>{
       const pre=ZPRE[z.key]||'';
       const comps=pre?compsFor(pre):[];
@@ -1640,6 +1653,7 @@ class Component extends DCLogic {
       countLabel:'', open:false, hasCompanies:false, noCompanies:false, companies:[], arrowDeg:0, onClick:()=>{},
       cardStyle:"background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 17px;" });
     return { floorCells, floorFixtures, floorDoors, floorZones,
+      floorTakenLegend:L('진한 색 = 신청 완료 부스 (번호에 마우스를 올리면 부스 번호 확인)','Dark = taken booths (hover for booth number)'),
       floorBoxStyle:"position:relative;width:100%;aspect-ratio:"+Lay.cols+" / "+Lay.rows+";background:#fff;border:2px solid #b7c4d4;border-radius:8px;" };
   }
   renderVals(){
