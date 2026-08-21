@@ -334,11 +334,11 @@
           </div>
         </div>
         <div style="border:1px solid #e2ece7;border-radius:18px;overflow:hidden;">
-          <div style="aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#EAF2FB,#EAF2FB 13px,#dfeaf6 13px,#dfeaf6 26px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#6885a3;font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);"><span style="background:#0B5FA5;color:#fff;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;padding:5px 14px;border-radius:999px;">{{ t.floor_soon }}</span></div>
+          <div onClick="{{ goFloor }}" style="aspect-ratio:16/9;overflow:hidden;position:relative;cursor:pointer;"><img src="uploads/expo_hall.jpg" alt="BEXCO 전시장" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1);display:block;" /><span style="position:absolute;left:14px;top:14px;background:#0B5FA5;color:#fff;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;padding:5px 14px;border-radius:999px;">{{ t.floorOpenBadge }}</span></div>
           <div style="padding:26px clamp(17px,4vw,28px);">
             <h3 style="font-size:19px;font-weight:800;margin:0 0 10px;color:#0A2236;">{{ t.floor_title }}</h3>
-            <p style="font-size:14.5px;line-height:1.6;color:#52677d;margin:0 0 20px;">{{ t.floor_soon_desc }}</p>
-            <button disabled style="background:#e6ebf2;color:#9aa9bd;border:none;padding:13px clamp(14px,4vw,22px);border-radius:10px;font-size:14.5px;font-weight:700;font-family:'Pretendard',sans-serif;cursor:not-allowed;">{{ t.floor_soon }}</button>
+            <p style="font-size:14.5px;line-height:1.6;color:#52677d;margin:0 0 20px;">{{ t.floor_desc }}</p>
+            <button onClick="{{ goFloor }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px clamp(14px,4vw,22px);border-radius:10px;font-size:14.5px;font-weight:700;font-family:'Pretendard',sans-serif;cursor:pointer;">{{ t.floorViewCta }}</button>
           </div>
         </div>
       </div>
@@ -1742,6 +1742,7 @@ class Component extends DCLogic {
       floor_scale:L('1칸 = 3m × 3m (1부스) · BEXCO 제1전시장 3A홀','1 cell = 3m × 3m (1 booth) · BEXCO Hall 3A'),
       floor_click_hint:L('존을 클릭하면 참가기업을 확인할 수 있습니다','Click a zone to see its exhibitors'),
       floor_soon:L('참가기업 확정 후 공개됩니다.','Exhibitors will be listed once confirmed.'),
+      floorOpenBadge:L('배치도 공개','Floor map open'), floorViewCta:L('부스 배치도 보기 →','View floor map →'),
       floor_apply_cta:L('부스 신청하기 →','Apply for a booth →'),
       exb_prog_note:L('※ 프로그램은 사정에 따라 변경될 수 있습니다. 본 시간표는 예시가 포함된 기본계획입니다.','* The program is subject to change. This schedule is a draft plan including sample items.'),
       co_bc:L('HOME / 커뮤니티','HOME / Community'), co_title:L('커뮤니티','Community'), co_empty:L('등록된 게시물이 없습니다.','No posts yet.'),
