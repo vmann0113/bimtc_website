@@ -929,7 +929,7 @@ class Component extends DCLogic {
       style:"cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;"+(mTab===k?'background:#0B5FA5;color:#fff;':'background:#fff;border:1px solid #d8e0ea;color:#5e7289;') }));
     const mColor={ exhibitor:['#E7F6F0','#0d8f6b','참가기업'], buyer:['#EAF2FC','#0B5FA5','바이어'], visitor:['#F3EEFB','#7a5cc4','방문객'] };
     const filtered=allMembers.filter(p=> mTab==='all' ? true : (p.type||'exhibitor')===mTab);
-    const grantedIds={}; (this.state.apps||[]).forEach(a=>{ if(a.profile_id&&a.status!=='rejected') grantedIds[a.profile_id]=true; });
+    const grantedIds={}; (this.state.booths||[]).forEach(a=>{ if(a.profile_id&&a.status!=='rejected') grantedIds[a.profile_id]=true; });
     const membersView=filtered.map(p=>{
       const c=mColor[p.type]||mColor.exhibitor;
       const isExh=(p.type||'exhibitor')==='exhibitor';
