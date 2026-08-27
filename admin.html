@@ -258,6 +258,7 @@
                   </div>
                 </sc-if>
                 <sc-if value="{{ b.isApproved }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;">승인됨</span></sc-if>
+                <sc-if value="{{ b.canUnapprove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ b.unapprove }}" style="background:#fff;color:#c0392b;border:1px solid #ecc8c2;padding:8px 12px;border-radius:8px;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인 취소</button></sc-if>
                 <sc-if value="{{ b.isRejected }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#97a4b6;background:#f1f4f8;padding:8px 14px;border-radius:8px;">반려됨</span></sc-if>
               </div>
               <span onClick="{{ b.toggleDetail }}" style="width:44px;flex-shrink:0;text-align:right;font-size:13px;font-weight:700;color:#0B5FA5;cursor:pointer;">{{ b.detailBtn }}</span>
@@ -283,6 +284,9 @@
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">이메일</label><input value="{{ bEditEmail }}" onInput="{{ setBEEmail }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부스 타입</label><select value="{{ bEditType }}" onChange="{{ setBEType }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;background:#fff;"><option value="package">조립부스</option><option value="space">독립부스</option></select></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부스 위치 (쉼표로 구분)</label><input value="{{ bEditIds }}" onInput="{{ setBEIds }}" placeholder="예: S-09, S-10, S-11, S-12" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">대표자</label><input value="{{ bEditCeo }}" onInput="{{ setBECeo }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">사업자등록번호</label><input value="{{ bEditBizno }}" onInput="{{ setBEBizno }}" placeholder="000-00-00000" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
+                    <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">주소</label><input value="{{ bEditAddr }}" onInput="{{ setBEAddr }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">얼리버드 할인</label><select value="{{ bEditEb }}" onChange="{{ setBEEb }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;background:#fff;"><option value="">없음</option><option value="phase1">1차 얼리버드 (20%)</option><option value="phase2">2차 얼리버드 (10%)</option></select></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">재참가 할인 (10%)</label><select value="{{ bEditRet }}" onChange="{{ setBERet }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;background:#fff;"><option value="n">미적용</option><option value="y">적용</option></select></div>
                     <div><label style="display:block;font-size:12px;font-weight:700;color:#8295ab;margin-bottom:5px;font-family:'Pretendard',sans-serif;">부가서비스 금액 (원 · 할인 미적용)</label><input value="{{ bEditAddon }}" onInput="{{ setBEAddon }}" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d8e0ea;border-radius:8px;font-size:13.5px;font-family:'Pretendard',sans-serif;outline:none;" /></div>
@@ -324,6 +328,7 @@
             <span style="width:130px;flex-shrink:0;">연락처</span>
             <span style="width:80px;flex-shrink:0;">국가</span>
             <span style="width:74px;flex-shrink:0;">가입일</span>
+            <span style="width:104px;flex-shrink:0;text-align:right;">비즈미팅</span>
           </div>
           <sc-for list="{{ membersView }}" as="m" hint-placeholder-count="6">
             <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
@@ -334,6 +339,10 @@
               <span style="width:130px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ m.phone }}</span>
               <span style="width:80px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.country }}</span>
               <span style="width:74px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ m.date }}</span>
+              <span style="width:104px;flex-shrink:0;text-align:right;">
+                <sc-if value="{{ m.canGrant }}" hint-placeholder-val="{{ false }}"><button onClick="{{ m.grant }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">매칭 권한 부여</button></sc-if>
+                <sc-if value="{{ m.hasMatch }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 10px;border-radius:999px;white-space:nowrap;">매칭 가능</span></sc-if>
+              </span>
             </div>
           </sc-for>
           </div>
@@ -686,6 +695,10 @@ class Component extends DCLogic {
   async confirmMatch(id){ await window.BimtcDB.setRequestStatus(id,'accepted'); await this.reload(); this.flash('매칭을 확정했습니다'); }
   async approveBooth(id){ await window.BimtcDB.setBoothStatus(id,'approved'); await this.reload(); this.flash('부스 신청을 승인했습니다'); }
   async rejectBooth(id){ await window.BimtcDB.setBoothStatus(id,'rejected'); await this.reload(); this.flash('부스 신청을 반려했습니다'); }
+  async unapproveBooth(b){
+    if(!confirm('"'+(b.company||'')+'" 승인을 취소(반려)할까요?\n부스 위치('+((b.booth_ids||[]).join(', ')||'-')+')가 즉시 해제되어 다른 업체가 신청할 수 있게 됩니다.')) return;
+    await window.BimtcDB.setBoothStatus(b.id,'rejected'); await this.reload(); this.flash('승인을 취소했습니다 · 부스 위치 해제됨');
+  }
   adminMap(){
     const CFG=window.BIMTC_CONFIG||{};
     const Lay=(this.state.layoutMap&&this.state.layoutMap.zones)?this.state.layoutMap:CFG.blueprintLayout;
@@ -730,12 +743,19 @@ class Component extends DCLogic {
       mapBoxStyle:'position:relative;width:100%;aspect-ratio:'+Lay.cols+' / '+Lay.rows+';background:#fff;border:1.5px solid #d8e0ea;border-radius:8px;',
       mapLegend:(modal.mode==='one'?legendOne:legendAll).map(x=>({l:x.l,sw:'display:inline-block;width:14px;height:14px;border-radius:4px;background:'+x.c+';border:1px solid #d8e0ea;'})) };
   }
+  async grantMatch(p){
+    if(!confirm('"'+(p.name||p.email)+'" 계정에 비즈미팅 권한을 부여할까요?\n(부스 위치 없는 공동참가 승인 건이 생성됩니다 · 0원)')) return;
+    const r=await window.BimtcDB.grantMatchRight(p);
+    if(!r.ok){ this.flash('부여 실패: '+r.error); return; }
+    await this.reload();
+    this.flash('비즈미팅 권한이 부여되었습니다 — 매칭 오픈 시 바로 이용 가능');
+  }
   setBE(field){ return (e)=>{ const o=Object.assign({},this.state.bEdit); o[field]=e.target.value; this.setState({bEdit:o}); }; }
   async saveAppEdit(){
     const e=this.state.bEdit; if(!e) return;
     const ids=(e.boothIds||'').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
     const num=(v)=>{ const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
-    const r=await window.BimtcDB.adminUpdateApplication(e.id,{ company:e.company, contact:e.contact, phone:e.phone, email:e.email, booth_type:e.boothType, booth_ids:ids, subtotal:num(e.subtotal), vat:num(e.vat), total:num(e.total), discount:num(e.discount), early_bird:e.ebKey||null, returning_company:e.retOn==='y'?(e.retName||'(재참가)'):null });
+    const r=await window.BimtcDB.adminUpdateApplication(e.id,{ company:e.company, contact:e.contact, phone:e.phone, email:e.email, booth_type:e.boothType, booth_ids:ids, subtotal:num(e.subtotal), vat:num(e.vat), total:num(e.total), discount:num(e.discount), early_bird:e.ebKey||null, returning_company:e.retOn==='y'?(e.retName||'(재참가)'):null, applicant:Object.assign({},e.applicant,{bizno:e.bizno,ceo:e.ceo,addr:e.addr}) });
     if(!r.ok){ const m=String(r.error||'').match(/BOOTH_TAKEN:([A-Za-z0-9,\- ]+)/); this.flash(m?('⚠ 이미 다른 업체가 신청한 부스: '+m[1]):('저장 실패: '+r.error)); return; }
     await this.reload(); this.setState({bEdit:null}); this.flash('신청 정보가 수정되었습니다');
   }
@@ -909,10 +929,15 @@ class Component extends DCLogic {
       style:"cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;"+(mTab===k?'background:#0B5FA5;color:#fff;':'background:#fff;border:1px solid #d8e0ea;color:#5e7289;') }));
     const mColor={ exhibitor:['#E7F6F0','#0d8f6b','참가기업'], buyer:['#EAF2FC','#0B5FA5','바이어'], visitor:['#F3EEFB','#7a5cc4','방문객'] };
     const filtered=allMembers.filter(p=> mTab==='all' ? true : (p.type||'exhibitor')===mTab);
+    const grantedIds={}; (this.state.apps||[]).forEach(a=>{ if(a.profile_id&&a.status!=='rejected') grantedIds[a.profile_id]=true; });
     const membersView=filtered.map(p=>{
       const c=mColor[p.type]||mColor.exhibitor;
+      const isExh=(p.type||'exhibitor')==='exhibitor';
+      const has=!!grantedIds[p.id];
       return { name:p.name||'-', dept:p.dept||'-', email:p.email||'-', phone:p.phone||'-', country:p.country||'-',
-        date:this.short(p.created_at), typeLabel:c[2], tagBg:c[0], tagColor:c[1] };
+        date:this.short(p.created_at), typeLabel:c[2], tagBg:c[0], tagColor:c[1],
+        canGrant:isExh&&!has, hasMatch:isExh&&has,
+        grant:()=>this.grantMatch(p) };
     });
     const exportMembers=()=>{
       const rows=[['유형','기관/기업명','소속','이메일','연락처','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,m.name,m.dept,m.email,m.phone,m.country,m.date]));
@@ -935,9 +960,10 @@ class Component extends DCLogic {
       toggleDetail:()=>this.setState({boothDetailId:this.state.boothDetailId===b.id?null:b.id}),
       detailRows:this.boothDetail(b),
       editing:!!(this.state.bEdit&&this.state.bEdit.id===b.id), notEditing:!(this.state.bEdit&&this.state.bEdit.id===b.id),
-      startEdit:()=>{ const CFG=window.BIMTC_CONFIG||{}; const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[b.booth_type])||0; const bc=unit*((b.booth_ids||[]).length); const addon=Math.max(0,(b.subtotal||0)-bc+(b.discount||0)); this.setState({boothDetailId:b.id, bEdit:{id:b.id, company:b.company||'', contact:b.contact||'', phone:b.phone||'', email:b.email||'', boothType:b.booth_type||'package', boothIds:(b.booth_ids||[]).join(', '), subtotal:String(b.subtotal||0), vat:String(b.vat||0), total:String(b.total||0), ebKey:b.early_bird||'', retOn:b.returning_company?'y':'n', retName:b.returning_company||'', addonAmt:String(addon), discount:String(b.discount||0)}}); },
+      startEdit:()=>{ const CFG=window.BIMTC_CONFIG||{}; const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[b.booth_type])||0; const bc=unit*((b.booth_ids||[]).length); const addon=Math.max(0,(b.subtotal||0)-bc+(b.discount||0)); this.setState({boothDetailId:b.id, bEdit:{id:b.id, company:b.company||'', contact:b.contact||'', phone:b.phone||'', email:b.email||'', boothType:b.booth_type||'package', boothIds:(b.booth_ids||[]).join(', '), subtotal:String(b.subtotal||0), vat:String(b.vat||0), total:String(b.total||0), ebKey:b.early_bird||'', retOn:b.returning_company?'y':'n', retName:b.returning_company||'', addonAmt:String(addon), discount:String(b.discount||0), bizno:(b.applicant&&b.applicant.bizno)||'', ceo:(b.applicant&&b.applicant.ceo)||'', addr:(b.applicant&&b.applicant.addr)||'', applicant:b.applicant||{}}}); },
       printInv:()=>this.printInvoice(b),
-      approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id) }));
+      approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id),
+      canUnapprove:b.status==='approved'&&!b.paid, unapprove:()=>this.unapproveBooth(b) }));
     const dlAllLogos=async()=>{
       const list=(this.state.booths||[]).filter(b=>b.logo_url&&b.status!=='rejected');
       if(!list.length){ this.flash('다운로드할 로고가 없습니다'); return; }
@@ -1009,6 +1035,9 @@ class Component extends DCLogic {
       bEditSub:(this.state.bEdit||{}).subtotal||'', setBESub:this.setBE('subtotal'),
       bEditVat:(this.state.bEdit||{}).vat||'', setBEVat:this.setBE('vat'),
       bEditTotal:(this.state.bEdit||{}).total||'', setBETotal:this.setBE('total'),
+      bEditBizno:(this.state.bEdit||{}).bizno||'', setBEBizno:this.setBE('bizno'),
+      bEditCeo:(this.state.bEdit||{}).ceo||'', setBECeo:this.setBE('ceo'),
+      bEditAddr:(this.state.bEdit||{}).addr||'', setBEAddr:this.setBE('addr'),
       bEditEb:(this.state.bEdit||{}).ebKey||'', setBEEb:this.setBE('ebKey'),
       bEditRet:(this.state.bEdit||{}).retOn||'n', setBERet:this.setBE('retOn'),
       bEditAddon:(this.state.bEdit||{}).addonAmt||'', setBEAddon:this.setBE('addonAmt'),

@@ -164,6 +164,16 @@
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
     async listBoothApplications() { var sb = await ready(); var r = await sb.from('booth_applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
+    async grantMatchRight(p) {
+      var sb = await ready();
+      var r = await sb.from('booth_applications').insert({
+        profile_id: p.id, company: p.name || '(공동 참가)', contact: '공동 참가 (부스 공유)',
+        email: p.email || '', phone: p.phone || '', booth_type: 'package', booth_ids: [],
+        subtotal: 0, vat: 0, total: 0, status: 'approved'
+      }).select();
+      if (r.error) return { ok: false, error: r.error.message };
+      return { ok: true };
+    },
     async adminUpdateApplication(id, fields) {
       var sb = await ready();
       var r = await sb.from('booth_applications').update(fields).eq('id', id).select();
