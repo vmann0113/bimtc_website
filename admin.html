@@ -144,7 +144,7 @@
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px;">
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;">
-            <div style="font-size:16px;font-weight:800;margin-bottom:18px;">최근 참가기업 신청</div>
+            <div style="font-size:16px;font-weight:800;margin-bottom:18px;">최근 부스 신청</div>
             <div style="display:flex;flex-direction:column;">
               <sc-for list="{{ recentApps }}" as="a" hint-placeholder-count="4">
                 <div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid #eef2f7;">
@@ -329,6 +329,7 @@
             <span style="width:80px;flex-shrink:0;">국가</span>
             <span style="width:74px;flex-shrink:0;">가입일</span>
             <span style="width:104px;flex-shrink:0;text-align:right;">비즈미팅</span>
+            <span style="width:48px;flex-shrink:0;text-align:right;">관리</span>
           </div>
           <sc-for list="{{ membersView }}" as="m" hint-placeholder-count="6">
             <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
@@ -343,6 +344,7 @@
                 <sc-if value="{{ m.canGrant }}" hint-placeholder-val="{{ false }}"><button onClick="{{ m.grant }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">매칭 권한 부여</button></sc-if>
                 <sc-if value="{{ m.hasMatch }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 10px;border-radius:999px;white-space:nowrap;">매칭 가능</span></sc-if>
               </span>
+              <span style="width:48px;flex-shrink:0;text-align:right;"><button onClick="{{ m.del }}" style="background:#fff;color:#c0392b;border:1px solid #ecc8c2;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button></span>
             </div>
           </sc-for>
           </div>
@@ -743,6 +745,14 @@ class Component extends DCLogic {
       mapBoxStyle:'position:relative;width:100%;aspect-ratio:'+Lay.cols+' / '+Lay.rows+';background:#fff;border:1.5px solid #d8e0ea;border-radius:8px;',
       mapLegend:(modal.mode==='one'?legendOne:legendAll).map(x=>({l:x.l,sw:'display:inline-block;width:14px;height:14px;border-radius:4px;background:'+x.c+';border:1px solid #d8e0ea;'})) };
   }
+  async deleteMember(p){
+    if(!confirm('"'+(p.name||p.email)+'" 회원을 삭제(탈퇴)할까요?\n계정과 함께 이 회원의 부스 신청·매칭·프로필이 모두 삭제되며 되돌릴 수 없습니다.')) return;
+    if(!confirm('정말 삭제합니다. 계속할까요?')) return;
+    const r=await window.BimtcDB.adminDeleteMember(p.id);
+    if(!r.ok){ this.flash('삭제 실패: '+r.error); return; }
+    await this.reload();
+    this.flash('회원이 삭제되었습니다');
+  }
   async grantMatch(p){
     if(!confirm('"'+(p.name||p.email)+'" 계정에 비즈미팅 권한을 부여할까요?\n(부스 위치 없는 공동참가 승인 건이 생성됩니다 · 0원)')) return;
     const r=await window.BimtcDB.grantMatchRight(p);
@@ -849,7 +859,6 @@ class Component extends DCLogic {
 
     const nav=[
       {k:'dash',label:'대시보드'},
-      {k:'apps',label:'참가기업 신청',badge:pendingApps},
       {k:'booths',label:'부스 신청·승인',badge:pendingBooths},
       {k:'members',label:'회원 명단'},
       {k:'reg',label:'사전등록 명단'},
@@ -887,8 +896,8 @@ class Component extends DCLogic {
     const statusPill=(t,c)=>React.createElement('span',{style:{fontSize:'12px',fontWeight:700,color:c,background:c+'1e',padding:'4px 10px',borderRadius:'999px',flexShrink:0}},t);
     const mapApp=(a)=>({ id:a.id, name:a.org_name||'(기업명 없음)', contact:a.contact||'', type:this.typeLabel(a.applicant_type),
       field:a.field||'', date:this.short(a.created_at), status:a.status });
-    const recentApps=apps.slice(0,4).map(mapApp).map(a=>({name:a.name,type:a.type,date:a.date,ini:this.ini(a.name),...this.av(a.type),
-      statusEl: a.status==='approved'?statusPill('승인','#0d8f6b'):a.status==='rejected'?statusPill('반려','#97a4b6'):statusPill('대기','#E0533C')}));
+    const recentApps=booths.slice(0,4).map(b=>({name:b.company||'(기업명)',type:(b.booth_type==='space'?'독립부스':'조립부스')+' '+((b.booth_ids||[]).length)+'개',date:this.short(b.created_at),ini:this.ini(b.company||'?'),...this.av('참가기업'),
+      statusEl: b.paid?statusPill('입금완료','#0B5FA5'):b.status==='approved'?statusPill('승인','#0d8f6b'):b.status==='rejected'?statusPill('반려','#97a4b6'):statusPill('대기','#E0533C')}));
 
     const appsView=apps.map(mapApp).map(a=>({...a,ini:this.ini(a.name),...this.av(a.type),
       isPending:a.status==='pending',isApproved:a.status==='approved',isRejected:a.status==='rejected',
@@ -937,7 +946,7 @@ class Component extends DCLogic {
       return { name:p.name||'-', dept:p.dept||'-', email:p.email||'-', phone:p.phone||'-', country:p.country||'-',
         date:this.short(p.created_at), typeLabel:c[2], tagBg:c[0], tagColor:c[1],
         canGrant:isExh&&!has, hasMatch:isExh&&has,
-        grant:()=>this.grantMatch(p) };
+        grant:()=>this.grantMatch(p), del:()=>this.deleteMember(p) };
     });
     const exportMembers=()=>{
       const rows=[['유형','기관/기업명','소속','이메일','연락처','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,m.name,m.dept,m.email,m.phone,m.country,m.date]));
@@ -1073,11 +1082,11 @@ class Component extends DCLogic {
         {label:'참가기업 신청',value:String(apps.length),delta:'대기 '+pendingApps,deltaColor:'#0d8f6b'},
         {label:'사전등록 참관객',value:String(regsData.length),delta:'실시간 집계',deltaColor:'#0d8f6b'},
         {label:'비즈미팅 요청',value:String(matches.length),delta:'대기 '+pendingMatch,deltaColor:'#E0533C'},
-        {label:'승인 대기',value:String(pendingApps),delta:'처리 필요',deltaColor:'#E0533C'},
+        {label:'부스 승인 대기',value:String(pendingBooths),delta:'처리 필요',deltaColor:'#E0533C'},
       ],
       recentApps,
       todos:[
-        {label:'참가 신청 검토',count:pendingApps,onClick:()=>this.setState({view:'apps'})},
+        {label:'부스 신청 검토',count:pendingBooths,onClick:()=>this.setState({view:'booths'})},
         {label:'비즈미팅 매칭 확정',count:pendingMatch,onClick:()=>this.setState({view:'match'})},
         {label:'미게시 공지',count:notices.filter(c=>!c.published).length,onClick:()=>this.setState({view:'cms'})},
       ],

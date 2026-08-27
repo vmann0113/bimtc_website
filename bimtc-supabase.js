@@ -164,6 +164,12 @@
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
     async listBoothApplications() { var sb = await ready(); var r = await sb.from('booth_applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
+    async adminDeleteMember(profileId) {
+      var sb = await ready();
+      var r = await sb.rpc('admin_delete_member', { target_id: profileId });
+      if (r.error) return { ok: false, error: r.error.message };
+      return { ok: true };
+    },
     async grantMatchRight(p) {
       var sb = await ready();
       var r = await sb.from('booth_applications').insert({
