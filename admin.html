@@ -319,10 +319,11 @@
           <button onClick="{{ exportMembers }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
         </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow-x:auto;">
-          <div style="min-width:760px;">
+          <div style="min-width:870px;">
           <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:74px;flex-shrink:0;">유형</span>
             <span style="width:170px;flex-shrink:0;">기관/기업명</span>
+            <span style="width:96px;flex-shrink:0;">담당자</span>
             <span style="width:110px;flex-shrink:0;">소속</span>
             <span style="flex:1;min-width:0;">이메일</span>
             <span style="width:130px;flex-shrink:0;">연락처</span>
@@ -335,6 +336,7 @@
             <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
               <span style="width:74px;flex-shrink:0;"><span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;padding:4px 9px;border-radius:999px;background:{{ m.tagBg }};color:{{ m.tagColor }};">{{ m.typeLabel }}</span></span>
               <span style="width:170px;flex-shrink:0;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.name }}</span>
+              <span style="width:96px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:600;color:#33485e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.person }}</span>
               <span style="width:110px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.dept }}</span>
               <span style="flex:1;min-width:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.email }}</span>
               <span style="width:130px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ m.phone }}</span>
@@ -599,13 +601,8 @@ class Component extends DCLogic {
   async componentDidMount(){
     try{
       const u = await window.BimtcDB.currentUser();
-      const isPreview = /[?&]preview=1/.test(location.search);
-      if(isPreview && (!u || !u.is_admin)){
-        this.setState({ gate:'ready', user: u || { name:'미리보기 (읽기전용)', email:'preview@bimtc', is_admin:false } });
-        try{ await this.reload(); }catch(e){}
-        this.flash('미리보기 모드 — 관리자 로그인 없이 UI만 표시되며, 데이터는 권한상 비어 보일 수 있습니다');
-        return;
-      }
+      // 오픈 전 시연용 ?preview=1 우회는 제거함 (URL만 알면 관리자 화면이 열렸음).
+      // 로그인 없이 확인이 필요하면 preview 분기를 되살리지 말고 본인 계정에 is_admin 을 부여할 것.
       if(!u){ this.setState({ gate:'login' }); return; }
       if(!u.is_admin){ this.setState({ gate:'denied', user:u }); return; }
       this.setState({ gate:'ready', user:u });
@@ -770,18 +767,21 @@ class Component extends DCLogic {
     await this.reload(); this.setState({bEdit:null}); this.flash('신청 정보가 수정되었습니다');
   }
   printInvoice(b){
-    const won=(v)=>((v||0).toLocaleString())+'원';
+    // 신청자가 입력한 값이 그대로 HTML로 들어가면 인보이스 창에서 스크립트가 실행된다.
+    // 이 창은 window.open('','_blank')이라 admin.html과 같은 오리진 → 관리자 세션까지 노출됨. 반드시 이스케이프.
+    const esc=(v)=>String(v==null?'':v).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+    const won=(v)=>esc(((v||0).toLocaleString())+'원');
     const CFG=window.BIMTC_CONFIG||{};
     const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[b.booth_type])||0;
     const n=(b.booth_ids||[]).length; const boothCost=unit*n;
     const disc=b.discount||0;
     const addonTotal=Math.max(0,(b.subtotal||0)-boothCost+disc);
     const ad=b.addons||{}; const adNames=Object.keys(ad).filter(k=>ad[k]).map(k=>k+(ad[k]===true?'':' ×'+ad[k])).join(', ');
-    const no='BIMTC-'+String(b.id||'').replace(/-/g,'').slice(0,8).toUpperCase();
+    const no='BIMTC-'+String(b.id||'').replace(/[^A-Za-z0-9]/g,'').slice(0,8).toUpperCase();
     const d=new Date(); const today=d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate();
     const ap=b.applicant||{};
-    const row=(k,v)=>'<tr><td style="padding:6px 10px;color:#5E7289;border-bottom:1px solid #eef2f7;width:120px;">'+k+'</td><td style="padding:6px 10px;border-bottom:1px solid #eef2f7;font-weight:600;">'+(v||'-')+'</td></tr>';
-    const item=(name,qty,amt)=>'<tr><td style="padding:9px 10px;border-bottom:1px solid #e6ebf2;">'+name+'</td><td style="padding:9px 10px;text-align:center;border-bottom:1px solid #e6ebf2;">'+qty+'</td><td style="padding:9px 10px;text-align:right;border-bottom:1px solid #e6ebf2;">'+amt+'</td></tr>';
+    const row=(k,v)=>'<tr><td style="padding:6px 10px;color:#5E7289;border-bottom:1px solid #eef2f7;width:120px;">'+esc(k)+'</td><td style="padding:6px 10px;border-bottom:1px solid #eef2f7;font-weight:600;">'+esc(v||'-')+'</td></tr>';
+    const item=(name,qty,amt)=>'<tr><td style="padding:9px 10px;border-bottom:1px solid #e6ebf2;">'+esc(name)+'</td><td style="padding:9px 10px;text-align:center;border-bottom:1px solid #e6ebf2;">'+esc(qty)+'</td><td style="padding:9px 10px;text-align:right;border-bottom:1px solid #e6ebf2;">'+esc(amt)+'</td></tr>';
     let items=item(b.booth_type==='space'?'독립부스 (Space Only)':'조립부스 (Package Booth)', n+'개', won(boothCost));
     if(adNames) items+=item('부가서비스: '+adNames,'-',won(addonTotal));
     if(b.fam_tour) items+=item('팸투어 참가','-','-');
@@ -939,17 +939,27 @@ class Component extends DCLogic {
     const mColor={ exhibitor:['#E7F6F0','#0d8f6b','참가기업'], buyer:['#EAF2FC','#0B5FA5','바이어'], visitor:['#F3EEFB','#7a5cc4','방문객'] };
     const filtered=allMembers.filter(p=> mTab==='all' ? true : (p.type||'exhibitor')===mTab);
     const grantedIds={}; (this.state.booths||[]).forEach(a=>{ if(a.profile_id&&a.status!=='rejected') grantedIds[a.profile_id]=true; });
+    // 바이어는 profiles.name 이 회사명이라, 담당자 성명은 first_name/last_name 을 조합해 따로 보여준다.
+    // 한글 이름은 성+이름 붙여쓰기, 그 외에는 First Last 순.
+    const personName=(p)=>{
+      const l=String(p.last_name||'').trim(), f=String(p.first_name||'').trim();
+      if(!l&&!f) return '';
+      if(!l) return f;
+      if(!f) return l;
+      return /[가-힣]/.test(l+f) ? (l+f) : (f+' '+l);
+    };
     const membersView=filtered.map(p=>{
       const c=mColor[p.type]||mColor.exhibitor;
       const isExh=(p.type||'exhibitor')==='exhibitor';
       const has=!!grantedIds[p.id];
-      return { name:p.name||'-', dept:p.dept||'-', email:p.email||'-', phone:p.phone||'-', country:p.country||'-',
+      return { name:p.name||'-', person:personName(p)||'-', dept:p.dept||'-', email:p.email||'-', phone:p.phone||'-', country:p.country||'-',
+        job:p.job_title||'-', industry:p.industry||'-', landline:p.landline||'-',
         date:this.short(p.created_at), typeLabel:c[2], tagBg:c[0], tagColor:c[1],
         canGrant:isExh&&!has, hasMatch:isExh&&has,
         grant:()=>this.grantMatch(p), del:()=>this.deleteMember(p) };
     });
     const exportMembers=()=>{
-      const rows=[['유형','기관/기업명','소속','이메일','연락처','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,m.name,m.dept,m.email,m.phone,m.country,m.date]));
+      const rows=[['유형','기관/기업명','담당자','직책','소속','이메일','연락처','유선전화','업종','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,m.name,m.person,m.job,m.dept,m.email,m.phone,m.landline,m.industry,m.country,m.date]));
       const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
       const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
       a.download='BIMTC_회원명단_'+mTab+'.csv'; a.click();

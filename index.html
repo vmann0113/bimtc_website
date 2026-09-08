@@ -1362,8 +1362,8 @@ class Component extends DCLogic {
     (async()=>{ try{
       for(let i=0;i<25&&!window.BIMTC_CONFIG;i++) await new Promise(r=>setTimeout(r,200));
       const C=window.BIMTC_CONFIG;
-      const m=(location.search||'').match(/[?&]eb=(phase1|phase2|none)/); // 미리보기 전용 강제 스위치
-      if(m&&C){ C.earlyBirdOverride=m[1]==='none'?{phase1:'off',phase2:'off'}:{[m[1]]:'on'}; window.__bimtcEbOv=C.earlyBirdOverride; C.loadEarlyBirdOverride=async()=>C.earlyBirdOverride; this.forceUpdate(); return; }
+      // 오픈 전 시연용 ?eb= 강제 스위치는 제거함. 호스트 검사가 없어 운영 도메인에서도 동작했고,
+      // 얼리버드 단계를 URL로 바꾸는 동시에 아래 DB 설정 로드를 건너뛰게 만들었음.
       if(C&&C.loadEarlyBirdOverride){ await C.loadEarlyBirdOverride(); this.forceUpdate(); }
     }catch(e){} })();
     (async()=>{ try{
