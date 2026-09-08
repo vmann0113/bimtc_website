@@ -758,6 +758,7 @@ class Component extends DCLogic {
     if(s.participation==='returning' && !s.retCompany) return this.L('기존 참가업체를 조회·선택하거나 신규 참가로 변경해 주세요.','Please select a returning exhibitor or switch to new participation.');
     if(s.famTour===null) return this.L('팸투어 참가 여부를 선택해 주세요.','Please choose whether to join the fam tour.');
     if(!s.company||!s.email) return this.L('기업명과 이메일을 입력해 주세요.','Please enter your company name and email.');
+    if(!(s.bizno||'').trim()) return this.L('사업자등록번호를 입력해 주세요. (세금계산서·인보이스 발행에 필요합니다)','Please enter your business registration number.');
     return '';
   }
 
@@ -1151,7 +1152,7 @@ class Component extends DCLogic {
       f_phone:L('전화 (핸드폰)','Mobile'),
       f_sec_biz:L('사업자 정보','Business Registration'),
       f_items:L('전시품목','Exhibit items'), f_items_ph:L('전시·홍보할 품목/서비스','Products/services to exhibit'),
-      f_bizno:L('사업자등록번호','Business reg. no.'),
+      f_bizno:L('사업자등록번호 (필수)','Business reg. no. (required)'),
       f_bizType:L('업태','Business type'), f_bizItem:L('종목','Business item'),
       earlyBirdChip:(eb?(this.state.lang==='en'?('Early bird applied · '+Math.round(eb.discountRate*100)+'% off'):(eb.label+' 적용중 · '+Math.round(eb.discountRate*100)+'% 할인')):''),
       q_discount:L('할인','Discount'),
