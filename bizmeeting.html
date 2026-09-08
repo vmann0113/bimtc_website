@@ -288,6 +288,7 @@
               </div>
               <h3 style="font-size:16.5px;font-weight:800;margin:0 0 4px;color:#0F2440;">{{ p.name }}</h3>
               <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:14px;">{{ p.country }} · {{ p.org }}</div>
+              <sc-if value="{{ p.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;font-weight:600;margin:-10px 0 14px;">담당자 {{ p.person }} <span style="color:#8295ab;font-weight:400;">{{ p.job }}</span></div></sc-if>
               <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">
                 <sc-for list="{{ p.tags }}" as="t" hint-placeholder-count="2">
                   <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#33485e;background:#F1F5FA;border:1px solid #e4ebf3;padding:4px 10px;border-radius:7px;">{{ t }}</span>
@@ -321,6 +322,7 @@
                   <span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;padding:3px 9px;border-radius:999px;background:{{ r.tagBg }};color:{{ r.tagColor }};">{{ r.type }}</span>
                 </div>
                 <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:8px;">{{ r.country }} · {{ r.org }}</div>
+                <sc-if value="{{ r.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;font-weight:600;margin:-4px 0 8px;">담당자 {{ r.person }}</div></sc-if>
                 <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">희망 일시</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div><sc-if value="{{ r.interpreter }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;background:#F3EEFB;border:1px solid #ddd0f0;color:#7a5cc4;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;border-radius:8px;padding:6px 11px;margin-bottom:8px;margin-left:8px;">통역 요청</span></sc-if>
                 <div style="font-size:14px;color:#33485e;">“{{ r.msg }}”</div>
               </div>
@@ -531,8 +533,10 @@ class Component extends DCLogic {
     const myId = this.state.user ? this.state.user.id : null;
     const requestedIds = new Set(sent.filter(r=>r.status!=='declined').map(r=>r.to_profile));
     const partnersMapped = partners.map(p=>({ id:p.id, name:p.name||'(이름 미입력)', type:this.typeLabel(p.type),
+      person:this.personName(p), job:p.job_title||'',
       country:p.country||'', org:p.category||'', tags:p.interests||[], status: requestedIds.has(p.id)?'requested':'none' }));
     const requestsMapped = inbox.map(r=>({ id:r.id, from_profile:r.from_profile, name:(r.from&&r.from.name)||'요청자', type:this.typeLabel(r.from&&r.from.type),
+      person:this.personName(r.from),
       country:(r.from&&r.from.country)||'', org:(r.from&&r.from.category)||'', msg:r.message||'', status:r.status,
       day:r.day, slot_idx:r.slot_idx, from:r.from, interpreter:!!r.interpreter }));
     const sentMapped = sent.map(r=>({ id:r.id, name:(r.to&&r.to.name)||'대상', type:this.typeLabel(r.to&&r.to.type),
@@ -544,6 +548,14 @@ class Component extends DCLogic {
     this.setState({ partners:partnersMapped, requests:requestsMapped, sent:sentMapped, reservations:resMap });
   }
 
+  // 바이어는 profiles.name 이 회사명이라 담당자 성명을 따로 조합한다 (admin.html 과 동일 규칙)
+  personName(p){
+    const l=String((p&&p.last_name)||'').trim(), f=String((p&&p.first_name)||'').trim();
+    if(!l&&!f) return '';
+    if(!l) return f;
+    if(!f) return l;
+    return /[가-힣]/.test(l+f) ? (l+f) : (f+' '+l);
+  }
   typeLabel(t){ return t==='buyer' ? '바이어' : '참가기업'; }
   setView(v){ this.setState({ view:v }); }
   set(k){ return (e)=>this.setState({ [k]: (e && e.target) ? e.target.value : e }); }

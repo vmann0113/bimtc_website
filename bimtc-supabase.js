@@ -149,6 +149,12 @@
     },
     // 사무국이 예약 현황판에서 닫아 둔 시간대. { 'D1-3-5': 1, ... } 형태로 site_settings 에 보관한다
     // (기존에는 화면 state 에만 있어 새로고침하면 사라졌다).
+    // 부스 단가·할인율. 서버 재계산 트리거와 같은 값을 읽어 화면 금액이 갈라지지 않게 한다.
+    async getPricing() {
+      var sb = await ready();
+      var r = await sb.from('site_settings').select('value').eq('key', 'pricing').maybeSingle();
+      return (r.data && r.data.value) ? r.data.value : null;
+    },
     async getClosedSlots() {
       var sb = await ready();
       var r = await sb.from('site_settings').select('value').eq('key', 'closed_slots').maybeSingle();
@@ -199,7 +205,13 @@
       if (!r.data || !r.data.length) return { ok: false, error: '수정 권한이 없거나 대상을 찾지 못했습니다' };
       return { ok: true, row: r.data[0] };
     },
-    async setBoothStatus(id, status) { var sb = await ready(); await sb.from('booth_applications').update({ status: status }).eq('id', id); },
+    async setBoothStatus(id, status) {
+      var sb = await ready();
+      var r = await sb.from('booth_applications').update({ status: status }).eq('id', id).select();
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true };
+    },
     async setBoothPaid(id, on) { var sb = await ready(); var r = await sb.from('booth_applications').update({ paid: on, paid_at: on ? new Date().toISOString() : null }).eq('id', id); return !r.error; },
     async myApprovedBooths() {
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return { count: 0, approved: 0 };
@@ -270,7 +282,13 @@
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     async listApplications() { var sb = await ready(); var r = await sb.from('applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
-    async setApplicationStatus(id, status) { var sb = await ready(); await sb.from('applications').update({ status: status }).eq('id', id); },
+    async setApplicationStatus(id, status) {
+      var sb = await ready();
+      var r = await sb.from('applications').update({ status: status }).eq('id', id).select();
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true };
+    },
 
     // ---------- 파트너(프로필) ----------
     async listPartners() {
@@ -291,6 +309,7 @@
     async addRequest(r) {
       var sb = await ready();
       var u = (await sb.auth.getUser()).data.user;
+      if (!u) return { ok: false, error: '로그인이 만료되었습니다. 다시 로그인해 주세요.' };
       var res = await sb.from('match_requests').insert({ from_profile: u.id, to_profile: r.to_profile, message: r.message || '', day: r.day || null, slot_idx: (r.slot != null ? r.slot : null), interpreter: !!r.interpreter }).select().single();
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
@@ -312,7 +331,7 @@
     },
     async inboxRequests() {
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return [];
-      var r = await sb.from('match_requests').select('*, from:profiles!match_requests_from_profile_fkey(name,type,country,category)').eq('to_profile', u.id).order('created_at', { ascending: false });
+      var r = await sb.from('match_requests').select('*, from:profiles!match_requests_from_profile_fkey(name,type,country,category,first_name,last_name,job_title)').eq('to_profile', u.id).order('created_at', { ascending: false });
       return r.data || [];
     },
     async sentRequests() {
@@ -322,11 +341,17 @@
     },
     async sentRequestsDetailed() {
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return [];
-      var r = await sb.from('match_requests').select('*, to:profiles!match_requests_to_profile_fkey(name,type,country,category)').eq('from_profile', u.id).order('created_at', { ascending: false });
+      var r = await sb.from('match_requests').select('*, to:profiles!match_requests_to_profile_fkey(name,type,country,category,first_name,last_name,job_title)').eq('from_profile', u.id).order('created_at', { ascending: false });
       return r.data || [];
     },
     async deleteRequest(id) { var sb = await ready(); var r = await sb.from('match_requests').delete().eq('id', id); return r.error ? { ok: false, error: r.error.message } : { ok: true }; },
-    async setRequestStatus(id, status) { var sb = await ready(); await sb.from('match_requests').update({ status: status }).eq('id', id); },
+    async setRequestStatus(id, status) {
+      var sb = await ready();
+      var r = await sb.from('match_requests').update({ status: status }).eq('id', id).select();
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true };
+    },
     // 요청 수락 → 예약 생성(빈 테이블 자동 배정) + 양측 정보 기록
     async acceptRequest(req, myName) {
       var sb = await ready();
@@ -347,7 +372,11 @@
     // ---------- 예약 ----------
     async listReservations(day) { var sb = await ready(); var q = sb.from('reservations').select('*'); if (day) q = q.eq('day', day); var r = await q; return r.data || []; },
     async myReservations() { var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return []; var r = await sb.from('reservations').select('*').or('owner_profile.eq.' + u.id + ',guest_profile.eq.' + u.id); return r.data || []; },
-    async removeReservation(id) { var sb = await ready(); await sb.from('reservations').delete().eq('id', id); },
+    async removeReservation(id) {
+      var sb = await ready();
+      var r = await sb.from('reservations').delete().eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     async rescheduleReservation(id, day, slot) {
       var sb = await ready();
       var ex = await sb.from('reservations').select('id,table_idx').eq('day', day).eq('slot_idx', slot);
@@ -360,13 +389,17 @@
     },
 
     // ---------- 매칭(관리자) ----------
-    async listMatchRequests() { var sb = await ready(); var r = await sb.from('match_requests').select('*, from:profiles!match_requests_from_profile_fkey(name), to:profiles!match_requests_to_profile_fkey(name)').order('created_at', { ascending: false }); return r.data || []; },
+    async listMatchRequests() { var sb = await ready(); var r = await sb.from('match_requests').select('*, from:profiles!match_requests_from_profile_fkey(name,first_name,last_name), to:profiles!match_requests_to_profile_fkey(name,first_name,last_name)').order('created_at', { ascending: false }); return r.data || []; },
 
     // ---------- 공지(CMS) ----------
     async publishedNotices() { var sb = await ready(); var r = await sb.from('notices').select('*').eq('published', true).order('published_at', { ascending: false }); return r.data || []; },
     async listNotices() { var sb = await ready(); var r = await sb.from('notices').select('*').order('published_at', { ascending: false }); return r.data || []; },
     async addNotice(n) { var sb = await ready(); var res = await sb.from('notices').insert({ tag: n.tag, title: n.title, published: n.published !== false }).select().single(); return res.data; },
-    async toggleNotice(id, on) { var sb = await ready(); await sb.from('notices').update({ published: on }).eq('id', id); },
+    async toggleNotice(id, on) {
+      var sb = await ready();
+      var r = await sb.from('notices').update({ published: on }).eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     async updateNotice(id, fields) { var sb = await ready(); var r = await sb.from('notices').update(fields).eq('id', id); return !r.error; },
     async deleteNotice(id) { var sb = await ready(); var r = await sb.from('notices').delete().eq('id', id); return !r.error; }
   };

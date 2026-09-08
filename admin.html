@@ -699,14 +699,36 @@ class Component extends DCLogic {
   ini(n){ return (n||'?').slice(0,2); }
   av(type){ return type==='바이어' ? {avBg:'#EAF2FC',avColor:'#0B5FA5'} : {avBg:'#E7F6F0',avColor:'#0d8f6b'}; }
 
-  async approve(id){ await window.BimtcDB.setApplicationStatus(id,'approved'); await this.reload(); this.flash('참가기업으로 승인했습니다'); }
-  async reject(id){ await window.BimtcDB.setApplicationStatus(id,'rejected'); await this.reload(); this.flash('신청을 반려했습니다'); }
-  async confirmMatch(id){ await window.BimtcDB.setRequestStatus(id,'accepted'); await this.reload(); this.flash('매칭을 확정했습니다'); }
-  async approveBooth(id){ await window.BimtcDB.setBoothStatus(id,'approved'); await this.reload(); this.flash('부스 신청을 승인했습니다'); }
-  async rejectBooth(id){ await window.BimtcDB.setBoothStatus(id,'rejected'); await this.reload(); this.flash('부스 신청을 반려했습니다'); }
+  async approve(id){
+    const r=await window.BimtcDB.setApplicationStatus(id,'approved');
+    if(r && r.ok===false){ this.flash('실패: '+r.error); return; }
+    await this.reload(); this.flash('참가기업으로 승인했습니다');
+  }
+  async reject(id){
+    const r=await window.BimtcDB.setApplicationStatus(id,'rejected');
+    if(r && r.ok===false){ this.flash('실패: '+r.error); return; }
+    await this.reload(); this.flash('신청을 반려했습니다');
+  }
+  async confirmMatch(id){
+    const r=await window.BimtcDB.setRequestStatus(id,'accepted');
+    if(r && r.ok===false){ this.flash('실패: '+r.error); return; }
+    await this.reload(); this.flash('매칭을 확정했습니다');
+  }
+  async approveBooth(id){
+    const r=await window.BimtcDB.setBoothStatus(id,'approved');
+    if(r && r.ok===false){ this.flash('실패: '+r.error); return; }
+    await this.reload(); this.flash('부스 신청을 승인했습니다');
+  }
+  async rejectBooth(id){
+    const r=await window.BimtcDB.setBoothStatus(id,'rejected');
+    if(r && r.ok===false){ this.flash('실패: '+r.error); return; }
+    await this.reload(); this.flash('부스 신청을 반려했습니다');
+  }
   async unapproveBooth(b){
     if(!confirm('"'+(b.company||'')+'" 승인을 취소(반려)할까요?\n부스 위치('+((b.booth_ids||[]).join(', ')||'-')+')가 즉시 해제되어 다른 업체가 신청할 수 있게 됩니다.')) return;
-    await window.BimtcDB.setBoothStatus(b.id,'rejected'); await this.reload(); this.flash('승인을 취소했습니다 · 부스 위치 해제됨');
+    const r=await window.BimtcDB.setBoothStatus(b.id,'rejected');
+    if(r && r.ok===false){ this.flash('승인 취소 실패: '+r.error); return; }
+    await this.reload(); this.flash('승인을 취소했습니다 · 부스 위치 해제됨');
   }
   adminMap(){
     const CFG=window.BIMTC_CONFIG||{};
