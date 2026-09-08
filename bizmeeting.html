@@ -321,7 +321,7 @@
                   <span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;padding:3px 9px;border-radius:999px;background:{{ r.tagBg }};color:{{ r.tagColor }};">{{ r.type }}</span>
                 </div>
                 <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:8px;">{{ r.country }} · {{ r.org }}</div>
-                <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">희망 일시</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div>
+                <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">희망 일시</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div><sc-if value="{{ r.interpreter }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;background:#F3EEFB;border:1px solid #ddd0f0;color:#7a5cc4;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;border-radius:8px;padding:6px 11px;margin-bottom:8px;margin-left:8px;">통역 요청</span></sc-if>
                 <div style="font-size:14px;color:#33485e;">“{{ r.msg }}”</div>
               </div>
               <sc-if value="{{ r.isPending }}" hint-placeholder-val="{{ true }}">
@@ -423,6 +423,7 @@
                 <div style="flex:1;min-width:160px;">
                   <div style="font-size:15px;font-weight:800;color:#0F2440;">{{ r.name }}</div>
                   <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;">희망 일시 · {{ r.slotLabel }}</div>
+                  <sc-if value="{{ r.interpreter }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;background:#F3EEFB;border:1px solid #ddd0f0;color:#7a5cc4;font-size:12.5px;font-weight:700;border-radius:7px;padding:3px 9px;margin-top:5px;">통역 요청</span></sc-if>
                 </div>
                 <span style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;color:#b78a3c;background:#FBF3E2;padding:7px 13px;border-radius:8px;flex-shrink:0;">수락 대기중</span>
                 <button onClick="{{ r.cancel }}" style="background:#fff;color:#8295ab;border:1px solid #d8e0ea;padding:9px 16px;border-radius:9px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">요청 취소</button>
@@ -456,6 +457,9 @@
             <button onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</button>
           </sc-for>
         </div>
+        <sc-if value="{{ showInterp }}" hint-placeholder-val="{{ true }}">
+          <label onClick="{{ toggleInterp }}" style="display:flex;gap:9px;align-items:flex-start;font-size:14px;color:#33485e;line-height:1.5;margin:0 0 18px;padding:12px 14px;background:#F7F9FC;border:1px solid #e6ebf2;border-radius:10px;cursor:pointer;font-family:'Pretendard',sans-serif;"><span style="{{ interpBoxStyle }}"><sc-if value="{{ pickInterp }}" hint-placeholder-val="{{ false }}"><span style="color:#fff;font-size:11px;font-weight:800;line-height:1;">✓</span></sc-if></span><span><b style="font-weight:700;">통역 지원 요청</b><br><span style="font-size:12.5px;color:#5E7289;">사무국이 미팅 시간에 맞춰 통역을 배정합니다. 상대방 국가에 맞는 언어로 준비됩니다.</span></span></label>
+        </sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end;">
           <button onClick="{{ closePicker }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">취소</button>
           <button onClick="{{ confirmRequest }}" style="{{ confirmStyle }}">{{ confirmLabel }}</button>
@@ -488,7 +492,7 @@ class Component extends DCLogic {
     requests: [],
     reservations: {},
     pendingAssign: [],
-    pickerId:null, pickerName:'', pickDay:'D1', pickSlot:null, pickerBusy:{}, requesting:false,
+    pickerId:null, pickerName:'', pickDay:'D1', pickSlot:null, pickerBusy:{}, requesting:false, pickInterp:false,
     pickerMode:'request', rescheduleId:null, sent:[],
     apOrg:'', apContact:'', apEmail:'', apCountry:'', apPurpose:'', apFields:[], apDay:'any', apFam:null,
     submitting:false,
@@ -530,9 +534,9 @@ class Component extends DCLogic {
       country:p.country||'', org:p.category||'', tags:p.interests||[], status: requestedIds.has(p.id)?'requested':'none' }));
     const requestsMapped = inbox.map(r=>({ id:r.id, from_profile:r.from_profile, name:(r.from&&r.from.name)||'요청자', type:this.typeLabel(r.from&&r.from.type),
       country:(r.from&&r.from.country)||'', org:(r.from&&r.from.category)||'', msg:r.message||'', status:r.status,
-      day:r.day, slot_idx:r.slot_idx, from:r.from }));
+      day:r.day, slot_idx:r.slot_idx, from:r.from, interpreter:!!r.interpreter }));
     const sentMapped = sent.map(r=>({ id:r.id, name:(r.to&&r.to.name)||'대상', type:this.typeLabel(r.to&&r.to.type),
-      day:r.day, slot_idx:r.slot_idx, status:r.status }));
+      day:r.day, slot_idx:r.slot_idx, status:r.status, interpreter:!!r.interpreter }));
     const resMap={};
     resvs.forEach(r=>{ const mine = (r.owner_profile===myId || r.guest_profile===myId);
       const counterpart = r.owner_profile===myId ? (r.guest_name||r.partner_name||'') : (r.host_name||'');
@@ -548,13 +552,13 @@ class Component extends DCLogic {
 
   // ----- 파트너 미팅 요청: 날짜·시간 피커 -----
   async openPicker(partner){
-    this.setState({ pickerMode:'request', rescheduleId:null, pickerId:partner.id, pickerName:partner.name, pickDay:'D1', pickSlot:null, pickerBusy:{} });
+    this.setState({ pickerMode:'request', rescheduleId:null, pickerId:partner.id, pickerName:partner.name, pickDay:'D1', pickSlot:null, pickerBusy:{}, pickInterp:false });
     try{ const busy = await window.BimtcDB.partnerBusy(partner.id); this.setState({ pickerBusy:busy }); }catch(e){}
   }
   openReschedule(m){
     this.setState({ pickerMode:'reschedule', rescheduleId:m.id, pickerId:'reschedule', pickerName:m.partner+' · 시간 변경', pickDay:m.dayKey, pickSlot:m.slotIdx, pickerBusy:{} });
   }
-  closePicker(){ this.setState({ pickerId:null, pickSlot:null, pickerMode:'request', rescheduleId:null }); }
+  closePicker(){ this.setState({ pickerId:null, pickSlot:null, pickerMode:'request', rescheduleId:null, pickInterp:false }); }
   selectSlot(si){ this.setState({ pickSlot:si }); }
   async confirmRequest(){
     if(this.state.pickSlot==null){ this.flash('시간대를 선택해 주세요'); return; }
@@ -570,12 +574,12 @@ class Component extends DCLogic {
       this.flash(dl+'로 미팅 시간을 변경했습니다');
       return;
     }
-    const res = await window.BimtcDB.addRequest({ to_profile:this.state.pickerId, message:'비즈니스 미팅을 요청합니다.', day:this.state.pickDay, slot:this.state.pickSlot });
+    const res = await window.BimtcDB.addRequest({ to_profile:this.state.pickerId, message:'비즈니스 미팅을 요청합니다.', day:this.state.pickDay, slot:this.state.pickSlot, interpreter:this.state.pickInterp });
     this.setState({requesting:false});
     if(!res.ok){ this.flash('요청 실패: '+res.error); return; }
     const dl = (this.state.pickDay==='D1'?'11.13':'11.14')+' '+this.SLOTS[this.state.pickSlot];
     const pid=this.state.pickerId;
-    this.setState(s=>({ pickerId:null, pickSlot:null, partners: s.partners.map(p=> p.id===pid ? {...p, status:'requested'} : p) }));
+    this.setState(s=>({ pickerId:null, pickSlot:null, pickInterp:false, partners: s.partners.map(p=> p.id===pid ? {...p, status:'requested'} : p) }));
     await this.reload();
     this.flash(dl+' 미팅을 요청했습니다 · 상대 수락 시 확정');
   }
@@ -775,6 +779,10 @@ class Component extends DCLogic {
       pickD1:()=>this.setState({pickDay:'D1',pickSlot:null}), pickD2:()=>this.setState({pickDay:'D2',pickSlot:null}),
       pickD1Style: pkTabBase + (pkDay==='D1'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1px solid #d8e0ea;'),
       pickD2Style: pkTabBase + (pkDay==='D2'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1px solid #d8e0ea;'),
+      showInterp: this.state.pickerMode!=='reschedule',
+      pickInterp: !!this.state.pickInterp,
+      toggleInterp: ()=>this.setState({ pickInterp: !this.state.pickInterp }),
+      interpBoxStyle: 'width:18px;height:18px;flex-shrink:0;border-radius:5px;margin-top:1px;display:flex;align-items:center;justify-content:center;'+(this.state.pickInterp?'background:#0B5FA5;border:1.5px solid #0B5FA5;':'border:1.5px solid #b7c4d3;background:#fff;'),
       closePicker:()=>this.closePicker(), stop:(e)=>e.stopPropagation(),
       confirmRequest:()=>this.confirmRequest(),
       confirmLabel: this.state.requesting?'요청 중…':(this.state.pickSlot!=null? (this.SLOTS[this.state.pickSlot]+' 요청'):'시간 선택'),

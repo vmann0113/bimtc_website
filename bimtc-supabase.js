@@ -147,6 +147,18 @@
       if (r.data && r.data.updated_at) window.__bimtcEbOvTs = r.data.updated_at; // 저장 시각 (오픈 전 잠금값 판별용)
       return (r.data && r.data.value) ? r.data.value : null;
     },
+    // 사무국이 예약 현황판에서 닫아 둔 시간대. { 'D1-3-5': 1, ... } 형태로 site_settings 에 보관한다
+    // (기존에는 화면 state 에만 있어 새로고침하면 사라졌다).
+    async getClosedSlots() {
+      var sb = await ready();
+      var r = await sb.from('site_settings').select('value').eq('key', 'closed_slots').maybeSingle();
+      return (r.data && r.data.value) ? r.data.value : {};
+    },
+    async saveClosedSlots(obj) {
+      var sb = await ready();
+      var r = await sb.from('site_settings').upsert({ key: 'closed_slots', value: obj, updated_at: new Date().toISOString() });
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     async saveEarlyBird(obj) {
       var sb = await ready();
       var r = await sb.from('site_settings').upsert({ key: 'early_bird', value: obj, updated_at: new Date().toISOString() });
@@ -279,7 +291,7 @@
     async addRequest(r) {
       var sb = await ready();
       var u = (await sb.auth.getUser()).data.user;
-      var res = await sb.from('match_requests').insert({ from_profile: u.id, to_profile: r.to_profile, message: r.message || '', day: r.day || null, slot_idx: (r.slot != null ? r.slot : null) }).select().single();
+      var res = await sb.from('match_requests').insert({ from_profile: u.id, to_profile: r.to_profile, message: r.message || '', day: r.day || null, slot_idx: (r.slot != null ? r.slot : null), interpreter: !!r.interpreter }).select().single();
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     // 특정 파트너가 요청/예약으로 이미 잡힌 (day-slot) 목록
@@ -325,7 +337,8 @@
       var used = {}; (ex.data || []).forEach(function (x) { used[x.table_idx] = 1; });
       var table = -1; for (var i = 0; i < 10; i++) { if (!used[i]) { table = i; break; } }
       if (table < 0) return { ok: false, error: '해당 시간대에 빈 테이블이 없습니다.' };
-      var ins = await sb.from('reservations').insert({ owner_profile: u.id, guest_profile: req.from_profile, day: day, slot_idx: slot, table_idx: table, host_name: myName || '', guest_name: (req.from && req.from.name) || req.fromName || '', partner_name: (req.from && req.from.name) || '' }).select().single();
+      // 통역 요청은 요청 건에서 확정 예약으로 그대로 옮긴다 (사무국이 확정 미팅 기준으로 통역사를 배정하므로)
+      var ins = await sb.from('reservations').insert({ owner_profile: u.id, guest_profile: req.from_profile, day: day, slot_idx: slot, table_idx: table, host_name: myName || '', guest_name: (req.from && req.from.name) || req.fromName || '', partner_name: (req.from && req.from.name) || '', interpreter: !!req.interpreter }).select().single();
       if (ins.error) return { ok: false, error: (ins.error.code === '23505' ? '해당 시간이 이미 예약되었습니다.' : ins.error.message) };
       await this.setRequestStatus(req.id, 'accepted');
       return { ok: true, table: table };

@@ -1608,6 +1608,10 @@ class Component extends DCLogic {
     const openKey=this.state.floorZoneOpen;
     const openZone=(k)=>this.setState({ floorZoneOpen: openKey===k?null:k });
     const taken=this.state.takenMap||{};
+    // 부스 → 참가기업명. public_exhibitors 는 '승인된' 기업만 담긴 공개 뷰라,
+    // 아직 승인 전인 신청 건의 기업명은 노출되지 않는다(그 경우 '신청 완료'만 표시).
+    const boothOwner={};
+    (this.state.pubExhibitors||[]).forEach(x=>{ (x.booth_ids||[]).forEach(id=>{ if(x.company) boothOwner[id]=x.company; }); });
     const sells=entries.filter(e=>e.cell.t==='sell').sort((a,b)=>(a.c-b.c)||(b.r-a.r));
     const zcnt={};
     const floorCells=sells.map(e=>{
@@ -1617,7 +1621,8 @@ class Component extends DCLogic {
       const zc=(zmap[e.cell.z]&&zmap[e.cell.z].color)||'#cdd8e4';
       const xoff=e.cell.z==='z5'?0.5:0;
       const zk=e.cell.z;
-      return { onClick:()=>openZone(zk), title:bid+(isTaken?' · '+L('신청 완료','Taken'):''), num:String(zcnt[pre]),
+      const owner=boothOwner[bid];
+      return { onClick:()=>openZone(zk), title:bid+(owner?' · '+owner:(isTaken?' · '+L('신청 완료','Taken'):'')), num:String(zcnt[pre]),
         style:"position:absolute;left:"+((e.c+xoff)*cw)+"%;top:"+(e.r*rh)+"%;width:"+cw+"%;height:"+rh+"%;box-sizing:border-box;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:'Pretendard',sans-serif;"+(isTaken
           ?"border:1px solid #fff;background:#33475c;color:#fff;cursor:pointer;"
           :"border:1px solid rgba(255,255,255,0.8);background:"+zc+(zk==='z5'?';opacity:0.55':'')+";color:rgba(255,255,255,0.85);cursor:pointer;") };

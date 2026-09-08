@@ -399,7 +399,7 @@
                 <div><div style="font-size:14.5px;font-weight:700;">{{ m.b }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ m.bField }}</div></div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-                <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 11px;border-radius:999px;">적합도 {{ m.score }}</span>
+                <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 11px;border-radius:999px;">적합도 {{ m.score }}</span><sc-if value="{{ m.interpreter }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;color:#7a5cc4;background:#F3EEFB;border:1px solid #ddd0f0;padding:5px 11px;border-radius:999px;margin-left:6px;">통역 요청</span></sc-if>
                 <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0d8f6b;">✓ 매칭됨</span></sc-if>
                 <sc-if value="{{ m.notDone }}" hint-placeholder-val="{{ true }}"><button onClick="{{ m.match }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">매칭 확정</button></sc-if>
               </div>
@@ -412,10 +412,15 @@
       <sc-if value="{{ isLounge }}" hint-placeholder-val="{{ false }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">라운지 운영</h1>
         <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">테이블·시간 슬롯을 열고 닫아 예약 가능 여부를 관리합니다. 칸 클릭으로 제한 토글.</p>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <span onClick="{{ setBoardD1 }}" style="{{ boardD1Style }}">11.13 (금)</span>
+          <span onClick="{{ setBoardD2 }}" style="{{ boardD2Style }}">11.14 (토)</span>
+        </div>
         <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5E7289;">
           <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#fff;border:1px solid #d8e0ea;"></span>운영</span>
           <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#eef1f6;border:1px solid #d8e0ea;"></span>예약됨</span>
           <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px);border:1px solid #e9cf9a;"></span>제한(닫음)</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#F3EEFB;border:1px solid #ddd0f0;"></span>통역 요청 포함</span>
         </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:18px;overflow-x:auto;">
           <div style="min-width:820px;">
@@ -592,11 +597,14 @@ class Component extends DCLogic {
     boothFilter: 'all', boothDetailId: null, mapModal: null,
     reserved: {},
     restricted: {},
+    boardDay: 'D1',
     cmsFlash: false,
     toast: null,
   };
 
-  SLOTS = ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'];
+  // bizmeeting.html 의 SLOTS 와 반드시 동일해야 한다. 예전에는 12개뿐이라
+  // 16:00 이후 예약이 현황판에 아예 표시되지 않았다.
+  SLOTS = ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
 
   async componentDidMount(){
     try{
@@ -665,12 +673,14 @@ class Component extends DCLogic {
       window.BimtcDB.listInquiries().catch(()=>[]),
       window.BimtcDB.listNotifications().catch(()=>[])
     ]);
-    const reserved={}; resvs.forEach(r=>{ reserved[r.table_idx+'-'+r.slot_idx]=1; });
+    // 11.13(D1)·11.14(D2) 를 구분하지 않으면 한쪽 예약이 다른 날에도 잡힌 것처럼 보인다
+    const reserved={}; resvs.forEach(r=>{ reserved[r.day+'-'+r.table_idx+'-'+r.slot_idx]=r.interpreter?2:1; });
+    let closed={}; try{ closed=await window.BimtcDB.getClosedSlots(); }catch(e){}
     let eb=null; try{ eb=await window.BimtcDB.getEarlyBird(); }catch(e){}
     // 오픈 전 잠금값(전부 끄기, 오픈 시각 이전 저장) → 자동 모드로 해석 (공개 사이트와 동일 규칙)
     if(eb){ try{ const C=window.BIMTC_CONFIG; const keys=Object.keys(eb); const allOff=keys.length>0&&keys.every(k=>eb[k]==='off'); const ts=window.__bimtcEbOvTs?new Date(window.__bimtcEbOvTs).getTime():0; if(C&&C.isLaunched&&C.isLaunched()&&allOff&&ts&&ts<new Date(C.launchAt).getTime()) eb={phase1:'auto',phase2:'auto'}; }catch(e){} }
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
-    this.setState({ apps, regs, matches, notices, reserved, booths, members, inquiries: inquiries||[], notifications: notifications||[], ebOverride: eb||{}, ebDirty:false });
+    this.setState({ apps, regs, matches, notices, reserved, restricted: closed||{}, booths, members, inquiries: inquiries||[], notifications: notifications||[], ebOverride: eb||{}, ebDirty:false });
   }
 
   async saveAnswer(id){
@@ -829,7 +839,16 @@ class Component extends DCLogic {
     rows.push({k:'입금 상태', v:b.paid?('입금완료'+(b.paid_at?' ('+String(b.paid_at).slice(0,10)+')':'')):'입금 전'});
     return rows;
   }
-  toggleCell(ti,si){ const k=ti+'-'+si; if(this.state.reserved[k]) { this.flash('이미 예약된 슬롯입니다'); return; } this.setState(s=>{ const r={...s.restricted}; if(r[k])delete r[k]; else r[k]=1; return {restricted:r}; }); }
+  async toggleCell(ti,si){
+    const k=this.state.boardDay+'-'+ti+'-'+si;
+    if(this.state.reserved[k]) { this.flash('이미 예약된 슬롯입니다'); return; }
+    const next={...this.state.restricted};
+    if(next[k]) delete next[k]; else next[k]=1;
+    const before=this.state.restricted;
+    this.setState({restricted:next});
+    const r=await window.BimtcDB.saveClosedSlots(next);   // 새로고침해도 유지되도록 저장
+    if(!r.ok){ this.setState({restricted:before}); this.flash('저장 실패: '+r.error); }
+  }
   async addNotice(){ await window.BimtcDB.addNotice({tag:'신규', title:'새 공지사항 (제목을 입력하세요)', published:true}); await this.reload(); this.setState({cmsFlash:true}); this.flash('새 공지를 등록했습니다'); }
   async toggleCms(id, on){ await window.BimtcDB.toggleNotice(id, on); await this.reload(); }
   async saveNotice(id){
@@ -907,13 +926,16 @@ class Component extends DCLogic {
       const aName=(m.from&&m.from.name)||'요청자', bName=(m.to&&m.to.name)||'대상';
       const done=m.status==='accepted', declined=m.status==='declined';
       return { id:m.id, a:aName, b:bName, aField:m.message||'', bField: done?'수락됨':(declined?'거절됨':'대기 중'),
-        score: declined?'—':'요청', aIni:this.ini(aName), bIni:this.ini(bName), done, notDone:!done && !declined, match:()=>this.confirmMatch(m.id) };
+        score: declined?'—':'요청', aIni:this.ini(aName), bIni:this.ini(bName), done, notDone:!done && !declined,
+        interpreter:!!m.interpreter, match:()=>this.confirmMatch(m.id) };
     });
 
     // lounge grid
+    const bDay=this.state.boardDay||'D1';
+    const bdTab="cursor:pointer;padding:9px 18px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;font-family:'Pretendard',sans-serif;";
     const loungeRows=this.SLOTS.map((time,si)=>({time,cells:Array.from({length:10}).map((_,ti)=>{
-      const k=ti+'-'+si; let bg='#fff',color='#c0ccda',border='#e1e8f0',label='',cursor='pointer';
-      if(reserved[k]){bg='#eef1f6';color='#9aa9bd';border='#dfe5ee';label='예약';cursor='not-allowed';}
+      const k=bDay+'-'+ti+'-'+si; let bg='#fff',color='#c0ccda',border='#e1e8f0',label='',cursor='pointer';
+      if(reserved[k]){bg='#eef1f6';color='#9aa9bd';border='#dfe5ee';label=reserved[k]===2?'예약·통역':'예약';cursor='not-allowed';}
       else if(restricted[k]){bg='repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px)';color='#b78a3c';border='#e9cf9a';label='닫음';}
       return {bg,color,border,label,cursor,onClick:()=>this.toggleCell(ti,si)};
     })}));
@@ -1106,6 +1128,9 @@ class Component extends DCLogic {
       regToday: '+' + regsData.filter(r=>{ if(!r.created_at) return false; const d=new Date(r.created_at); const n=new Date(); return d.toDateString()===n.toDateString(); }).length,
       exportCsv: ()=>this.exportCsv(),
       matchRows,
+      setBoardD1:()=>this.setState({boardDay:'D1'}), setBoardD2:()=>this.setState({boardDay:'D2'}),
+      boardD1Style: bdTab + (bDay==='D1'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1px solid #d8e0ea;'),
+      boardD2Style: bdTab + (bDay==='D2'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1px solid #d8e0ea;'),
       tableHeaders:Array.from({length:10}).map((_,i)=>'T'+(i+1)),
       loungeRows,
       cmsRows, cmsFlash:this.state.cmsFlash, addNotice:()=>this.addNotice(),
