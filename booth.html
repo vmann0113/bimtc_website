@@ -518,7 +518,7 @@
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   state = {
-    lang:(typeof localStorage!=='undefined'&&localStorage.getItem('bimtc_lang'))||'ko',
+    lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(),
     gate:'loading', adminTest:false, step:1, pickerModal:false,
     participation:'new', retQuery:'', retCompany:'',
     boothType:'package', selected:[], addons:{}, taken:{}, famTour:null, layout:null,

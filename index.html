@@ -1326,7 +1326,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { page: 'home', lang:(typeof localStorage!=='undefined'&&localStorage.getItem('bimtc_lang'))||'ko', exTab: 'companies', commTab: 'notice', loginRole: 'exhibitor', visitorDone: false, toast: null,
+  state = { page: 'home', lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(), exTab: 'companies', commTab: 'notice', loginRole: 'exhibitor', visitorDone: false, toast: null,
     vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both',
     crEmail:'', crSearched:false, crRows:[],
     authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
