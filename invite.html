@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Invited Buyer Information · BIMTC 2026</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<!--
+  초청바이어 세부정보 입력 폼 (invite.html?t=<token>)
+  · 홈페이지 메뉴에 연결하지 않는 독립 페이지. 바이어 관리자가 보낸 개인 링크로만 연다.
+  · 중국 접속을 위해 외부 CDN/폰트를 쓰지 않고, Supabase REST(RPC)를 fetch 로 직접 호출한다.
+  · 데이터: public.buyer_invites (SQL: ../buyer_invites.sql) — invite_get / invite_submit 함수만 사용.
+-->
+<style>
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{margin:0;background:#EEF1F6;color:#0F2440;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans","PingFang SC","Microsoft YaHei","Malgun Gothic",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5;word-break:keep-all;overflow-wrap:break-word;}
+  .top{background:#0A2236;color:#fff;}
+  .top .bar{height:4px;background:linear-gradient(90deg,#0B5FA5,#11A37B);}
+  .top .in{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;}
+  .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0B5FA5,#11A37B);position:relative;flex-shrink:0;}
+  .logo:before,.logo:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:2px;}
+  .logo:before{width:12px;height:3px;} .logo:after{width:3px;height:12px;}
+  .langs{display:flex;gap:4px;}
+  .langs button{background:transparent;border:1px solid rgba(255,255,255,.25);color:#cfdbe7;padding:5px 10px;border-radius:999px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .langs button.on{background:#fff;color:#0A2236;border-color:#fff;font-weight:700;}
+  main{max-width:760px;margin:0 auto;padding:20px 16px 60px;}
+  .hero{background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 20px;margin-bottom:14px;}
+  .hero h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em;}
+  .hero .sub{color:#0B5FA5;font-weight:700;font-size:13.5px;margin:0 0 2px;}
+  .hero .ev{color:#5E7289;font-size:13.5px;margin:0 0 12px;}
+  .hero .for{display:inline-block;background:#E8F6F0;color:#0d8f6b;font-weight:700;font-size:13.5px;padding:4px 10px;border-radius:8px;margin-bottom:10px;}
+  .hero p{margin:0;color:#33485e;}
+  .req-note{color:#c0392b;font-size:13px;margin-top:10px;}
+  section.card{background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:18px 20px;margin-bottom:14px;}
+  section.card h2{font-size:16px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #eef1f6;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;}
+  .f{min-width:0;} .f.full{grid-column:1/-1;}
+  @media (max-width:560px){.grid{grid-template-columns:1fr;}}
+  label.l{display:block;font-weight:700;font-size:13.5px;color:#33485e;margin-bottom:6px;}
+  label.l .r{color:#c0392b;margin-left:2px;}
+  .hint{font-size:12.5px;color:#8295ab;margin-top:4px;}
+  input[type=text],input[type=email],input[type=tel],input[type=number],input[type=date],input[type=time],select,textarea{width:100%;padding:11px 12px;border:1px solid #d8e0ea;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#0F2440;outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:#0B5FA5;box-shadow:0 0 0 3px rgba(11,95,165,.12);}
+  textarea{min-height:76px;resize:vertical;}
+  .opts{display:flex;flex-wrap:wrap;gap:8px;}
+  .opts label{display:flex;align-items:center;gap:7px;border:1px solid #d8e0ea;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14.5px;background:#fff;}
+  .opts label.on{border-color:#0B5FA5;background:#EEF5FC;color:#0B5FA5;font-weight:700;}
+  .opts input{margin:0;accent-color:#0B5FA5;}
+  .f.bad input,.f.bad select,.f.bad textarea,.f.bad .opts label{border-color:#e0533c;}
+  .consent{background:#F6F8FB;border:1px solid #e6ebf2;border-radius:12px;padding:14px 16px;font-size:13.5px;color:#33485e;}
+  .consent b{display:block;margin-bottom:6px;color:#0F2440;}
+  .consent .agree{display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:700;color:#0F2440;cursor:pointer;}
+  .consent .agree input{width:18px;height:18px;accent-color:#0B5FA5;}
+  .consent.bad{border-color:#e0533c;}
+  .actions{margin-top:18px;}
+  .btn{display:block;width:100%;background:#16294F;color:#fff;border:none;padding:15px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;}
+  .btn:disabled{opacity:.6;cursor:default;}
+  .btn.ghost{background:#fff;color:#0B5FA5;border:1px solid #0B5FA5;}
+  .msg{border-radius:10px;padding:11px 14px;font-size:14px;margin-top:12px;}
+  .msg.err{background:#fdecea;border:1px solid #f5c6cb;color:#c0392b;}
+  .center{text-align:center;padding:48px 20px;}
+  .done-ic{width:56px;height:56px;border-radius:50%;background:#11A37B;color:#fff;font-size:30px;line-height:56px;margin:0 auto 14px;}
+  .muted{color:#8295ab;font-size:13px;}
+  footer{text-align:center;color:#8295ab;font-size:12.5px;margin-top:22px;}
+  [hidden]{display:none !important;}
+</style>
+</head>
+<body>
+<div class="top"><div class="bar"></div><div class="in">
+  <div class="brand"><div class="logo"></div><span>BIMTC 2026</span></div>
+  <div class="langs" id="langs"></div>
+</div></div>
+<main id="app"><div class="center muted" id="boot">Loading…</div></main>
+
+<script>
+(function () {
+  // bimtc-supabase.js 와 같은 프로젝트·공개(anon) 키. 이 키로는 invite_get / invite_submit 만 호출 가능하다(RLS).
+  var SUPABASE_URL = 'https://xkomxbskwvtofpglback.supabase.co';
+  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrb214YnNrd3Z0b2ZwZ2xiYWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjIxNzYsImV4cCI6MjEwMDAzODE3Nn0.YVBpieLDFP4AyeapuiRmjrDyZYdAHfiudnUdRPG65mo';
+
+  var LANGS = [['en', 'EN'], ['zh', '中文'], ['ru', 'RU'], ['mn', 'MN']];
+
+  var T = {
+    en: {
+      title: 'Invited Buyer Information', sub: 'BIMTC 2026 · Busan International Medical Tourism Convention', ev: 'November 13–14, 2026 · BEXCO, Busan, Korea',
+      intro: 'Please share your travel details so we can arrange your airport pickup, hotel and program. You can reopen this link and update your answers at any time — for example if your flight changes.',
+      req_note: '* Required',
+      s_basic: 'Basic information', s_flight: 'Flight', s_stay: 'Accommodation & transfer', s_program: 'Program', s_visa: 'Visa', s_other: 'Other',
+      passport_name: 'Full name (as in passport)', h_passport_name: 'Latin letters exactly as shown in your passport',
+      gender: 'Gender', o_male: 'Male', o_female: 'Female',
+      country: 'Country', company: 'Company / Organization', job_title: 'Job title', email: 'Email',
+      mobile: 'Mobile phone', h_mobile: 'Include country code, e.g. +7 701 000 0000',
+      messenger: 'WhatsApp / WeChat / Telegram ID', h_messenger: 'The messenger we can reach you on during your trip',
+      companions: 'Number of accompanying persons', companion_names: 'Names of accompanying persons (as in passport)',
+      arrival_date: 'Arrival date in Korea', arrival_flight: 'Arrival flight number', h_flight: 'e.g. KE1234', arrival_airport: 'Arrival airport', arrival_terminal: 'Incheon terminal', arrival_time: 'Arrival time (Korea local time)',
+      departure_date: 'Departure date from Korea', departure_flight: 'Departure flight number', departure_airport: 'Departure airport', departure_time: 'Departure time (Korea local time)',
+      ap_PUS: 'Busan Gimhae (PUS)', ap_ICN: 'Seoul Incheon (ICN)', ap_GMP: 'Seoul Gimpo (GMP)', ap_OTHER: 'Other', ap_other_ph: 'Airport name', select: 'Select',
+      checkin_date: 'Hotel check-in', checkout_date: 'Hotel check-out',
+      hotel_type: 'Accommodation', o_provided: 'Hotel provided by the organizer', o_own: 'I will arrange my own',
+      pickup: 'Do you need an airport pickup?', o_yes: 'Yes', o_no: 'No', o_undecided: 'Not decided yet', o_unsure: 'Not sure',
+      fam_tour: 'Fam tour (the day after the convention)', b2b: 'B2B business meetings',
+      visa_needed: 'Do you need a visa to enter Korea?', h_visa: 'If yes, we will prepare an invitation letter — please enter your passport details below.',
+      passport_no: 'Passport number', birth_date: 'Date of birth',
+      dietary: 'Dietary requirements', o_none: 'None', o_vegetarian: 'Vegetarian', o_vegan: 'Vegan', o_halal: 'Halal', o_other: 'Other',
+      dietary_note: 'Allergies / details', interpreter: 'Do you need an interpreter?', interpreter_lang: 'Language', h_interp: 'e.g. Russian',
+      requests: 'Other requests',
+      consent_title: 'Consent to the collection and use of personal information',
+      consent_body: 'Purpose: arranging your invitation, flights, pickup, accommodation and program for BIMTC 2026. Items: the information entered in this form. Retention: destroyed after the event settlement is completed. You may refuse, but we may then be unable to provide invitation support.',
+      consent_agree: 'I agree', submit: 'Submit', update: 'Save changes', saving: 'Saving…',
+      err_req: 'Please fill in the required fields.', err_consent: 'Please agree to the personal information consent.', err_net: 'Could not save. Please check your connection and try again.', err_link: 'This link is invalid. Please contact the BIMTC secretariat.',
+      loading: 'Loading…', done_title: 'Thank you!', done_body: 'Your information has been saved. You can reopen this link to update it anytime.', edit: 'Edit my answers', last_saved: 'Last saved',
+      contact: 'Questions? BIMTC Secretariat · bmia0528@naver.com · +82-51-461-4276'
+    },
+    zh: {
+      title: '受邀买家信息登记', sub: 'BIMTC 2026 · 釜山国际医疗观光大会', ev: '2026年11月13日–14日 · 韩国釜山 BEXCO',
+      intro: '请填写您的行程信息，以便我们为您安排接机、酒店和日程。如航班有变，可随时通过此链接修改。',
+      req_note: '* 为必填项',
+      s_basic: '基本信息', s_flight: '航班信息', s_stay: '住宿与接送', s_program: '活动参加', s_visa: '签证', s_other: '其他',
+      passport_name: '姓名（护照英文名）', h_passport_name: '请按护照上的拼音/英文填写',
+      gender: '性别', o_male: '男', o_female: '女',
+      country: '国家', company: '公司 / 机构', job_title: '职务', email: '电子邮箱',
+      mobile: '手机号码', h_mobile: '请包含国际区号，例如 +86 138 0000 0000',
+      messenger: '微信 / WhatsApp / Telegram 账号', h_messenger: '行程期间方便联系的即时通讯账号',
+      companions: '随行人数', companion_names: '随行人员姓名（护照英文名）',
+      arrival_date: '抵达韩国日期', arrival_flight: '入境航班号', h_flight: '例如 KE1234', arrival_airport: '抵达机场', arrival_terminal: '仁川机场航站楼', arrival_time: '抵达时间（韩国当地时间）',
+      departure_date: '离开韩国日期', departure_flight: '出境航班号', departure_airport: '出发机场', departure_time: '起飞时间（韩国当地时间）',
+      ap_PUS: '釜山金海机场 (PUS)', ap_ICN: '首尔仁川机场 (ICN)', ap_GMP: '首尔金浦机场 (GMP)', ap_OTHER: '其他', ap_other_ph: '机场名称', select: '请选择',
+      checkin_date: '酒店入住日期', checkout_date: '酒店退房日期',
+      hotel_type: '住宿安排', o_provided: '由主办方提供酒店', o_own: '自行安排',
+      pickup: '是否需要接机？', o_yes: '是', o_no: '否', o_undecided: '尚未确定', o_unsure: '不确定',
+      fam_tour: '考察旅游（大会次日）', b2b: 'B2B 商务洽谈会',
+      visa_needed: '入境韩国是否需要签证？', h_visa: '如需签证，我们将准备邀请函，请填写以下护照信息。',
+      passport_no: '护照号码', birth_date: '出生日期',
+      dietary: '饮食要求', o_none: '无', o_vegetarian: '素食', o_vegan: '纯素', o_halal: '清真', o_other: '其他',
+      dietary_note: '过敏或其他说明', interpreter: '是否需要翻译？', interpreter_lang: '所需语言', h_interp: '例如 中文',
+      requests: '其他要求',
+      consent_title: '个人信息收集及使用同意',
+      consent_body: '目的：为 BIMTC 2026 安排邀请、航班、接机、住宿及日程。项目：本表所填信息。保存期限：活动结算完成后销毁。您可以拒绝同意，但可能因此无法获得邀请相关支持。',
+      consent_agree: '我同意', submit: '提交', update: '保存修改', saving: '保存中…',
+      err_req: '请填写必填项。', err_consent: '请勾选同意个人信息收集及使用。', err_net: '保存失败，请检查网络后重试。', err_link: '链接无效，请联系 BIMTC 秘书处。',
+      loading: '加载中…', done_title: '感谢您的填写！', done_body: '您的信息已保存。如有变动，可随时通过此链接修改。', edit: '修改信息', last_saved: '最后保存',
+      contact: '如有疑问：BIMTC 秘书处 · bmia0528@naver.com · +82-51-461-4276'
+    },
+    ru: {
+      title: 'Информация о приглашённом байере', sub: 'BIMTC 2026 · Международная конвенция медицинского туризма, Пусан', ev: '13–14 ноября 2026 · BEXCO, Пусан, Корея',
+      intro: 'Пожалуйста, укажите данные о поездке, чтобы мы организовали встречу в аэропорту, отель и программу. Вы можете открыть эту ссылку снова и изменить ответы в любое время — например, если изменится рейс.',
+      req_note: '* Обязательные поля',
+      s_basic: 'Основная информация', s_flight: 'Перелёт', s_stay: 'Проживание и трансфер', s_program: 'Программа', s_visa: 'Виза', s_other: 'Прочее',
+      passport_name: 'Имя и фамилия (как в загранпаспорте)', h_passport_name: 'Латиницей, точно как в паспорте',
+      gender: 'Пол', o_male: 'Мужской', o_female: 'Женский',
+      country: 'Страна', company: 'Компания / организация', job_title: 'Должность', email: 'Эл. почта',
+      mobile: 'Мобильный телефон', h_mobile: 'С кодом страны, например +7 701 000 0000',
+      messenger: 'WhatsApp / Telegram / WeChat', h_messenger: 'Мессенджер для связи во время поездки',
+      companions: 'Количество сопровождающих', companion_names: 'Имена сопровождающих (как в паспорте)',
+      arrival_date: 'Дата прилёта в Корею', arrival_flight: 'Номер рейса прилёта', h_flight: 'например KE1234', arrival_airport: 'Аэропорт прилёта', arrival_terminal: 'Терминал Инчхона', arrival_time: 'Время прилёта (местное время Кореи)',
+      departure_date: 'Дата вылета из Кореи', departure_flight: 'Номер рейса вылета', departure_airport: 'Аэропорт вылета', departure_time: 'Время вылета (местное время Кореи)',
+      ap_PUS: 'Пусан Кимхэ (PUS)', ap_ICN: 'Сеул Инчхон (ICN)', ap_GMP: 'Сеул Кимпхо (GMP)', ap_OTHER: 'Другой', ap_other_ph: 'Название аэропорта', select: 'Выберите',
+      checkin_date: 'Заезд в отель', checkout_date: 'Выезд из отеля',
+      hotel_type: 'Проживание', o_provided: 'Отель предоставляет организатор', o_own: 'Бронирую самостоятельно',
+      pickup: 'Нужна ли встреча в аэропорту?', o_yes: 'Да', o_no: 'Нет', o_undecided: 'Пока не решено', o_unsure: 'Не уверен(а)',
+      fam_tour: 'Ознакомительный тур (на следующий день после конвенции)', b2b: 'B2B-встречи',
+      visa_needed: 'Нужна ли вам виза для въезда в Корею?', h_visa: 'Если да, мы подготовим пригласительное письмо — укажите паспортные данные ниже.',
+      passport_no: 'Номер паспорта', birth_date: 'Дата рождения',
+      dietary: 'Особенности питания', o_none: 'Нет', o_vegetarian: 'Вегетарианское', o_vegan: 'Веганское', o_halal: 'Халяль', o_other: 'Другое',
+      dietary_note: 'Аллергии / подробности', interpreter: 'Нужен ли переводчик?', interpreter_lang: 'Язык', h_interp: 'например, русский',
+      requests: 'Другие пожелания',
+      consent_title: 'Согласие на сбор и использование персональных данных',
+      consent_body: 'Цель: организация приглашения, перелёта, встречи, проживания и программы BIMTC 2026. Данные: сведения, указанные в этой форме. Срок хранения: уничтожаются после завершения расчётов по мероприятию. Вы можете отказаться, однако в этом случае мы не сможем оказать поддержку по приглашению.',
+      consent_agree: 'Я согласен(на)', submit: 'Отправить', update: 'Сохранить изменения', saving: 'Сохранение…',
+      err_req: 'Заполните обязательные поля.', err_consent: 'Пожалуйста, дайте согласие на обработку персональных данных.', err_net: 'Не удалось сохранить. Проверьте подключение и попробуйте снова.', err_link: 'Ссылка недействительна. Пожалуйста, свяжитесь с секретариатом BIMTC.',
+      loading: 'Загрузка…', done_title: 'Спасибо!', done_body: 'Ваши данные сохранены. Вы можете открыть эту ссылку снова и изменить их в любое время.', edit: 'Изменить ответы', last_saved: 'Последнее сохранение',
+      contact: 'Вопросы: секретариат BIMTC · bmia0528@naver.com · +82-51-461-4276'
+    },
+    mn: {
+      title: 'Урилгат худалдан авагчийн мэдээлэл', sub: 'BIMTC 2026 · Пусан олон улсын эмнэлгийн аялал жуулчлалын чуулган', ev: '2026 оны 11-р сарын 13–14 · BEXCO, Пусан, Солонгос',
+      intro: 'Нисэх буудлаас тосох, зочид буудал болон хөтөлбөрийг зохион байгуулахын тулд аяллын мэдээллээ бөглөнө үү. Нислэг өөрчлөгдвөл энэ холбоосоор орж хэдийд ч засах боломжтой.',
+      req_note: '* Заавал бөглөх',
+      s_basic: 'Үндсэн мэдээлэл', s_flight: 'Нислэг', s_stay: 'Байр ба тээвэр', s_program: 'Хөтөлбөр', s_visa: 'Виз', s_other: 'Бусад',
+      passport_name: 'Овог нэр (гадаад паспортын дагуу)', h_passport_name: 'Паспорт дээрх латин үсгээр яг адилхан',
+      gender: 'Хүйс', o_male: 'Эрэгтэй', o_female: 'Эмэгтэй',
+      country: 'Улс', company: 'Байгууллага / компани', job_title: 'Албан тушаал', email: 'И-мэйл',
+      mobile: 'Гар утас', h_mobile: 'Улсын кодтой, жишээ нь +976 9900 0000',
+      messenger: 'WhatsApp / WeChat / Telegram', h_messenger: 'Аяллын үеэр холбогдох мессенжер',
+      companions: 'Дагалдан яваа хүний тоо', companion_names: 'Дагалдан яваа хүмүүсийн нэр (паспортын дагуу)',
+      arrival_date: 'Солонгост ирэх өдөр', arrival_flight: 'Ирэх нислэгийн дугаар', h_flight: 'жишээ нь OM301', arrival_airport: 'Ирэх нисэх буудал', arrival_terminal: 'Инчоны терминал', arrival_time: 'Ирэх цаг (Солонгосын цагаар)',
+      departure_date: 'Солонгосоос явах өдөр', departure_flight: 'Явах нислэгийн дугаар', departure_airport: 'Явах нисэх буудал', departure_time: 'Явах цаг (Солонгосын цагаар)',
+      ap_PUS: 'Пусан Гимхэ (PUS)', ap_ICN: 'Сөүл Инчон (ICN)', ap_GMP: 'Сөүл Гимпо (GMP)', ap_OTHER: 'Бусад', ap_other_ph: 'Нисэх буудлын нэр', select: 'Сонгох',
+      checkin_date: 'Буудалд орох өдөр', checkout_date: 'Буудлаас гарах өдөр',
+      hotel_type: 'Байрлах газар', o_provided: 'Зохион байгуулагчийн зочид буудал', o_own: 'Өөрөө захиална',
+      pickup: 'Нисэх буудлаас тосох шаардлагатай юу?', o_yes: 'Тийм', o_no: 'Үгүй', o_undecided: 'Шийдээгүй', o_unsure: 'Мэдэхгүй',
+      fam_tour: 'Танилцах аялал (чуулганы дараа өдөр)', b2b: 'B2B бизнес уулзалт',
+      visa_needed: 'Солонгост нэвтрэхэд виз шаардлагатай юу?', h_visa: 'Шаардлагатай бол бид урилга бэлтгэнэ — паспортын мэдээллээ доор бөглөнө үү.',
+      passport_no: 'Паспортын дугаар', birth_date: 'Төрсөн огноо',
+      dietary: 'Хоолны онцлог', o_none: 'Байхгүй', o_vegetarian: 'Цагаан хоол', o_vegan: 'Веган', o_halal: 'Халал', o_other: 'Бусад',
+      dietary_note: 'Харшил / дэлгэрэнгүй', interpreter: 'Орчуулагч хэрэгтэй юу?', interpreter_lang: 'Хэл', h_interp: 'жишээ нь монгол хэл',
+      requests: 'Бусад хүсэлт',
+      consent_title: 'Хувийн мэдээлэл цуглуулах, ашиглахыг зөвшөөрөх',
+      consent_body: 'Зорилго: BIMTC 2026-д урих, нислэг, тосох, байр, хөтөлбөрийг зохион байгуулах. Мэдээлэл: энэ маягтад бөглөсөн мэдээлэл. Хадгалах хугацаа: арга хэмжээний тооцоо дууссаны дараа устгана. Та татгалзаж болно, гэхдээ энэ тохиолдолд урилгын дэмжлэг үзүүлэх боломжгүй байж магадгүй.',
+      consent_agree: 'Би зөвшөөрч байна', submit: 'Илгээх', update: 'Өөрчлөлтийг хадгалах', saving: 'Хадгалж байна…',
+      err_req: 'Заавал бөглөх талбаруудыг бөглөнө үү.', err_consent: 'Хувийн мэдээллийн зөвшөөрлийг тэмдэглэнэ үү.', err_net: 'Хадгалж чадсангүй. Интернэт холболтоо шалгаад дахин оролдоно уу.', err_link: 'Холбоос хүчингүй байна. BIMTC-ийн нарийн бичгийн газартай холбогдоно уу.',
+      loading: 'Ачаалж байна…', done_title: 'Баярлалаа!', done_body: 'Таны мэдээлэл хадгалагдлаа. Энэ холбоосоор орж хэдийд ч засах боломжтой.', edit: 'Хариултаа засах', last_saved: 'Сүүлд хадгалсан',
+      contact: 'Асуулт: BIMTC нарийн бичгийн газар · bmia0528@naver.com · +82-51-461-4276'
+    }
+  };
+
+  // 폼 구성. show: 조건부 표시, req: 필수(PDF 굵은 항목 기준)
+  var YN = ['yes', 'no'], YNU = ['yes', 'no', 'undecided'];
+  var SECTIONS = [
+    { k: 's_basic', fields: [
+      { k: 'passport_name', type: 'text', req: 1, hint: 'h_passport_name', full: 1, upper: 1 },
+      { k: 'gender', type: 'radio', req: 1, opts: ['male', 'female'] },
+      { k: 'country', type: 'text', req: 1 },
+      { k: 'company', type: 'text' },
+      { k: 'job_title', type: 'text' },
+      { k: 'email', type: 'email' },
+      { k: 'mobile', type: 'tel', hint: 'h_mobile' },
+      { k: 'messenger', type: 'text', hint: 'h_messenger' },
+      { k: 'companions', type: 'number' },
+      { k: 'companion_names', type: 'textarea', full: 1, show: function (d) { return +d.companions > 0; } }
+    ] },
+    { k: 's_flight', fields: [
+      { k: 'arrival_date', type: 'date', req: 1 },
+      { k: 'arrival_time', type: 'time', req: 1 },
+      { k: 'arrival_flight', type: 'text', req: 1, hint: 'h_flight', upper: 1 },
+      { k: 'arrival_airport', type: 'airport', req: 1 },
+      { k: 'arrival_terminal', type: 'radio', opts: ['T1', 'T2'], raw: 1, show: function (d) { return d.arrival_airport === 'ICN'; } },
+      { k: 'departure_date', type: 'date', req: 1 },
+      { k: 'departure_time', type: 'time', req: 1 },
+      { k: 'departure_flight', type: 'text', req: 1, hint: 'h_flight', upper: 1 },
+      { k: 'departure_airport', type: 'airport', req: 1 }
+    ] },
+    { k: 's_stay', fields: [
+      { k: 'checkin_date', type: 'date' },
+      { k: 'checkout_date', type: 'date' },
+      { k: 'hotel_type', type: 'radio', opts: ['provided', 'own'], full: 1 },
+      { k: 'pickup', type: 'radio', req: 1, opts: YN, full: 1 }
+    ] },
+    { k: 's_program', fields: [
+      { k: 'fam_tour', type: 'radio', opts: YNU, full: 1 },
+      { k: 'b2b', type: 'radio', opts: YNU, full: 1 }
+    ] },
+    { k: 's_visa', fields: [
+      { k: 'visa_needed', type: 'radio', opts: ['yes', 'no', 'unsure'], full: 1, hint: 'h_visa' },
+      { k: 'passport_no', type: 'text', upper: 1, show: function (d) { return d.visa_needed === 'yes'; } },
+      { k: 'birth_date', type: 'date', show: function (d) { return d.visa_needed === 'yes'; } }
+    ] },
+    { k: 's_other', fields: [
+      { k: 'dietary', type: 'radio', req: 1, opts: ['none', 'vegetarian', 'vegan', 'halal', 'other'], full: 1 },
+      { k: 'dietary_note', type: 'textarea', full: 1 },
+      { k: 'interpreter', type: 'radio', opts: YN },
+      { k: 'interpreter_lang', type: 'text', hint: 'h_interp', show: function (d) { return d.interpreter === 'yes'; } },
+      { k: 'requests', type: 'textarea', full: 1 }
+    ] }
+  ];
+  var AIRPORTS = ['PUS', 'ICN', 'GMP'];
+
+  var token = (new URLSearchParams(location.search).get('t') || '').trim();
+  var lang = 'en', D = {}, consent = false, loaded = null, busy = false;
+  var app = document.getElementById('app');
+
+  function t(k) { return (T[lang] && T[lang][k]) || T.en[k] || k; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function store(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function recall(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function rpc(fn, body) {
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.text().then(function (txt) {
+        var j = null; try { j = txt ? JSON.parse(txt) : null; } catch (e) {}
+        if (!r.ok) throw new Error((j && j.message) || ('HTTP ' + r.status));
+        return j;
+      });
+    });
+  }
+
+  function renderLangs() {
+    document.getElementById('langs').innerHTML = LANGS.map(function (l) {
+      return '<button type="button" data-l="' + l[0] + '" class="' + (l[0] === lang ? 'on' : '') + '">' + l[1] + '</button>';
+    }).join('');
+    document.documentElement.lang = lang;
+    document.title = t('title') + ' · BIMTC 2026';
+  }
+  document.getElementById('langs').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-l]'); if (!b) return;
+    lang = b.getAttribute('data-l'); store('bimtc_invite_lang', lang);
+    renderLangs();
+    if (loaded) (app.getAttribute('data-view') === 'done' ? renderDone() : renderForm());
+  });
+
+  function fieldHtml(f) {
+    var v = D[f.k] == null ? '' : D[f.k];
+    var lab = '<label class="l" for="f_' + f.k + '">' + esc(t(f.k)) + (f.req ? '<span class="r">*</span>' : '') + '</label>';
+    var ctl = '';
+    if (f.type === 'radio') {
+      ctl = '<div class="opts" role="radiogroup">' + f.opts.map(function (o) {
+        var on = String(v) === o;
+        return '<label class="' + (on ? 'on' : '') + '"><input type="radio" name="' + f.k + '" value="' + o + '"' + (on ? ' checked' : '') + '>' + esc(f.raw ? o : t('o_' + o)) + '</label>';
+      }).join('') + '</div>';
+    } else if (f.type === 'airport') {
+      var isOther = v && AIRPORTS.indexOf(v) < 0;
+      ctl = '<select id="f_' + f.k + '" data-k="' + f.k + '" data-ap="1"><option value="">' + esc(t('select')) + '</option>' +
+        AIRPORTS.concat(['OTHER']).map(function (a) {
+          var sel = (a === 'OTHER') ? isOther : v === a;
+          return '<option value="' + a + '"' + (sel ? ' selected' : '') + '>' + esc(t('ap_' + a)) + '</option>';
+        }).join('') + '</select>' +
+        '<input type="text" data-k="' + f.k + '" data-apo="1" placeholder="' + esc(t('ap_other_ph')) + '" value="' + esc(isOther ? v : '') + '" style="margin-top:8px;"' + (isOther ? '' : ' hidden') + '>';
+    } else if (f.type === 'textarea') {
+      ctl = '<textarea id="f_' + f.k + '" data-k="' + f.k + '">' + esc(v) + '</textarea>';
+    } else {
+      var extra = f.type === 'number' ? ' min="0" max="20" inputmode="numeric"' : '';
+      if (f.upper) extra += ' autocapitalize="characters" style="text-transform:uppercase"';
+      ctl = '<input id="f_' + f.k + '" data-k="' + f.k + '" type="' + f.type + '" value="' + esc(v) + '"' + extra + '>';
+    }
+    var hint = f.hint ? '<div class="hint">' + esc(t(f.hint)) + '</div>' : '';
+    var hide = f.show && !f.show(D);
+    return '<div class="f' + (f.full ? ' full' : '') + '" data-f="' + f.k + '"' + (hide ? ' hidden' : '') + '>' + lab + ctl + hint + '</div>';
+  }
+
+  function renderForm() {
+    app.setAttribute('data-view', 'form');
+    var html = '<div class="hero"><p class="sub">' + esc(t('sub')) + '</p><h1>' + esc(t('title')) + '</h1><p class="ev">' + esc(t('ev')) + '</p>' +
+      (loaded.company ? '<div class="for">' + esc(loaded.company) + '</div>' : '') +
+      '<p>' + esc(t('intro')) + '</p><div class="req-note">' + esc(t('req_note')) + '</div></div>';
+    SECTIONS.forEach(function (s) {
+      html += '<section class="card"><h2>' + esc(t(s.k)) + '</h2><div class="grid">' + s.fields.map(fieldHtml).join('') + '</div></section>';
+    });
+    html += '<section class="card"><div class="consent" id="consentBox"><b>' + esc(t('consent_title')) + '</b>' + esc(t('consent_body')) +
+      '<label class="agree"><input type="checkbox" id="consent"' + (consent ? ' checked' : '') + '>' + esc(t('consent_agree')) + '<span style="color:#c0392b">*</span></label></div>' +
+      '<div class="actions"><button type="button" class="btn" id="submit">' + esc(loaded.submitted_at ? t('update') : t('submit')) + '</button>' +
+      '<div id="err"></div></div></section>' +
+      '<footer>' + esc(t('contact')) + '</footer>';
+    app.innerHTML = html;
+  }
+
+  function refreshVisibility() {
+    SECTIONS.forEach(function (s) { s.fields.forEach(function (f) {
+      if (!f.show) return;
+      var el = app.querySelector('[data-f="' + f.k + '"]'); if (el) el.hidden = !f.show(D);
+    }); });
+  }
+
+  app.addEventListener('input', onChange);
+  app.addEventListener('change', onChange);
+  function onChange(e) {
+    var el = e.target;
+    if (el.id === 'consent') { consent = el.checked; document.getElementById('consentBox').classList.remove('bad'); return; }
+    if (el.type === 'radio') {
+      D[el.name] = el.value;
+      var grp = el.closest('.opts');
+      grp.querySelectorAll('label').forEach(function (l) { l.classList.toggle('on', l.querySelector('input').checked); });
+    } else if (el.getAttribute('data-ap')) {
+      var k = el.getAttribute('data-k'), other = el.parentNode.querySelector('[data-apo]');
+      other.hidden = el.value !== 'OTHER';
+      D[k] = el.value === 'OTHER' ? other.value.trim() : el.value;
+    } else if (el.getAttribute('data-apo')) {
+      D[el.getAttribute('data-k')] = el.value.trim();
+    } else if (el.getAttribute('data-k')) {
+      D[el.getAttribute('data-k')] = el.value;
+    } else return;
+    var box = el.closest('.f'); if (box) box.classList.remove('bad');
+    refreshVisibility();
+  }
+
+  app.addEventListener('click', function (e) {
+    if (e.target.id === 'submit') submit();
+    if (e.target.id === 'editAgain') { renderForm(); window.scrollTo(0, 0); }
+  });
+
+  function submit() {
+    if (busy) return;
+    var err = document.getElementById('err'); err.innerHTML = '';
+    var firstBad = null;
+    SECTIONS.forEach(function (s) { s.fields.forEach(function (f) {
+      if (!f.req || (f.show && !f.show(D))) return;
+      var v = D[f.k];
+      if (v == null || String(v).trim() === '') {
+        var box = app.querySelector('[data-f="' + f.k + '"]'); box.classList.add('bad'); if (!firstBad) firstBad = box;
+      }
+    }); });
+    if (firstBad) { err.innerHTML = '<div class="msg err">' + esc(t('err_req')) + '</div>'; firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    if (!consent) { document.getElementById('consentBox').classList.add('bad'); err.innerHTML = '<div class="msg err">' + esc(t('err_consent')) + '</div>'; return; }
+
+    var p = { consent: true, lang: lang };
+    SECTIONS.forEach(function (s) { s.fields.forEach(function (f) {
+      var v = (f.show && !f.show(D)) ? '' : D[f.k];
+      p[f.k] = v == null ? '' : String(v);
+    }); });
+
+    busy = true;
+    var btn = document.getElementById('submit'); btn.disabled = true; btn.textContent = t('saving');
+    rpc('invite_submit', { p_token: token, p: p }).then(function () {
+      busy = false;
+      loaded.submitted_at = loaded.submitted_at || new Date().toISOString();
+      loaded.buyer_updated_at = new Date().toISOString();
+      renderDone(); window.scrollTo(0, 0);
+    }).catch(function () {
+      busy = false; btn.disabled = false; btn.textContent = loaded.submitted_at ? t('update') : t('submit');
+      err.innerHTML = '<div class="msg err">' + esc(t('err_net')) + '</div>';
+    });
+  }
+
+  function renderDone() {
+    app.setAttribute('data-view', 'done');
+    var when = loaded.buyer_updated_at ? new Date(loaded.buyer_updated_at).toLocaleString() : '';
+    app.innerHTML = '<div class="hero center"><div class="done-ic">✓</div><h1>' + esc(t('done_title')) + '</h1><p>' + esc(t('done_body')) + '</p>' +
+      (when ? '<p class="muted" style="margin-top:10px">' + esc(t('last_saved')) + ': ' + esc(when) + '</p>' : '') +
+      '<div style="max-width:320px;margin:20px auto 0"><button type="button" class="btn ghost" id="editAgain">' + esc(t('edit')) + '</button></div></div>' +
+      '<footer>' + esc(t('contact')) + '</footer>';
+  }
+
+  function fail() {
+    app.innerHTML = '<div class="hero center"><h1 style="font-size:19px">' + esc(t('err_link')) + '</h1><p class="muted" style="margin-top:10px">' + esc(t('contact')) + '</p></div>';
+  }
+
+  // 시작
+  var urlLang = new URLSearchParams(location.search).get('lang');
+  lang = T[urlLang] ? urlLang : (T[recall('bimtc_invite_lang')] ? recall('bimtc_invite_lang') : 'en');
+  renderLangs();
+  document.getElementById('boot').textContent = t('loading');
+  if (!/^[0-9a-f-]{36}$/i.test(token)) { fail(); return; }
+
+  rpc('invite_get', { p_token: token }).then(function (row) {
+    if (!row) { fail(); return; }
+    loaded = row;
+    if (!urlLang && !recall('bimtc_invite_lang') && T[row.lang]) { lang = row.lang; renderLangs(); }
+    SECTIONS.forEach(function (s) { s.fields.forEach(function (f) {
+      var v = row[f.k];
+      if (v == null) return;
+      if (f.type === 'time') v = String(v).slice(0, 5);
+      D[f.k] = String(v);
+    }); });
+    consent = !!row.consent_at;
+    if (row.submitted_at) renderDone(); else renderForm();
+  }).catch(fail);
+})();
+</script>
+</body>
+</html>

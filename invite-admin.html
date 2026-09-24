@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>초청바이어 관리 · BIMTC 2026</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!--
+  초청바이어 관리 (invite-admin.html)
+  · 바이어 관리자 전용. 관리자 콘솔(admin.html) 메뉴와 분리된 독립 페이지 — 기존 관리자(is_admin) 계정으로 로그인.
+  · 명단 등록 → 개인 링크 안내문 발송 → 입력 현황 확인 → 엑셀 다운로드 / 인쇄.
+  · 데이터: public.buyer_invites (SQL: ../buyer_invites.sql). 바이어 입력 폼은 invite.html.
+-->
+<script src="bimtc-config.js"></script>
+<script src="bimtc-supabase.js"></script>
+<style>
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{margin:0;background:#EEF1F6;color:#0F2440;font-family:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;font-size:14px;word-break:keep-all;overflow-wrap:break-word;}
+  input,textarea,select,button{font-family:inherit;}
+  ::selection{background:#0B5FA5;color:#fff;}
+  .top{position:sticky;top:0;z-index:40;background:#0A2236;color:#fff;}
+  .top .bar{height:4px;background:linear-gradient(90deg,#0B5FA5,#11A37B);}
+  .top .in{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;padding:9px clamp(14px,4vw,26px);min-height:60px;}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#0B5FA5,#11A37B);position:relative;}
+  .logo:before,.logo:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:2px;}
+  .logo:before{width:13px;height:3px;} .logo:after{width:3px;height:13px;}
+  .brand b{font-weight:800;font-size:16px;} .brand b i{font-style:normal;color:#FF6B5A;margin:0 3px;} .brand b em{font-style:normal;color:#25C281;}
+  .brand .sec{font-size:15px;font-weight:700;color:#9fb4c7;border-left:1px solid rgba(255,255,255,.15);padding-left:11px;}
+  .top a,.top .lnk{font-size:14px;color:#9fb4c7;text-decoration:none;cursor:pointer;}
+  .top .right{display:flex;align-items:center;gap:16px;}
+  main{padding:22px clamp(14px,4vw,26px) 60px;max-width:1500px;margin:0 auto;}
+  h1{font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-.02em;}
+  .lead{font-size:14px;color:#5E7289;margin:0 0 18px;}
+  .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px;}
+  @media (max-width:900px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  .kpi{background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:14px 16px;cursor:pointer;}
+  .kpi.on{border-color:#0B5FA5;box-shadow:0 0 0 2px rgba(11,95,165,.15);}
+  .kpi .l{font-size:13px;color:#8295ab;font-weight:600;}
+  .kpi .v{font-size:26px;font-weight:700;color:#0B5FA5;margin-top:4px;line-height:1;}
+  .kpi.warn .v{color:#E0533C;}
+  .panel{background:#fff;border:1px solid #e6ebf2;border-radius:16px;}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid #eef1f6;}
+  .toolbar .sp{flex:1;}
+  .in-s{padding:9px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;background:#fff;color:#0F2440;outline:none;}
+  .in-s:focus{border-color:#0B5FA5;}
+  .chip{border:1px solid #d8e0ea;background:#fff;color:#33485e;padding:7px 11px;border-radius:999px;font-size:13px;cursor:pointer;font-weight:600;}
+  .chip.on{background:#0B5FA5;border-color:#0B5FA5;color:#fff;}
+  .btn{border:none;background:#0B5FA5;color:#fff;padding:9px 15px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .btn.dark{background:#16294F;} .btn.green{background:#11A37B;} .btn.line{background:#fff;color:#0B5FA5;border:1px solid #c9d6e6;} .btn.red{background:#fff;color:#c0392b;border:1px solid #f0c4bd;}
+  .btn.sm{padding:6px 10px;font-size:12.5px;border-radius:7px;}
+  .btn:disabled{opacity:.55;cursor:default;}
+  .dd{position:relative;display:inline-block;}
+  .dd-menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e6ebf2;border-radius:12px;box-shadow:0 14px 40px rgba(15,36,64,.14);min-width:230px;padding:6px;z-index:30;}
+  .dd-menu button{display:block;width:100%;text-align:left;background:none;border:none;padding:9px 12px;border-radius:8px;font-size:14px;cursor:pointer;color:#0F2440;}
+  .dd-menu button:hover{background:#F2F6FB;}
+  .dd-menu small{display:block;color:#8295ab;font-size:12px;}
+  .tbl-wrap{overflow-x:auto;}
+  table.t{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.t th{text-align:left;font-size:12.5px;color:#5E7289;font-weight:700;background:#F6F8FB;padding:10px 10px;border-bottom:1px solid #e6ebf2;white-space:nowrap;position:sticky;top:0;}
+  table.t td{padding:10px 10px;border-bottom:1px solid #eef1f6;vertical-align:top;}
+  table.t tbody tr{cursor:pointer;} table.t tbody tr:hover{background:#F8FAFD;}
+  .nm{font-weight:700;} .sub{color:#8295ab;font-size:12.5px;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .st-new{background:#EEF1F6;color:#5E7289;} .st-sent{background:#FFF4E0;color:#B7791F;} .st-submitted{background:#E6F0FA;color:#0B5FA5;}
+  .st-reviewed{background:#E8F6F0;color:#0d8f6b;} .st-changed{background:#fdecea;color:#c0392b;}
+  .yes{color:#0d8f6b;font-weight:700;} .no{color:#aab6c4;}
+  .empty{padding:50px 20px;text-align:center;color:#8295ab;}
+  .modal-bg{position:fixed;inset:0;background:rgba(10,34,54,.45);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow-y:auto;}
+  .modal{background:#fff;border-radius:18px;width:100%;max-width:860px;box-shadow:0 30px 80px rgba(0,0,0,.25);}
+  .modal.sm{max-width:620px;}
+  .modal .hd{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid #eef1f6;}
+  .modal .hd h2{font-size:18px;margin:0;}
+  .modal .x{background:none;border:none;font-size:22px;cursor:pointer;color:#8295ab;}
+  .modal .bd{padding:18px 22px;}
+  .modal .ft{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:14px 22px;border-top:1px solid #eef1f6;}
+  .modal .ft .sp{flex:1;}
+  .fg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 14px;}
+  @media (max-width:700px){.fg{grid-template-columns:1fr 1fr;}}
+  .fg .full{grid-column:1/-1;}
+  .fg h3{grid-column:1/-1;font-size:14px;margin:8px 0 0;padding-top:10px;border-top:1px solid #eef1f6;color:#0B5FA5;}
+  .fg h3:first-child{border-top:none;padding-top:0;margin-top:0;}
+  .fg label{display:block;font-size:12.5px;font-weight:700;color:#5E7289;margin-bottom:4px;}
+  .fg input,.fg select,.fg textarea,.bd textarea.big{width:100%;padding:8px 10px;border:1px solid #d8e0ea;border-radius:8px;font-size:14px;color:#0F2440;background:#fff;outline:none;}
+  .fg textarea{min-height:60px;resize:vertical;}
+  .bd textarea.big{min-height:260px;font-size:13.5px;line-height:1.55;}
+  .note{background:#F6F8FB;border:1px solid #e6ebf2;border-radius:10px;padding:10px 12px;font-size:13px;color:#5E7289;line-height:1.6;}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#0A2236;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;z-index:90;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .gate{max-width:420px;margin:60px auto;background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:34px 30px;box-shadow:0 20px 50px rgba(15,36,64,.08);}
+  .gate h1{font-size:21px;} .gate label{display:block;font-size:14px;font-weight:700;margin:14px 0 6px;color:#33485e;}
+  .gate input{width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:15px;outline:none;}
+  .gate .btn{width:100%;padding:13px;margin-top:18px;font-size:15px;}
+  .err{color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:9px 12px;font-size:13.5px;margin-top:12px;}
+  [hidden]{display:none !important;}
+
+  /* ─── 인쇄 ─── */
+  #print{display:none;}
+  @media print{
+    body{background:#fff;font-size:10.5pt;}
+    #root,.toast,.modal-bg{display:none !important;}
+    #print{display:block;}
+  }
+  .pr-hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #0A2236;padding-bottom:6px;margin-bottom:10px;}
+  .pr-hd b{font-size:15pt;} .pr-hd span{font-size:9pt;color:#555;}
+  table.p{width:100%;border-collapse:collapse;font-size:9pt;}
+  table.p th{background:#E9EEF5 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;border:1px solid #9aa7b5;padding:4px 5px;text-align:left;white-space:nowrap;}
+  table.p td{border:1px solid #b9c3cf;padding:4px 5px;vertical-align:top;}
+  table.p tr{page-break-inside:avoid;}
+  table.p thead{display:table-header-group;}
+  .pr-sec{font-size:10.5pt;font-weight:700;margin:12px 0 5px;}
+  .card-p{page-break-after:always;}
+  .card-p:last-child{page-break-after:auto;}
+  .card-p h2{font-size:18pt;margin:0 0 2px;} .card-p .co{font-size:11pt;color:#333;margin-bottom:10px;}
+  table.kv{width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:8px;}
+  table.kv th{width:24%;background:#F0F3F7 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;border:1px solid #b9c3cf;padding:6px 8px;text-align:left;font-weight:700;}
+  table.kv td{border:1px solid #b9c3cf;padding:6px 8px;}
+</style>
+<style id="pageSize">@page{size:A4 landscape;margin:12mm;}</style>
+</head>
+<body>
+<div id="root">
+  <div class="top"><div class="bar"></div><div class="in">
+    <div class="brand"><div class="logo"></div><b>MEDI<i>×</i><em>WELLNESS</em></b><span class="sec">초청바이어 관리</span></div>
+    <div class="right" id="topRight" hidden><span id="who" style="font-size:14px;font-weight:600;"></span><span class="lnk" id="logout">로그아웃</span><a href="admin.html">관리자 콘솔 →</a></div>
+  </div></div>
+  <div id="view"></div>
+</div>
+<div id="print"></div>
+
+<script>
+(function () {
+  var DB = window.BimtcDB, sb = null;
+  var ROWS = [], SEL = {}, F = { q: '', status: '', date: '', flags: {} };
+  var view = document.getElementById('view');
+
+  // ───────── 표시용 사전 ─────────
+  var STATUS = { new: '미발송', sent: '발송 · 미입력', submitted: '입력완료', reviewed: '확인완료', changed: '수정됨 · 재확인' };
+  var V = {
+    yes: '예', no: '아니오', undecided: '미정', unsure: '모름', provided: '주최측 제공', own: '개별 숙박',
+    male: '남', female: '여', none: '없음', vegetarian: '채식', vegan: '비건', halal: '할랄', other: '기타',
+    PUS: '김해(PUS)', ICN: '인천(ICN)', GMP: '김포(GMP)'
+  };
+  var LANG_KO = { en: '영어', zh: '중국어', ru: '러시아어', mn: '몽골어' };
+  var FLAGS = [
+    ['pickup', '픽업 필요', function (r) { return r.pickup === 'yes'; }],
+    ['diet', '식이제한', function (r) { return hasDiet(r); }],
+    ['interp', '통역 필요', function (r) { return r.interpreter === 'yes'; }],
+    ['visa', '비자 필요', function (r) { return r.visa_needed === 'yes'; }],
+    ['fam', '팸투어', function (r) { return r.fam_tour === 'yes'; }],
+    ['b2b', 'B2B', function (r) { return r.b2b === 'yes'; }]
+  ];
+
+  // 관리자 상세 편집 필드 (invite.html 과 같은 컬럼)
+  var YN = [['', '-'], ['yes', '예'], ['no', '아니오']], YNU = YN.concat([['undecided', '미정']]);
+  var EDIT = [
+    ['h', '관리'],
+    ['lang', '폼 언어', 'sel', [['en', '영어'], ['zh', '중국어'], ['ru', '러시아어'], ['mn', '몽골어']]],
+    ['memo', '관리자 메모 (바이어에게 안 보임)', 'ta', null, 'full'],
+    ['h', '기본정보'],
+    ['passport_name', '여권 영문명'], ['gender', '성별', 'sel', [['', '-'], ['male', '남'], ['female', '여']]], ['country', '국가'],
+    ['company', '기업/기관'], ['job_title', '직함'], ['email', '이메일'],
+    ['mobile', '휴대전화'], ['messenger', '메신저(WhatsApp·WeChat 등)'], ['companions', '동반자 수', 'num'],
+    ['companion_names', '동반자 이름', 'ta', null, 'full'],
+    ['h', '항공'],
+    ['arrival_date', '입국일', 'date'], ['arrival_time', '도착시간', 'time'], ['arrival_flight', '입국 편명'],
+    ['arrival_airport', '도착공항 (PUS/ICN/GMP)'], ['arrival_terminal', '터미널', 'sel', [['', '-'], ['T1', 'T1'], ['T2', 'T2']]], ['_', ''],
+    ['departure_date', '출국일', 'date'], ['departure_time', '출발시간', 'time'], ['departure_flight', '출국 편명'],
+    ['departure_airport', '출발공항 (PUS/ICN/GMP)'],
+    ['h', '숙박 · 이동 · 행사'],
+    ['checkin_date', '체크인', 'date'], ['checkout_date', '체크아웃', 'date'], ['hotel_type', '숙박', 'sel', [['', '-'], ['provided', '주최측 제공'], ['own', '개별 숙박']]],
+    ['pickup', '공항 픽업', 'sel', YN], ['fam_tour', '팸투어', 'sel', YNU], ['b2b', 'B2B 상담회', 'sel', YNU],
+    ['h', '비자'],
+    ['visa_needed', '비자 필요', 'sel', YN.concat([['unsure', '모름']])], ['passport_no', '여권번호'], ['birth_date', '생년월일', 'date'],
+    ['h', '기타'],
+    ['dietary', '식이', 'sel', [['', '-'], ['none', '없음'], ['vegetarian', '채식'], ['vegan', '비건'], ['halal', '할랄'], ['other', '기타']]],
+    ['interpreter', '통역', 'sel', YN], ['interpreter_lang', '통역 언어'],
+    ['dietary_note', '알레르기 / 식이 상세', 'ta', null, 'full'],
+    ['requests', '기타 요청사항', 'ta', null, 'full']
+  ];
+
+  // 바이어에게 보내는 안내문 (관리자가 복사해 메일·메신저로 발송)
+  var MAIL = {
+    en: { s: '[BIMTC 2026] Please confirm your travel details', b: 'Dear {name},\n\nThank you for accepting our invitation to BIMTC 2026 (November 13–14, 2026 · BEXCO, Busan, Korea).\n\nTo arrange your airport pickup, hotel and program, please fill in your travel details at the link below:\n{link}\n\nYou can reopen the same link and update your details at any time — for example if your flight changes.\n\nBest regards,\nBIMTC 2026 Secretariat\nbmia0528@naver.com · +82-51-461-4276' },
+    zh: { s: '【BIMTC 2026】请确认您的行程信息', b: '尊敬的 {name}：\n\n感谢您接受 BIMTC 2026（2026年11月13日–14日 · 韩国釜山 BEXCO）的邀请。\n\n为便于我们安排接机、酒店及日程，请通过以下链接填写您的行程信息：\n{link}\n\n如航班等信息有变，可随时通过同一链接修改。\n\nBIMTC 2026 秘书处\nbmia0528@naver.com · +82-51-461-4276' },
+    ru: { s: '[BIMTC 2026] Пожалуйста, подтвердите данные о поездке', b: 'Уважаемые коллеги из {name}!\n\nБлагодарим вас за принятие приглашения на BIMTC 2026 (13–14 ноября 2026 · BEXCO, Пусан, Корея).\n\nЧтобы мы могли организовать встречу в аэропорту, отель и программу, пожалуйста, заполните данные о поездке по ссылке:\n{link}\n\nВы можете открыть эту ссылку снова и изменить данные в любое время — например, если изменится рейс.\n\nС уважением,\nСекретариат BIMTC 2026\nbmia0528@naver.com · +82-51-461-4276' },
+    mn: { s: '[BIMTC 2026] Аяллын мэдээллээ баталгаажуулна уу', b: 'Эрхэм {name},\n\nBIMTC 2026 (2026 оны 11-р сарын 13–14 · BEXCO, Пусан, Солонгос)-ийн урилгыг хүлээн авсанд баярлалаа.\n\nНисэх буудлаас тосох, зочид буудал болон хөтөлбөрийг зохион байгуулахын тулд доорх холбоосоор аяллын мэдээллээ бөглөнө үү:\n{link}\n\nНислэг өөрчлөгдвөл ижил холбоосоор орж хэдийд ч засах боломжтой.\n\nХүндэтгэсэн,\nBIMTC 2026 нарийн бичгийн газар\nbmia0528@naver.com · +82-51-461-4276' }
+  };
+
+  // 국가명 → 폼 기본 언어
+  var LANG_BY_COUNTRY = [
+    [/카자흐|러시아|우즈벡|아제르|키르기|타지키|벨라루스|투르크메|아르메니아|kazakh|russia|uzbek|azerbai|kyrgyz|tajik|belarus|turkmen|armenia/i, 'ru'],
+    [/몽골|mongol/i, 'mn'],
+    [/중국|대만|홍콩|마카오|china|taiwan|hong\s*kong|macau/i, 'zh']
+  ];
+  function langFor(country) {
+    for (var i = 0; i < LANG_BY_COUNTRY.length; i++) if (LANG_BY_COUNTRY[i][0].test(country || '')) return LANG_BY_COUNTRY[i][1];
+    return 'en';
+  }
+
+  // ───────── 공통 ─────────
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function v(x) { return x == null || x === '' ? '' : (V[x] || x); }
+  function hm(x) { return x ? String(x).slice(0, 5) : ''; }
+  function md(x) { return x ? String(x).slice(5).replace('-', '/') : ''; }
+  function hasDiet(r) { return (r.dietary && r.dietary !== 'none') || !!(r.dietary_note && r.dietary_note.trim()); }
+  function status(r) {
+    if (r.submitted_at) {
+      if (r.reviewed_at && r.buyer_updated_at && new Date(r.buyer_updated_at) > new Date(r.reviewed_at)) return 'changed';
+      return r.reviewed_at ? 'reviewed' : 'submitted';
+    }
+    return r.sent_at ? 'sent' : 'new';
+  }
+  function label(r) { return r.passport_name || r.company || r.email || '(이름 없음)'; }
+  // Vercel cleanUrls 환경(/invite-admin)에서는 확장자 없는 주소로 — 리디렉트 한 번을 줄인다
+  function link(r) { return location.origin + location.pathname.replace(/[^\/]*$/, '') + (/\.html$/.test(location.pathname) ? 'invite.html' : 'invite') + '?t=' + r.token; }
+  function nights(r) {
+    if (!r.checkin_date || !r.checkout_date) return '';
+    var n = Math.round((new Date(r.checkout_date) - new Date(r.checkin_date)) / 864e5);
+    return n > 0 ? n + '박' : '';
+  }
+  function people(r) { return 1 + (+r.companions || 0); }
+  function stamp() { var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+  function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2200); }
+  function copy(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove();
+    return Promise.resolve();
+  }
+  function byArrival(a, b) { return String(a.arrival_date || '9999') .localeCompare(String(b.arrival_date || '9999')) || String(a.arrival_time || '').localeCompare(String(b.arrival_time || '')); }
+
+  // ───────── 로그인 게이트 ─────────
+  function renderLogin(msg) {
+    document.getElementById('topRight').hidden = true;
+    view.innerHTML = '<div class="gate"><h1>초청바이어 관리</h1><p style="color:#8295ab;margin:4px 0 6px;">사무국 관리자 계정으로 로그인하세요.</p>' +
+      '<label>이메일</label><input id="liE" type="email" autocomplete="username"><label>비밀번호</label><input id="liP" type="password" autocomplete="current-password">' +
+      (msg ? '<div class="err">' + esc(msg) + '</div>' : '') + '<button class="btn dark" id="liB">로그인</button></div>';
+    function go() {
+      var b = document.getElementById('liB'); b.disabled = true; b.textContent = '로그인 중…';
+      DB.login(document.getElementById('liE').value.trim(), document.getElementById('liP').value).then(function (r) {
+        if (!r.ok) return renderLogin('이메일 또는 비밀번호를 확인해 주세요.');
+        boot();
+      });
+    }
+    document.getElementById('liB').onclick = go;
+    document.getElementById('liP').onkeydown = function (e) { if (e.key === 'Enter') go(); };
+  }
+  document.getElementById('logout').onclick = function () { DB.logout().then(function () { renderLogin(); }); };
+
+  function boot() {
+    view.innerHTML = '<div class="empty">불러오는 중…</div>';
+    DB.ready().then(function (c) { sb = c; return DB.currentUser(); }).then(function (u) {
+      if (!u) return renderLogin();
+      if (!u.is_admin) return renderLogin('이 계정은 관리자 권한이 없습니다.');
+      document.getElementById('who').textContent = u.name || u.email;
+      document.getElementById('topRight').hidden = false;
+      load();
+    });
+  }
+
+  function load() {
+    return sb.from('buyer_invites').select('*').order('created_at', { ascending: true }).then(function (r) {
+      if (r.error) { view.innerHTML = '<div class="empty">데이터를 불러오지 못했습니다: ' + esc(r.error.message) + '<br><br>Supabase 에 buyer_invites.sql 을 실행했는지 확인해 주세요.</div>'; return; }
+      ROWS = r.data || [];
+      Object.keys(SEL).forEach(function (id) { if (!ROWS.some(function (x) { return x.id === id; })) delete SEL[id]; });
+      renderMain();
+    });
+  }
+
+  // ───────── 목록 ─────────
+  function filtered() {
+    var q = F.q.trim().toLowerCase();
+    return ROWS.filter(function (r) {
+      if (F.status && status(r) !== F.status) return false;
+      if (F.date && r.arrival_date !== F.date) return false;
+      for (var i = 0; i < FLAGS.length; i++) if (F.flags[FLAGS[i][0]] && !FLAGS[i][2](r)) return false;
+      if (q) {
+        var hay = [r.passport_name, r.company, r.country, r.email, r.mobile, r.messenger, r.arrival_flight, r.departure_flight, r.memo].join(' ').toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderMain() {
+    var counts = { all: ROWS.length, new: 0, sent: 0, submitted: 0, reviewed: 0, changed: 0 };
+    ROWS.forEach(function (r) { counts[status(r)]++; });
+    var pick = ROWS.filter(function (r) { return r.pickup === 'yes'; }).reduce(function (s, r) { return s + people(r); }, 0);
+    var dates = ROWS.map(function (r) { return r.arrival_date; }).filter(Boolean).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort();
+
+    var kp = [['', '전체', counts.all], ['new', '미발송', counts.new], ['sent', '발송 · 미입력', counts.sent], ['submitted', '입력완료 (확인 전)', counts.submitted], ['changed', '수정됨 · 재확인', counts.changed, 1], ['reviewed', '확인완료', counts.reviewed]];
+
+    view.innerHTML = '<main><h1>초청바이어 관리</h1><p class="lead">명단 등록 → 개인 링크 안내문 발송 → 바이어 입력 확인 → 엑셀 다운로드 · 인쇄. 공항 픽업 필요 인원(동반자 포함): <b>' + pick + '명</b></p>' +
+      '<div class="kpis">' + kp.map(function (k) {
+        return '<div class="kpi' + (k[3] && k[2] ? ' warn' : '') + (F.status === k[0] ? ' on' : '') + '" data-st="' + k[0] + '"><div class="l">' + k[1] + '</div><div class="v">' + k[2] + '</div></div>';
+      }).join('') + '</div>' +
+      '<div class="panel"><div class="toolbar">' +
+        '<input class="in-s" id="q" placeholder="이름·기업·국가·편명 검색" value="' + esc(F.q) + '" style="min-width:210px">' +
+        '<select class="in-s" id="fd"><option value="">입국일 전체</option>' + dates.map(function (d) { return '<option value="' + d + '"' + (F.date === d ? ' selected' : '') + '>' + d + '</option>'; }).join('') + '</select>' +
+        FLAGS.map(function (f) { return '<span class="chip' + (F.flags[f[0]] ? ' on' : '') + '" data-flag="' + f[0] + '">' + f[1] + '</span>'; }).join('') +
+        '<span class="sp"></span>' +
+        '<button class="btn line" id="addB">+ 바이어 등록</button>' +
+        '<button class="btn green" id="xlsB">엑셀 다운로드</button>' +
+        '<div class="dd"><button class="btn dark" id="prB">인쇄 ▾</button><div class="dd-menu" id="prM" hidden>' +
+          '<button data-pr="list">목록 인쇄<small>지금 보이는 표 · 가로 A4</small></button>' +
+          '<button data-pr="pickup">공항 픽업표<small>픽업 필요 · 입국일시 순</small></button>' +
+          '<button data-pr="rooms">숙박 룸리스트<small>체크인 순</small></button>' +
+          '<button data-pr="diet">식이 · 통역 명단</button>' +
+          '<button data-pr="cards">바이어별 상세 카드<small>선택한 바이어 (없으면 입력완료 전원) · 1인 1장</small></button>' +
+        '</div></div>' +
+      '</div><div class="tbl-wrap" id="tbl"></div></div></main>';
+
+    renderTable();
+
+    document.getElementById('q').oninput = function (e) { F.q = e.target.value; renderTable(); };
+    document.getElementById('fd').onchange = function (e) { F.date = e.target.value; renderTable(); };
+    view.querySelectorAll('[data-flag]').forEach(function (el) { el.onclick = function () { var k = el.getAttribute('data-flag'); F.flags[k] = !F.flags[k]; el.classList.toggle('on', !!F.flags[k]); renderTable(); }; });
+    view.querySelectorAll('[data-st]').forEach(function (el) { el.onclick = function () { F.status = el.getAttribute('data-st'); renderMain(); }; });
+    document.getElementById('addB').onclick = openAdd;
+    document.getElementById('xlsB').onclick = exportXlsx;
+    var prM = document.getElementById('prM');
+    document.getElementById('prB').onclick = function (e) { e.stopPropagation(); prM.hidden = !prM.hidden; };
+    prM.onclick = function (e) { var b = e.target.closest('[data-pr]'); if (!b) return; prM.hidden = true; doPrint(b.getAttribute('data-pr')); };
+  }
+  document.addEventListener('click', function () { var m = document.getElementById('prM'); if (m) m.hidden = true; });
+
+  function renderTable() {
+    var list = filtered(), el = document.getElementById('tbl');
+    if (!ROWS.length) { el.innerHTML = '<div class="empty">등록된 바이어가 없습니다. <b>+ 바이어 등록</b>으로 명단을 붙여넣어 시작하세요.</div>'; return; }
+    if (!list.length) { el.innerHTML = '<div class="empty">조건에 맞는 바이어가 없습니다.</div>'; return; }
+    var allOn = list.every(function (r) { return SEL[r.id]; });
+    el.innerHTML = '<table class="t"><thead><tr><th><input type="checkbox" id="selAll"' + (allOn ? ' checked' : '') + '></th><th>상태</th><th>바이어</th><th>입국</th><th>출국</th><th>픽업</th><th>숙박</th><th>팸투어/B2B</th><th>식이 · 통역</th><th>안내</th></tr></thead><tbody>' +
+      list.map(function (r) {
+        var st = status(r);
+        return '<tr data-id="' + r.id + '">' +
+          '<td data-stop="1"><input type="checkbox" data-sel="' + r.id + '"' + (SEL[r.id] ? ' checked' : '') + '></td>' +
+          '<td><span class="badge st-' + st + '">' + STATUS[st] + '</span></td>' +
+          '<td><div class="nm">' + esc(label(r)) + (r.companions > 0 ? ' <span class="sub">+' + r.companions + '</span>' : '') + '</div><div class="sub">' + esc([r.country, r.passport_name ? r.company : ''].filter(Boolean).join(' · ')) + '</div></td>' +
+          '<td>' + (r.arrival_date ? '<div>' + md(r.arrival_date) + ' ' + hm(r.arrival_time) + '</div><div class="sub">' + esc([r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join(' · ')) + '</div>' : '<span class="no">-</span>') + '</td>' +
+          '<td>' + (r.departure_date ? '<div>' + md(r.departure_date) + ' ' + hm(r.departure_time) + '</div><div class="sub">' + esc([r.departure_flight, v(r.departure_airport)].filter(Boolean).join(' · ')) + '</div>' : '<span class="no">-</span>') + '</td>' +
+          '<td>' + (r.pickup === 'yes' ? '<span class="yes">필요</span>' : r.pickup === 'no' ? '<span class="no">불필요</span>' : '<span class="no">-</span>') + '</td>' +
+          '<td>' + (r.hotel_type ? v(r.hotel_type) + '<div class="sub">' + md(r.checkin_date) + (r.checkout_date ? '~' + md(r.checkout_date) : '') + ' ' + nights(r) + '</div>' : '<span class="no">-</span>') + '</td>' +
+          '<td>' + (r.fam_tour || r.b2b ? esc(v(r.fam_tour) || '-') + ' / ' + esc(v(r.b2b) || '-') : '<span class="no">-</span>') + '</td>' +
+          '<td>' + (hasDiet(r) ? '<span class="yes">' + esc(v(r.dietary) || '상세') + '</span>' : '') + (r.interpreter === 'yes' ? '<div class="sub">통역 ' + esc(r.interpreter_lang || '') + '</div>' : '') + (!hasDiet(r) && r.interpreter !== 'yes' ? '<span class="no">-</span>' : '') + '</td>' +
+          '<td data-stop="1"><button class="btn sm line" data-mail="' + r.id + '">안내문</button></td>' +
+        '</tr>';
+      }).join('') + '</tbody></table>';
+
+    document.getElementById('selAll').onchange = function (e) { list.forEach(function (r) { if (e.target.checked) SEL[r.id] = 1; else delete SEL[r.id]; }); renderTable(); };
+    el.querySelector('tbody').onclick = function (e) {
+      var cb = e.target.closest('[data-sel]'); if (cb) { if (cb.checked) SEL[cb.getAttribute('data-sel')] = 1; else delete SEL[cb.getAttribute('data-sel')]; return; }
+      var m = e.target.closest('[data-mail]'); if (m) { openMail(find(m.getAttribute('data-mail'))); return; }
+      if (e.target.closest('[data-stop]')) return;
+      var tr = e.target.closest('tr[data-id]'); if (tr) openDetail(find(tr.getAttribute('data-id')));
+    };
+  }
+  function find(id) { return ROWS.filter(function (r) { return r.id === id; })[0]; }
+
+  // ───────── 모달 ─────────
+  function modal(title, body, foot, cls) {
+    closeModal();
+    var bg = document.createElement('div'); bg.className = 'modal-bg'; bg.id = 'mbg';
+    bg.innerHTML = '<div class="modal ' + (cls || '') + '"><div class="hd"><h2>' + title + '</h2><button class="x" data-close>×</button></div><div class="bd">' + body + '</div><div class="ft">' + foot + '</div></div>';
+    bg.addEventListener('mousedown', function (e) { if (e.target === bg) closeModal(); });
+    bg.querySelectorAll('[data-close]').forEach(function (b) { b.onclick = closeModal; });
+    document.body.appendChild(bg);
+    return bg;
+  }
+  function closeModal() { var m = document.getElementById('mbg'); if (m) m.remove(); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+  // ───────── 등록 ─────────
+  function openAdd() {
+    var m = modal('바이어 등록',
+      '<div class="note">엑셀에서 <b>국가 | 기관/기업명 | 소속 | 이메일 | 연락처</b> 5개 열을 그대로 복사해 붙여넣으세요 (바이어 신청자 명단 C~G열 순서). 머리글 줄은 자동으로 건너뜁니다. 이미 등록된 이메일은 제외하고, 국가에 맞춰 폼 언어(러시아어·몽골어·중국어·영어)가 정해집니다.</div>' +
+      '<textarea class="big" id="paste" placeholder="카자흐스탄	Aktash LLP	overseas sales	aktash@list.ru	+7 701-3388-806" style="margin-top:12px"></textarea>' +
+      '<div id="pv" class="sub" style="margin-top:8px"></div>',
+      '<span class="sub" style="align-self:center">한 명만 추가하려면 한 줄만 입력해도 됩니다.</span><span class="sp"></span><button class="btn line" data-close>취소</button><button class="btn" id="addGo" disabled>등록</button>', 'sm');
+    var parsed = [];
+    var ta = m.querySelector('#paste'), pv = m.querySelector('#pv'), go = m.querySelector('#addGo');
+    ta.oninput = function () {
+      var seen = {}; ROWS.forEach(function (r) { if (r.email) seen[r.email.toLowerCase()] = 1; });
+      var dup = 0;
+      parsed = ta.value.split(/\r?\n/).map(function (line) { return line.split('\t').map(function (c) { return c.trim(); }); })
+        .filter(function (c) { return c.join('') !== '' && !/^(국가|country)$/i.test(c[0]); })
+        .map(function (c) {
+          if (c.length === 1) c = ['', c[0]]; // 한 칸만 붙여넣으면 기업명으로
+          return { country: c[0] || null, company: c[1] || null, memo: c[2] ? '소속: ' + c[2] : null, email: c[3] || null, mobile: c[4] || null, lang: langFor(c[0]) };
+        })
+        .filter(function (r) {
+          var k = (r.email || '').toLowerCase(); if (k && seen[k]) { dup++; return false; } if (k) seen[k] = 1; return r.company || r.email;
+        });
+      var byLang = {}; parsed.forEach(function (r) { byLang[r.lang] = (byLang[r.lang] || 0) + 1; });
+      pv.innerHTML = parsed.length ? '<b>' + parsed.length + '명</b> 등록 예정 · ' + Object.keys(byLang).map(function (l) { return LANG_KO[l] + ' ' + byLang[l]; }).join(', ') + (dup ? ' · 중복 이메일 ' + dup + '건 제외' : '') : (dup ? '모두 이미 등록된 이메일입니다.' : '');
+      go.disabled = !parsed.length;
+    };
+    go.onclick = function () {
+      go.disabled = true; go.textContent = '등록 중…';
+      sb.from('buyer_invites').insert(parsed).select().then(function (r) {
+        if (r.error) { go.disabled = false; go.textContent = '등록'; toast('등록 실패: ' + r.error.message); return; }
+        closeModal(); toast((r.data || []).length + '명 등록했습니다'); load();
+      });
+    };
+  }
+
+  // ───────── 안내문 ─────────
+  function mailText(r, lang) {
+    var t = MAIL[lang] || MAIL.en;
+    return { s: t.s, b: t.b.replace('{name}', r.company || r.passport_name || 'Sir/Madam').replace('{link}', link(r)) };
+  }
+  function openMail(r) {
+    var lang = r.lang || 'en', mt = mailText(r, lang);
+    var m = modal('안내문 · ' + esc(label(r)),
+      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap"><span class="sub">언어</span>' +
+        ['en', 'zh', 'ru', 'mn'].map(function (l) { return '<span class="chip' + (l === lang ? ' on' : '') + '" data-ml="' + l + '">' + LANG_KO[l] + '</span>'; }).join('') +
+        '<span class="sp" style="flex:1"></span><span class="sub">받는 사람: ' + esc(r.email || '(이메일 없음)') + '</span></div>' +
+      '<label class="sub">제목</label><input class="in-s" id="ms" style="width:100%;margin:4px 0 10px" value="' + esc(mt.s) + '">' +
+      '<textarea class="big" id="mb">' + esc(mt.b) + '</textarea>' +
+      '<div class="note" style="margin-top:10px">개인 링크: <b>' + esc(link(r)) + '</b><br>복사하거나 메일 앱으로 열면 상태가 <b>발송</b>으로 바뀝니다. 위챗·왓츠앱으로 보낼 때는 본문만 복사해 붙여넣으세요.</div>',
+      '<button class="btn line" id="mLink">링크만 복사</button><span class="sp"></span>' +
+      (r.email ? '<button class="btn line" id="mOpen">메일 앱으로 열기</button>' : '') + '<button class="btn" id="mCopy">본문 복사</button>');
+    m.querySelectorAll('[data-ml]').forEach(function (c) { c.onclick = function () {
+      lang = c.getAttribute('data-ml'); var x = mailText(r, lang);
+      m.querySelector('#ms').value = x.s; m.querySelector('#mb').value = x.b;
+      m.querySelectorAll('[data-ml]').forEach(function (o) { o.classList.toggle('on', o === c); });
+    }; });
+    function sent() {
+      var patch = { sent_at: r.sent_at || new Date().toISOString() };
+      if (lang !== r.lang) patch.lang = lang; // 안내문 언어를 바꿨으면 폼 기본 언어도 맞춘다
+      sb.from('buyer_invites').update(patch).eq('id', r.id).then(function () { Object.assign(r, patch); renderMain(); });
+    }
+    m.querySelector('#mCopy').onclick = function () { copy(m.querySelector('#ms').value + '\n\n' + m.querySelector('#mb').value).then(function () { toast('안내문을 복사했습니다'); sent(); }); };
+    m.querySelector('#mLink').onclick = function () { copy(link(r)).then(function () { toast('링크를 복사했습니다'); sent(); }); };
+    var op = m.querySelector('#mOpen');
+    if (op) op.onclick = function () {
+      location.href = 'mailto:' + encodeURIComponent(r.email) + '?subject=' + encodeURIComponent(m.querySelector('#ms').value) + '&body=' + encodeURIComponent(m.querySelector('#mb').value);
+      sent();
+    };
+  }
+
+  // ───────── 상세 · 수정 ─────────
+  function openDetail(r) {
+    var st = status(r);
+    var body = '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px"><span class="badge st-' + st + '">' + STATUS[st] + '</span>' +
+      '<span class="sub">' + (r.submitted_at ? '최초 제출 ' + new Date(r.submitted_at).toLocaleString() : '아직 제출 전') +
+      (r.buyer_updated_at && r.buyer_updated_at !== r.submitted_at ? ' · 바이어 최종 수정 ' + new Date(r.buyer_updated_at).toLocaleString() : '') +
+      (r.reviewed_at ? ' · 확인 ' + new Date(r.reviewed_at).toLocaleString() : '') + '</span></div><div class="fg">' +
+      EDIT.map(function (f) {
+        if (f[0] === 'h') return '<h3>' + f[1] + '</h3>';
+        if (f[0] === '_') return '<div></div>';
+        var val = r[f[0]] == null ? '' : r[f[0]], type = f[2], cls = f[4] === 'full' ? ' class="full"' : '', ctl;
+        if (type === 'sel') ctl = '<select data-e="' + f[0] + '">' + f[3].map(function (o) { return '<option value="' + o[0] + '"' + (String(val) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>';
+        else if (type === 'ta') ctl = '<textarea data-e="' + f[0] + '">' + esc(val) + '</textarea>';
+        else ctl = '<input data-e="' + f[0] + '" type="' + ({ date: 'date', time: 'time', num: 'number' }[type] || 'text') + '" value="' + esc(type === 'time' ? hm(val) : val) + '">';
+        return '<div' + cls + '><label>' + f[1] + '</label>' + ctl + '</div>';
+      }).join('') + '</div>';
+    var m = modal(esc(label(r)), body,
+      '<button class="btn red" id="dDel">삭제</button><button class="btn line" id="dMail">안내문</button><span class="sp"></span>' +
+      '<button class="btn line" data-close>닫기</button><button class="btn" id="dSave">저장</button>' +
+      (r.submitted_at ? '<button class="btn green" id="dOk">저장 + 확인완료</button>' : ''));
+
+    function collect() {
+      var p = {};
+      m.querySelectorAll('[data-e]').forEach(function (el) {
+        var k = el.getAttribute('data-e'), x = el.value.trim();
+        p[k] = x === '' ? (k === 'companions' ? 0 : k === 'lang' ? 'en' : null) : (k === 'companions' ? parseInt(x, 10) || 0 : x);
+      });
+      return p;
+    }
+    function save(ok) {
+      var p = collect(); if (ok) p.reviewed_at = new Date().toISOString();
+      sb.from('buyer_invites').update(p).eq('id', r.id).select().then(function (res) {
+        if (res.error) { toast('저장 실패: ' + res.error.message); return; }
+        closeModal(); toast(ok ? '저장하고 확인완료로 표시했습니다' : '저장했습니다'); load();
+      });
+    }
+    m.querySelector('#dSave').onclick = function () { save(false); };
+    var ok = m.querySelector('#dOk'); if (ok) ok.onclick = function () { save(true); };
+    m.querySelector('#dMail').onclick = function () { openMail(r); };
+    m.querySelector('#dDel').onclick = function () {
+      if (!confirm(label(r) + ' 바이어를 삭제할까요? 입력한 정보와 개인 링크가 모두 사라지며 되돌릴 수 없습니다.')) return;
+      sb.from('buyer_invites').delete().eq('id', r.id).then(function (res) {
+        if (res.error) { toast('삭제 실패: ' + res.error.message); return; }
+        delete SEL[r.id]; closeModal(); toast('삭제했습니다'); load();
+      });
+    };
+  }
+
+  // ───────── 표 정의 (엑셀·인쇄 공용) ─────────
+  var COLS = {
+    all: [
+      ['상태', function (r) { return STATUS[status(r)]; }, 12], ['국가', 'country', 12], ['기업/기관', 'company', 24], ['직함', 'job_title', 14],
+      ['여권 영문명', 'passport_name', 22], ['성별', function (r) { return v(r.gender); }, 6], ['이메일', 'email', 26], ['휴대전화', 'mobile', 18], ['메신저', 'messenger', 18],
+      ['동반자 수', function (r) { return +r.companions || 0; }, 8], ['동반자 이름', 'companion_names', 22],
+      ['입국일', 'arrival_date', 11], ['도착시간', function (r) { return hm(r.arrival_time); }, 8], ['입국 편명', 'arrival_flight', 10], ['도착공항', function (r) { return v(r.arrival_airport); }, 11], ['터미널', 'arrival_terminal', 7],
+      ['출국일', 'departure_date', 11], ['출발시간', function (r) { return hm(r.departure_time); }, 8], ['출국 편명', 'departure_flight', 10], ['출발공항', function (r) { return v(r.departure_airport); }, 11],
+      ['체크인', 'checkin_date', 11], ['체크아웃', 'checkout_date', 11], ['숙박', function (r) { return v(r.hotel_type); }, 11], ['공항 픽업', function (r) { return v(r.pickup); }, 9],
+      ['팸투어', function (r) { return v(r.fam_tour); }, 8], ['B2B', function (r) { return v(r.b2b); }, 8],
+      ['비자 필요', function (r) { return v(r.visa_needed); }, 9], ['여권번호', 'passport_no', 13], ['생년월일', 'birth_date', 11],
+      ['식이', function (r) { return v(r.dietary); }, 8], ['알레르기/식이 상세', 'dietary_note', 24], ['통역', function (r) { return v(r.interpreter); }, 6], ['통역 언어', 'interpreter_lang', 10],
+      ['기타 요청', 'requests', 30], ['관리자 메모', 'memo', 24], ['폼 언어', function (r) { return LANG_KO[r.lang] || r.lang; }, 8],
+      ['최초 제출', function (r) { return r.submitted_at ? new Date(r.submitted_at).toLocaleString() : ''; }, 18],
+      ['바이어 최종 수정', function (r) { return r.buyer_updated_at ? new Date(r.buyer_updated_at).toLocaleString() : ''; }, 18],
+      ['개인 링크', function (r) { return link(r); }, 40]
+    ],
+    pickup: [
+      ['입국일', 'arrival_date', 11], ['도착시간', function (r) { return hm(r.arrival_time); }, 8], ['편명', 'arrival_flight', 10], ['공항', function (r) { return v(r.arrival_airport); }, 11], ['터미널', 'arrival_terminal', 7],
+      ['여권 영문명', 'passport_name', 22], ['인원', people, 6], ['동반자', 'companion_names', 20], ['국가', 'country', 11], ['기업/기관', 'company', 22],
+      ['휴대전화', 'mobile', 17], ['메신저', 'messenger', 16], ['출국일', 'departure_date', 11], ['출국 편명', 'departure_flight', 10], ['출발시간', function (r) { return hm(r.departure_time); }, 8]
+    ],
+    rooms: [
+      ['체크인', 'checkin_date', 11], ['체크아웃', 'checkout_date', 11], ['박수', nights, 6], ['숙박', function (r) { return v(r.hotel_type); }, 11],
+      ['여권 영문명', 'passport_name', 22], ['성별', function (r) { return v(r.gender); }, 6], ['인원', people, 6], ['동반자', 'companion_names', 22],
+      ['국가', 'country', 11], ['기업/기관', 'company', 22], ['휴대전화', 'mobile', 17], ['식이', function (r) { return v(r.dietary); }, 8], ['요청사항', 'requests', 26]
+    ],
+    diet: [
+      ['여권 영문명', 'passport_name', 22], ['국가', 'country', 11], ['기업/기관', 'company', 22], ['인원', people, 6],
+      ['식이', function (r) { return v(r.dietary); }, 8], ['알레르기/식이 상세', 'dietary_note', 30], ['통역', function (r) { return v(r.interpreter); }, 6], ['통역 언어', 'interpreter_lang', 12]
+    ]
+  };
+  function cell(c, r) { var x = typeof c[1] === 'function' ? c[1](r) : r[c[1]]; return x == null ? '' : x; }
+  function sets(list) {
+    return {
+      all: list,
+      pickup: list.filter(function (r) { return r.pickup === 'yes'; }).sort(byArrival),
+      rooms: list.filter(function (r) { return r.hotel_type || r.checkin_date; }).sort(function (a, b) { return String(a.checkin_date || '9999').localeCompare(String(b.checkin_date || '9999')); }),
+      diet: list.filter(function (r) { return hasDiet(r) || r.interpreter === 'yes'; })
+    };
+  }
+  var TITLES = { all: '전체 명단', pickup: '공항 픽업', rooms: '숙박 룸리스트', diet: '식이 · 통역' };
+
+  // ───────── 엑셀 ─────────
+  function loadXlsx() {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    return new Promise(function (ok, no) {
+      var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+      s.onload = function () { ok(window.XLSX); }; s.onerror = no; document.head.appendChild(s);
+    });
+  }
+  function exportXlsx() {
+    var list = filtered();
+    if (!list.length) { toast('내보낼 바이어가 없습니다'); return; }
+    var btn = document.getElementById('xlsB'); btn.disabled = true; btn.textContent = '만드는 중…';
+    loadXlsx().then(function (X) {
+      var wb = X.utils.book_new(), S = sets(list);
+      ['all', 'pickup', 'rooms', 'diet'].forEach(function (k) {
+        var cols = COLS[k];
+        var aoa = [cols.map(function (c) { return c[0]; })].concat(S[k].map(function (r) { return cols.map(function (c) { return cell(c, r); }); }));
+        var ws = X.utils.aoa_to_sheet(aoa);
+        ws['!cols'] = cols.map(function (c) { return { wch: c[2] || 12 }; });
+        ws['!autofilter'] = { ref: X.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(aoa.length - 1, 0), c: cols.length - 1 } }) };
+        X.utils.book_append_sheet(wb, ws, TITLES[k].replace(/[\\\/?*\[\]:]/g, ''));
+      });
+      X.writeFile(wb, 'BIMTC2026_초청바이어_' + stamp().replace(/[-: ]/g, '').replace(/^(\d{8})(\d{4})$/, '$1_$2') + '.xlsx');
+      toast(list.length + '명 · 엑셀 4개 시트로 내보냈습니다');
+    }).catch(function () { toast('엑셀 모듈을 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.'); })
+      .then(function () { btn.disabled = false; btn.textContent = '엑셀 다운로드'; });
+  }
+
+  // ───────── 인쇄 ─────────
+  function prHead(title, n) {
+    return '<div class="pr-hd"><b>2026 BIMTC 초청바이어 · ' + esc(title) + '</b><span>' + n + '명 · 출력 ' + stamp() + '</span></div>';
+  }
+  function prTable(cols, rows) {
+    return '<table class="p"><thead><tr><th>No</th>' + cols.map(function (c) { return '<th>' + esc(c[0]) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td>' + cols.map(function (c) { return '<td>' + esc(cell(c, r)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+  }
+  var LIST_COLS = [
+    ['상태', function (r) { return STATUS[status(r)]; }], ['국가', 'country'], ['기업/기관', 'company'], ['여권 영문명', 'passport_name'], ['인원', people],
+    ['입국', function (r) { return [md(r.arrival_date), hm(r.arrival_time), r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join(' '); }],
+    ['출국', function (r) { return [md(r.departure_date), hm(r.departure_time), r.departure_flight, v(r.departure_airport)].filter(Boolean).join(' '); }],
+    ['픽업', function (r) { return v(r.pickup); }], ['숙박', function (r) { return [v(r.hotel_type), md(r.checkin_date) + (r.checkout_date ? '~' + md(r.checkout_date) : '')].filter(Boolean).join(' '); }],
+    ['팸/B2B', function (r) { return (v(r.fam_tour) || '-') + '/' + (v(r.b2b) || '-'); }],
+    ['식이', function (r) { return [v(r.dietary), r.dietary_note].filter(Boolean).join(' · '); }], ['통역', function (r) { return r.interpreter === 'yes' ? (r.interpreter_lang || '예') : ''; }],
+    ['연락처', function (r) { return [r.mobile, r.messenger].filter(Boolean).join(' / '); }]
+  ];
+  function card(r) {
+    function row(k, x) { return '<tr><th>' + k + '</th><td>' + esc(x || '') + '</td></tr>'; }
+    return '<div class="card-p">' + prHead('바이어 상세', 1).replace('1명 · ', '') +
+      '<h2>' + esc(r.passport_name || '(여권명 미입력)') + ' <span style="font-size:12pt;font-weight:400">' + esc(v(r.gender)) + '</span></h2>' +
+      '<div class="co">' + esc([r.country, r.company, r.job_title].filter(Boolean).join(' · ')) + '</div>' +
+      '<div class="pr-sec">연락처</div><table class="kv">' + row('휴대전화', r.mobile) + row('메신저', r.messenger) + row('이메일', r.email) + row('동반자', (+r.companions || 0) + '명 ' + (r.companion_names || '')) + '</table>' +
+      '<div class="pr-sec">항공</div><table class="kv">' +
+        row('입국', [r.arrival_date, hm(r.arrival_time), r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join('  ')) +
+        row('출국', [r.departure_date, hm(r.departure_time), r.departure_flight, v(r.departure_airport)].filter(Boolean).join('  ')) + row('공항 픽업', v(r.pickup)) + '</table>' +
+      '<div class="pr-sec">숙박 · 행사</div><table class="kv">' +
+        row('숙박', [v(r.hotel_type), r.checkin_date ? r.checkin_date + ' ~ ' + (r.checkout_date || '') : '', nights(r)].filter(Boolean).join('  ')) +
+        row('팸투어', v(r.fam_tour)) + row('B2B 상담회', v(r.b2b)) + row('비자', [v(r.visa_needed), r.passport_no, r.birth_date].filter(Boolean).join('  ')) + '</table>' +
+      '<div class="pr-sec">기타</div><table class="kv">' +
+        row('식이 / 알레르기', [v(r.dietary), r.dietary_note].filter(Boolean).join(' · ')) + row('통역', r.interpreter === 'yes' ? '필요 · ' + (r.interpreter_lang || '') : v(r.interpreter)) +
+        row('기타 요청', r.requests) + row('관리자 메모', r.memo) + '</table></div>';
+  }
+  function doPrint(kind) {
+    var list = filtered(), S = sets(list), html, landscape = true;
+    if (kind === 'list') html = prHead('목록', list.length) + prTable(LIST_COLS, list.slice().sort(byArrival));
+    else if (kind === 'cards') {
+      // 선택한 바이어만. 선택이 없으면 목록 중 입력을 마친 바이어만 (빈 카드 출력 방지)
+      var pick = list.filter(function (r) { return SEL[r.id]; });
+      if (!pick.length) pick = list.filter(function (r) { return r.submitted_at; });
+      html = pick.slice().sort(byArrival).map(card).join(''); landscape = false; list = pick;
+    } else html = prHead(TITLES[kind], S[kind].reduce(function (s, r) { return s + people(r); }, 0)) + prTable(COLS[kind], S[kind]);
+    if (!list.length || (kind !== 'list' && kind !== 'cards' && !S[kind].length)) { toast('인쇄할 대상이 없습니다'); return; }
+    document.getElementById('pageSize').textContent = '@page{size:A4 ' + (landscape ? 'landscape' : 'portrait') + ';margin:12mm;}';
+    document.getElementById('print').innerHTML = html;
+    setTimeout(function () { window.print(); }, 50);
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
