@@ -65,6 +65,9 @@
   .center{text-align:center;padding:48px 20px;}
   .done-ic{width:56px;height:56px;border-radius:50%;background:#11A37B;color:#fff;font-size:30px;line-height:56px;margin:0 auto 14px;}
   .muted{color:#8295ab;font-size:13px;}
+  .link-box{background:#F6F8FB;border:1px solid #e6ebf2;border-radius:12px;padding:16px;margin:20px auto 0;max-width:520px;text-align:left;}
+  .link-box b{display:block;margin-bottom:8px;}
+  .link-url{background:#fff;border:1px dashed #c9d6e6;border-radius:8px;padding:10px 12px;font-size:13.5px;word-break:break-all;color:#0B5FA5;margin-bottom:8px;user-select:all;}
   footer{text-align:center;color:#8295ab;font-size:12.5px;margin-top:22px;}
   [hidden]{display:none !important;}
 </style>
@@ -86,6 +89,8 @@
 
   var T = {
     en: {
+      ceo_name: 'CEO / Representative name', contact_name: 'Contact person name', err_email: 'Please enter a valid email address.',
+      link_title: 'Your personal edit link', link_note: 'Save this link. Open it anytime to update your details (e.g. if your flight changes).', copy: 'Copy link', copied: 'Copied!',
       title: 'Invited Buyer Information', sub: 'BIMTC 2026 · Busan International Medical Tourism Convention', ev: 'November 13–14, 2026 · BEXCO, Busan, Korea',
       intro: 'Please share your travel details so we can arrange your airport pickup, hotel and program. You can reopen this link and update your answers at any time — for example if your flight changes.',
       req_note: '* Required',
@@ -116,6 +121,8 @@
       contact: 'Questions? BIMTC Secretariat · bmia0528@naver.com · +82-51-461-4276'
     },
     zh: {
+      ceo_name: '代表人姓名', contact_name: '联系人姓名', err_email: '请输入有效的电子邮箱。',
+      link_title: '您的专属修改链接', link_note: '请保存此链接。如航班等信息有变，可随时通过此链接修改。', copy: '复制链接', copied: '已复制！',
       title: '受邀买家信息登记', sub: 'BIMTC 2026 · 釜山国际医疗观光大会', ev: '2026年11月13日–14日 · 韩国釜山 BEXCO',
       intro: '请填写您的行程信息，以便我们为您安排接机、酒店和日程。如航班有变，可随时通过此链接修改。',
       req_note: '* 为必填项',
@@ -146,6 +153,8 @@
       contact: '如有疑问：BIMTC 秘书处 · bmia0528@naver.com · +82-51-461-4276'
     },
     ru: {
+      ceo_name: 'ФИО руководителя', contact_name: 'Контактное лицо', err_email: 'Введите корректный адрес эл. почты.',
+      link_title: 'Ваша личная ссылка для изменений', link_note: 'Сохраните эту ссылку. По ней можно в любое время изменить данные (например, если изменится рейс).', copy: 'Копировать ссылку', copied: 'Скопировано!',
       title: 'Информация о приглашённом байере', sub: 'BIMTC 2026 · Международная конвенция медицинского туризма, Пусан', ev: '13–14 ноября 2026 · BEXCO, Пусан, Корея',
       intro: 'Пожалуйста, укажите данные о поездке, чтобы мы организовали встречу в аэропорту, отель и программу. Вы можете открыть эту ссылку снова и изменить ответы в любое время — например, если изменится рейс.',
       req_note: '* Обязательные поля',
@@ -176,6 +185,8 @@
       contact: 'Вопросы: секретариат BIMTC · bmia0528@naver.com · +82-51-461-4276'
     },
     mn: {
+      ceo_name: 'Удирдлагын нэр', contact_name: 'Холбоо барих хүний нэр', err_email: 'Зөв и-мэйл хаяг оруулна уу.',
+      link_title: 'Таны засах холбоос', link_note: 'Энэ холбоосыг хадгална уу. Нислэг өөрчлөгдвөл энэ холбоосоор орж хэдийд ч засах боломжтой.', copy: 'Холбоос хуулах', copied: 'Хуулагдлаа!',
       title: 'Урилгат худалдан авагчийн мэдээлэл', sub: 'BIMTC 2026 · Пусан олон улсын эмнэлгийн аялал жуулчлалын чуулган', ev: '2026 оны 11-р сарын 13–14 · BEXCO, Пусан, Солонгос',
       intro: 'Нисэх буудлаас тосох, зочид буудал болон хөтөлбөрийг зохион байгуулахын тулд аяллын мэдээллээ бөглөнө үү. Нислэг өөрчлөгдвөл энэ холбоосоор орж хэдийд ч засах боломжтой.',
       req_note: '* Заавал бөглөх',
@@ -211,14 +222,16 @@
   var YN = ['yes', 'no'], YNU = ['yes', 'no', 'undecided'];
   var SECTIONS = [
     { k: 's_basic', fields: [
+      { k: 'company', type: 'text', req: 1 },
+      { k: 'ceo_name', type: 'text', req: 1 },
+      { k: 'contact_name', type: 'text', req: 1 },
+      { k: 'job_title', type: 'text' },
+      { k: 'email', type: 'email', req: 1 },
+      { k: 'mobile', type: 'tel', req: 1, hint: 'h_mobile' },
+      { k: 'messenger', type: 'text', hint: 'h_messenger' },
+      { k: 'country', type: 'text', req: 1 },
       { k: 'passport_name', type: 'text', req: 1, hint: 'h_passport_name', full: 1, upper: 1 },
       { k: 'gender', type: 'radio', req: 1, opts: ['male', 'female'] },
-      { k: 'country', type: 'text', req: 1 },
-      { k: 'company', type: 'text' },
-      { k: 'job_title', type: 'text' },
-      { k: 'email', type: 'email' },
-      { k: 'mobile', type: 'tel', hint: 'h_mobile' },
-      { k: 'messenger', type: 'text', hint: 'h_messenger' },
       { k: 'companions', type: 'number' },
       { k: 'companion_names', type: 'textarea', full: 1, show: function (d) { return +d.companions > 0; } }
     ] },
@@ -332,6 +345,8 @@
     SECTIONS.forEach(function (s) {
       html += '<section class="card"><h2>' + esc(t(s.k)) + '</h2><div class="grid">' + s.fields.map(fieldHtml).join('') + '</div></section>';
     });
+    // 로봇 차단용 숨은 칸 — 사람은 볼 수 없어 비어 있어야 한다
+    html += '<input type="text" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">';
     html += '<section class="card"><div class="consent" id="consentBox"><b>' + esc(t('consent_title')) + '</b>' + esc(t('consent_body')) +
       '<label class="agree"><input type="checkbox" id="consent"' + (consent ? ' checked' : '') + '>' + esc(t('consent_agree')) + '<span style="color:#c0392b">*</span></label></div>' +
       '<div class="actions"><button type="button" class="btn" id="submit">' + esc(loaded.submitted_at ? t('update') : t('submit')) + '</button>' +
@@ -372,6 +387,7 @@
   app.addEventListener('click', function (e) {
     if (e.target.id === 'submit') submit();
     if (e.target.id === 'editAgain') { renderForm(); window.scrollTo(0, 0); }
+    if (e.target.id === 'copyLink') copyLink();
   });
 
   function submit() {
@@ -386,9 +402,13 @@
       }
     }); });
     if (firstBad) { err.innerHTML = '<div class="msg err">' + esc(t('err_req')) + '</div>'; firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(D.email || '').trim())) {
+      var eb = app.querySelector('[data-f="email"]'); eb.classList.add('bad');
+      err.innerHTML = '<div class="msg err">' + esc(t('err_email')) + '</div>'; eb.scrollIntoView({ behavior: 'smooth', block: 'center' }); return;
+    }
     if (!consent) { document.getElementById('consentBox').classList.add('bad'); err.innerHTML = '<div class="msg err">' + esc(t('err_consent')) + '</div>'; return; }
 
-    var p = { consent: true, lang: lang };
+    var p = { consent: true, lang: lang, hp: (document.getElementById('hp') || {}).value || '' };
     SECTIONS.forEach(function (s) { s.fields.forEach(function (f) {
       var v = (f.show && !f.show(D)) ? '' : D[f.k];
       p[f.k] = v == null ? '' : String(v);
@@ -396,8 +416,14 @@
 
     busy = true;
     var btn = document.getElementById('submit'); btn.disabled = true; btn.textContent = t('saving');
-    rpc('invite_submit', { p_token: token, p: p }).then(function () {
+    // 개인 링크(token)면 내 행 수정, 공통 링크면 새 행 생성 → 받은 token 으로 주소를 바꿔 새로고침해도 이어서 수정
+    var call = token ? rpc('invite_submit', { p_token: token, p: p }) : rpc('invite_create', { p: p });
+    call.then(function (res) {
       busy = false;
+      if (!token && res && res.token) {
+        token = res.token;
+        try { history.replaceState(null, '', location.pathname + '?t=' + token); } catch (e) {}
+      }
       loaded.submitted_at = loaded.submitted_at || new Date().toISOString();
       loaded.buyer_updated_at = new Date().toISOString();
       renderDone(); window.scrollTo(0, 0);
@@ -412,8 +438,22 @@
     var when = loaded.buyer_updated_at ? new Date(loaded.buyer_updated_at).toLocaleString() : '';
     app.innerHTML = '<div class="hero center"><div class="done-ic">✓</div><h1>' + esc(t('done_title')) + '</h1><p>' + esc(t('done_body')) + '</p>' +
       (when ? '<p class="muted" style="margin-top:10px">' + esc(t('last_saved')) + ': ' + esc(when) + '</p>' : '') +
-      '<div style="max-width:320px;margin:20px auto 0"><button type="button" class="btn ghost" id="editAgain">' + esc(t('edit')) + '</button></div></div>' +
+      '<div class="link-box"><b>' + esc(t('link_title')) + '</b><div class="link-url" id="myLink">' + esc(myLink()) + '</div>' +
+      '<p class="muted" style="margin:0 0 10px">' + esc(t('link_note')) + '</p><button type="button" class="btn" id="copyLink">' + esc(t('copy')) + '</button></div>' +
+      '<div style="max-width:320px;margin:14px auto 0"><button type="button" class="btn ghost" id="editAgain">' + esc(t('edit')) + '</button></div></div>' +
       '<footer>' + esc(t('contact')) + '</footer>';
+  }
+
+  function myLink() { return location.origin + location.pathname + '?t=' + token; }
+  function copyLink() {
+    var btn = document.getElementById('copyLink'), text = myLink();
+    function done() { btn.textContent = t('copied'); setTimeout(function () { btn.textContent = t('copy'); }, 1800); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else fallback();
+    function fallback() {
+      var r = document.createRange(), el = document.getElementById('myLink'); r.selectNodeContents(el);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      try { document.execCommand('copy'); done(); } catch (e) {}
+    }
   }
 
   function fail() {
@@ -425,6 +465,8 @@
   lang = T[urlLang] ? urlLang : (T[recall('bimtc_invite_lang')] ? recall('bimtc_invite_lang') : 'en');
   renderLangs();
   document.getElementById('boot').textContent = t('loading');
+  // 링크 코드 없이 열면 공통 링크 — 빈 폼으로 새로 작성
+  if (!token) { loaded = {}; renderForm(); return; }
   if (!/^[0-9a-f-]{36}$/i.test(token)) { fail(); return; }
 
   rpc('invite_get', { p_token: token }).then(function (row) {

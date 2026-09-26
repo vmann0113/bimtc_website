@@ -38,6 +38,10 @@
   .lead{font-size:14px;color:#5E7289;margin:0 0 18px;}
   .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px;}
   @media (max-width:900px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  .share{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:space-between;padding:14px 16px;margin-bottom:14px;border-color:#bfe3d4;background:#F4FBF8;}
+  .share-t{font-weight:800;font-size:14.5px;margin-bottom:6px;}
+  .share-url{font-size:13.5px;color:#0B5FA5;background:#fff;border:1px dashed #c9d6e6;border-radius:8px;padding:7px 10px;word-break:break-all;user-select:all;}
+  .share-btns{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
   .kpi{background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:14px 16px;cursor:pointer;}
   .kpi.on{border-color:#0B5FA5;box-shadow:0 0 0 2px rgba(11,95,165,.15);}
   .kpi .l{font-size:13px;color:#8295ab;font-weight:600;}
@@ -151,7 +155,8 @@
     ['interp', '통역 필요', function (r) { return r.interpreter === 'yes'; }],
     ['visa', '비자 필요', function (r) { return r.visa_needed === 'yes'; }],
     ['fam', '팸투어', function (r) { return r.fam_tour === 'yes'; }],
-    ['b2b', 'B2B', function (r) { return r.b2b === 'yes'; }]
+    ['b2b', 'B2B', function (r) { return r.b2b === 'yes'; }],
+    ['dup', '중복 의심', function (r) { return isDup(r, dupEmails()); }]
   ];
 
   // 관리자 상세 편집 필드 (invite.html 과 같은 컬럼)
@@ -161,8 +166,9 @@
     ['lang', '폼 언어', 'sel', [['en', '영어'], ['zh', '중국어'], ['ru', '러시아어'], ['mn', '몽골어']]],
     ['memo', '관리자 메모 (바이어에게 안 보임)', 'ta', null, 'full'],
     ['h', '기본정보'],
+    ['company', '기업/기관'], ['ceo_name', '대표자명'], ['contact_name', '담당자명'],
     ['passport_name', '여권 영문명'], ['gender', '성별', 'sel', [['', '-'], ['male', '남'], ['female', '여']]], ['country', '국가'],
-    ['company', '기업/기관'], ['job_title', '직함'], ['email', '이메일'],
+    ['job_title', '직함'], ['email', '이메일'], ['_', ''],
     ['mobile', '휴대전화'], ['messenger', '메신저(WhatsApp·WeChat 등)'], ['companions', '동반자 수', 'num'],
     ['companion_names', '동반자 이름', 'ta', null, 'full'],
     ['h', '항공'],
@@ -214,9 +220,16 @@
     }
     return r.sent_at ? 'sent' : 'new';
   }
-  function label(r) { return r.passport_name || r.company || r.email || '(이름 없음)'; }
-  // Vercel cleanUrls 환경(/invite-admin)에서는 확장자 없는 주소로 — 리디렉트 한 번을 줄인다
-  function link(r) { return location.origin + location.pathname.replace(/[^\/]*$/, '') + (/\.html$/.test(location.pathname) ? 'invite.html' : 'invite') + '?t=' + r.token; }
+  function label(r) { return r.company || r.passport_name || r.email || '(이름 없음)'; }
+  function link(r) { return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'invite.html?t=' + r.token; }
+  // 공통 링크 (구글폼처럼 누구나 새로 작성). 영어가 기본, 언어별 주소는 ?lang=
+  function commonLink(l) { return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'invite.html' + (l && l !== 'en' ? '?lang=' + l : ''); }
+  // 같은 이메일로 2건 이상이면 중복 의심
+  function dupEmails() {
+    var c = {}; ROWS.forEach(function (r) { var k = (r.email || '').trim().toLowerCase(); if (k) c[k] = (c[k] || 0) + 1; });
+    return c;
+  }
+  function isDup(r, c) { var k = (r.email || '').trim().toLowerCase(); return !!(k && c[k] > 1); }
   function nights(r) {
     if (!r.checkin_date || !r.checkout_date) return '';
     var n = Math.round((new Date(r.checkout_date) - new Date(r.checkin_date)) / 864e5);
@@ -279,7 +292,7 @@
       if (F.date && r.arrival_date !== F.date) return false;
       for (var i = 0; i < FLAGS.length; i++) if (F.flags[FLAGS[i][0]] && !FLAGS[i][2](r)) return false;
       if (q) {
-        var hay = [r.passport_name, r.company, r.country, r.email, r.mobile, r.messenger, r.arrival_flight, r.departure_flight, r.memo].join(' ').toLowerCase();
+        var hay = [r.passport_name, r.company, r.ceo_name, r.contact_name, r.country, r.email, r.mobile, r.messenger, r.arrival_flight, r.departure_flight, r.memo].join(' ').toLowerCase();
         if (hay.indexOf(q) < 0) return false;
       }
       return true;
@@ -294,10 +307,14 @@
 
     var kp = [['', '전체', counts.all], ['new', '미발송', counts.new], ['sent', '발송 · 미입력', counts.sent], ['submitted', '입력완료 (확인 전)', counts.submitted], ['changed', '수정됨 · 재확인', counts.changed, 1], ['reviewed', '확인완료', counts.reviewed]];
 
-    view.innerHTML = '<main><h1>초청바이어 관리</h1><p class="lead">명단 등록 → 개인 링크 안내문 발송 → 바이어 입력 확인 → 엑셀 다운로드 · 인쇄. 공항 픽업 필요 인원(동반자 포함): <b>' + pick + '명</b></p>' +
+    view.innerHTML = '<main><h1>초청바이어 관리</h1><p class="lead">공통 링크 발송 → 바이어 제출(목록에 자동 추가) → 확인 → 엑셀 다운로드 · 인쇄. 명단 등록·개인 링크 안내문은 필요할 때만 쓰세요. 공항 픽업 필요 인원(동반자 포함): <b>' + pick + '명</b></p>' +
       '<div class="kpis">' + kp.map(function (k) {
         return '<div class="kpi' + (k[3] && k[2] ? ' warn' : '') + (F.status === k[0] ? ' on' : '') + '" data-st="' + k[0] + '"><div class="l">' + k[1] + '</div><div class="v">' + k[2] + '</div></div>';
       }).join('') + '</div>' +
+      '<div class="panel share"><div><div class="share-t">공통 링크 <span class="sub">— 구글폼처럼 이 링크 하나를 모든 바이어에게 보내면, 제출하는 대로 아래 목록에 추가됩니다</span></div>' +
+        '<div class="share-url" id="cl">' + esc(commonLink('en')) + '</div></div>' +
+        '<div class="share-btns"><span class="sub">링크 복사</span>' + ['en', 'zh', 'ru', 'mn'].map(function (l) { return '<button class="btn sm line" data-cl="' + l + '">' + LANG_KO[l] + '</button>'; }).join('') +
+        '<button class="btn sm" id="clMail">공통 안내문</button></div></div>' +
       '<div class="panel"><div class="toolbar">' +
         '<input class="in-s" id="q" placeholder="이름·기업·국가·편명 검색" value="' + esc(F.q) + '" style="min-width:210px">' +
         '<select class="in-s" id="fd"><option value="">입국일 전체</option>' + dates.map(function (d) { return '<option value="' + d + '"' + (F.date === d ? ' selected' : '') + '>' + d + '</option>'; }).join('') + '</select>' +
@@ -320,6 +337,11 @@
     document.getElementById('fd').onchange = function (e) { F.date = e.target.value; renderTable(); };
     view.querySelectorAll('[data-flag]').forEach(function (el) { el.onclick = function () { var k = el.getAttribute('data-flag'); F.flags[k] = !F.flags[k]; el.classList.toggle('on', !!F.flags[k]); renderTable(); }; });
     view.querySelectorAll('[data-st]').forEach(function (el) { el.onclick = function () { F.status = el.getAttribute('data-st'); renderMain(); }; });
+    view.querySelectorAll('[data-cl]').forEach(function (b) { b.onclick = function () {
+      var l = b.getAttribute('data-cl'); document.getElementById('cl').textContent = commonLink(l);
+      copy(commonLink(l)).then(function () { toast(LANG_KO[l] + ' 공통 링크를 복사했습니다'); });
+    }; });
+    document.getElementById('clMail').onclick = openCommonMail;
     document.getElementById('addB').onclick = openAdd;
     document.getElementById('xlsB').onclick = exportXlsx;
     var prM = document.getElementById('prM');
@@ -332,14 +354,15 @@
     var list = filtered(), el = document.getElementById('tbl');
     if (!ROWS.length) { el.innerHTML = '<div class="empty">등록된 바이어가 없습니다. <b>+ 바이어 등록</b>으로 명단을 붙여넣어 시작하세요.</div>'; return; }
     if (!list.length) { el.innerHTML = '<div class="empty">조건에 맞는 바이어가 없습니다.</div>'; return; }
+    var dups = dupEmails();
     var allOn = list.every(function (r) { return SEL[r.id]; });
     el.innerHTML = '<table class="t"><thead><tr><th><input type="checkbox" id="selAll"' + (allOn ? ' checked' : '') + '></th><th>상태</th><th>바이어</th><th>입국</th><th>출국</th><th>픽업</th><th>숙박</th><th>팸투어/B2B</th><th>식이 · 통역</th><th>안내</th></tr></thead><tbody>' +
       list.map(function (r) {
         var st = status(r);
         return '<tr data-id="' + r.id + '">' +
           '<td data-stop="1"><input type="checkbox" data-sel="' + r.id + '"' + (SEL[r.id] ? ' checked' : '') + '></td>' +
-          '<td><span class="badge st-' + st + '">' + STATUS[st] + '</span></td>' +
-          '<td><div class="nm">' + esc(label(r)) + (r.companions > 0 ? ' <span class="sub">+' + r.companions + '</span>' : '') + '</div><div class="sub">' + esc([r.country, r.passport_name ? r.company : ''].filter(Boolean).join(' · ')) + '</div></td>' +
+          '<td><span class="badge st-' + st + '">' + STATUS[st] + '</span>' + (isDup(r, dups) ? '<div style="margin-top:4px"><span class="badge st-changed">중복 의심</span></div>' : '') + (r.source === 'public' ? '<div class="sub" style="margin-top:3px">공통 링크</div>' : '') + '</td>' +
+          '<td><div class="nm">' + esc(label(r)) + (r.companions > 0 ? ' <span class="sub">+' + r.companions + '</span>' : '') + '</div><div class="sub">' + esc([r.contact_name, r.country, r.passport_name].filter(Boolean).join(' · ')) + '</div></td>' +
           '<td>' + (r.arrival_date ? '<div>' + md(r.arrival_date) + ' ' + hm(r.arrival_time) + '</div><div class="sub">' + esc([r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join(' · ')) + '</div>' : '<span class="no">-</span>') + '</td>' +
           '<td>' + (r.departure_date ? '<div>' + md(r.departure_date) + ' ' + hm(r.departure_time) + '</div><div class="sub">' + esc([r.departure_flight, v(r.departure_airport)].filter(Boolean).join(' · ')) + '</div>' : '<span class="no">-</span>') + '</td>' +
           '<td>' + (r.pickup === 'yes' ? '<span class="yes">필요</span>' : r.pickup === 'no' ? '<span class="no">불필요</span>' : '<span class="no">-</span>') + '</td>' +
@@ -442,6 +465,30 @@
     };
   }
 
+  // 공통 안내문 — 받는 사람 이름 없이, 공통 링크(언어별)로
+  var GENERIC = { en: 'Sir/Madam', zh: '合作伙伴', ru: '', mn: 'хамтрагч' };
+  function commonText(l) {
+    var t = MAIL[l] || MAIL.en, b = t.b;
+    if (l === 'ru') b = b.replace(' из {name}', '');
+    return { s: t.s, b: b.replace('{name}', GENERIC[l]).replace('{link}', commonLink(l)) };
+  }
+  function openCommonMail() {
+    var lang = 'en', mt = commonText(lang);
+    var m = modal('공통 안내문',
+      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap"><span class="sub">언어</span>' +
+        ['en', 'zh', 'ru', 'mn'].map(function (l) { return '<span class="chip' + (l === lang ? ' on' : '') + '" data-ml="' + l + '">' + LANG_KO[l] + '</span>'; }).join('') + '</div>' +
+      '<label class="sub">제목</label><input class="in-s" id="ms" style="width:100%;margin:4px 0 10px" value="' + esc(mt.s) + '">' +
+      '<textarea class="big" id="mb">' + esc(mt.b) + '</textarea>' +
+      '<div class="note" style="margin-top:10px">여러 바이어에게 한 번에 보낼 때 쓰세요 (메일은 숨은참조 BCC 권장). 러시아어권에는 러시아어, 몽골에는 몽골어 안내문을 보내면 폼도 그 언어로 열립니다.</div>',
+      '<span class="sp"></span><button class="btn line" data-close>닫기</button><button class="btn" id="mCopy">본문 복사</button>');
+    m.querySelectorAll('[data-ml]').forEach(function (c) { c.onclick = function () {
+      lang = c.getAttribute('data-ml'); var x = commonText(lang);
+      m.querySelector('#ms').value = x.s; m.querySelector('#mb').value = x.b;
+      m.querySelectorAll('[data-ml]').forEach(function (o) { o.classList.toggle('on', o === c); });
+    }; });
+    m.querySelector('#mCopy').onclick = function () { copy(m.querySelector('#ms').value + '\n\n' + m.querySelector('#mb').value).then(function () { toast('공통 안내문을 복사했습니다'); }); };
+  }
+
   // ───────── 상세 · 수정 ─────────
   function openDetail(r) {
     var st = status(r);
@@ -493,7 +540,7 @@
   // ───────── 표 정의 (엑셀·인쇄 공용) ─────────
   var COLS = {
     all: [
-      ['상태', function (r) { return STATUS[status(r)]; }, 12], ['국가', 'country', 12], ['기업/기관', 'company', 24], ['직함', 'job_title', 14],
+      ['상태', function (r) { return STATUS[status(r)]; }, 12], ['국가', 'country', 12], ['기업/기관', 'company', 24], ['대표자명', 'ceo_name', 14], ['담당자명', 'contact_name', 14], ['직함', 'job_title', 14],
       ['여권 영문명', 'passport_name', 22], ['성별', function (r) { return v(r.gender); }, 6], ['이메일', 'email', 26], ['휴대전화', 'mobile', 18], ['메신저', 'messenger', 18],
       ['동반자 수', function (r) { return +r.companions || 0; }, 8], ['동반자 이름', 'companion_names', 22],
       ['입국일', 'arrival_date', 11], ['도착시간', function (r) { return hm(r.arrival_time); }, 8], ['입국 편명', 'arrival_flight', 10], ['도착공항', function (r) { return v(r.arrival_airport); }, 11], ['터미널', 'arrival_terminal', 7],
@@ -503,6 +550,7 @@
       ['비자 필요', function (r) { return v(r.visa_needed); }, 9], ['여권번호', 'passport_no', 13], ['생년월일', 'birth_date', 11],
       ['식이', function (r) { return v(r.dietary); }, 8], ['알레르기/식이 상세', 'dietary_note', 24], ['통역', function (r) { return v(r.interpreter); }, 6], ['통역 언어', 'interpreter_lang', 10],
       ['기타 요청', 'requests', 30], ['관리자 메모', 'memo', 24], ['폼 언어', function (r) { return LANG_KO[r.lang] || r.lang; }, 8],
+      ['등록 경로', function (r) { return r.source === 'public' ? '공통 링크' : '관리자 등록'; }, 11],
       ['최초 제출', function (r) { return r.submitted_at ? new Date(r.submitted_at).toLocaleString() : ''; }, 18],
       ['바이어 최종 수정', function (r) { return r.buyer_updated_at ? new Date(r.buyer_updated_at).toLocaleString() : ''; }, 18],
       ['개인 링크', function (r) { return link(r); }, 40]
@@ -583,7 +631,7 @@
     return '<div class="card-p">' + prHead('바이어 상세', 1).replace('1명 · ', '') +
       '<h2>' + esc(r.passport_name || '(여권명 미입력)') + ' <span style="font-size:12pt;font-weight:400">' + esc(v(r.gender)) + '</span></h2>' +
       '<div class="co">' + esc([r.country, r.company, r.job_title].filter(Boolean).join(' · ')) + '</div>' +
-      '<div class="pr-sec">연락처</div><table class="kv">' + row('휴대전화', r.mobile) + row('메신저', r.messenger) + row('이메일', r.email) + row('동반자', (+r.companions || 0) + '명 ' + (r.companion_names || '')) + '</table>' +
+      '<div class="pr-sec">연락처</div><table class="kv">' + row('대표자 / 담당자', [r.ceo_name, r.contact_name].filter(Boolean).join(' / ')) + row('휴대전화', r.mobile) + row('메신저', r.messenger) + row('이메일', r.email) + row('동반자', (+r.companions || 0) + '명 ' + (r.companion_names || '')) + '</table>' +
       '<div class="pr-sec">항공</div><table class="kv">' +
         row('입국', [r.arrival_date, hm(r.arrival_time), r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join('  ')) +
         row('출국', [r.departure_date, hm(r.departure_time), r.departure_flight, v(r.departure_airport)].filter(Boolean).join('  ')) + row('공항 픽업', v(r.pickup)) + '</table>' +
