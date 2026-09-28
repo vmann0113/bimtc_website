@@ -160,7 +160,7 @@
   ];
 
   // 관리자 상세 편집 필드 (invite.html 과 같은 컬럼)
-  var YN = [['', '-'], ['yes', '예'], ['no', '아니오']], YNU = YN.concat([['undecided', '미정']]);
+  var YN = [['', '-'], ['yes', '예'], ['no', '아니오']];
   var EDIT = [
     ['h', '관리'],
     ['lang', '폼 언어', 'sel', [['en', '영어'], ['zh', '중국어'], ['ru', '러시아어'], ['mn', '몽골어']]],
@@ -169,8 +169,7 @@
     ['company', '기업/기관'], ['ceo_name', '대표자명'], ['contact_name', '담당자명'],
     ['passport_name', '여권 영문명'], ['gender', '성별', 'sel', [['', '-'], ['male', '남'], ['female', '여']]], ['country', '국가'],
     ['job_title', '직함'], ['email', '이메일'], ['_', ''],
-    ['mobile', '휴대전화'], ['messenger', '메신저(WhatsApp·WeChat 등)'], ['companions', '동반자 수', 'num'],
-    ['companion_names', '동반자 이름', 'ta', null, 'full'],
+    ['mobile', '휴대전화'], ['messenger', '메신저(WhatsApp·WeChat 등)'],
     ['h', '항공'],
     ['arrival_date', '입국일', 'date'], ['arrival_time', '도착시간', 'time'], ['arrival_flight', '입국 편명'],
     ['arrival_airport', '도착공항 (PUS/ICN/GMP)'], ['arrival_terminal', '터미널', 'sel', [['', '-'], ['T1', 'T1'], ['T2', 'T2']]], ['_', ''],
@@ -178,7 +177,7 @@
     ['departure_airport', '출발공항 (PUS/ICN/GMP)'],
     ['h', '숙박 · 이동 · 행사'],
     ['checkin_date', '체크인', 'date'], ['checkout_date', '체크아웃', 'date'], ['hotel_type', '숙박', 'sel', [['', '-'], ['provided', '주최측 제공'], ['own', '개별 숙박']]],
-    ['pickup', '공항 픽업', 'sel', YN], ['fam_tour', '팸투어', 'sel', YNU], ['b2b', 'B2B 상담회', 'sel', YNU],
+    ['pickup', '공항 픽업', 'sel', YN], ['fam_tour', '팸투어', 'sel', YN], ['b2b', 'B2B 상담회', 'sel', YN],
     ['h', '비자'],
     ['visa_needed', '비자 필요', 'sel', YN.concat([['unsure', '모름']])], ['passport_no', '여권번호'], ['birth_date', '생년월일', 'date'],
     ['h', '기타'],
@@ -190,10 +189,10 @@
 
   // 바이어에게 보내는 안내문 (관리자가 복사해 메일·메신저로 발송)
   var MAIL = {
-    en: { s: '[BIMTC 2026] Please confirm your travel details', b: 'Dear {name},\n\nThank you for accepting our invitation to BIMTC 2026 (November 13–14, 2026 · BEXCO, Busan, Korea).\n\nTo arrange your airport pickup, hotel and program, please fill in your travel details at the link below:\n{link}\n\nYou can reopen the same link and update your details at any time — for example if your flight changes.\n\nBest regards,\nBIMTC 2026 Secretariat\nbmia0528@naver.com · +82-51-461-4276' },
-    zh: { s: '【BIMTC 2026】请确认您的行程信息', b: '尊敬的 {name}：\n\n感谢您接受 BIMTC 2026（2026年11月13日–14日 · 韩国釜山 BEXCO）的邀请。\n\n为便于我们安排接机、酒店及日程，请通过以下链接填写您的行程信息：\n{link}\n\n如航班等信息有变，可随时通过同一链接修改。\n\nBIMTC 2026 秘书处\nbmia0528@naver.com · +82-51-461-4276' },
-    ru: { s: '[BIMTC 2026] Пожалуйста, подтвердите данные о поездке', b: 'Уважаемые коллеги из {name}!\n\nБлагодарим вас за принятие приглашения на BIMTC 2026 (13–14 ноября 2026 · BEXCO, Пусан, Корея).\n\nЧтобы мы могли организовать встречу в аэропорту, отель и программу, пожалуйста, заполните данные о поездке по ссылке:\n{link}\n\nВы можете открыть эту ссылку снова и изменить данные в любое время — например, если изменится рейс.\n\nС уважением,\nСекретариат BIMTC 2026\nbmia0528@naver.com · +82-51-461-4276' },
-    mn: { s: '[BIMTC 2026] Аяллын мэдээллээ баталгаажуулна уу', b: 'Эрхэм {name},\n\nBIMTC 2026 (2026 оны 11-р сарын 13–14 · BEXCO, Пусан, Солонгос)-ийн урилгыг хүлээн авсанд баярлалаа.\n\nНисэх буудлаас тосох, зочид буудал болон хөтөлбөрийг зохион байгуулахын тулд доорх холбоосоор аяллын мэдээллээ бөглөнө үү:\n{link}\n\nНислэг өөрчлөгдвөл ижил холбоосоор орж хэдийд ч засах боломжтой.\n\nХүндэтгэсэн,\nBIMTC 2026 нарийн бичгийн газар\nbmia0528@naver.com · +82-51-461-4276' }
+    en: { s: '[BIMTC 2026] Please confirm your travel details', b: 'Dear {name},\n\nThank you for accepting our invitation to BIMTC 2026 (November 13–14, 2026 · BEXCO, Busan, Korea).\n\nOfficial schedule: Nov 11 arrival, airport pickup & hotel check-in · Nov 12 FAM Tour · Nov 13–14 BIMTC 2026 & B2B business meetings · Nov 14 departure after the official program. Accommodation support: 3 nights (Nov 11–14).\n\nTo arrange your airport pickup, hotel and program, please fill in your travel details at the link below:\n{link}\n\nYou can reopen the same link and update your details at any time — for example if your flight changes.\n\nBest regards,\nBIMTC 2026 Secretariat\nbmia0528@naver.com · +82-51-461-4276' },
+    zh: { s: '【BIMTC 2026】请确认您的行程信息', b: '尊敬的 {name}：\n\n感谢您接受 BIMTC 2026（2026年11月13日–14日 · 韩国釜山 BEXCO）的邀请。\n\n官方日程：11月11日 抵达·接机·入住酒店 / 11月12日 考察旅游 / 11月13日–14日 BIMTC 2026·B2B 商务洽谈 / 11月14日 官方日程结束后离境。住宿支持：3晚（11月11日–14日）。\n\n为便于我们安排接机、酒店及日程，请通过以下链接填写您的行程信息：\n{link}\n\n如航班等信息有变，可随时通过同一链接修改。\n\nBIMTC 2026 秘书处\nbmia0528@naver.com · +82-51-461-4276' },
+    ru: { s: '[BIMTC 2026] Пожалуйста, подтвердите данные о поездке', b: 'Уважаемые коллеги из {name}!\n\nБлагодарим вас за принятие приглашения на BIMTC 2026 (13–14 ноября 2026 · BEXCO, Пусан, Корея).\n\nОфициальная программа: 11 ноября — прилёт, встреча в аэропорту, заселение в отель · 12 ноября — ознакомительный тур · 13–14 ноября — BIMTC 2026 и B2B-встречи · 14 ноября — вылет после официальной программы. Проживание: 3 ночи (11–14 ноября).\n\nЧтобы мы могли организовать встречу в аэропорту, отель и программу, пожалуйста, заполните данные о поездке по ссылке:\n{link}\n\nВы можете открыть эту ссылку снова и изменить данные в любое время — например, если изменится рейс.\n\nС уважением,\nСекретариат BIMTC 2026\nbmia0528@naver.com · +82-51-461-4276' },
+    mn: { s: '[BIMTC 2026] Аяллын мэдээллээ баталгаажуулна уу', b: 'Эрхэм {name},\n\nBIMTC 2026 (2026 оны 11-р сарын 13–14 · BEXCO, Пусан, Солонгос)-ийн урилгыг хүлээн авсанд баярлалаа.\n\nАлбан ёсны хуваарь: 11/11 ирэх, нисэх буудлаас тосох, буудалд байрлах · 11/12 танилцах аялал · 11/13–14 BIMTC 2026, B2B бизнес уулзалт · 11/14 хөтөлбөрийн дараа буцах. Байрны дэмжлэг: 3 шөнө (11/11–11/14).\n\nНисэх буудлаас тосох, зочид буудал болон хөтөлбөрийг зохион байгуулахын тулд доорх холбоосоор аяллын мэдээллээ бөглөнө үү:\n{link}\n\nНислэг өөрчлөгдвөл ижил холбоосоор орж хэдийд ч засах боломжтой.\n\nХүндэтгэсэн,\nBIMTC 2026 нарийн бичгийн газар\nbmia0528@naver.com · +82-51-461-4276' }
   };
 
   // 국가명 → 폼 기본 언어
@@ -235,7 +234,6 @@
     var n = Math.round((new Date(r.checkout_date) - new Date(r.checkin_date)) / 864e5);
     return n > 0 ? n + '박' : '';
   }
-  function people(r) { return 1 + (+r.companions || 0); }
   function stamp() { var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
   function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2200); }
   function copy(text) {
@@ -302,12 +300,12 @@
   function renderMain() {
     var counts = { all: ROWS.length, new: 0, sent: 0, submitted: 0, reviewed: 0, changed: 0 };
     ROWS.forEach(function (r) { counts[status(r)]++; });
-    var pick = ROWS.filter(function (r) { return r.pickup === 'yes'; }).reduce(function (s, r) { return s + people(r); }, 0);
+    var pick = ROWS.filter(function (r) { return r.pickup === 'yes'; }).length;
     var dates = ROWS.map(function (r) { return r.arrival_date; }).filter(Boolean).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort();
 
     var kp = [['', '전체', counts.all], ['new', '미발송', counts.new], ['sent', '발송 · 미입력', counts.sent], ['submitted', '입력완료 (확인 전)', counts.submitted], ['changed', '수정됨 · 재확인', counts.changed, 1], ['reviewed', '확인완료', counts.reviewed]];
 
-    view.innerHTML = '<main><h1>초청바이어 관리</h1><p class="lead">공통 링크 발송 → 바이어 제출(목록에 자동 추가) → 확인 → 엑셀 다운로드 · 인쇄. 명단 등록·개인 링크 안내문은 필요할 때만 쓰세요. 공항 픽업 필요 인원(동반자 포함): <b>' + pick + '명</b></p>' +
+    view.innerHTML = '<main><h1>초청바이어 관리</h1><p class="lead">공통 링크 발송 → 바이어 제출(목록에 자동 추가) → 확인 → 엑셀 다운로드 · 인쇄. 명단 등록·개인 링크 안내문은 필요할 때만 쓰세요. 공항 픽업 필요: <b>' + pick + '명</b></p>' +
       '<div class="kpis">' + kp.map(function (k) {
         return '<div class="kpi' + (k[3] && k[2] ? ' warn' : '') + (F.status === k[0] ? ' on' : '') + '" data-st="' + k[0] + '"><div class="l">' + k[1] + '</div><div class="v">' + k[2] + '</div></div>';
       }).join('') + '</div>' +
@@ -362,7 +360,7 @@
         return '<tr data-id="' + r.id + '">' +
           '<td data-stop="1"><input type="checkbox" data-sel="' + r.id + '"' + (SEL[r.id] ? ' checked' : '') + '></td>' +
           '<td><span class="badge st-' + st + '">' + STATUS[st] + '</span>' + (isDup(r, dups) ? '<div style="margin-top:4px"><span class="badge st-changed">중복 의심</span></div>' : '') + (r.source === 'public' ? '<div class="sub" style="margin-top:3px">공통 링크</div>' : '') + '</td>' +
-          '<td><div class="nm">' + esc(label(r)) + (r.companions > 0 ? ' <span class="sub">+' + r.companions + '</span>' : '') + '</div><div class="sub">' + esc([r.contact_name, r.country, r.passport_name].filter(Boolean).join(' · ')) + '</div></td>' +
+          '<td><div class="nm">' + esc(label(r)) + '</div><div class="sub">' + esc([r.contact_name, r.country, r.passport_name].filter(Boolean).join(' · ')) + '</div></td>' +
           '<td>' + (r.arrival_date ? '<div>' + md(r.arrival_date) + ' ' + hm(r.arrival_time) + '</div><div class="sub">' + esc([r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join(' · ')) + '</div>' : '<span class="no">-</span>') + '</td>' +
           '<td>' + (r.departure_date ? '<div>' + md(r.departure_date) + ' ' + hm(r.departure_time) + '</div><div class="sub">' + esc([r.departure_flight, v(r.departure_airport)].filter(Boolean).join(' · ')) + '</div>' : '<span class="no">-</span>') + '</td>' +
           '<td>' + (r.pickup === 'yes' ? '<span class="yes">필요</span>' : r.pickup === 'no' ? '<span class="no">불필요</span>' : '<span class="no">-</span>') + '</td>' +
@@ -514,7 +512,7 @@
       var p = {};
       m.querySelectorAll('[data-e]').forEach(function (el) {
         var k = el.getAttribute('data-e'), x = el.value.trim();
-        p[k] = x === '' ? (k === 'companions' ? 0 : k === 'lang' ? 'en' : null) : (k === 'companions' ? parseInt(x, 10) || 0 : x);
+        p[k] = x === '' ? (k === 'lang' ? 'en' : null) : x;
       });
       return p;
     }
@@ -542,7 +540,6 @@
     all: [
       ['상태', function (r) { return STATUS[status(r)]; }, 12], ['국가', 'country', 12], ['기업/기관', 'company', 24], ['대표자명', 'ceo_name', 14], ['담당자명', 'contact_name', 14], ['직함', 'job_title', 14],
       ['여권 영문명', 'passport_name', 22], ['성별', function (r) { return v(r.gender); }, 6], ['이메일', 'email', 26], ['휴대전화', 'mobile', 18], ['메신저', 'messenger', 18],
-      ['동반자 수', function (r) { return +r.companions || 0; }, 8], ['동반자 이름', 'companion_names', 22],
       ['입국일', 'arrival_date', 11], ['도착시간', function (r) { return hm(r.arrival_time); }, 8], ['입국 편명', 'arrival_flight', 10], ['도착공항', function (r) { return v(r.arrival_airport); }, 11], ['터미널', 'arrival_terminal', 7],
       ['출국일', 'departure_date', 11], ['출발시간', function (r) { return hm(r.departure_time); }, 8], ['출국 편명', 'departure_flight', 10], ['출발공항', function (r) { return v(r.departure_airport); }, 11],
       ['체크인', 'checkin_date', 11], ['체크아웃', 'checkout_date', 11], ['숙박', function (r) { return v(r.hotel_type); }, 11], ['공항 픽업', function (r) { return v(r.pickup); }, 9],
@@ -557,16 +554,16 @@
     ],
     pickup: [
       ['입국일', 'arrival_date', 11], ['도착시간', function (r) { return hm(r.arrival_time); }, 8], ['편명', 'arrival_flight', 10], ['공항', function (r) { return v(r.arrival_airport); }, 11], ['터미널', 'arrival_terminal', 7],
-      ['여권 영문명', 'passport_name', 22], ['인원', people, 6], ['동반자', 'companion_names', 20], ['국가', 'country', 11], ['기업/기관', 'company', 22],
+      ['여권 영문명', 'passport_name', 22], ['국가', 'country', 11], ['기업/기관', 'company', 22],
       ['휴대전화', 'mobile', 17], ['메신저', 'messenger', 16], ['출국일', 'departure_date', 11], ['출국 편명', 'departure_flight', 10], ['출발시간', function (r) { return hm(r.departure_time); }, 8]
     ],
     rooms: [
       ['체크인', 'checkin_date', 11], ['체크아웃', 'checkout_date', 11], ['박수', nights, 6], ['숙박', function (r) { return v(r.hotel_type); }, 11],
-      ['여권 영문명', 'passport_name', 22], ['성별', function (r) { return v(r.gender); }, 6], ['인원', people, 6], ['동반자', 'companion_names', 22],
+      ['여권 영문명', 'passport_name', 22], ['성별', function (r) { return v(r.gender); }, 6],
       ['국가', 'country', 11], ['기업/기관', 'company', 22], ['휴대전화', 'mobile', 17], ['식이', function (r) { return v(r.dietary); }, 8], ['요청사항', 'requests', 26]
     ],
     diet: [
-      ['여권 영문명', 'passport_name', 22], ['국가', 'country', 11], ['기업/기관', 'company', 22], ['인원', people, 6],
+      ['여권 영문명', 'passport_name', 22], ['국가', 'country', 11], ['기업/기관', 'company', 22],
       ['식이', function (r) { return v(r.dietary); }, 8], ['알레르기/식이 상세', 'dietary_note', 30], ['통역', function (r) { return v(r.interpreter); }, 6], ['통역 언어', 'interpreter_lang', 12]
     ]
   };
@@ -618,7 +615,7 @@
       rows.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td>' + cols.map(function (c) { return '<td>' + esc(cell(c, r)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   var LIST_COLS = [
-    ['상태', function (r) { return STATUS[status(r)]; }], ['국가', 'country'], ['기업/기관', 'company'], ['여권 영문명', 'passport_name'], ['인원', people],
+    ['상태', function (r) { return STATUS[status(r)]; }], ['국가', 'country'], ['기업/기관', 'company'], ['여권 영문명', 'passport_name'],
     ['입국', function (r) { return [md(r.arrival_date), hm(r.arrival_time), r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join(' '); }],
     ['출국', function (r) { return [md(r.departure_date), hm(r.departure_time), r.departure_flight, v(r.departure_airport)].filter(Boolean).join(' '); }],
     ['픽업', function (r) { return v(r.pickup); }], ['숙박', function (r) { return [v(r.hotel_type), md(r.checkin_date) + (r.checkout_date ? '~' + md(r.checkout_date) : '')].filter(Boolean).join(' '); }],
@@ -631,7 +628,7 @@
     return '<div class="card-p">' + prHead('바이어 상세', 1).replace('1명 · ', '') +
       '<h2>' + esc(r.passport_name || '(여권명 미입력)') + ' <span style="font-size:12pt;font-weight:400">' + esc(v(r.gender)) + '</span></h2>' +
       '<div class="co">' + esc([r.country, r.company, r.job_title].filter(Boolean).join(' · ')) + '</div>' +
-      '<div class="pr-sec">연락처</div><table class="kv">' + row('대표자 / 담당자', [r.ceo_name, r.contact_name].filter(Boolean).join(' / ')) + row('휴대전화', r.mobile) + row('메신저', r.messenger) + row('이메일', r.email) + row('동반자', (+r.companions || 0) + '명 ' + (r.companion_names || '')) + '</table>' +
+      '<div class="pr-sec">연락처</div><table class="kv">' + row('대표자 / 담당자', [r.ceo_name, r.contact_name].filter(Boolean).join(' / ')) + row('휴대전화', r.mobile) + row('메신저', r.messenger) + row('이메일', r.email) + '</table>' +
       '<div class="pr-sec">항공</div><table class="kv">' +
         row('입국', [r.arrival_date, hm(r.arrival_time), r.arrival_flight, v(r.arrival_airport), r.arrival_terminal].filter(Boolean).join('  ')) +
         row('출국', [r.departure_date, hm(r.departure_time), r.departure_flight, v(r.departure_airport)].filter(Boolean).join('  ')) + row('공항 픽업', v(r.pickup)) + '</table>' +
@@ -650,7 +647,7 @@
       var pick = list.filter(function (r) { return SEL[r.id]; });
       if (!pick.length) pick = list.filter(function (r) { return r.submitted_at; });
       html = pick.slice().sort(byArrival).map(card).join(''); landscape = false; list = pick;
-    } else html = prHead(TITLES[kind], S[kind].reduce(function (s, r) { return s + people(r); }, 0)) + prTable(COLS[kind], S[kind]);
+    } else html = prHead(TITLES[kind], S[kind].length) + prTable(COLS[kind], S[kind]);
     if (!list.length || (kind !== 'list' && kind !== 'cards' && !S[kind].length)) { toast('인쇄할 대상이 없습니다'); return; }
     document.getElementById('pageSize').textContent = '@page{size:A4 ' + (landscape ? 'landscape' : 'portrait') + ';margin:12mm;}';
     document.getElementById('print').innerHTML = html;
