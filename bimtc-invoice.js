@@ -22,7 +22,9 @@
     const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[b.booth_type])||0;
     const n=(b.booth_ids||[]).length; const boothCost=unit*n;
     const disc=b.discount||0;
-    const addonTotal=Math.max(0,(b.subtotal||0)-boothCost+disc);
+    const rentalTotal=Number(b.rental_total||0);
+    const rentalCount=Object.keys(b.rentals||{}).filter(k=>Number((b.rentals||{})[k])>0).length;
+    const addonTotal=Math.max(0,(b.subtotal||0)-boothCost+disc-rentalTotal);
     const ad=b.addons||{}; const adNames=Object.keys(ad).filter(k=>ad[k]).map(k=>k+(ad[k]===true?'':' ×'+ad[k])).join(', ');
     const no=number(b.id);
     const d=now||new Date(); const today=d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate();
@@ -31,6 +33,7 @@
     const item=(name,qty,amt)=>'<tr><td style="padding:9px 10px;border-bottom:1px solid #e6ebf2;">'+esc(name)+'</td><td style="padding:9px 10px;text-align:center;border-bottom:1px solid #e6ebf2;">'+esc(qty)+'</td><td style="padding:9px 10px;text-align:right;border-bottom:1px solid #e6ebf2;">'+esc(amt)+'</td></tr>';
     let items=item(b.booth_type==='space'?'독립부스 (Space Only)':'조립부스 (Package Booth)', n+'개', won(boothCost));
     if(adNames) items+=item('부가서비스: '+adNames,'-',won(addonTotal));
+    if(rentalTotal>0) items+=item('비품 렌탈 '+rentalCount+'종','-',won(rentalTotal));
     if(b.fam_tour) items+=item('팸투어 참가','-','-');
     if(disc){ let dl='할인'; const parts=[]; if(b.early_bird) parts.push(b.early_bird==='phase1'?'1차 얼리버드':'2차 얼리버드'); if(b.returning_company) parts.push('재참가'); if(parts.length) dl+=' ('+parts.join(' + ')+')'; items+=item(dl,'-','− '+won(disc)); }
     return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>INVOICE '+no+'</title></head><body style="font-family:Pretendard,-apple-system,sans-serif;color:#0F2440;max-width:720px;margin:0 auto;padding:36px 28px;">'

@@ -35,6 +35,13 @@
     return _ready;
   }
 
+  // rentals 는 선택한 비품이 있을 때만 payload 에 넣는다.
+  // booth_applications.rentals 컬럼이 아직 없는 환경에서도 기존 신청이 그대로 동작하게 하기 위함.
+  function withRentals(row, r) {
+    if (r && typeof r === 'object' && Object.keys(r).some(function (k) { return Number(r[k]) > 0; })) row.rentals = r;
+    return row;
+  }
+
   var DB = {
     ready: ready,
     client: function () { return _client; },
@@ -104,7 +111,7 @@
     async addBoothApplication(a) {
       var sb = await ready();
       var u = (await sb.auth.getUser()).data.user;
-      var res = await sb.from('booth_applications').insert({
+      var res = await sb.from('booth_applications').insert(withRentals({
         profile_id: u ? u.id : null, company: a.company, contact: a.contact, email: a.email, phone: a.phone,
         booth_type: a.booth_type, booth_ids: a.booth_ids || [], addons: a.addons || {},
         subtotal: a.subtotal, vat: a.vat, total: a.total,
@@ -112,12 +119,12 @@
         discount: a.discount || 0, early_bird: a.early_bird || null,
         logo_url: a.logo_url || null, logo_name: a.logo_name || null,
         applicant: a.applicant || {}
-      }).select().single();
+      }, a.rentals)).select().single();
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     async updateBoothApplication(id, a) {
       var sb = await ready();
-      var r = await sb.from('booth_applications').update({
+      var r = await sb.from('booth_applications').update(withRentals({
         company: a.company, contact: a.contact, email: a.email, phone: a.phone,
         booth_type: a.booth_type, booth_ids: a.booth_ids || [], addons: a.addons || {},
         subtotal: a.subtotal, vat: a.vat, total: a.total,
@@ -125,7 +132,7 @@
         discount: a.discount || 0, early_bird: a.early_bird || null,
         logo_url: a.logo_url || null, logo_name: a.logo_name || null,
         applicant: a.applicant || {}
-      }).eq('id', id).select();
+      }, a.rentals)).eq('id', id).select();
       if (r.error) return { ok: false, error: r.error.message };
       if (!r.data || !r.data.length) return { ok: false, error: '수정할 수 없는 상태입니다 (입금완료·반려된 신청은 사무국으로 연락해 주세요)' };
       return { ok: true, row: r.data[0] };

@@ -351,6 +351,41 @@
             </div>
           </sc-for>
         </div>
+
+      <sc-if value="{{ rentalOn }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#F9FBFD;border:1px solid #e9eef5;border-radius:14px;padding:clamp(16px,2.6vw,24px);margin-bottom:16px;">
+        <div style="font-size:16px;font-weight:800;margin-bottom:6px;">{{ s_rental }}</div>
+        <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:0 0 10px;line-height:1.6;">{{ s_rental_note }}</p>
+        <input value="{{ rentalQuery }}" onInput="{{ setRentalQuery }}" placeholder="{{ s_rental_ph }}" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;font-family:'Pretendard',sans-serif;" />
+        <sc-if value="{{ rentalPicked }}" hint-placeholder-val="{{ '' }}">
+          <div style="font-size:13.5px;font-weight:700;color:#0B5FA5;margin-top:10px;">{{ rentalPicked }}</div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;margin-top:4px;">
+          <sc-for list="{{ rentalRows }}" as="a" hint-placeholder-count="8">
+            <sc-if value="{{ a.isCat }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ a.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 2px;border-top:1px solid #eef2f7;cursor:pointer;">
+                <span style="font-size:14.5px;font-weight:800;color:#22384e;">{{ a.name }}</span>
+                <span style="font-size:13px;color:#8295ab;white-space:nowrap;">{{ a.right }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ a.isItem }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid #eef2f7;">
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:14.5px;font-weight:600;color:#22384e;">{{ a.name }}</div>
+                  <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ a.sub }}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+                  <button onClick="{{ a.dec }}" style="width:30px;height:30px;border-radius:8px;border:1px solid #d8e0ea;background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:#5E7289;">−</button>
+                  <span style="width:28px;text-align:center;font-size:15px;font-weight:700;">{{ a.qty }}</span>
+                  <button onClick="{{ a.inc }}" style="width:30px;height:30px;border-radius:8px;border:1px solid #d8e0ea;background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:#0B5FA5;">+</button>
+                </div>
+                <div style="width:110px;text-align:right;font-size:14px;font-weight:700;color:{{ a.lineColor }};flex-shrink:0;">{{ a.lineW }}</div>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
       </div>
 
       <div style="background:#F9FBFD;border:1px solid #e9eef5;border-radius:14px;padding:clamp(16px,2.6vw,24px);margin-bottom:16px;">
@@ -521,7 +556,7 @@ class Component extends DCLogic {
     lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(),
     gate:'loading', adminTest:false, step:1, pickerModal:false,
     participation:'new', retQuery:'', retCompany:'',
-    boothType:'package', selected:[], addons:{}, taken:{}, famTour:null, layout:null,
+    boothType:'package', selected:[], addons:{}, rentals:{}, rentalQuery:'', rentalCat:null, taken:{}, famTour:null, layout:null,
     company:'', companyEn:'', ceo:'', ceoEn:'', addr:'', tel:'', fax:'', homepage:'',
     bizno:'', bizType:'', bizItem:'', items:'', dept:'', contact:'', email:'', phone:'',
     submitting:false, done:false, invoiceNo:'', formError:'', toast:null,
@@ -549,6 +584,8 @@ class Component extends DCLogic {
     { key:'air',   name:'압축공기', unit:'개소', price:200000 },
     { key:'lan',   name:'LAN (인터넷)', unit:'회선', price:150000 },
   ];
+
+  RENTALS = [];   // 비품 렌탈 품목 — site_settings.pricing.rentals 에서 로드 (없으면 섹션 숨김)
 
   cfg(){ return window.BIMTC_CONFIG; }
 
@@ -615,6 +652,7 @@ class Component extends DCLogic {
         const pr = await window.BimtcDB.getPricing();
         if(pr){
           if(pr.unitPrice) this.cfg().boothLayout.unitPrice = Object.assign({}, this.cfg().boothLayout.unitPrice, pr.unitPrice);
+          if(pr.rentals && typeof pr.rentals==='object') this.RENTALS = Object.keys(pr.rentals).map(k=>Object.assign({key:k}, pr.rentals[k]));
           if(typeof pr.returningRate==='number') this.cfg().returningDiscountRate = pr.returningRate;
           if(pr.addons) this.ADDONS = this.ADDONS.map(x=> (typeof pr.addons[x.key]==='number') ? Object.assign({}, x, {price:pr.addons[x.key]}) : x);
           if(Array.isArray(pr.earlyBird) && pr.earlyBird.length){
@@ -636,7 +674,7 @@ class Component extends DCLogic {
     if(this._onFocus) window.removeEventListener('focus', this._onFocus);
   }
 
-  DRAFT_KEYS=['participation','retQuery','retCompany','boothType','selected','addons','famTour','company','companyEn','ceo','ceoEn','addr','tel','fax','homepage','bizno','bizType','bizItem','items','dept','contact','email','phone','step','logoUrl','logoName'];
+  DRAFT_KEYS=['participation','retQuery','retCompany','boothType','selected','addons','rentals','famTour','company','companyEn','ceo','ceoEn','addr','tel','fax','homepage','bizno','bizType','bizItem','items','dept','contact','email','phone','step','logoUrl','logoName'];
   saveDraft(){
     const d={}; this.DRAFT_KEYS.forEach(k=>d[k]=this.state[k]);
     try{ localStorage.setItem('bimtc_booth_draft', JSON.stringify({v:1, ts:Date.now(), data:d})); this.setState({draftOnly:true}); this.flash(this.state.lang==='en'?'⚠ Draft saved — NOT submitted yet. Press "Submit Application" at STEP 4 to complete.':'⚠ 임시저장만 된 상태입니다 · 아직 접수 전! STEP 4에서 [부스 신청 제출]을 눌러야 신청이 완료됩니다'); }
@@ -749,6 +787,8 @@ class Component extends DCLogic {
   }
   incAddon(key){ this.setState(s=>({ addons:{...s.addons, [key]:(s.addons[key]||0)+1} })); }
   decAddon(key){ this.setState(s=>({ addons:{...s.addons, [key]:Math.max((s.addons[key]||0)-1,0)} })); }
+  incRental(key){ this.setState(s=>({ rentals:{...s.rentals, [key]:(s.rentals[key]||0)+1} })); }
+  decRental(key){ this.setState(s=>({ rentals:{...s.rentals, [key]:Math.max((s.rentals[key]||0)-1,0)} })); }
 
   pickReturning(name){ this.setState({ retCompany:name, retQuery:name, company:name }); }
 
@@ -758,7 +798,10 @@ class Component extends DCLogic {
     const boothCost=unit*count;
     let addonCost=0; const addonLines=[];
     this.ADDONS.forEach(a=>{ const q=this.state.addons[a.key]||0; if(q>0){ const amt=a.price*q; addonCost+=amt; addonLines.push({key:a.key, name:this.addonName(a), qty:q, unit:a.price, amt}); } });
-    const gross=boothCost+addonCost;
+    // 비품 렌탈 (수량 x 단가) — 할인은 적용하지 않는다 (부스 면적비에만 적용)
+    let rentalCost=0; const rentalLines=[];
+    (this.RENTALS||[]).forEach(it=>{ const q=(this.state.rentals||{})[it.key]||0; if(q>0){ const amt=(it.p||0)*q; rentalCost+=amt; rentalLines.push({key:it.key, name:it.n, qty:q, unit:it.p, amt}); } });
+    const gross=boothCost+addonCost+rentalCost;
     // 할인: 얼리버드 + 재참가 (부스 비용 기준, 중복 적용 합산)
     const eb=this.cfg().currentEarlyBird();
     let rate=0; const parts=[];
@@ -768,7 +811,7 @@ class Component extends DCLogic {
     const subtotal=gross-discount;
     const vat=Math.round(subtotal*0.1);
     const total=subtotal+vat;
-    return { unit, count, boothCost, addonCost, addonLines, gross, rate, discount, discountParts:parts, subtotal, vat, total, eb };
+    return { unit, count, boothCost, addonCost, addonLines, rentalCost, rentalLines, gross, rate, discount, discountParts:parts, subtotal, vat, total, eb };
   }
 
   validate(){
@@ -816,7 +859,7 @@ class Component extends DCLogic {
     const c=this.calc();
     const payload={
       company:this.state.company, contact:this.state.contact, email:this.state.email, phone:this.state.phone,
-      booth_type:this.state.boothType, booth_ids:this.state.selected, addons:this.state.addons,
+      booth_type:this.state.boothType, booth_ids:this.state.selected, addons:this.state.addons, rentals:this.state.rentals,
       subtotal:c.subtotal, vat:c.vat, total:c.total,
       fam_tour:this.state.famTour===true, returning_company:this.state.retCompany||null,
       discount:c.discount, early_bird:c.eb?c.eb.key:null,
@@ -847,7 +890,7 @@ class Component extends DCLogic {
     (a.booth_ids||[]).forEach(id=>{ delete taken[id]; });
     this.setState({ editAppId:a.id, editOrigIds:(a.booth_ids||[]).slice(), gate:'open', step:1, done:false, myAppsOpen:false,
       participation:a.returning_company?'returning':'new', retCompany:a.returning_company||'', retQuery:a.returning_company||'',
-      boothType:a.booth_type||'package', selected:(a.booth_ids||[]).slice(), addons:a.addons||{},
+      boothType:a.booth_type||'package', selected:(a.booth_ids||[]).slice(), addons:a.addons||{}, rentals:a.rentals||{},
       famTour:a.fam_tour===true?true:(a.fam_tour===false?false:null),
       company:a.company||'', contact:a.contact||'', email:a.email||'', phone:a.phone||'',
       companyEn:ap.companyEn||'', ceo:ap.ceo||'', ceoEn:ap.ceoEn||'', addr:ap.addr||'', tel:ap.tel||'', fax:ap.fax||'',
@@ -967,6 +1010,7 @@ class Component extends DCLogic {
       { k:L('부스 타입','Booth type'), v:bt==='space'?L('독립부스 · 사무국 협의','Space only · by phone'):(L('조립부스','Package')+' × '+c.count) },
       { k:L('부스 위치','Location'), v:bt==='space'?L('사무국 전화 협의로 배정 (T. 051-461-4276~8)\n⚡ 전기 별도 신청 필수','Assigned via phone (051-461-4276~8)\n⚡ Separate power application required'):(boothLocLabel||L('미선택 — STEP 2에서 선택해 주세요','Not selected — choose in STEP 2')) },
       { k:L('부가 서비스','Add-ons'), v:c.addonLines.length?c.addonLines.map(l=>l.name+' × '+l.qty).join(', '):L('없음','None') },
+      { k:L('비품 렌탈','Rental'), v:c.rentalLines.length?(c.rentalLines.map(l=>l.name+' × '+l.qty).join(', ')+' · '+this.won(c.rentalCost)):L('없음','None') },
       { k:L('팸투어','Fam tour'), v:this.state.famTour===true?L('참가 희망','Join'):(this.state.famTour===false?L('참가 안 함','No'):'-') },
       { k:L('기업 · 담당자','Company'), v:(this.state.company||'-')+(this.state.contact?' · '+this.state.contact:'') },
       { k:L('최종 입금액','Total due'), v:this.won(c.total) },
@@ -978,16 +1022,43 @@ class Component extends DCLogic {
         inc:()=>this.incAddon(a.key), dec:()=>this.decAddon(a.key) };
     });
 
+    // ---- 비품 렌탈 목록 (분류 접기 + 검색). 단가표가 없으면 섹션 자체를 숨긴다 ----
+    const RENT=this.RENTALS||[]; const rq=(this.state.rentalQuery||'').trim().toLowerCase(); const rsel=this.state.rentals||{};
+    const rentalRows=[];
+    if(RENT.length){
+      const cats=[], byCat={};
+      RENT.forEach(it=>{ if(!byCat[it.c]){ byCat[it.c]=[]; cats.push(it.c); } byCat[it.c].push(it); });
+      const mk=(it)=>{ const q=rsel[it.key]||0;
+        return { isItem:true, isCat:false, name:it.n,
+          sub:[this.won(it.p), it.note, it.s].filter(Boolean).join(' · '),
+          qty:q, lineW:this.won((it.p||0)*q), lineColor:q>0?'#22384e':'#c0ccda',
+          inc:()=>this.incRental(it.key), dec:()=>this.decRental(it.key) }; };
+      if(rq){
+        RENT.filter(it=>((it.n||'')+' '+(it.c||'')).toLowerCase().includes(rq)).slice(0,60).forEach(it=>rentalRows.push(mk(it)));
+      } else {
+        cats.forEach(cn=>{
+          const open=this.state.rentalCat===cn, picked=byCat[cn].filter(it=>(rsel[it.key]||0)>0).length;
+          rentalRows.push({ isCat:true, isItem:false, name:cn+' ('+byCat[cn].length+')',
+            right:(picked?picked+L('종 선택',' selected')+' · ':'')+(open?'▲':'▼'),
+            toggle:()=>this.setState({ rentalCat: open?null:cn }) });
+          (open?byCat[cn]:byCat[cn].filter(it=>(rsel[it.key]||0)>0)).forEach(it=>rentalRows.push(mk(it)));
+        });
+      }
+    }
+    const rentalPickedN=Object.keys(rsel).filter(k=>rsel[k]>0).length;
+
     const lineItems=[];
     if(bt==='space') lineItems.push({ label:L('독립부스 · 위치·수량 사무국 협의','Space-only · arranged by phone'), amt:L('별도 견적','TBD') });
     else lineItems.push({ label:L('조립부스','Package booth')+' × '+c.count, amt:this.won(c.boothCost) });
     c.addonLines.forEach(l=>lineItems.push({ label:l.name+' × '+l.qty, amt:this.won(l.amt) }));
+    c.rentalLines.forEach(l=>lineItems.push({ label:l.name+' × '+l.qty, amt:this.won(l.amt) }));
     if(bt!=='space' && lineItems.length===1 && c.count===0) lineItems[0]={ label:L('부스를 선택하세요','Select your booths'), amt:this.won(0) };
 
     const invoiceRows=[(bt==='space'
       ? { name:L('독립부스 (Space Only) · 사무국 협의 배정','Space Only — arranged with secretariat'), qty:'-', unit:'-', amt:L('별도 견적','Separate quote') }
       : { name:L('조립부스 (Package Booth)','Package Booth'), qty:c.count, unit:this.won(c.unit), amt:this.won(c.boothCost) })]
-      .concat(c.addonLines.map(l=>({ name:l.name, qty:l.qty, unit:this.won(l.unit), amt:this.won(l.amt) })));
+      .concat(c.addonLines.map(l=>({ name:l.name, qty:l.qty, unit:this.won(l.unit), amt:this.won(l.amt) })))
+      .concat(c.rentalLines.map(l=>({ name:l.name, qty:l.qty, unit:this.won(l.unit), amt:this.won(l.amt) })));
 
     // 기존업체 검색
     const q=(this.state.retQuery||'').trim();
@@ -1113,6 +1184,11 @@ class Component extends DCLogic {
       returningRateLabel:Math.round(CFG.returningDiscountRate*100)+'%',
 
       typeCards, addonRows, lineItems, invoiceRows,
+      rentalOn:RENT.length>0, rentalRows, rentalQuery:this.state.rentalQuery, setRentalQuery:this.set('rentalQuery'),
+      rentalPicked: rentalPickedN ? (L('선택한 비품 ','Selected ')+rentalPickedN+L('종 · 합계 ',' items · ')+this.won(c.rentalCost)) : '',
+      s_rental:L('비품 렌탈','Equipment Rental'),
+      s_rental_note:L('필요한 비품을 수량과 함께 신청하세요. 금액은 부가세 별도이며 견적에 합산됩니다. 목록에 없는 품목(커피머신·키오스크·냉동쇼케이스 등)은 사무국으로 문의해 주세요.','Add rental items with quantities. Prices exclude VAT and are added to your quote. For items not listed (coffee machine, kiosk, freezer showcase, etc.) please contact the secretariat.'),
+      s_rental_ph:L('품목 검색 (예: 의자, 테이블, TV, 냉장고)','Search items (e.g. chair, table, TV)'),
       planCells, planFixtures, planDoors, planZones, planBoxStyle,
       boothCount:c.count, boothCostW:this.won(c.boothCost),
 
