@@ -39,7 +39,7 @@
       var rsel=b.rentals||{};
       var rnames=Object.keys(rsel).filter(function(k){ return Number(rsel[k])>0; })
         .map(function(k){ return ((rmap&&rmap[k]&&rmap[k].n)||k)+' x'+rsel[k]; });
-      var rlabel=rmap ? ('비품 렌탈: '+rnames.join(', ')) : ('비품 렌탈 '+rentalCount+'종');
+      var rlabel='비품 렌탈 '+rentalCount+'종: '+rnames.join(', ');
       items+=item(rlabel,'-',won(rentalTotal));
     }
     if(b.fam_tour) items+=item('팸투어 참가','-','-');
@@ -63,10 +63,24 @@
 
   // 새 창에 인보이스를 열고 인쇄 대화상자를 띄운다. 팝업이 차단되면 false.
   function open(b) {
-    var w = window.open('', '_blank');
+    var w = window.open('', '_blank');   // 팝업 차단을 피하려면 클릭 직후 바로 열어야 한다
     if (!w) return false;
-    w.document.write(html(b)); w.document.close();
-    setTimeout(function () { try { w.focus(); w.print(); } catch (e) {} }, 400);
+    function write() {
+      try { w.document.open(); } catch (e) {}
+      w.document.write(html(b)); w.document.close();
+      setTimeout(function () { try { w.focus(); w.print(); } catch (e) {} }, 400);
+    }
+    // 품목명을 쓰려면 단가표가 필요하다. 아직 없으면 여기서 직접 받아온다
+    // (어느 화면에서 인보이스를 열든 품목이 항상 보이도록)
+    var need = !window.BIMTC_RENTALS && b && b.rentals && Object.keys(b.rentals).length;
+    if (need && window.BimtcDB && window.BimtcDB.getPricing) {
+      try { w.document.write('<!doctype html><html><head><meta charset="utf-8"></head><body style="font-family:sans-serif;padding:28px;color:#5E7289;">인보이스를 준비하고 있습니다…</body></html>'); } catch (e) {}
+      window.BimtcDB.getPricing().then(function (pr) {
+        if (pr && pr.rentals) window.BIMTC_RENTALS = pr.rentals;
+      })['catch'](function () {}).then(function () { write(); });
+      return true;
+    }
+    write();
     return true;
   }
 
