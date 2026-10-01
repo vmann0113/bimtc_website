@@ -678,7 +678,7 @@ class Component extends DCLogic {
     const reserved={}; resvs.forEach(r=>{ reserved[r.day+'-'+r.table_idx+'-'+r.slot_idx]=r.interpreter?2:1; });
     let closed={}; try{ closed=await window.BimtcDB.getClosedSlots(); }catch(e){}
     let eb=null; try{ eb=await window.BimtcDB.getEarlyBird(); }catch(e){}
-    try{ const pr=await window.BimtcDB.getPricing(); this._rentals=(pr&&pr.rentals)||{}; }catch(e){ this._rentals={}; }   // 비품 품목명 표시용
+    try{ const pr=await window.BimtcDB.getPricing(); this._rentals=(pr&&pr.rentals)||{}; window.BIMTC_RENTALS=this._rentals; }catch(e){ this._rentals={}; }   // 비품 품목명 표시용(인보이스 포함)
     // 오픈 전 잠금값(전부 끄기, 오픈 시각 이전 저장) → 자동 모드로 해석 (공개 사이트와 동일 규칙)
     if(eb){ try{ const C=window.BIMTC_CONFIG; const keys=Object.keys(eb); const allOff=keys.length>0&&keys.every(k=>eb[k]==='off'); const ts=window.__bimtcEbOvTs?new Date(window.__bimtcEbOvTs).getTime():0; if(C&&C.isLaunched&&C.isLaunched()&&allOff&&ts&&ts<new Date(C.launchAt).getTime()) eb={phase1:'auto',phase2:'auto'}; }catch(e){} }
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}

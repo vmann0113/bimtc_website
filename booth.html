@@ -145,6 +145,9 @@
                 <span style="{{ a.badgeStyle }}">{{ a.statusLabel }}</span>
               </div>
               <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5E7289;line-height:1.7;">{{ a.detail }}</div>
+              <sc-if value="{{ a.rentalText }}" hint-placeholder-val="{{ '' }}">
+                <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#0B5FA5;font-weight:600;line-height:1.6;margin-top:3px;">{{ a.rentalText }}</div>
+              </sc-if>
               <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:5px;">
                 <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;">{{ a.date }}</span>
                 <span style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
@@ -556,7 +559,7 @@ class Component extends DCLogic {
     lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(),
     gate:'loading', adminTest:false, step:1, pickerModal:false,
     participation:'new', retQuery:'', retCompany:'',
-    boothType:'package', selected:[], addons:{}, rentals:{}, rentalQuery:'', rentalCat:null, taken:{}, famTour:null, layout:null,
+    boothType:'package', selected:[], addons:{}, rentals:{}, rentalQuery:'', rentalCat:null, editEarlyBird:null, taken:{}, famTour:null, layout:null,
     company:'', companyEn:'', ceo:'', ceoEn:'', addr:'', tel:'', fax:'', homepage:'',
     bizno:'', bizType:'', bizItem:'', items:'', dept:'', contact:'', email:'', phone:'',
     submitting:false, done:false, invoiceNo:'', formError:'', toast:null,
@@ -652,7 +655,10 @@ class Component extends DCLogic {
         const pr = await window.BimtcDB.getPricing();
         if(pr){
           if(pr.unitPrice) this.cfg().boothLayout.unitPrice = Object.assign({}, this.cfg().boothLayout.unitPrice, pr.unitPrice);
-          if(pr.rentals && typeof pr.rentals==='object') this.RENTALS = Object.keys(pr.rentals).map(k=>Object.assign({key:k}, pr.rentals[k]));
+          if(pr.rentals && typeof pr.rentals==='object'){
+            this.RENTALS = Object.keys(pr.rentals).map(k=>Object.assign({key:k}, pr.rentals[k]));
+            window.BIMTC_RENTALS = pr.rentals;   // 인보이스에서 품목명을 쓰기 위해 공유
+          }
           if(typeof pr.returningRate==='number') this.cfg().returningDiscountRate = pr.returningRate;
           if(pr.addons) this.ADDONS = this.ADDONS.map(x=> (typeof pr.addons[x.key]==='number') ? Object.assign({}, x, {price:pr.addons[x.key]}) : x);
           if(Array.isArray(pr.earlyBird) && pr.earlyBird.length){
@@ -803,7 +809,11 @@ class Component extends DCLogic {
     (this.RENTALS||[]).forEach(it=>{ const q=(this.state.rentals||{})[it.key]||0; if(q>0){ const amt=(it.p||0)*q; rentalCost+=amt; rentalLines.push({key:it.key, name:it.n, qty:q, unit:it.p, amt}); } });
     const gross=boothCost+addonCost+rentalCost;
     // 할인: 얼리버드 + 재참가 (부스 비용 기준, 중복 적용 합산)
-    const eb=this.cfg().currentEarlyBird();
+    // 기존 신청을 수정하는 중이면 접수 당시 얼리버드 단계를 유지한다.
+    // (서버 재계산 트리거도 UPDATE 시 접수 당시 단계를 유지하므로 화면과 저장값이 같아진다)
+    const eb=(this.state.editAppId && this.state.editEarlyBird)
+      ? ((this.cfg().earlyBird||[]).find(x=>x.key===this.state.editEarlyBird) || null)
+      : this.cfg().currentEarlyBird();
     let rate=0; const parts=[];
     if(eb){ rate+=eb.discountRate; parts.push(this.state.lang==='en'?'Early bird':eb.label); }
     if(this.state.participation==='returning' && this.state.retCompany){ rate+=this.cfg().returningDiscountRate; parts.push(this.state.lang==='en'?'Returning':'재참가'); }
@@ -879,7 +889,7 @@ class Component extends DCLogic {
     }
     const wasEdit=!!this.state.editAppId;
     const saved=res.row||null;
-    this.setState({ done:true, invoiceNo:this.invNo(saved&&saved.id), lastRow:saved, editAppId:null, editOrigIds:null });
+    this.setState({ done:true, invoiceNo:this.invNo(saved&&saved.id), lastRow:saved, editAppId:null, editOrigIds:null, editEarlyBird:null });
     try{ localStorage.removeItem('bimtc_booth_draft'); }catch(e){}
     this.flash(wasEdit?this.L('신청 내용이 수정되었습니다','Your application has been updated'):this.L('부스 신청이 접수되었습니다','Your booth application has been received'));
   }
@@ -891,6 +901,7 @@ class Component extends DCLogic {
     this.setState({ editAppId:a.id, editOrigIds:(a.booth_ids||[]).slice(), gate:'open', step:1, done:false, myAppsOpen:false,
       participation:a.returning_company?'returning':'new', retCompany:a.returning_company||'', retQuery:a.returning_company||'',
       boothType:a.booth_type||'package', selected:(a.booth_ids||[]).slice(), addons:a.addons||{}, rentals:a.rentals||{},
+      editEarlyBird:a.early_bird||null,   // 접수 당시 단계 유지 (수정한다고 1차→2차로 떨어지지 않게)
       famTour:a.fam_tour===true?true:(a.fam_tour===false?false:null),
       company:a.company||'', contact:a.contact||'', email:a.email||'', phone:a.phone||'',
       companyEn:ap.companyEn||'', ceo:ap.ceo||'', ceoEn:ap.ceoEn||'', addr:ap.addr||'', tel:ap.tel||'', fax:ap.fax||'',
@@ -1233,6 +1244,9 @@ class Component extends DCLogic {
         return { title:(a.booth_type==='space'?L('독립부스','Space Only'):L('조립부스','Package Booth'))+((a.booth_ids||[]).length?' · '+(a.booth_ids||[]).join(', '):''),
           statusLabel:s[0], badgeStyle:'font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:'+s[1]+';color:'+s[2]+';',
           detail:L('합계 ','Total ')+this.won(a.total||0)+(a.fam_tour?(' · '+L('팸투어 참가','Fam tour')):''),
+          rentalText:(()=>{ const m=window.BIMTC_RENTALS||{}, r=a.rentals||{};
+            const names=Object.keys(r).filter(k=>Number(r[k])>0).map(k=>((m[k]&&m[k].n)||k)+' ×'+r[k]);
+            return names.length ? (L('비품 ','Rental ')+names.length+L('종 · ',' items · ')+this.won(a.rental_total||0)+' — '+names.join(', ')) : ''; })(),
           date:d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate(),
           canEdit:(st==='submitted'||st==='pending'||st==='approved')&&!a.paid, editLabel:L('신청 내용 수정하기','Edit application'),
           edit:()=>this.startEditApp(a),

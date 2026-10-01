@@ -33,7 +33,15 @@
     const item=(name,qty,amt)=>'<tr><td style="padding:9px 10px;border-bottom:1px solid #e6ebf2;">'+esc(name)+'</td><td style="padding:9px 10px;text-align:center;border-bottom:1px solid #e6ebf2;">'+esc(qty)+'</td><td style="padding:9px 10px;text-align:right;border-bottom:1px solid #e6ebf2;">'+esc(amt)+'</td></tr>';
     let items=item(b.booth_type==='space'?'독립부스 (Space Only)':'조립부스 (Package Booth)', n+'개', won(boothCost));
     if(adNames) items+=item('부가서비스: '+adNames,'-',won(addonTotal));
-    if(rentalTotal>0) items+=item('비품 렌탈 '+rentalCount+'종','-',won(rentalTotal));
+    if(rentalTotal>0){
+      // 품목명은 window.BIMTC_RENTALS(단가표)가 있으면 풀어서 쓰고, 없으면 종 수만 표기한다
+      var rmap=(typeof window!=='undefined' && window.BIMTC_RENTALS) || null;
+      var rsel=b.rentals||{};
+      var rnames=Object.keys(rsel).filter(function(k){ return Number(rsel[k])>0; })
+        .map(function(k){ return ((rmap&&rmap[k]&&rmap[k].n)||k)+' x'+rsel[k]; });
+      var rlabel=rmap ? ('비품 렌탈: '+rnames.join(', ')) : ('비품 렌탈 '+rentalCount+'종');
+      items+=item(rlabel,'-',won(rentalTotal));
+    }
     if(b.fam_tour) items+=item('팸투어 참가','-','-');
     if(disc){ let dl='할인'; const parts=[]; if(b.early_bird) parts.push(b.early_bird==='phase1'?'1차 얼리버드':'2차 얼리버드'); if(b.returning_company) parts.push('재참가'); if(parts.length) dl+=' ('+parts.join(' + ')+')'; items+=item(dl,'-','− '+won(disc)); }
     return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>INVOICE '+no+'</title></head><body style="font-family:Pretendard,-apple-system,sans-serif;color:#0F2440;max-width:720px;margin:0 auto;padding:36px 28px;">'
