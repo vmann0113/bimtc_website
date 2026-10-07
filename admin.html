@@ -213,7 +213,11 @@
             <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 신청 · 입금 승인</h1>
             <p style="font-size:14px;color:#5E7289;margin:0;">신청 검토 후 승인·반려를 처리하고, 입금 확인 시 입금완료를 체크하세요. 비즈미팅 매칭은 매칭 오픈(10/31 이후) 시 승인 기업에 한해 활성화됩니다.</p>
           </div>
-          <button onClick="{{ dlAllLogos }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ dlAllLogosLabel }}</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+            <button onClick="{{ exportBooths }}" style="background:#0B5FA5;color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">신청 내역 받기 (CSV)</button>
+            <button onClick="{{ exportRentals }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">비품 집계 받기 (CSV)</button>
+            <button onClick="{{ dlAllLogos }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ dlAllLogosLabel }}</button>
+          </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px;">
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#8295ab;font-weight:600;margin-bottom:5px;">총 신청 · 부스</div><div style="font-size:19px;font-weight:800;color:#0F2440;">{{ bcTotal }} · {{ bcBoothN }}</div></div>
@@ -999,6 +1003,65 @@ class Component extends DCLogic {
       printInv:()=>this.printInvoice(b),
       approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id),
       canUnapprove:b.status==='approved'&&!b.paid, unapprove:()=>this.unapproveBooth(b) }));
+    // ---- CSV 내보내기 (엑셀에서 바로 열리도록 BOM 포함) ----
+    const ADDON_LABEL={ elec_1p:'전기 단상 220V', elec_3p220:'전기 삼상 220V', elec_3p380:'전기 삼상 380V',
+      elec_24h:'24시간 전기', tel:'전화선', water:'급·배수', air:'압축공기', lan:'LAN(인터넷)' };
+    const csvSave=(rows,filename)=>{
+      const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+      a.download=filename; a.click();
+    };
+    const today10=()=>new Date().toISOString().slice(0,10);
+    const pairs=(obj,nameOf)=>Object.keys(obj||{}).filter(k=>Number(obj[k])>0).map(k=>nameOf(k)+' x'+obj[k]).join(', ');
+    const FILTER_LABEL={all:'전체', submitted:'접수', awaiting:'승인입금대기', paid:'입금완료', rejected:'반려'};
+
+    // ① 부스 신청 내역 — 화면에서 고른 필터 그대로, 한 업체 = 한 줄
+    const exportBooths=()=>{
+      if(!bFiltered.length){ this.flash('내보낼 신청이 없습니다'); return; }
+      const rmap=this._rentals||{};
+      const head=['신청일','상태','입금여부','입금일','기업명','영문상호','대표자','사업자번호','업태','종목','주소','홈페이지',
+        '담당자','담당부서','연락처','이메일','전화','팩스','전시품목','부스타입','부스수','부스위치','재참가','얼리버드',
+        '부가서비스','비품','비품합계','할인','공급가','부가세','최종금액','팸투어'];
+      const rows=[head].concat(bFiltered.map(b=>{
+        const ap=b.applicant||{};
+        const st=b.paid?'입금완료':(b.status==='approved'?'승인':(b.status==='rejected'?'반려':'접수'));
+        return [ String(b.created_at||'').slice(0,10), st, b.paid?'Y':'N', b.paid_at?String(b.paid_at).slice(0,10):'',
+          b.company||'', ap.companyEn||'', ap.ceo||'', ap.bizno||'', ap.bizType||'', ap.bizItem||'', ap.addr||'', ap.homepage||'',
+          b.contact||'', ap.dept||'', b.phone||'', b.email||'', ap.tel||'', ap.fax||'', ap.items||'',
+          b.booth_type==='space'?'독립부스':'조립부스', (b.booth_ids||[]).length, (b.booth_ids||[]).join(' '),
+          b.returning_company||'', b.early_bird==='phase1'?'1차':(b.early_bird==='phase2'?'2차':''),
+          pairs(b.addons,k=>ADDON_LABEL[k]||k),
+          pairs(b.rentals,k=>(rmap[k]&&rmap[k].n)||k),
+          Number(b.rental_total||0), Number(b.discount||0), Number(b.subtotal||0), Number(b.vat||0), Number(b.total||0),
+          b.fam_tour?'Y':'N' ];
+      }));
+      csvSave(rows,'BIMTC_부스신청_'+(FILTER_LABEL[bfv]||bfv)+'_'+today10()+'.csv');
+      this.flash(bFiltered.length+'건을 내려받았습니다');
+    };
+
+    // ② 비품 집계 — 품목별 총수량 (반려 건 제외, 렌탈업체 발주용)
+    const exportRentals=()=>{
+      const rmap=this._rentals||{}; const agg={};
+      (this.state.booths||[]).filter(b=>b.status!=='rejected').forEach(b=>{
+        Object.keys(b.rentals||{}).forEach(k=>{ const q=Number((b.rentals||{})[k])||0; if(q<=0) return;
+          if(!agg[k]) agg[k]={qty:0,who:[]};
+          agg[k].qty+=q; agg[k].who.push((b.company||'')+' x'+q); });
+      });
+      const keys=Object.keys(agg);
+      if(!keys.length){ this.flash('신청된 비품이 없습니다'); return; }
+      keys.sort((a,b)=>{ const A=rmap[a]||{}, B=rmap[b]||{};
+        return String(A.c||'').localeCompare(String(B.c||''),'ko') || String(A.n||a).localeCompare(String(B.n||b),'ko'); });
+      let qSum=0, mSum=0;
+      const rows=[['분류','품목','규격','단가','총수량','금액','신청업체']].concat(keys.map(k=>{
+        const it=rmap[k]||{}, price=Number(it.p||0), amt=price*agg[k].qty;
+        qSum+=agg[k].qty; mSum+=amt;
+        return [ it.c||'', it.n||k, it.s||'', price, agg[k].qty, amt, agg[k].who.join(', ') ];
+      }));
+      rows.push(['','합계','','',qSum,mSum,'']);
+      csvSave(rows,'BIMTC_비품집계_'+today10()+'.csv');
+      this.flash('비품 '+keys.length+'종 · '+qSum+'점을 내려받았습니다');
+    };
+
     const dlAllLogos=async()=>{
       const list=(this.state.booths||[]).filter(b=>b.logo_url&&b.status!=='rejected');
       if(!list.length){ this.flash('다운로드할 로고가 없습니다'); return; }
@@ -1055,6 +1118,7 @@ class Component extends DCLogic {
       liKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.doAdminLogin(); } },
       doAdminLogin:()=>this.doAdminLogin(), loginLabel:this.state.loginBusy?'로그인 중…':'로그인',
       boothsView, pendingBooths, dlAllLogos, dlAllLogosLabel:'로고 전체 다운로드 (ZIP)',
+      exportBooths, exportRentals,
       mapModalOn:!!this.state.mapModal,
       openMapAll:()=>this.setState({mapModal:{mode:'all'}}),
       closeMapModal:()=>this.setState({mapModal:null}),
