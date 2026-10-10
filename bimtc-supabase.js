@@ -188,6 +188,24 @@
       var r = await sb.from('site_settings').upsert({ key: 'booth_layout', value: obj, updated_at: new Date().toISOString() }).select().single();
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
+    // 부스 유치 대상 명단 (관리자 전용 · booth_prospects)
+    async listProspects() {
+      var sb = await ready();
+      var r = await sb.from('booth_prospects').select('*').order('seq', { ascending: true });
+      if (r.error) return [];
+      return r.data || [];
+    },
+    async updateProspect(id, fields) {
+      var sb = await ready();
+      var f = {};
+      if (fields.status !== undefined) f.status = fields.status;
+      if (fields.memo !== undefined) f.memo = fields.memo;
+      if (fields.contacted_at !== undefined) f.contacted_at = fields.contacted_at;
+      if (fields.joined_manual !== undefined) f.joined_manual = fields.joined_manual;
+      if (!Object.keys(f).length) return { ok: true };
+      var r = await sb.from('booth_prospects').update(f).eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     async listBoothApplications() { var sb = await ready(); var r = await sb.from('booth_applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
     async adminDeleteMember(profileId) {
       var sb = await ready();

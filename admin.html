@@ -170,6 +170,79 @@
         </div>
       </sc-if>
 
+      <!-- BOOTH PROSPECTS (부스 유치 업무) -->
+      <sc-if value="{{ isProspect }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 유치 업무</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 20px;line-height:1.6;">유치 대상 의료기관 명단입니다. 전화·문자로 유치 업무를 한 뒤 <b style="color:#0d8f6b;">○ 희망</b> · <b style="color:#b78a3c;">△ 검토중</b> · <b style="color:#c0392b;">✕ 거절</b> 로 표시하세요. 부스 신청을 마친 기관은 자동으로 회색 처리됩니다.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0F2440;">{{ pTotal }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">총 대상</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#5E7289;">{{ pJoined }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">신청완료</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0d8f6b;">{{ pWant }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">○ 희망</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#b78a3c;">{{ pHold }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">△ 검토중</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#c0392b;">{{ pNo }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">✕ 거절</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#8295ab;">{{ pNone }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">미접촉</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ prospectTabs }}" as="pt" hint-placeholder-count="6">
+              <span onClick="{{ pt.onClick }}" style="{{ pt.style }}">{{ pt.label }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input value="{{ pQuery }}" onInput="{{ setPQuery }}" placeholder="기관명·주소·담당자·메모 검색" style="padding:10px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;width:230px;" />
+            <button onClick="{{ exportProspects }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">엑셀(CSV) 받기</button>
+            <button onClick="{{ printProspects }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 18px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">인쇄 · PDF 저장</button>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow-x:auto;">
+          <div style="min-width:1480px;">
+          <div style="display:flex;gap:12px;padding:13px 20px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
+            <span style="width:38px;flex-shrink:0;">번호</span>
+            <span style="width:200px;flex-shrink:0;">기관명</span>
+            <span style="width:84px;flex-shrink:0;">구분</span>
+            <span style="width:112px;flex-shrink:0;">대표전화</span>
+            <span style="width:132px;flex-shrink:0;">담당자</span>
+            <span style="flex:1;min-width:0;">담당자 이메일</span>
+            <span style="width:116px;flex-shrink:0;">유치 목표 국가</span>
+            <span style="width:124px;flex-shrink:0;text-align:center;">유치 표시</span>
+            <span style="width:236px;flex-shrink:0;">메모 (통화·문자 내용)</span>
+            <span style="width:84px;flex-shrink:0;text-align:right;">최근 접촉</span>
+          </div>
+          <sc-for list="{{ prospectRows }}" as="p" hint-placeholder-count="8">
+            <div style="{{ p.rowStyle }}">
+              <span style="width:38px;flex-shrink:0;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#9aa9bd;">{{ p.seq }}</span>
+              <span style="width:200px;flex-shrink:0;">
+                <span style="{{ p.nameStyle }}">{{ p.name }}</span>
+                <sc-if value="{{ p.joined }}" hint-placeholder-val="{{ false }}"><span style="display:block;font-size:11.5px;font-weight:700;color:#5E7289;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.joinedLabel }}</span></sc-if>
+              </span>
+              <span style="width:84px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.medType }}</span>
+              <span style="width:112px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#33485e;">{{ p.tel }}</span>
+              <span style="width:132px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#33485e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.mgr }}</span>
+              <span style="flex:1;min-width:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.email }}</span>
+              <span style="width:116px;flex-shrink:0;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.countries }}</span>
+              <span style="width:124px;flex-shrink:0;display:flex;gap:5px;justify-content:center;">
+                <button onClick="{{ p.setO }}" title="유치 희망" style="{{ p.oStyle }}">○</button>
+                <button onClick="{{ p.setT }}" title="고민중 · 회신 대기" style="{{ p.tStyle }}">△</button>
+                <button onClick="{{ p.setX }}" title="거절" style="{{ p.xStyle }}">✕</button>
+              </span>
+              <span style="width:236px;flex-shrink:0;display:flex;gap:5px;align-items:center;">
+                <input value="{{ p.memoVal }}" onInput="{{ p.setMemo }}" onBlur="{{ p.saveMemo }}" onKeyDown="{{ p.memoKey }}" placeholder="통화 결과·회신 예정일 등" style="flex:1;min-width:0;padding:7px 9px;border:1px solid #e1e8f0;border-radius:8px;font-size:13px;outline:none;" />
+                <sc-if value="{{ p.memoDirty }}" hint-placeholder-val="{{ false }}"><button onClick="{{ p.saveMemo }}" style="background:#0B5FA5;color:#fff;border:none;padding:7px 9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">저장</button></sc-if>
+              </span>
+              <span style="width:84px;flex-shrink:0;text-align:right;font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#9aa9bd;">
+                {{ p.at }}
+                <span onClick="{{ p.markJoined }}" style="display:block;margin-top:3px;font-size:11px;color:#8295ab;cursor:pointer;text-decoration:underline;white-space:nowrap;">{{ p.markJoinedLabel }}</span>
+              </span>
+            </div>
+          </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ noProspects }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px dashed #d3deea;border-radius:14px;padding:40px;text-align:center;font-size:14px;color:#8295ab;margin-top:14px;">{{ pEmptyMsg }}</div>
+        </sc-if>
+        <p style="font-size:12.5px;color:#9aa9bd;margin:12px 0 0;line-height:1.7;">같은 표시를 한 번 더 누르면 해제됩니다. 메모는 입력란을 벗어나거나 Enter를 누르면 저장됩니다. 기관명이 신청서와 달라 자동으로 회색 처리되지 않는 경우에는 우측의 <b>신청완료로 표시</b>를 눌러 직접 처리할 수 있습니다.</p>
+      </sc-if>
+
       <!-- APPLICATIONS -->
       <sc-if value="{{ isApps }}" hint-placeholder-val="{{ false }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">참가기업 신청 관리</h1>
@@ -603,6 +676,7 @@ class Component extends DCLogic {
     reserved: {},
     restricted: {},
     boardDay: 'D1',
+    prospects: [], pFilter: 'all', pQuery: '', pMemo: {},
     cmsFlash: false,
     toast: null,
   };
@@ -671,12 +745,13 @@ class Component extends DCLogic {
     };
   }
   async reload(){
-    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications] = await Promise.all([
+    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
       window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
       window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers(),
       window.BimtcDB.listInquiries().catch(()=>[]),
-      window.BimtcDB.listNotifications().catch(()=>[])
+      window.BimtcDB.listNotifications().catch(()=>[]),
+      window.BimtcDB.listProspects().catch(()=>[])
     ]);
     // 11.13(D1)·11.14(D2) 를 구분하지 않으면 한쪽 예약이 다른 날에도 잡힌 것처럼 보인다
     const reserved={}; resvs.forEach(r=>{ reserved[r.day+'-'+r.table_idx+'-'+r.slot_idx]=r.interpreter?2:1; });
@@ -686,7 +761,7 @@ class Component extends DCLogic {
     // 오픈 전 잠금값(전부 끄기, 오픈 시각 이전 저장) → 자동 모드로 해석 (공개 사이트와 동일 규칙)
     if(eb){ try{ const C=window.BIMTC_CONFIG; const keys=Object.keys(eb); const allOff=keys.length>0&&keys.every(k=>eb[k]==='off'); const ts=window.__bimtcEbOvTs?new Date(window.__bimtcEbOvTs).getTime():0; if(C&&C.isLaunched&&C.isLaunched()&&allOff&&ts&&ts<new Date(C.launchAt).getTime()) eb={phase1:'auto',phase2:'auto'}; }catch(e){} }
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
-    this.setState({ apps, regs, matches, notices, reserved, restricted: closed||{}, booths, members, inquiries: inquiries||[], notifications: notifications||[], ebOverride: eb||{}, ebDirty:false });
+    this.setState({ apps, regs, matches, notices, reserved, restricted: closed||{}, booths, members, inquiries: inquiries||[], notifications: notifications||[], prospects: prospects||[], ebOverride: eb||{}, ebDirty:false });
   }
 
   async saveAnswer(id){
@@ -877,6 +952,7 @@ class Component extends DCLogic {
     const nav=[
       {k:'dash',label:'대시보드'},
       {k:'booths',label:'부스 신청·승인',badge:pendingBooths},
+      {k:'prospect',label:'부스 유치 업무'},
       {k:'members',label:'회원 명단'},
       {k:'reg',label:'사전등록 명단'},
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
@@ -1085,6 +1161,170 @@ class Component extends DCLogic {
       }catch(e){ this.flash('압축 실패: '+e.message); }
     };
 
+    // ── 부스 유치 업무 ───────────────────────────────────────────────
+    // 유치 대상 명단(booth_prospects)에 ○(희망)/△(검토중)/✕(거절) 을 표시하고,
+    // 부스를 신청한 기관은 자동으로 회색 처리한다.
+    const PRO_ST={ none:['미접촉','','#8295ab','#F2F5F9'], interested:['희망','○','#0d8f6b','#E7F6F0'],
+                   pending:['검토중','△','#b78a3c','#FBF6E9'], rejected:['거절','✕','#c0392b','#FDECEA'] };
+    // 기관명 비교용 정규화: 괄호 내용·공백·기호·법인 수식어를 떼고 맞춘다
+    const pNorm=(x)=>String(x||'').replace(/\([^)]*\)/g,'')
+      .replace(/[\s\-·,.'"()]/g,'')
+      .replace(/^(의료법인|재단법인|사단법인|학교법인|특수법인|주식회사|유한회사)/,'')
+      .toLowerCase();
+    const prospects=this.state.prospects||[];
+    const proKeys=prospects.map(p=>({ id:p.id, key:pNorm(p.name) }));
+    // 신청 기업 → 명단 매칭. 한 신청이 여러 후보에 걸리면(분원 등) 자동 처리하지 않는다.
+    const joinedBy={};
+    (this.state.booths||[]).filter(b=>b.status!=='rejected').forEach(b=>{
+      const ak=pNorm(b.company); if(!ak) return;
+      const ex=proKeys.filter(p=>p.key===ak);
+      if(ex.length){ ex.forEach(p=>{ joinedBy[p.id]=b.company; }); return; }
+      if(ak.length>=5){
+        const sub=proKeys.filter(p=>p.key.length>=5 && (p.key.indexOf(ak)>=0 || ak.indexOf(p.key)>=0));
+        if(sub.length===1) joinedBy[sub[0].id]=b.company;
+      }
+    });
+
+    const setPStatus=async(id,st)=>{
+      const cur=(this.state.prospects||[]).find(p=>p.id===id); if(!cur) return;
+      const next=(cur.status===st)?'none':st;                 // 같은 표시를 다시 누르면 해제
+      const at=next==='none'?null:new Date().toISOString();
+      this.setState({prospects:(this.state.prospects||[]).map(p=>p.id===id?{...p,status:next,contacted_at:at}:p)});
+      const r=await window.BimtcDB.updateProspect(id,{status:next,contacted_at:at});
+      if(r&&r.ok===false){ this.flash('저장 실패: '+r.error); await this.reload(); return; }
+      this.flash(cur.name+' · '+PRO_ST[next][0]);
+    };
+    const setPJoined=async(id,on)=>{
+      const cur=(this.state.prospects||[]).find(p=>p.id===id); if(!cur) return;
+      this.setState({prospects:(this.state.prospects||[]).map(p=>p.id===id?{...p,joined_manual:on}:p)});
+      const r=await window.BimtcDB.updateProspect(id,{joined_manual:on});
+      if(r&&r.ok===false){ this.flash('저장 실패: '+r.error); await this.reload(); return; }
+      this.flash(cur.name+(on?' · 신청완료로 표시':' · 신청완료 해제'));
+    };
+    const savePMemo=async(id)=>{
+      const cur=(this.state.prospects||[]).find(p=>p.id===id); if(!cur) return;
+      const d=this.state.pMemo||{};
+      if(!(id in d)) return;
+      const val=d[id];
+      if(String(val||'')===String(cur.memo||'')){ const nd={...d}; delete nd[id]; this.setState({pMemo:nd}); return; }
+      const r=await window.BimtcDB.updateProspect(id,{memo:val});
+      if(r&&r.ok===false){ this.flash('메모 저장 실패: '+r.error); return; }
+      const nd={...(this.state.pMemo||{})}; delete nd[id];
+      this.setState({ pMemo:nd, prospects:(this.state.prospects||[]).map(p=>p.id===id?{...p,memo:val}:p) });
+      this.flash('메모를 저장했습니다');
+    };
+
+    const pJoinedOf=(p)=> p.joined_manual ? (joinedBy[p.id]||p.name) : (joinedBy[p.id]||null);
+    const pq=String(this.state.pQuery||'').trim().toLowerCase();
+    const pf=this.state.pFilter||'all';
+    const pMatchQ=(p)=> !pq || [p.name,p.med_type,p.found_type,p.ceo,p.address,p.tel,p.mgr_name,p.mgr_dept,p.mgr_email,p.target_countries,p.memo]
+      .some(x=>String(x||'').toLowerCase().indexOf(pq)>=0);
+    const pPass=(p)=>{ const j=!!pJoinedOf(p);
+      if(pf==='joined') return j;
+      if(pf==='all') return true;
+      if(j) return false;                                      // 신청 완료한 곳은 진행 상태 탭에서 제외
+      return (p.status||'none')===pf; };
+    const pFiltered=prospects.filter(p=>pPass(p)&&pMatchQ(p));
+
+    const pCount=(k)=>{ if(k==='joined') return prospects.filter(p=>!!pJoinedOf(p)).length;
+      if(k==='all') return prospects.length;
+      return prospects.filter(p=>!pJoinedOf(p)&&(p.status||'none')===k).length; };
+    const pChip="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;white-space:nowrap;";
+    const prospectTabs=[['all','전체'],['none','미접촉'],['interested','○ 희망'],['pending','△ 검토중'],['rejected','✕ 거절'],['joined','신청완료']]
+      .map(([k,l])=>({ label:l+' '+pCount(k), onClick:()=>this.setState({pFilter:k}),
+        style:pChip+(pf===k?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;border:1px solid #dde5ee;color:#5e7289;') }));
+
+    const pBtn=(on,color,bg)=>'width:34px;height:30px;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:\'Pretendard\',sans-serif;line-height:1;'
+      +(on?('background:'+color+';color:#fff;border:1px solid '+color+';'):('background:'+bg+';color:'+color+';border:1px solid #dde5ee;'));
+    const prospectRows=pFiltered.map(p=>{
+      const joined=pJoinedOf(p);
+      const st=PRO_ST[p.status||'none']||PRO_ST.none;
+      const d=(this.state.pMemo||{});
+      return { id:p.id, seq:p.seq, name:p.name, medType:p.med_type||'', foundType:p.found_type||'',
+        ceo:p.ceo||'', tel:p.tel||'', addr:p.address||'',
+        mgr:(p.mgr_name||'')+(p.mgr_dept?' · '+p.mgr_dept:''), email:p.mgr_email||'',
+        countries:p.target_countries||'',
+        rowStyle:'display:flex;gap:12px;padding:13px 20px;border-bottom:1px solid #eef2f7;align-items:center;'
+          +(joined?'background:#F4F6F8;color:#9aa9bd;':''),
+        nameStyle:'display:block;width:200px;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'
+          +(joined?'color:#8c9bad;':'color:#0F2440;'),
+        joined:!!joined, notJoined:!joined, joinedLabel:joined?('신청완료 · '+joined):'',
+        stMark:st[1]||'–', stLabel:st[0],
+        stStyle:'font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap;background:'+st[3]+';color:'+st[2]+';',
+        oStyle:pBtn((p.status==='interested'),'#0d8f6b','#fff'),
+        tStyle:pBtn((p.status==='pending'),'#b78a3c','#fff'),
+        xStyle:pBtn((p.status==='rejected'),'#c0392b','#fff'),
+        setO:()=>setPStatus(p.id,'interested'), setT:()=>setPStatus(p.id,'pending'), setX:()=>setPStatus(p.id,'rejected'),
+        memoVal:(p.id in d)?d[p.id]:(p.memo||''),
+        setMemo:(e)=>this.setState({pMemo:{...(this.state.pMemo||{}),[p.id]:e.target.value}}),
+        saveMemo:()=>savePMemo(p.id),
+        memoKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); savePMemo(p.id); } },
+        memoDirty:(p.id in d)&&String(d[p.id]||'')!==String(p.memo||''),
+        markJoined:()=>setPJoined(p.id,!p.joined_manual),
+        markJoinedLabel:p.joined_manual?'신청완료 해제':'신청완료로 표시',
+        canUnjoin:!!p.joined_manual,
+        at:p.contacted_at?this.shortTime(p.contacted_at):'' };
+    });
+
+    const PRO_COLS=[['번호','seq'],['상태','st'],['신청완료','joined'],['기관구분','org_type'],['기업명','name'],
+      ['의료기관구분','med_type'],['설립유형','found_type'],['대표자','ceo'],['우편번호','zipcode'],['주소','address'],
+      ['대표전화','tel'],['팩스','fax'],['외국인환자응대번호','intl_tel'],['유치목표국가','target_countries'],
+      ['담당자','mgr_name'],['담당자부서','mgr_dept'],['담당자이메일','mgr_email'],['메모','memo'],['최근접촉','at']];
+    const PRO_TAG={all:'전체',none:'미접촉',interested:'희망',pending:'검토중',rejected:'거절',joined:'신청완료'};
+    const proCell=(p,f)=>{
+      const st=PRO_ST[p.status||'none']||PRO_ST.none;
+      if(f==='st') return (st[1]?st[1]+' ':'')+st[0];
+      if(f==='joined'){ const j=pJoinedOf(p); return j?('신청완료 ('+j+')'):''; }
+      if(f==='at') return p.contacted_at?this.shortTime(p.contacted_at):'';
+      return p[f]==null?'':String(p[f]);
+    };
+    const exportProspects=()=>{
+      if(!pFiltered.length){ this.flash('내려받을 내역이 없습니다'); return; }
+      const rows=[PRO_COLS.map(c=>c[0])].concat(pFiltered.map(p=>PRO_COLS.map(c=>proCell(p,c[1]))));
+      csvSave(rows,'BIMTC_부스유치_'+(PRO_TAG[pf]||'전체')+'_'+today10()+'.csv');
+      this.flash('유치 명단 '+pFiltered.length+'건을 내려받았습니다');
+    };
+    const printProspects=()=>{
+      if(!pFiltered.length){ this.flash('인쇄할 내역이 없습니다'); return; }
+      const w=window.open('','_blank','width=1180,height=900');
+      if(!w){ this.flash('팝업이 차단되었습니다. 팝업을 허용한 뒤 다시 시도해 주세요'); return; }
+      const esc=(v)=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const tag={all:'전체',none:'미접촉',interested:'유치 희망(O)',pending:'검토중(△)',rejected:'거절(X)',joined:'부스 신청완료'}[pf]||'전체';
+      const cols=[['번호',34],['기업명',150],['구분',64],['대표전화',94],['담당자',96],['담당자 이메일',148],['유치 목표 국가',118],['상태',52],['메모',0]];
+      let h='<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>부스 유치 명단 · BIMTC 2026</title><style>'
+        +'@page{size:A4 landscape;margin:11mm 9mm;}'
+        +'*{box-sizing:border-box;}body{font-family:"Malgun Gothic","Pretendard",sans-serif;margin:0;color:#111;}'
+        +'h1{font-size:15pt;margin:0 0 2mm;}.sub{font-size:8.5pt;color:#555;margin:0 0 4mm;}'
+        +'table{width:100%;border-collapse:collapse;}'
+        +'th,td{border:1px solid #bbb;padding:1.6mm 1.8mm;font-size:7.6pt;vertical-align:top;word-break:break-all;}'
+        +'th{background:#eef2f7;font-weight:700;text-align:left;}'
+        +'tr.j td{background:#f1f3f5;color:#888;}'
+        +'thead{display:table-header-group;}tr{page-break-inside:avoid;}'
+        +'.m{text-align:center;font-weight:700;font-size:9.5pt;}'
+        +'</style></head><body>'
+        +'<h1>2026 부산국제의료관광컨벤션 · 부스 유치 명단</h1>'
+        +'<p class="sub">'+esc(tag)+' '+pFiltered.length+'건 · 출력 '+esc(new Date().toLocaleString('ko-KR'))
+        +' · 표시 ○ 유치 희망 / △ 검토중 / ✕ 거절 · 회색 줄은 부스 신청을 마친 기관</p><table><thead><tr>';
+      cols.forEach(c=>{ h+='<th'+(c[1]?' style="width:'+c[1]+'px"':'')+'>'+esc(c[0])+'</th>'; });
+      h+='</tr></thead><tbody>';
+      pFiltered.forEach(p=>{
+        const j=pJoinedOf(p); const st=PRO_ST[p.status||'none']||PRO_ST.none;
+        h+='<tr'+(j?' class="j"':'')+'>'
+          +'<td>'+esc(p.seq)+'</td>'
+          +'<td>'+esc(p.name)+(j?'<br><span style="font-size:6.8pt">신청완료</span>':'')+'</td>'
+          +'<td>'+esc(p.med_type||'')+'</td>'
+          +'<td>'+esc(p.tel||'')+'</td>'
+          +'<td>'+esc((p.mgr_name||'')+(p.mgr_dept?' / '+p.mgr_dept:''))+'</td>'
+          +'<td>'+esc(p.mgr_email||'')+'</td>'
+          +'<td>'+esc(p.target_countries||'')+'</td>'
+          +'<td class="m">'+esc(j?'-':(st[1]||'-'))+'</td>'
+          +'<td>'+esc(p.memo||'')+'</td></tr>';
+      });
+      h+='</tbody></table></body></html>';
+      try{ w.document.open(); w.document.write(h); w.document.close(); }catch(e){ this.flash('인쇄 창을 열지 못했습니다'); return; }
+      setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },500);
+    };
+
     const regs=regsData.map(r=>({ name:r.name||'ooo', org:r.org||'개인', field:(r.interests||[]).join('·'),
       day: r.visit_day==='D1'?'11.13':r.visit_day==='D2'?'11.14':'양일', at:this.shortTime(r.created_at) }));
 
@@ -1108,7 +1348,15 @@ class Component extends DCLogic {
       noNoti:(this.state.notifications||[]).filter(n=>n.status==='pending').length===0,
       hasSentNoti:(this.state.notifications||[]).some(n=>n.status==='sent'),
       sentNotiCount:(this.state.notifications||[]).filter(n=>n.status==='sent').length,
-      isDash:v==='dash',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',
+      prospectTabs, prospectRows, exportProspects, printProspects,
+      noProspects:prospectRows.length===0,
+      pQuery:this.state.pQuery||'', setPQuery:(e)=>this.setState({pQuery:e.target.value}),
+      pTotal:String(prospects.length), pJoined:String(pCount('joined')),
+      pWant:String(pCount('interested')), pHold:String(pCount('pending')),
+      pNo:String(pCount('rejected')), pNone:String(pCount('none')),
+      pShown:String(pFiltered.length),
+      pEmptyMsg:prospects.length===0?'유치 대상 명단이 비어 있습니다. booth_prospect_2_data.sql 을 실행해 명단을 올려 주세요.':'조건에 맞는 기관이 없습니다.',
+      isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',
       memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       gateLogin:this.state.gate==='login', gateDenied:this.state.gate==='denied', gateReady:this.state.gate==='ready',
       ...this.ebVals(),
