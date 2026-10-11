@@ -195,6 +195,15 @@
       if (r.error) return [];
       return r.data || [];
     },
+    // 여러 사람이 같은 화면을 보므로, 마지막으로 본 시각 이후 바뀐 행만 주기적으로 받아온다
+    async listProspectChanges(since) {
+      var sb = await ready();
+      var q = sb.from('booth_prospects').select('id,status,memo,contacted_at,joined_manual,updated_at,updated_by');
+      if (since) q = q.gt('updated_at', since);
+      var r = await q;
+      if (r.error) return [];
+      return r.data || [];
+    },
     async updateProspect(id, fields) {
       var sb = await ready();
       var f = {};
