@@ -170,6 +170,7 @@
     <div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 8%,rgba(255,255,255,0.35),rgba(255,255,255,0) 46%);"></div>
     <div style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(36px,6.5vw,66px) clamp(16px,4.5vw,32px) clamp(33px,6vw,60px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:clamp(26px,2.36vw,52px);align-items:center;">
       <div>
+        <div title="{{ t.cert_label }}" style="display:inline-flex;align-items:center;background:#fff;border-radius:10px;padding:6px 12px;margin-bottom:18px;box-shadow:0 4px 14px rgba(24,53,102,0.10);"><img src="uploads/akei_approved.png" alt="{{ t.cert_label }}" style="height:34px;width:auto;display:block;" /></div>
         <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.15em;color:#173a63;font-weight:700;margin-bottom:20px;">BUSAN INTERNATIONAL MEDICAL TOURISM CONVENTION</div>
         <h1 style="font-size:clamp(37px,6.11vw,55px);font-weight:800;line-height:1.13;letter-spacing:-0.025em;color:#183566;margin:0 0 22px;">{{ t.hero_pre }}<span style="color:#0B5FA5;">{{ t.hero_biz }}</span>{{ t.hero_post }}<br><span style="color:#0B5FA5;">{{ t.hero_biz2 }}</span>{{ t.hero_l2a }}<span style="color:#FF6B5A;">{{ t.hero_busan }}</span>{{ t.hero_after }}</h1>
         <p style="font-size:18px;line-height:1.6;color:#1c3f63;margin:0 0 30px;max-width:480px;font-weight:500;">{{ t.hero_sub }}</p>
@@ -425,6 +426,13 @@
           <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_org }}</div>
           <div style="display:flex;justify-content:center;align-items:center;">
             <img src="uploads/logo_org.png" alt="(사)부산권의료산업협의회" style="height:30px;width:auto;object-fit:contain;opacity:0.92;" />
+          </div>
+        </div>
+        <div style="width:1px;align-self:stretch;background:rgba(255,255,255,0.1);"></div>
+        <div style="text-align:center;">
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);letter-spacing:0.14em;color:#6b8aa6;margin-bottom:14px;">{{ t.spons_cert }}</div>
+          <div style="display:inline-flex;justify-content:center;align-items:center;background:#fff;border-radius:10px;padding:8px 14px;">
+            <img src="uploads/akei_approved.png" alt="{{ t.cert_label }}" style="height:40px;width:auto;display:block;" />
           </div>
         </div>
       </div>
@@ -1279,6 +1287,7 @@
           <span style="font-weight:800;font-size:17px;"><span style="color:#fff;">MEDI</span><span style="color:#FF6B5A;margin:0 3px;">×</span><span style="color:#25C281;">WELLNESS</span></span>
         </div>
         <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.7;margin:0 0 18px;color:#7d93a8;">{{ t.ft_office }}<br>{{ t.ft_addr }}<br>T. 051-461-4276~8 · F. 051-442-6006<br>E. bmia0528@naver.com</p>
+        <div style="display:inline-flex;background:#fff;border-radius:10px;padding:7px 12px;margin-bottom:18px;"><img src="uploads/akei_approved.png" alt="{{ t.cert_label }}" style="height:36px;width:auto;display:block;" /></div>
         <div style="display:flex;gap:8px;">
           <a href="https://www.instagram.com/bimtc_korea/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" style="width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;color:#9fb4c7;cursor:pointer;text-decoration:none;" style-hover="border-color:#25C281;color:#25C281;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.2"></rect><circle cx="12" cy="12" r="4.3"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"></circle></svg>
@@ -1702,7 +1711,7 @@ class Component extends DCLogic {
       eb_strip_cta:L('부스 신청하기 →','Apply now →'),
       ft_quick:L('바로가기','Quick Links'), ft_info:L('이용안내','Information'), ft_support:L('고객지원','Support'),
       ft_lib:L('자료실 다운로드','Downloads'), ft_stay:L('숙박·관광 안내','Stay & Tour'), ft_contact:L('문의하기','Contact'), ft_faq:L('자주 묻는 질문','FAQ'),
-      go:L('바로가기 →','Go →'), spons_host:L('주최','HOSTS'), spons_org:L('주관','ORGANIZER'),
+      go:L('바로가기 →','Go →'), spons_host:L('주최','HOSTS'), spons_org:L('주관','ORGANIZER'), spons_cert:L('인증','CERTIFIED BY'), cert_label:L('한국전시산업진흥회 인증전시회','AKEI Approved Exhibition'),
       ft_office:L('2026 부산국제의료관광컨벤션 사무국','2026 BIMTC Secretariat'), ft_addr:L('부산광역시 동구 중앙대로 365, 3층','3F, 365 Jungang-daero, Dong-gu, Busan'),
       ft_floormap:L('플로어맵·부스배치도','Floor Map · Booths'),
       ft_legal:L('개인정보처리방침 · 이메일무단수집거부 · 사이트맵','Privacy Policy · No Email Collection · Sitemap'),
