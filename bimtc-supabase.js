@@ -204,6 +204,51 @@
       if (r.error) return [];
       return r.data || [];
     },
+    // 유치 대상 기관 추가. 이미 있는 곳(기관명|전화|우편번호가 같은 곳)은 건너뛴다.
+    async addProspects(rows) {
+      var sb = await ready();
+      var clean = [], seen = {};
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i] || {};
+        var name = String(r.name || '').trim();
+        if (!name) continue;
+        var tel = String(r.tel || '').trim(), zip = String(r.zipcode || '').trim();
+        var key = name + '|' + tel + '|' + zip;
+        if (seen[key]) continue;            // 붙여넣기 안에서 중복된 줄
+        seen[key] = 1;
+        clean.push({ src_key: key, name: name, tel: tel || null, zipcode: zip || null,
+          org_type: String(r.org_type || '의료기관').trim() || null,
+          med_type: String(r.med_type || '').trim() || null,
+          found_type: String(r.found_type || '').trim() || null,
+          ceo: String(r.ceo || '').trim() || null,
+          address: String(r.address || '').trim() || null,
+          target_countries: String(r.target_countries || '').trim() || null,
+          mgr_name: String(r.mgr_name || '').trim() || null,
+          mgr_dept: String(r.mgr_dept || '').trim() || null,
+          mgr_email: String(r.mgr_email || '').trim() || null,
+          memo: String(r.memo || '').trim() || null,
+          source: 'manual' });
+      }
+      if (!clean.length) return { ok: true, added: 0, skipped: 0 };
+      var added = 0;
+      for (var j = 0; j < clean.length; j += 100) {    // 한 번에 100건씩
+        var part = clean.slice(j, j + 100);
+        var res = await sb.from('booth_prospects')
+          .upsert(part, { onConflict: 'src_key', ignoreDuplicates: true })
+          .select('id');
+        if (res.error) return { ok: false, error: res.error.message, added: added };
+        added += (res.data || []).length;
+      }
+      return { ok: true, added: added, skipped: clean.length - added };
+    },
+    // 직접 추가한 곳만 지울 수 있다. 원본 명단(source='excel')은 지워지지 않는다.
+    async deleteProspect(id) {
+      var sb = await ready();
+      var r = await sb.from('booth_prospects').delete().eq('id', id).eq('source', 'manual').select('id');
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '원본 명단은 삭제할 수 없습니다' };
+      return { ok: true };
+    },
     async updateProspect(id, fields) {
       var sb = await ready();
       var f = {};

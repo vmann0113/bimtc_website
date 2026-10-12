@@ -192,9 +192,55 @@
             <input value="{{ pQuery }}" onInput="{{ setPQuery }}" placeholder="기관명·주소·담당자·메모 검색" style="padding:10px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;width:230px;" />
             <button onClick="{{ exportProspects }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">엑셀(CSV) 받기</button>
             <button onClick="{{ printProspects }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 18px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">인쇄 · PDF 저장</button>
+            <button onClick="{{ openAdd }}" style="background:#11A37B;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">+ 기관 추가</button>
             <button onClick="{{ reloadProspects }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:10px 14px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">새로고침</button>
           </div>
         </div>
+        <sc-if value="{{ addOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #d8e4f0;border-radius:16px;padding:20px 22px;margin-bottom:16px;box-shadow:0 6px 18px rgba(15,36,64,0.06);">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+              <div style="font-size:16px;font-weight:800;">유치 대상 기관 추가</div>
+              <span onClick="{{ closeAdd }}" style="font-size:13px;color:#8295ab;cursor:pointer;">닫기 ✕</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;">
+              <span onClick="{{ setAddOne }}" style="{{ addOneStyle }}">한 곳씩 입력</span>
+              <span onClick="{{ setAddBulk }}" style="{{ addBulkStyle }}">여러 곳 한번에 (엑셀 붙여넣기)</span>
+            </div>
+            <sc-if value="{{ addIsOne }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-wrap:wrap;gap:12px;">
+                <label style="flex:1 1 220px;min-width:180px;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">기관명 <span style="color:#E0533C;">*</span></span><input value="{{ afName }}" onInput="{{ setAfName }}" placeholder="예) 좋은문화병원" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:0 1 150px;min-width:130px;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">구분</span><input value="{{ afMed }}" onInput="{{ setAfMed }}" placeholder="종합병원 · 의원 등" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:0 1 160px;min-width:140px;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">대표전화</span><input value="{{ afTel }}" onInput="{{ setAfTel }}" placeholder="051-000-0000" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:0 1 130px;min-width:110px;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">담당자</span><input value="{{ afMgr }}" onInput="{{ setAfMgr }}" placeholder="이름" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:0 1 140px;min-width:120px;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">부서</span><input value="{{ afDept }}" onInput="{{ setAfDept }}" placeholder="국제진료센터 등" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:1 1 220px;min-width:180px;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">담당자 이메일</span><input value="{{ afEmail }}" onInput="{{ setAfEmail }}" placeholder="name@hospital.co.kr" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:1 1 200px;min-width:170px;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">유치 목표 국가</span><input value="{{ afCountries }}" onInput="{{ setAfCountries }}" placeholder="미국/일본/중국" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:1 1 100%;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">주소</span><input value="{{ afAddr }}" onInput="{{ setAfAddr }}" placeholder="부산광역시 ..." style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+                <label style="flex:1 1 100%;"><span style="display:block;font-size:12.5px;font-weight:700;color:#33485e;margin-bottom:6px;">메모</span><input value="{{ afMemo }}" onInput="{{ setAfMemo }}" placeholder="추가 사유·소개자 등" style="width:100%;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;outline:none;" /></label>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+                <button onClick="{{ closeAdd }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">취소</button>
+                <button onClick="{{ addOne }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ addBtnLabel }}</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ addIsBulk }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#F7F9FC;border:1px solid #e6ebf2;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12.5px;color:#5E7289;line-height:1.75;">
+                엑셀에서 <b>기관명이 있는 열부터 오른쪽으로</b> 범위를 복사해 아래에 붙여넣으세요. 한 줄에 한 곳씩, 열 순서는 다음과 같습니다.<br>
+                <span style="display:inline-block;margin-top:6px;font-family:'Pretendard',sans-serif;background:#fff;border:1px solid #dde5ee;border-radius:7px;padding:7px 10px;color:#33485e;">기관명 · 구분 · 대표전화 · 담당자 · 부서 · 담당자이메일 · 유치목표국가 · 주소</span><br>
+                <span style="color:#8295ab;">기관명만 있어도 추가됩니다. 뒤쪽 열은 비워도 되고, 첫 줄이 제목 줄이면 알아서 건너뜁니다. 쉼표(CSV)로 나뉜 것도 됩니다.</span>
+              </div>
+              <textarea value="{{ bulkText }}" onInput="{{ setBulkText }}" rows="9" placeholder="좋은문화병원	종합병원	051-644-2002	천석희	원무팀	mh3728@goodhospital.or.kr	미국/일본	부산광역시 동구 범일로 119&#10;해운대부민병원	종합병원	051-900-5000" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:13px;line-height:1.6;outline:none;font-family:'Pretendard',sans-serif;resize:vertical;"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;">
+                <span style="font-size:13px;font-weight:700;color:#0d8f6b;">{{ bulkHint }}</span>
+                <div style="display:flex;gap:8px;">
+                  <button onClick="{{ closeAdd }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">취소</button>
+                  <button onClick="{{ addBulkGo }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ addBtnLabel }}</button>
+                </div>
+              </div>
+            </sc-if>
+            <p style="font-size:12px;color:#9aa9bd;margin:14px 0 0;line-height:1.7;">이미 명단에 있는 기관(기관명·대표전화가 같은 곳)은 <b>자동으로 건너뜁니다.</b> 기존 354곳의 표시·메모는 그대로 유지됩니다.</p>
+          </div>
+        </sc-if>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow-x:auto;">
           <div style="min-width:824px;">
           <div style="display:flex;gap:10px;padding:12px 16px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
@@ -232,6 +278,7 @@
                 {{ p.at }}
                 <sc-if value="{{ p.hasBy }}" hint-placeholder-val="{{ false }}"><span style="display:block;font-size:11px;color:#5E7289;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.by }}</span></sc-if>
                 <span onClick="{{ p.markJoined }}" style="display:block;margin-top:3px;font-size:11px;color:#8295ab;cursor:pointer;text-decoration:underline;white-space:nowrap;">{{ p.markJoinedLabel }}</span>
+                <sc-if value="{{ p.canDelete }}" hint-placeholder-val="{{ false }}"><span onClick="{{ p.del }}" style="display:block;margin-top:2px;font-size:11px;color:#c0392b;cursor:pointer;text-decoration:underline;white-space:nowrap;">삭제</span></sc-if>
               </span>
             </div>
           </sc-for>
@@ -677,6 +724,7 @@ class Component extends DCLogic {
     restricted: {},
     boardDay: 'D1',
     prospects: [], pFilter: 'all', pQuery: '', pMemo: {},
+    addOpen: false, addMode: 'one', addForm: {}, addBulk: '', addBusy: false,
     cmsFlash: false,
     toast: null,
   };
@@ -1311,8 +1359,54 @@ class Component extends DCLogic {
         markJoinedLabel:p.joined_manual?'신청완료 해제':'신청완료로 표시',
         canUnjoin:!!p.joined_manual,
         at:p.contacted_at?this.shortTime(p.contacted_at):'',
-        by:(p.updated_by&&proWho[p.updated_by])?proWho[p.updated_by]:'', hasBy:!!(p.updated_by&&proWho[p.updated_by]) };
+        by:(p.updated_by&&proWho[p.updated_by])?proWho[p.updated_by]:'', hasBy:!!(p.updated_by&&proWho[p.updated_by]),
+        canDelete:p.source==='manual', del:()=>delProspect(p.id,p.name) };
     });
+
+    // ── 기관 추가 (한 곳씩 / 엑셀 붙여넣기) ──────────────────────────
+    const AF=this.state.addForm||{};
+    const setAF=(k)=>(e)=>this.setState({addForm:Object.assign({},this.state.addForm||{},{[k]:e.target.value})});
+    // 엑셀에서 복사하면 탭으로, CSV로 저장하면 쉼표로 나뉜다. 둘 다 받는다.
+    const BULK_COLS=['name','med_type','tel','mgr_name','mgr_dept','mgr_email','target_countries','address'];
+    const parseBulk=(txt)=>{
+      const out=[]; const bad=[];
+      String(txt||'').split(/\r?\n/).forEach((line,i)=>{
+        if(!line.trim()) return;
+        const cells=(line.indexOf('\t')>=0 ? line.split('\t') : line.split(',')).map(c=>c.replace(/^\s*"?|"?\s*$/g,'').trim());
+        const first=cells[0]||'';
+        if(i===0 && /^(기관명|기업명|병원명|이름|상호)$/.test(first)) return;   // 머리글 줄은 건너뜀
+        if(!first){ bad.push(i+1); return; }
+        const row={};
+        BULK_COLS.forEach((k,n)=>{ if(cells[n]) row[k]=cells[n]; });
+        out.push(row);
+      });
+      return {rows:out, bad};
+    };
+    const bulkParsed=parseBulk(this.state.addBulk);
+    const addReset=()=>this.setState({addOpen:false, addForm:{}, addBulk:'', addBusy:false});
+    const doAdd=async(rows,label)=>{
+      if(this.state.addBusy) return;
+      if(!rows.length){ this.flash('추가할 기관이 없습니다'); return; }
+      this.setState({addBusy:true});
+      const r=await window.BimtcDB.addProspects(rows);
+      if(!r || r.ok===false){ this.setState({addBusy:false}); this.flash('추가 실패: '+((r&&r.error)||'알 수 없는 오류')); return; }
+      await this.reload();
+      addReset();
+      this.flash(label+' '+r.added+'곳 추가'+(r.skipped?' · 이미 있는 '+r.skipped+'곳은 건너뜀':''));
+    };
+    const addOne=()=>{
+      const f=this.state.addForm||{};
+      if(!String(f.name||'').trim()){ this.flash('기관명을 입력하세요'); return; }
+      doAdd([f],'기관');
+    };
+    const addBulkGo=()=>doAdd(bulkParsed.rows,'기관');
+    const delProspect=async(id,name)=>{
+      if(!window.confirm(name+' 을(를) 명단에서 지울까요?\n(직접 추가한 기관만 삭제됩니다)')) return;
+      const r=await window.BimtcDB.deleteProspect(id);
+      if(!r || r.ok===false){ this.flash('삭제 실패: '+((r&&r.error)||'')); return; }
+      await this.reload();
+      this.flash(name+' 을(를) 명단에서 지웠습니다');
+    };
 
     const PRO_COLS=[['번호','seq'],['상태','st'],['신청완료','joined'],['기관구분','org_type'],['기업명','name'],
       ['의료기관구분','med_type'],['설립유형','found_type'],['대표자','ceo'],['우편번호','zipcode'],['주소','address'],
@@ -1397,6 +1491,27 @@ class Component extends DCLogic {
       hasSentNoti:(this.state.notifications||[]).some(n=>n.status==='sent'),
       sentNotiCount:(this.state.notifications||[]).filter(n=>n.status==='sent').length,
       prospectTabs, prospectRows, exportProspects, printProspects,
+      addOpen:!!this.state.addOpen, addIsOne:(this.state.addMode||'one')==='one', addIsBulk:(this.state.addMode||'one')==='bulk',
+      openAdd:()=>this.setState({addOpen:true, addMode:'one', addForm:{}, addBulk:''}), closeAdd:addReset,
+      setAddOne:()=>this.setState({addMode:'one'}), setAddBulk:()=>this.setState({addMode:'bulk'}),
+      addOneStyle:pChip+((this.state.addMode||'one')==='one'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;border:1px solid #dde5ee;color:#5e7289;'),
+      addBulkStyle:pChip+((this.state.addMode||'one')==='bulk'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;border:1px solid #dde5ee;color:#5e7289;'),
+      afName:AF.name||'', setAfName:setAF('name'),
+      afMed:AF.med_type||'', setAfMed:setAF('med_type'),
+      afTel:AF.tel||'', setAfTel:setAF('tel'),
+      afMgr:AF.mgr_name||'', setAfMgr:setAF('mgr_name'),
+      afDept:AF.mgr_dept||'', setAfDept:setAF('mgr_dept'),
+      afEmail:AF.mgr_email||'', setAfEmail:setAF('mgr_email'),
+      afCountries:AF.target_countries||'', setAfCountries:setAF('target_countries'),
+      afAddr:AF.address||'', setAfAddr:setAF('address'),
+      afMemo:AF.memo||'', setAfMemo:setAF('memo'),
+      addOne, addBulkGo,
+      bulkText:this.state.addBulk||'', setBulkText:(e)=>this.setState({addBulk:e.target.value}),
+      bulkCount:bulkParsed.rows.length,
+      bulkHint:bulkParsed.rows.length? (bulkParsed.rows.length+'곳이 인식되었습니다'+(bulkParsed.bad.length?' · 기관명이 없는 '+bulkParsed.bad.length+'줄은 제외':'')) : '엑셀에서 복사해 붙여넣거나 한 줄에 한 곳씩 입력하세요',
+      bulkReady:bulkParsed.rows.length>0,
+      addBtnLabel:this.state.addBusy?'추가 중…':'추가하기',
+
       proSyncLabel:(()=>{ const t=this.state.proSyncedAt; if(!t) return '동기화 중…';
         const d=new Date(t); return '자동 반영 중 · 마지막 확인 '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0'); })(),
       reloadProspects:async()=>{ await this.reload(); this.flash('명단을 새로 불러왔습니다'); },
