@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>개막식 참석 회신 · 2026 부산국제의료관광컨벤션</title>
+<meta name="description" content="2026 부산국제의료관광컨벤션 개막식(11월 13일 금 11:00, 벡스코 제1전시장 3A홀) 참석 회신">
+<meta property="og:title" content="2026 BIMTC 개막식 참석 회신">
+<meta property="og:description" content="11월 13일(금) 11:00 · 벡스코 제1전시장 3A홀">
+<meta property="og:image" content="uploads/mail/invite_header.jpg">
+<meta name="theme-color" content="#3BA6CF">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&display=swap">
+<!--
+  개막식 참석 회신 (rsvp.html) — 초청 메일의 [참석 회신하기] 버튼이 여는 공통 링크.
+  제출은 rsvp_submit RPC 로만 저장된다(SQL: ../opening_rsvps.sql). 관리 화면은 rsvp-admin.html.
+-->
+<style>
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{margin:0;background:#E9F1F6;color:#1d2a3d;font-family:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;font-size:15px;line-height:1.6;word-break:keep-all}
+  input,textarea,button{font-family:inherit;font-size:16px}
+  .wrap{max-width:560px;margin:0 auto;padding:0 0 40px}
+  .hero img{display:block;width:100%;height:auto}
+  .card{background:#fff;margin:0 12px;border-radius:0 0 16px 16px;padding:24px 20px 28px;box-shadow:0 8px 30px rgba(20,50,90,.08)}
+  h1{font-family:'Noto Serif KR',serif;font-size:22px;color:#213661;margin:0 0 14px;text-align:center;letter-spacing:-.3px}
+  .info{background:#F3F7FA;border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.75;margin-bottom:22px}
+  .info div{display:flex;gap:10px;padding:2px 0}
+  .info b{color:#1F7FBF;flex:none;width:34px}
+  .info small{display:block;color:#6b7a8c;font-size:12.5px}
+  .due{text-align:center;font-size:14px;color:#5b6878;margin:-8px 0 22px}
+  .due em{font-style:normal;color:#D6336C;font-weight:700}
+  .f{margin-bottom:16px}
+  .f label.t{display:block;font-weight:700;font-size:14px;margin-bottom:6px;color:#213661}
+  .req{color:#D6336C;margin-left:2px}
+  .f input[type=text],.f input[type=tel],.f input[type=email],.f textarea{width:100%;border:1.5px solid #d3dde6;border-radius:10px;padding:12px 13px;background:#fff;color:#1d2a3d;outline:none}
+  .f input:focus,.f textarea:focus{border-color:#1F7FBF;box-shadow:0 0 0 3px rgba(31,127,191,.12)}
+  .f textarea{min-height:76px;resize:vertical}
+  .hint{font-size:12.5px;color:#7a8898;margin-top:4px}
+  .seg{display:flex;gap:8px}
+  .seg label{flex:1;position:relative}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg span{display:block;text-align:center;border:1.5px solid #d3dde6;border-radius:10px;padding:11px 6px;font-weight:600;color:#5b6878;cursor:pointer;user-select:none}
+  .seg input:checked+span{border-color:#213661;background:#213661;color:#fff}
+  .seg input:focus-visible+span{box-shadow:0 0 0 3px rgba(31,127,191,.3)}
+  .sub{font-size:13px;color:#7a8898;font-weight:500;margin-left:4px}
+  .group{border-top:1px solid #e3ebf0;padding-top:18px;margin-top:6px}
+  .consent{background:#F7F9FB;border-radius:10px;padding:12px 14px;font-size:13px;color:#5b6878;margin:8px 0 18px}
+  .consent label{display:flex;gap:9px;align-items:flex-start;color:#1d2a3d;font-weight:600;font-size:14px;margin-top:8px;cursor:pointer}
+  .consent input{width:19px;height:19px;margin:2px 0 0;flex:none;accent-color:#213661}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .err{display:none;background:#FDEDEF;color:#B4233C;border-radius:10px;padding:10px 13px;font-size:14px;margin-bottom:12px}
+  .btn{display:block;width:100%;border:0;border-radius:12px;background:#213661;color:#fff;font-size:17px;font-weight:700;padding:16px;cursor:pointer}
+  .btn:disabled{opacity:.6;cursor:default}
+  .done{text-align:center;padding:30px 6px 10px}
+  .done .ic{width:64px;height:64px;border-radius:50%;background:#E6F5EE;color:#11A37B;font-size:34px;line-height:64px;margin:0 auto 14px}
+  .done h2{font-family:'Noto Serif KR',serif;color:#213661;font-size:21px;margin:0 0 10px}
+  .foot{text-align:center;font-size:13px;color:#7a8898;margin-top:22px;line-height:1.8}
+  .foot a{color:#1F7FBF;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero" style="margin:0 12px"><img src="uploads/mail/invite_header.jpg" alt="2026 부산국제의료관광컨벤션 MEDI × WELLNESS" style="border-radius:16px 16px 0 0"></div>
+  <div class="card" id="card">
+    <h1>개막식 참석 회신</h1>
+    <div class="info">
+      <div><b>일시</b><span>2026년 11월 13일(금) 11:00</span></div>
+      <div><b>장소</b><span>벡스코 제1전시장 3A홀</span></div>
+      <div><b>식전</b><span>10:30 VIP 네트워킹<small>제1전시장 213호</small></span></div>
+      <div><b>오찬</b><span>12:00 개막 오찬<small>제1전시장 214~216호</small></span></div>
+    </div>
+    <p class="due"><em>11월 6일(금)</em>까지 회신해 주시기 바랍니다.</p>
+
+    <form id="f" novalidate>
+      <div class="f"><label class="t" for="org">소속(기관·기업명)<span class="req">*</span></label><input type="text" id="org" autocomplete="organization" required></div>
+      <div class="f"><label class="t" for="job_title">직위<span class="req">*</span></label><input type="text" id="job_title" autocomplete="organization-title" required></div>
+      <div class="f"><label class="t" for="name">성명<span class="req">*</span></label><input type="text" id="name" autocomplete="name" required></div>
+      <div class="f"><label class="t" for="phone">연락처(휴대전화)<span class="req">*</span></label><input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" required></div>
+      <div class="f"><label class="t" for="email">이메일<span class="sub">선택</span></label><input type="email" id="email" autocomplete="email"></div>
+
+      <div class="group">
+        <div class="f"><label class="t">개막식 참석 여부<span class="req">*</span></label>
+          <div class="seg"><label><input type="radio" name="ceremony" value="참석"><span>참석</span></label><label><input type="radio" name="ceremony" value="불참"><span>불참</span></label></div></div>
+        <div class="f" id="more">
+          <label class="t">VIP 네트워킹 <span class="sub">10:30 · 213호</span></label>
+          <div class="seg" style="margin-bottom:14px"><label><input type="radio" name="networking" value="참석"><span>참석</span></label><label><input type="radio" name="networking" value="불참"><span>불참</span></label></div>
+          <label class="t">개막 오찬 <span class="sub">12:00 · 214~216호</span></label>
+          <div class="seg"><label><input type="radio" name="lunch" value="참석"><span>참석</span></label><label><input type="radio" name="lunch" value="불참"><span>불참</span></label></div>
+        </div>
+        <div class="f"><label class="t" for="companions">동행자(수행원)<span class="sub">선택</span></label><input type="text" id="companions" placeholder="예) 홍길동 비서실장"></div>
+        <div class="f"><label class="t" for="note">기타 요청사항<span class="sub">선택</span></label><textarea id="note"></textarea></div>
+      </div>
+
+      <div class="hp" aria-hidden="true"><input type="text" id="hp" tabindex="-1" autocomplete="off"></div>
+      <div class="consent">
+        수집 항목: 소속, 직위, 성명, 연락처, 이메일 · 이용 목적: 개막식 참석 확인 및 행사 안내 · 보유 기간: 행사 종료 후 1년
+        <label><input type="checkbox" id="consent"> 개인정보 수집·이용에 동의합니다.<span class="req">*</span></label>
+      </div>
+      <div class="err" id="err"></div>
+      <button class="btn" id="btn" type="submit">회신 제출</button>
+    </form>
+  </div>
+  <div class="foot">2026 부산국제의료관광컨벤션 사무국<br>T. 051-461-4276~8 · <a href="mailto:bmia0528@naver.com">bmia0528@naver.com</a><br><a href="/">bimtc.busan.com</a></div>
+</div>
+<script>
+(function () {
+  // bimtc-supabase.js 와 같은 프로젝트·공개(anon) 키. 이 키로는 rsvp_submit 만 호출 가능(RLS).
+  var SUPABASE_URL = 'https://xkomxbskwvtofpglback.supabase.co';
+  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrb214YnNrd3Z0b2ZwZ2xiYWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjIxNzYsImV4cCI6MjEwMDAzODE3Nn0.YVBpieLDFP4AyeapuiRmjrDyZYdAHfiudnUdRPG65mo';
+  var $ = function (id) { return document.getElementById(id); };
+  var radio = function (n) { var c = document.querySelector('input[name="' + n + '"]:checked'); return c ? c.value : ''; };
+
+  // 불참이면 네트워킹·오찬 질문을 숨긴다
+  document.querySelectorAll('input[name="ceremony"]').forEach(function (r) {
+    r.onchange = function () { $('more').style.display = radio('ceremony') === '불참' ? 'none' : ''; };
+  });
+
+  function fail(msg, el) { var e = $('err'); e.textContent = msg; e.style.display = 'block'; if (el) el.focus(); }
+
+  $('f').onsubmit = function (ev) {
+    ev.preventDefault();
+    $('err').style.display = 'none';
+    var p = {
+      org: $('org').value.trim(), job_title: $('job_title').value.trim(), name: $('name').value.trim(),
+      phone: $('phone').value.trim(), email: $('email').value.trim(),
+      ceremony: radio('ceremony'), networking: radio('ceremony') === '불참' ? '불참' : radio('networking'),
+      lunch: radio('ceremony') === '불참' ? '불참' : radio('lunch'),
+      companions: $('companions').value.trim(), note: $('note').value.trim(),
+      consent: $('consent').checked, hp: $('hp').value
+    };
+    if (!p.org) return fail('소속을 입력해 주세요.', $('org'));
+    if (!p.job_title) return fail('직위를 입력해 주세요.', $('job_title'));
+    if (!p.name) return fail('성명을 입력해 주세요.', $('name'));
+    if (!/^[0-9+\-\s()]{9,}$/.test(p.phone)) return fail('연락처를 확인해 주세요.', $('phone'));
+    if (p.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.email)) return fail('이메일 형식을 확인해 주세요.', $('email'));
+    if (!p.ceremony) return fail('개막식 참석 여부를 선택해 주세요.');
+    if (!p.consent) return fail('개인정보 수집·이용에 동의해 주세요.', $('consent'));
+
+    var b = $('btn'); b.disabled = true; b.textContent = '제출 중…';
+    fetch(SUPABASE_URL + '/rest/v1/rpc/rsvp_submit', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p: p })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      $('card').innerHTML = '<div class="done"><div class="ic">✓</div><h2>회신해 주셔서 감사합니다</h2>' +
+        '<p style="margin:0;color:#5b6878">' + (p.ceremony === '참석' ? '11월 13일(금) 11:00, 벡스코 제1전시장 3A홀에서 뵙겠습니다.' : '불참 회신이 접수되었습니다.') +
+        '<br>변경 사항은 사무국(051-461-4276)으로 연락해 주세요.</p></div>';
+      window.scrollTo(0, 0);
+    }).catch(function () {
+      b.disabled = false; b.textContent = '회신 제출';
+      fail('제출하지 못했습니다. 잠시 후 다시 시도하시거나 사무국(051-461-4276)으로 연락해 주세요.');
+    });
+  };
+})();
+</script>
+</body>
+</html>
