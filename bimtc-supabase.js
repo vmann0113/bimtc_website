@@ -198,7 +198,7 @@
     // 여러 사람이 같은 화면을 보므로, 마지막으로 본 시각 이후 바뀐 행만 주기적으로 받아온다
     async listProspectChanges(since) {
       var sb = await ready();
-      var q = sb.from('booth_prospects').select('id,status,memo,contacted_at,joined_manual,updated_at,updated_by');
+      var q = sb.from('booth_prospects').select('id,status,memo,contacted_at,joined_manual,updated_at,updated_by,name,med_type,tel,mgr_name,mgr_dept,mgr_email,target_countries,address,org_type,src_key');
       if (since) q = q.gt('updated_at', since);
       var r = await q;
       if (r.error) return [];
@@ -240,6 +240,37 @@
         added += (res.data || []).length;
       }
       return { ok: true, added: added, skipped: clean.length - added };
+    },
+    // 기관 정보 수정 (이름 오탈자·연락처 등). 유치 표시·메모는 건드리지 않는다.
+    async updateProspectInfo(id, fields) {
+      var sb = await ready();
+      var name = String(fields.name == null ? '' : fields.name).trim();
+      if (!name) return { ok: false, error: '기관명을 입력하세요' };
+      var tel = String(fields.tel || '').trim();
+      var zip = String(fields.zipcode || '').trim();
+      var f = {
+        name: name,
+        tel: tel || null,
+        zipcode: zip || null,
+        med_type: String(fields.med_type || '').trim() || null,
+        org_type: String(fields.org_type || '').trim() || null,
+        ceo: String(fields.ceo || '').trim() || null,
+        address: String(fields.address || '').trim() || null,
+        target_countries: String(fields.target_countries || '').trim() || null,
+        mgr_name: String(fields.mgr_name || '').trim() || null,
+        mgr_dept: String(fields.mgr_dept || '').trim() || null,
+        mgr_email: String(fields.mgr_email || '').trim() || null,
+        src_key: name + '|' + tel + '|' + zip   // 나중에 같은 기관을 또 붙여넣어도 중복되지 않도록 맞춰 둔다
+      };
+      var r = await sb.from('booth_prospects').update(f).eq('id', id).select('id');
+      if (r.error) {
+        if (String(r.error.code) === '23505' || /duplicate key/i.test(r.error.message || '')) {
+          return { ok: false, error: '같은 기관(기관명·대표전화)이 이미 명단에 있습니다' };
+        }
+        return { ok: false, error: r.error.message };
+      }
+      if (!r.data || !r.data.length) return { ok: false, error: '수정 권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true };
     },
     // 직접 추가한 곳만 지울 수 있다. 원본 명단(source='excel')은 지워지지 않는다.
     async deleteProspect(id) {
