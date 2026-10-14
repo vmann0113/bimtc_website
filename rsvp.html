@@ -89,13 +89,21 @@
           <label class="t">개막 오찬 <span class="sub">12:00 · 214~216호</span></label>
           <div class="seg"><label><input type="radio" name="lunch" value="참석"><span>참석</span></label><label><input type="radio" name="lunch" value="불참"><span>불참</span></label></div>
         </div>
-        <div class="f"><label class="t" for="companions">동행자(수행원)<span class="sub">선택</span></label><input type="text" id="companions" placeholder="예) 홍길동 비서실장"></div>
+      </div>
+      <div class="group">
+        <label class="t" style="display:block;font-weight:700;font-size:14px;margin-bottom:4px;color:#213661">수행원(동반자)<span class="sub">있는 경우</span></label>
+        <div class="hint" style="margin:0 0 8px">수행원이 함께 오시면 성함과 연락처를 적어 주세요.</div>
+        <div class="f"><label class="t" for="companion_name" style="font-weight:600;color:#5b6878">성명·직위</label><input type="text" id="companion_name" placeholder="예) 홍길동 비서실장"></div>
+        <div class="f"><label class="t" for="companion_phone" style="font-weight:600;color:#5b6878">연락처</label><input type="tel" id="companion_phone" inputmode="tel" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="group">
+        <div class="f"><label class="t" for="car_no">차량번호<span class="sub">자차 이용 시 · 주차 등록용</span></label><input type="text" id="car_no" placeholder="예) 12가 3456" autocomplete="off"></div>
         <div class="f"><label class="t" for="note">기타 요청사항<span class="sub">선택</span></label><textarea id="note"></textarea></div>
       </div>
 
       <div class="hp" aria-hidden="true"><input type="text" id="hp" tabindex="-1" autocomplete="off"></div>
       <div class="consent">
-        수집 항목: 소속, 직위, 성명, 연락처, 이메일 · 이용 목적: 개막식 참석 확인 및 행사 안내 · 보유 기간: 행사 종료 후 1년
+        수집 항목: 소속, 직위, 성명, 연락처, 이메일, 수행원 성명·연락처, 차량번호 · 이용 목적: 개막식 참석 확인, 행사 안내 및 주차 등록 · 보유 기간: 행사 종료 후 1년
         <label><input type="checkbox" id="consent"> 개인정보 수집·이용에 동의합니다.<span class="req">*</span></label>
       </div>
       <div class="err" id="err"></div>
@@ -127,7 +135,8 @@
       phone: $('phone').value.trim(), email: $('email').value.trim(),
       ceremony: radio('ceremony'), networking: radio('ceremony') === '불참' ? '불참' : radio('networking'),
       lunch: radio('ceremony') === '불참' ? '불참' : radio('lunch'),
-      companions: $('companions').value.trim(), note: $('note').value.trim(),
+      companion_name: $('companion_name').value.trim(), companion_phone: $('companion_phone').value.trim(), car_no: $('car_no').value.trim(),
+      note: $('note').value.trim(),
       consent: $('consent').checked, hp: $('hp').value
     };
     if (!p.org) return fail('소속을 입력해 주세요.', $('org'));
@@ -136,6 +145,8 @@
     if (!/^[0-9+\-\s()]{9,}$/.test(p.phone)) return fail('연락처를 확인해 주세요.', $('phone'));
     if (p.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.email)) return fail('이메일 형식을 확인해 주세요.', $('email'));
     if (!p.ceremony) return fail('개막식 참석 여부를 선택해 주세요.');
+    if (p.companion_phone && !/^[0-9+\-\s()]{9,}$/.test(p.companion_phone)) return fail('수행원 연락처를 확인해 주세요.', $('companion_phone'));
+    if (p.companion_phone && !p.companion_name) return fail('수행원 성명을 입력해 주세요.', $('companion_name'));
     if (!p.consent) return fail('개인정보 수집·이용에 동의해 주세요.', $('consent'));
 
     var b = $('btn'); b.disabled = true; b.textContent = '제출 중…';
