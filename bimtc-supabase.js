@@ -51,7 +51,7 @@
       var sb = await ready();
       var res = await sb.auth.signUp({
         email: o.email, password: o.password,
-        options: { data: { type: o.type || 'exhibitor', name: o.name || '', country: o.country || '', category: o.category || '', dept: o.dept || '', phone: o.phone || '', interests: o.interests || [], first_name: o.firstName || '', last_name: o.lastName || '', job_title: o.jobTitle || '', industry: o.industry || '', landline: o.landline || '' } }
+        options: { data: { type: o.type || 'exhibitor', name: o.name || '', country: o.country || '', category: o.category || '', dept: o.dept || '', phone: o.phone || '', interests: o.interests || [], first_name: o.firstName || '', last_name: o.lastName || '', job_title: o.jobTitle || '', industry: o.industry || '', landline: o.landline || '', attend_mode: o.attendMode || 'onsite' } }
       });
       if (res.error) return { ok: false, error: res.error.message };
       return { ok: true, user: res.data.user, session: res.data.session };
@@ -471,20 +471,41 @@
       return { ok: true };
     },
     // 요청 수락 → 예약 생성(빈 테이블 자동 배정) + 양측 정보 기록
+    // 미팅은 '참가기업 자기 부스'에서 한다. (라운지 테이블 배정 방식 폐지)
+    // 요청한 쪽이 참가기업이든 바이어든, 장소는 언제나 참가기업의 부스다.
+    async boothPlaceOf(profileId) {
+      var sb = await ready();
+      var r = await sb.from('booth_applications').select('booth_ids,status')
+        .eq('profile_id', profileId).eq('status', 'approved');
+      var ids = [];
+      (r.data || []).forEach(function (a) { (a.booth_ids || []).forEach(function (b) { if (ids.indexOf(b) < 0) ids.push(b); }); });
+      ids.sort();
+      return ids.length ? (ids.join(', ') + ' 부스') : '독립부스 (사무국 안내)';
+    },
     async acceptRequest(req, myName) {
       var sb = await ready();
       var u = (await sb.auth.getUser()).data.user;
       var day = req.day, slot = req.slot_idx;
       if (day == null || slot == null) { await this.setRequestStatus(req.id, 'accepted'); return { ok: true, noSlot: true }; }
-      var ex = await sb.from('reservations').select('table_idx').eq('day', day).eq('slot_idx', slot);
-      var used = {}; (ex.data || []).forEach(function (x) { used[x.table_idx] = 1; });
-      var table = -1; for (var i = 0; i < 10; i++) { if (!used[i]) { table = i; break; } }
-      if (table < 0) return { ok: false, error: '해당 시간대에 빈 테이블이 없습니다.' };
-      // 통역 요청은 요청 건에서 확정 예약으로 그대로 옮긴다 (사무국이 확정 미팅 기준으로 통역사를 배정하므로)
-      var ins = await sb.from('reservations').insert({ owner_profile: u.id, guest_profile: req.from_profile, day: day, slot_idx: slot, table_idx: table, host_name: myName || '', guest_name: (req.from && req.from.name) || req.fromName || '', partner_name: (req.from && req.from.name) || '', interpreter: !!req.interpreter }).select().single();
-      if (ins.error) return { ok: false, error: (ins.error.code === '23505' ? '해당 시간이 이미 예약되었습니다.' : ins.error.message) };
+
+      // 둘 중 참가기업 쪽의 부스를 장소로 쓴다
+      var me = (await sb.from('profiles').select('type').eq('id', u.id).maybeSingle()).data;
+      var exhibitorId = (me && me.type === 'buyer') ? req.from_profile : u.id;
+      var place = await this.boothPlaceOf(exhibitorId);
+
+      var ins = await sb.from('reservations').insert({
+        owner_profile: u.id, guest_profile: req.from_profile, day: day, slot_idx: slot,
+        table_idx: null, place: place, host_name: myName || '',
+        guest_name: (req.from && req.from.name) || req.fromName || '',
+        partner_name: (req.from && req.from.name) || '', interpreter: !!req.interpreter
+      }).select().single();
+      if (ins.error) {
+        var m = ins.error.message || '';
+        if (/이미 다른 미팅/.test(m)) return { ok: false, error: '그 시간에는 이미 다른 미팅이 잡혀 있습니다. 다른 시간으로 요청해 주세요.' };
+        return { ok: false, error: m };
+      }
       await this.setRequestStatus(req.id, 'accepted');
-      return { ok: true, table: table };
+      return { ok: true, place: place };
     },
 
     // ---------- 예약 ----------

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>비즈미팅 · BIMTC 2026</title>
-<meta name="description" content="참가기업·바이어 1:1 비즈니스 매칭 및 라운지 테이블 예약.">
+<meta name="description" content="참가기업·바이어 1:1 비즈니스 매칭. 미팅은 참가기업 부스에서 진행됩니다.">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#16294F">
 <link rel="icon" type="image/png" href="uploads/favicon.png">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BIMTC 2026">
 <meta property="og:title" content="비즈미팅 · BIMTC 2026">
-<meta property="og:description" content="참가기업·바이어 1:1 비즈니스 매칭 및 라운지 테이블 예약.">
+<meta property="og:description" content="참가기업·바이어 1:1 비즈니스 매칭. 미팅은 참가기업 부스에서 진행됩니다.">
 <meta property="og:image" content="uploads/keyvisual.png">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
@@ -152,7 +152,7 @@
           <div style="position:relative;">
             <div style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);letter-spacing:0.16em;color:rgba(255,255,255,0.85);margin-bottom:16px;">BUSINESS MATCHING PROGRAM</div>
             <h1 style="font-size:clamp(26px,4.22vw,38px);font-weight:800;letter-spacing:-0.025em;line-height:1.18;margin:0 0 16px;">비즈니스 미팅,<br>이렇게 진행됩니다</h1>
-            <p style="font-size:16.5px;line-height:1.6;color:rgba(255,255,255,0.9);margin:0 0 28px;max-width:560px;">온라인으로 신청하면 사무국이 관심분야에 맞춰 매칭하고, 라운지 테이블을 시간대별로 예약해 현장에서 1:1로 만납니다.</p>
+            <p style="font-size:16.5px;line-height:1.6;color:rgba(255,255,255,0.9);margin:0 0 28px;max-width:560px;">관심 있는 상대에게 날짜·시간을 지정해 미팅을 요청하고, 수락되면 참가기업 부스에서 1:1로 만납니다.</p>
             <button onClick="{{ goApply }}" style="background:#fff;color:#0B5FA5;border:none;padding:15px 28px;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">지금 신청하기 →</button>
           </div>
         </div>
@@ -248,7 +248,7 @@
                   </div>
                 </sc-for>
               </div>
-              <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin:16px 0 0;line-height:1.6;">제출 후 사무국이 검토하여 매칭 결과를 이메일로 안내합니다. 매칭이 확정되면 [예약 현황판]에서 라운지 테이블을 시간대별로 예약할 수 있습니다.</p>
+              <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin:16px 0 0;line-height:1.6;">제출 후 사무국이 검토하여 매칭 결과를 이메일로 안내합니다. 미팅이 확정되면 [내 미팅 일정]에서 날짜·시간과 부스 번호를 확인하실 수 있습니다.</p>
             </div>
           </sc-if>
           <sc-if value="{{ isSubmitted }}" hint-placeholder-val="{{ false }}">
@@ -260,7 +260,7 @@
               <p style="font-size:14.5px;color:#5E7289;margin:0 0 26px;line-height:1.6;">사무국 매칭 후 결과를 안내드립니다.<br>매칭된 파트너에게 직접 1:1 미팅을 요청할 수도 있습니다.</p>
               <div style="display:flex;gap:12px;justify-content:center;">
                 <button onClick="{{ goPartners }}" style="background:#0B5FA5;color:#fff;border:none;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;">파트너 찾기</button>
-                <button onClick="{{ goBoard }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;">예약 현황판 보기</button>
+                <button onClick="{{ goBoard }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;">내 미팅 일정 보기</button>
               </div>
             </div>
           </sc-if>
@@ -310,7 +310,7 @@
       <sc-if value="{{ showRequests }}" hint-placeholder-val="{{ false }}">
         <div style="margin-bottom:22px;">
           <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">받은 미팅 요청</h2>
-          <p style="font-size:14.5px;color:#5E7289;margin:0;">요청한 날짜·시간을 확인하고 수락하면 미팅이 확정되어 라운지 테이블이 배정됩니다.</p>
+          <p style="font-size:14.5px;color:#5E7289;margin:0;">요청한 날짜·시간을 확인하고 수락하면 미팅이 확정됩니다. 장소는 참가기업 부스입니다.</p>
         </div>
         <div style="display:flex;flex-direction:column;gap:14px;">
           <sc-for list="{{ requestsView }}" as="r" hint-placeholder-count="3">
@@ -346,8 +346,8 @@
       <sc-if value="{{ showBoard }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px;">
           <div>
-            <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">예약 현황판</h2>
-            <p style="font-size:14.5px;color:#5E7289;margin:0;">확정된 미팅이 테이블·시간대에 표시됩니다. 예약은 [파트너 찾기]에서 시간을 골라 요청하세요.</p>
+            <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">미팅 현황</h2>
+            <p style="font-size:14.5px;color:#5E7289;margin:0;">확정된 미팅이 날짜·시간대에 표시됩니다. 미팅은 [파트너 찾기]에서 시간을 골라 요청하세요.</p>
           </div>
           <div style="display:flex;gap:8px;">
             <button onClick="{{ setDayD1 }}" style="{{ d1Style }}">11.13 (금)</button>
@@ -544,7 +544,7 @@ class Component extends DCLogic {
     const resMap={};
     resvs.forEach(r=>{ const mine = (r.owner_profile===myId || r.guest_profile===myId);
       const counterpart = r.owner_profile===myId ? (r.guest_name||r.partner_name||'') : (r.host_name||'');
-      resMap[`${r.day}-${r.table_idx}-${r.slot_idx}`]={ by: mine?'me':'other', partner:counterpart, id:r.id }; });
+      resMap[`${r.day}-${r.table_idx}-${r.slot_idx}`]={ by: mine?'me':'other', partner:counterpart, id:r.id, place:r.place||'' }; });
     this.setState({ partners:partnersMapped, requests:requestsMapped, sent:sentMapped, reservations:resMap });
   }
 
@@ -557,7 +557,7 @@ class Component extends DCLogic {
     return /[가-힣]/.test(l+f) ? (l+f) : (f+' '+l);
   }
   typeLabel(t){ return t==='buyer' ? '바이어' : '참가기업'; }
-  setView(v){ this.setState({ view:v }); }
+  setView(v){ this.setState({ view: v==='board' ? 'meetings' : v }); }
   set(k){ return (e)=>this.setState({ [k]: (e && e.target) ? e.target.value : e }); }
   flash(msg){ this.setState({ toast:msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 2400); }
   async doLogout(){ await window.BimtcDB.logout(); window.location.href='index.html'; }
@@ -610,7 +610,7 @@ class Component extends DCLogic {
     const res = await window.BimtcDB.acceptRequest(req, myName);
     if(!res.ok){ this.flash('수락 실패: '+res.error); return; }
     await this.reload();
-    this.flash(res.noSlot ? '수락했습니다' : '미팅이 확정되었습니다 · 현황판에 배정되었습니다');
+    this.flash(res.noSlot ? '수락했습니다' : ('미팅이 확정되었습니다 · 장소: '+(res.place||'참가기업 부스')));
   }
   async decline(id){
     await window.BimtcDB.setRequestStatus(id, 'declined');
@@ -673,7 +673,6 @@ class Component extends DCLogic {
       { key:'apply', label:'신청하기' },
       { key:'partners', label:'파트너 찾기' },
       { key:'requests', label:'받은 요청', badge:pendingCount },
-      { key:'board', label:'예약 현황판' },
       { key:'meetings', label:'내 미팅 일정', badge:myMeetingsCount },
     ].map(n=>({ ...n, badge:n.badge||0, active:v===n.key, style:(v===n.key?navActive:navIdle), onClick:()=>this.setView(n.key) }));
 
@@ -695,7 +694,7 @@ class Component extends DCLogic {
     const myMeetings = Object.keys(reservations).filter(k=>reservations[k].by==='me').map(k=>{
       const [d, ti, si] = k.split('-'); const siN = parseInt(si,10);
       const rid = reservations[k].id;
-      return { id:rid, sortKey:(d==='D1'?0:1000)+siN, day:this.DAYLABEL[d], dayKey:d, slotIdx:siN, time:this.SLOTS[siN], table:'TABLE '+(parseInt(ti,10)+1), partner:reservations[k].partner||'상대 미상', note:'1:1 비즈니스 미팅 · 30분',
+      return { id:rid, sortKey:(d==='D1'?0:1000)+siN, day:this.DAYLABEL[d], dayKey:d, slotIdx:siN, time:this.SLOTS[siN], table:(reservations[k].place||'참가기업 부스'), partner:reservations[k].partner||'상대 미상', note:'1:1 비즈니스 미팅 · 30분 · 참가기업 부스에서 진행',
         reschedule:()=>this.openReschedule({ id:rid, partner:reservations[k].partner||'미팅', dayKey:d, slotIdx:siN }), cancel:()=>this.cancelMeeting(rid) };
     }).sort((a,b)=>a.sortKey-b.sortKey);
     // 보낸 요청 (대기중)
@@ -741,10 +740,10 @@ class Component extends DCLogic {
       { no:'01', title:'온라인 신청', desc:'참가기업·바이어 모두 관심분야와 목적을 입력해 신청합니다.', bg:'#EAF2FC', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:5,border:'2.5px solid #0B5FA5'}}) },
       { no:'02', title:'사무국 매칭', desc:'관심분야를 바탕으로 사무국이 최적의 상대를 매칭합니다.', bg:'#E7F6F0', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:'50%',border:'2.5px solid #11A37B'}}) },
       { no:'03', title:'1:1 요청·수락', desc:'매칭된 상대에게 미팅을 요청하고 상대가 수락합니다.', bg:'#EAF2FC', icon:React.createElement('div',{style:{width:16,height:16,background:'#0B5FA5',transform:'rotate(45deg)'}}) },
-      { no:'04', title:'테이블·시간 예약', desc:'라운지 테이블을 30분 단위로 예약해 현장에서 만납니다.', bg:'#E7F6F0', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:5,background:'#11A37B'}}) },
+      { no:'04', title:'부스에서 미팅', desc:'확정된 시간에 참가기업 부스에서 30분간 1:1로 만납니다.', bg:'#E7F6F0', icon:React.createElement('div',{style:{width:18,height:18,borderRadius:5,background:'#11A37B'}}) },
     ];
     const facts = [
-      { v:'10', k:'미팅 라운지 테이블' },
+      { v:'30', k:'분 단위 미팅' },
       { v:'30분', k:'미팅 1회 (슬롯)' },
       { v:'2일', k:'11.13–14 · 10:00–18:00' },
       { v:'1:1', k:'사전 매칭 미팅' },
