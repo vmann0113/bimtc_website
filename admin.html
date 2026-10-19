@@ -457,9 +457,10 @@
           <button onClick="{{ exportMembers }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
         </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow-x:auto;">
-          <div style="min-width:870px;">
+          <div style="min-width:962px;">
           <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
             <span style="width:74px;flex-shrink:0;">유형</span>
+            <span style="width:92px;flex-shrink:0;">참가 방식</span>
             <span style="width:170px;flex-shrink:0;">기관/기업명</span>
             <span style="width:96px;flex-shrink:0;">담당자</span>
             <span style="width:110px;flex-shrink:0;">소속</span>
@@ -473,6 +474,7 @@
           <sc-for list="{{ membersView }}" as="m" hint-placeholder-count="6">
             <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
               <span style="width:74px;flex-shrink:0;"><span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;padding:4px 9px;border-radius:999px;background:{{ m.tagBg }};color:{{ m.tagColor }};">{{ m.typeLabel }}</span></span>
+              <span style="width:92px;flex-shrink:0;"><sc-if value="{{ m.isBuyer }}" hint-placeholder-val="{{ false }}"><span style="{{ m.modeStyle }}">{{ m.modeLabel }}</span></sc-if></span>
               <span style="width:170px;flex-shrink:0;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.name }}</span>
               <span style="width:96px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:600;color:#33485e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.person }}</span>
               <span style="width:110px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.dept }}</span>
@@ -546,38 +548,62 @@
         </div>
       </sc-if>
 
-      <!-- LOUNGE -->
+      <!-- MEETINGS -->
       <sc-if value="{{ isLounge }}" hint-placeholder-val="{{ false }}">
-        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">라운지 운영</h1>
-        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">테이블·시간 슬롯을 열고 닫아 예약 가능 여부를 관리합니다. 칸 클릭으로 제한 토글.</p>
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">미팅 현황</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 20px;line-height:1.6;">확정된 1:1 미팅입니다. 현장 미팅은 <b>참가기업 부스</b>에서 진행되고, 온라인 미팅은 사무국이 넣은 <b>화상 링크</b>로 연결됩니다.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0F2440;">{{ mtgAllCount }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">전체 확정</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0B5FA5;">{{ mtgDayCount }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">이 날짜</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#7a5cc4;">{{ mtgOnlineCount }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">온라인</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#E0533C;">{{ mtgNoLinkCount }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">링크 미입력</span></div>
+        </div>
         <div style="display:flex;gap:8px;margin-bottom:16px;">
           <span onClick="{{ setBoardD1 }}" style="{{ boardD1Style }}">11.13 (금)</span>
           <span onClick="{{ setBoardD2 }}" style="{{ boardD2Style }}">11.14 (토)</span>
         </div>
-        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5E7289;">
-          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#fff;border:1px solid #d8e0ea;"></span>운영</span>
-          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#eef1f6;border:1px solid #d8e0ea;"></span>예약됨</span>
-          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px);border:1px solid #e9cf9a;"></span>제한(닫음)</span>
-          <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:4px;background:#F3EEFB;border:1px solid #ddd0f0;"></span>통역 요청 포함</span>
-        </div>
-        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:18px;overflow-x:auto;">
-          <div style="min-width:820px;">
-            <div style="display:flex;gap:6px;margin-bottom:6px;">
-              <div style="width:52px;flex-shrink:0;"></div>
-              <sc-for list="{{ tableHeaders }}" as="th" hint-placeholder-count="10">
-                <div style="flex:1;min-width:66px;text-align:center;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:600;color:#5E7289;padding:6px 0;">{{ th }}</div>
-              </sc-for>
-            </div>
-            <sc-for list="{{ loungeRows }}" as="row" hint-placeholder-count="12">
-              <div style="display:flex;gap:6px;margin-bottom:6px;">
-                <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#8295ab;">{{ row.time }}</div>
-                <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="10">
-                  <div onClick="{{ c.onClick }}" style="flex:1;min-width:66px;height:32px;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:clamp(10px,calc(14.13px - 0.35vw),12px);font-weight:600;border-radius:6px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};cursor:{{ c.cursor }};">{{ c.label }}</div>
-                </sc-for>
+        <sc-if value="{{ mtgHasNoLink }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FDF0ED;border:1px solid #f3cfc5;border-radius:12px;padding:13px 16px;margin-bottom:16px;font-size:13.5px;color:#c0392b;line-height:1.7;">온라인 미팅 <b>{{ mtgNoLinkCount }}건</b>에 아직 화상 링크가 없습니다. 미팅 전까지 입력해 주세요.</div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ meetingRows }}" as="m" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:16px 20px;">
+              <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                <span style="font-family:'Pretendard',sans-serif;font-size:17px;font-weight:800;color:#0B5FA5;width:62px;flex-shrink:0;">{{ m.time }}</span>
+                <div style="flex:1;min-width:200px;">
+                  <div style="font-size:14.5px;font-weight:800;color:#0A2236;">{{ m.exhName }}</div>
+                  <div style="font-size:12.5px;color:#8295ab;margin-top:2px;">바이어 · {{ m.buyerName }} {{ m.buyerCountry }}</div>
+                </div>
+                <span style="{{ m.modeStyle }}">{{ m.modeLabel }}</span>
+                <span style="font-size:13px;font-weight:700;color:#33485e;background:#F7F9FC;border:1px solid #e6ebf2;padding:6px 12px;border-radius:8px;white-space:nowrap;">{{ m.place }}</span>
+                <sc-if value="{{ m.interp }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#7a5cc4;background:#F3EEFB;border:1px solid #ddd0f0;padding:5px 10px;border-radius:999px;white-space:nowrap;">통역 요청</span></sc-if>
+                <span onClick="{{ m.toggleMode }}" style="font-size:12px;color:#8295ab;cursor:pointer;text-decoration:underline;white-space:nowrap;">{{ m.toggleLabel }}</span>
               </div>
-            </sc-for>
-          </div>
+              <sc-if value="{{ m.isOnline }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:13px;padding-top:13px;border-top:1px solid #eef2f7;">
+                  <sc-if value="{{ m.chinaWarn }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:#FBF6E9;border:1px solid #efe2c4;border-radius:9px;padding:9px 12px;margin-bottom:10px;font-size:12.5px;color:#b78a3c;line-height:1.6;">중국 바이어입니다. Google Meet는 접속되지 않고 Zoom도 불안정합니다. <b>텐센트 회의</b>를 쓰시고, 미팅 전에 접속 테스트를 권합니다.</div>
+                  </sc-if>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;">
+                    <sc-for list="{{ m.platChips }}" as="pc" hint-placeholder-count="5">
+                      <span onClick="{{ pc.onClick }}" style="{{ pc.style }}">{{ pc.label }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <input value="{{ m.linkVal }}" onInput="{{ m.setLink }}" placeholder="화상 미팅 링크를 붙여넣으세요 (https://...)" style="flex:1;min-width:220px;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:13.5px;outline:none;" />
+                    <button onClick="{{ m.save }}" style="background:#0B5FA5;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">저장</button>
+                  </div>
+                  <sc-if value="{{ m.hasLink }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:12px;color:#0d8f6b;margin-top:8px;word-break:break-all;">저장됨 · {{ m.savedLink }}</div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
         </div>
+        <sc-if value="{{ noMeetings }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px dashed #d3deea;border-radius:14px;padding:40px;text-align:center;font-size:14px;color:#8295ab;">이 날짜에 확정된 미팅이 없습니다. 비즈매칭은 11월 1일에 열립니다.</div>
+        </sc-if>
       </sc-if>
 
       <!-- INQUIRIES -->
@@ -735,7 +761,7 @@ class Component extends DCLogic {
     boothFilter: 'all', boothDetailId: null, mapModal: null,
     reserved: {},
     restricted: {},
-    boardDay: 'D1',
+    boardDay: 'D1', resvRows: [], mtgLink: {}, mtgPlat: {},
     prospects: [], pFilter: 'all', pQuery: '', pMemo: {},
     addOpen: false, addMode: 'one', addForm: {}, addBulk: '', addBusy: false,
     pSort: 'seq', pDesc: false, editId: null,
@@ -869,7 +895,7 @@ class Component extends DCLogic {
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
     this.proMark(prospects||[]);
     this.setState({ apps, regs, matches, notices, reserved, restricted: closed||{}, booths, members, inquiries: inquiries||[],
-      notifications: notifications||[], prospects: prospects||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false });
+      notifications: notifications||[], prospects: prospects||[], resvRows: resvs||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false });
   }
 
   async saveAnswer(id){
@@ -1064,7 +1090,7 @@ class Component extends DCLogic {
       {k:'members',label:'회원 명단'},
       {k:'reg',label:'사전등록 명단'},
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
-      {k:'lounge',label:'라운지 운영'},
+      {k:'lounge',label:'미팅 현황'},
       {k:'inq',label:'문의 관리',badge:(this.state.inquiries||[]).filter(q=>!q.answer).length},
       {k:'noti',label:'알림함',badge:(this.state.notifications||[]).filter(n=>n.status==='pending').length},
       {k:'cms',label:'공지·콘텐츠'},
@@ -1113,14 +1139,67 @@ class Component extends DCLogic {
     });
 
     // lounge grid
+    // ── 미팅 현황 (확정된 1:1 미팅) ──────────────────────────────────
+    // 라운지 테이블 격자는 폐지. 현장 미팅은 참가기업 부스에서, 온라인은 화상으로 진행한다.
     const bDay=this.state.boardDay||'D1';
     const bdTab="cursor:pointer;padding:9px 18px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;font-family:'Pretendard',sans-serif;";
-    const loungeRows=this.SLOTS.map((time,si)=>({time,cells:Array.from({length:10}).map((_,ti)=>{
-      const k=bDay+'-'+ti+'-'+si; let bg='#fff',color='#c0ccda',border='#e1e8f0',label='',cursor='pointer';
-      if(reserved[k]){bg='#eef1f6';color='#9aa9bd';border='#dfe5ee';label=reserved[k]===2?'예약·통역':'예약';cursor='not-allowed';}
-      else if(restricted[k]){bg='repeating-linear-gradient(135deg,#FBEFD9,#FBEFD9 4px,#F6E2BE 4px,#F6E2BE 8px)';color='#b78a3c';border='#e9cf9a';label='닫음';}
-      return {bg,color,border,label,cursor,onClick:()=>this.toggleCell(ti,si)};
-    })}));
+    const PLATFORMS=[['tencent','텐센트 회의'],['zoom','Zoom'],['teams','Teams'],['webex','Webex'],['other','기타']];
+    // 중국 본토는 Google Meet 차단, Zoom 도 불안정하다. 사무국이 보고 고를 수 있게 표시해 둔다.
+    const isChina=(c)=>/china|中国|중국|prc/i.test(String(c||''));
+    const profById={}; (this.state.members||[]).forEach(p=>{ profById[p.id]=p; });
+    const mtgDrafts=this.state.mtgLink||{};
+    const setMtgLink=(id,v)=>this.setState({mtgLink:Object.assign({},this.state.mtgLink||{},{[id]:v})});
+    const setMtgPlat=(id,v)=>this.setState({mtgPlat:Object.assign({},this.state.mtgPlat||{},{[id]:v})});
+    const saveMtg=async(r)=>{
+      const url=(mtgDrafts[r.id]!==undefined)?mtgDrafts[r.id]:(r.meet_url||'');
+      const plat=((this.state.mtgPlat||{})[r.id]!==undefined)?(this.state.mtgPlat||{})[r.id]:(r.platform||'');
+      const res=await window.BimtcDB.setMeetingLink(r.id, plat, url);
+      if(!res||res.ok===false){ this.flash('저장 실패: '+((res&&res.error)||'')); return; }
+      await this.reload();
+      const nd=Object.assign({},this.state.mtgLink||{}); delete nd[r.id];
+      const np=Object.assign({},this.state.mtgPlat||{}); delete np[r.id];
+      this.setState({mtgLink:nd, mtgPlat:np});
+      this.flash('화상 링크를 저장했습니다');
+    };
+    const toggleMtgMode=async(r)=>{
+      const next=(r.mode==='online')?'onsite':'online';
+      const res=await window.BimtcDB.setMeetingMode(r.id, next);
+      if(!res||res.ok===false){ this.flash('변경 실패: '+((res&&res.error)||'')); return; }
+      await this.reload();
+      this.flash(next==='online'?'온라인 미팅으로 바꿨습니다':'현장(부스) 미팅으로 바꿨습니다');
+    };
+    const allResv=(this.state.resvRows||[]);
+    const dayResv=allResv.filter(r=>r.day===bDay).sort((a,b)=>(a.slot_idx||0)-(b.slot_idx||0));
+    const meetingRows=dayResv.map(r=>{
+      const host=profById[r.owner_profile]||{}, guest=profById[r.guest_profile]||{};
+      const buyer=(host.type==='buyer')?host:((guest.type==='buyer')?guest:null);
+      const exh  =(host.type==='buyer')?guest:host;
+      const online=r.mode==='online';
+      const china=buyer&&isChina(buyer.country);
+      const url=(mtgDrafts[r.id]!==undefined)?mtgDrafts[r.id]:(r.meet_url||'');
+      const plat=((this.state.mtgPlat||{})[r.id]!==undefined)?(this.state.mtgPlat||{})[r.id]:(r.platform||'');
+      return { id:r.id,
+        time:this.SLOTS[r.slot_idx]||('슬롯 '+r.slot_idx),
+        exhName:(exh.name||r.host_name||'참가기업'), buyerName:(buyer?buyer.name:(r.guest_name||'바이어')),
+        buyerCountry:(buyer&&buyer.country)||'',
+        place: online ? '온라인 화상미팅' : (r.place||'참가기업 부스'),
+        modeLabel: online?'온라인':'현장(부스)',
+        modeStyle:'font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap;'
+          +(online?'background:#F3EEFB;color:#7a5cc4;':'background:#E7F6F0;color:#0d8f6b;'),
+        isOnline:online,
+        interp:!!r.interpreter,
+        chinaWarn:!!(online&&china),
+        linkVal:url, setLink:(e)=>setMtgLink(r.id, e.target.value),
+        platChips:PLATFORMS.map(([k,l])=>({ label:l, onClick:()=>setMtgPlat(r.id,k),
+          style:"cursor:pointer;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;"
+            +(plat===k?'background:#0F2440;color:#fff;border:1px solid #0F2440;':'background:#fff;border:1px solid #dde5ee;color:#5e7289;') })),
+        save:()=>saveMtg(r), toggleMode:()=>toggleMtgMode(r),
+        toggleLabel: online?'현장(부스)으로 바꾸기':'온라인으로 바꾸기',
+        hasLink:!!(r.meet_url), savedLink:r.meet_url||'' };
+    });
+    const mtgCount={ all:allResv.length, day:dayResv.length,
+      online:dayResv.filter(r=>r.mode==='online').length,
+      noLink:dayResv.filter(r=>r.mode==='online'&&!r.meet_url).length };
 
     const cmsRows=notices.map(c=>({ id:c.id, tag:c.tag||'안내', title:c.title, date:(c.published_at||'').replace(/-/g,'.'),
       on:c.published, tglBg:c.published?'#11A37B':'#cdd6e2', tglLeft:c.published?'18px':'2px', toggle:()=>this.toggleCms(c.id, !c.published),
@@ -1134,14 +1213,20 @@ class Component extends DCLogic {
       del:async()=>{ if(typeof window!=='undefined'&&!window.confirm('이 공지를 삭제할까요?')) return; const ok=await window.BimtcDB.deleteNotice(c.id); await this.reload(); this.setState({editingId:null}); this.flash(ok?'공지를 삭제했습니다':'삭제 실패 (권한 확인)'); } }));
 
     const won=(n)=>(n||0).toLocaleString('ko-KR')+'원';
-    const memberDef=[['all','전체'],['exhibitor','참가기업'],['buyer','바이어'],['visitor','방문객']];
+    const memberDef=[['all','전체'],['exhibitor','참가기업'],['buyer','바이어'],['buyer_online','온라인 바이어'],['visitor','방문객']];
+    const MODE_L={ onsite:['현장 방문','#EAF2FC','#0B5FA5'], online:['온라인','#F3EEFB','#7a5cc4'], both:['현장+온라인','#E7F6F0','#0d8f6b'] };
+    const isOnlineBuyer=(p)=>p.type==='buyer' && (p.attend_mode==='online'||p.attend_mode==='both');
     const mTab=this.state.memberTab;
     const allMembers=(this.state.members||[]).filter(p=>!p.is_admin);
-    const mCount=(k)=> k==='all' ? allMembers.length : allMembers.filter(p=>(p.type||'exhibitor')===k).length;
+    const mCount=(k)=> k==='all' ? allMembers.length
+      : k==='buyer_online' ? allMembers.filter(isOnlineBuyer).length
+      : allMembers.filter(p=>(p.type||'exhibitor')===k).length;
     const memberTabs=memberDef.map(([k,l])=>({ label:l+' '+mCount(k), onClick:()=>this.setState({memberTab:k}),
       style:"cursor:pointer;padding:9px 16px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;"+(mTab===k?'background:#0B5FA5;color:#fff;':'background:#fff;border:1px solid #d8e0ea;color:#5e7289;') }));
     const mColor={ exhibitor:['#E7F6F0','#0d8f6b','참가기업'], buyer:['#EAF2FC','#0B5FA5','바이어'], visitor:['#F3EEFB','#7a5cc4','방문객'] };
-    const filtered=allMembers.filter(p=> mTab==='all' ? true : (p.type||'exhibitor')===mTab);
+    const filtered=allMembers.filter(p=> mTab==='all' ? true
+      : mTab==='buyer_online' ? isOnlineBuyer(p)
+      : (p.type||'exhibitor')===mTab);
     const grantedIds={}; (this.state.booths||[]).forEach(a=>{ if(a.profile_id&&a.status!=='rejected') grantedIds[a.profile_id]=true; });
     // 바이어는 profiles.name 이 회사명이라, 담당자 성명은 first_name/last_name 을 조합해 따로 보여준다.
     // 한글 이름은 성+이름 붙여쓰기, 그 외에는 First Last 순.
@@ -1159,14 +1244,17 @@ class Component extends DCLogic {
       return { name:p.name||'-', person:personName(p)||'-', dept:p.dept||'-', email:p.email||'-', phone:p.phone||'-', country:p.country||'-',
         job:p.job_title||'-', industry:p.industry||'-', landline:p.landline||'-',
         date:this.short(p.created_at), typeLabel:c[2], tagBg:c[0], tagColor:c[1],
+        isBuyer:p.type==='buyer',
+        modeLabel:(MODE_L[p.attend_mode||'onsite']||MODE_L.onsite)[0],
+        modeStyle:'font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap;background:'+(MODE_L[p.attend_mode||'onsite']||MODE_L.onsite)[1]+';color:'+(MODE_L[p.attend_mode||'onsite']||MODE_L.onsite)[2]+';',
         canGrant:isExh&&!has, hasMatch:isExh&&has,
         grant:()=>this.grantMatch(p), del:()=>this.deleteMember(p) };
     });
     const exportMembers=()=>{
-      const rows=[['유형','기관/기업명','담당자','직책','소속','이메일','연락처','유선전화','업종','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,m.name,m.person,m.job,m.dept,m.email,m.phone,m.landline,m.industry,m.country,m.date]));
+      const rows=[['유형','참가 방식','기관/기업명','담당자','직책','소속','이메일','연락처','유선전화','업종','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,(m.isBuyer?m.modeLabel:'-'),m.name,m.person,m.job,m.dept,m.email,m.phone,m.landline,m.industry,m.country,m.date]));
       const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
       const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-      a.download='BIMTC_회원명단_'+mTab+'.csv'; a.click();
+      a.download='BIMTC_회원명단_'+(({all:'전체',exhibitor:'참가기업',buyer:'바이어',buyer_online:'온라인바이어',visitor:'방문객'})[mTab]||mTab)+'.csv'; a.click();
     };
     const bfv=this.state.boothFilter||'all';
     const bFiltered=booths.filter(b=> bfv==='all'?true : bfv==='submitted'?b.status==='submitted' : bfv==='awaiting'?(b.status==='approved'&&!b.paid) : bfv==='paid'?!!b.paid : b.status==='rejected');
@@ -1674,7 +1762,10 @@ class Component extends DCLogic {
       boardD1Style: bdTab + (bDay==='D1'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1px solid #d8e0ea;'),
       boardD2Style: bdTab + (bDay==='D2'?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1px solid #d8e0ea;'),
       tableHeaders:Array.from({length:10}).map((_,i)=>'T'+(i+1)),
-      loungeRows,
+      meetingRows, noMeetings:meetingRows.length===0,
+      mtgDayCount:String(mtgCount.day), mtgOnlineCount:String(mtgCount.online),
+      mtgNoLinkCount:String(mtgCount.noLink), mtgHasNoLink:mtgCount.noLink>0,
+      mtgAllCount:String(mtgCount.all),
       cmsRows, cmsFlash:this.state.cmsFlash, addNotice:()=>this.addNotice(),
     };
   }

@@ -511,6 +511,22 @@
     // ---------- 예약 ----------
     async listReservations(day) { var sb = await ready(); var q = sb.from('reservations').select('*'); if (day) q = q.eq('day', day); var r = await q; return r.data || []; },
     async myReservations() { var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return []; var r = await sb.from('reservations').select('*').or('owner_profile.eq.' + u.id + ',guest_profile.eq.' + u.id); return r.data || []; },
+    // 사무국이 확정 미팅에 화상 링크를 넣는다 (중국 바이어는 텐센트 회의 등 접속 가능한 것으로)
+    async setMeetingLink(id, platform, url) {
+      var sb = await ready();
+      var r = await sb.from('reservations')
+        .update({ platform: platform || null, meet_url: (url || '').trim() || null })
+        .eq('id', id).select('id');
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true };
+    },
+    async setMeetingMode(id, mode) {
+      var sb = await ready();
+      var r = await sb.from('reservations').update({ mode: mode }).eq('id', id).select('id');
+      if (r.error) return { ok: false, error: r.error.message };
+      return { ok: true };
+    },
     async removeReservation(id) {
       var sb = await ready();
       var r = await sb.from('reservations').delete().eq('id', id);
