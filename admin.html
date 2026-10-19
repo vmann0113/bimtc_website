@@ -823,29 +823,33 @@ class Component extends DCLogic {
     if(this._proBusy) return;
     this._proBusy=true;
     try{
-      const rows=await window.BimtcDB.listProspectChanges(this._proSince);
-      if(rows && rows.length){
+      const rows=await window.BimtcDB.listProspectChanges(this._proSince) || [];
+      const cur=this.state.prospects||[];
+      const has={}; cur.forEach(p=>{ has[p.id]=1; });
+      const added=rows.some(r=>!has[r.id]);                 // 다른 사람이 기관을 새로 추가함
+      let cnt=null;
+      try{ cnt=await window.BimtcDB.countProspects(); }catch(e){}
+      const removed=(typeof cnt==='number' && cnt>=0 && cnt!==cur.length);  // 삭제되거나 수가 어긋남
+      if(added || removed){
+        await this.reload();                                 // 통째로 다시 받아 맞춘다
+        this.setState({ proSyncedAt:new Date().toISOString() });
+      } else if(rows.length){
         const drafts=this.state.pMemo||{};
         const map={}; rows.forEach(r=>{ map[r.id]=r; });
         this.proMark(rows);
-        let n=0;
-        const next=(this.state.prospects||[]).map(p=>{
+        const next=cur.map(p=>{
           const r=map[p.id]; if(!r) return p;
-          n++;
-          // 내가 지금 입력 중인 메모는 덮어쓰지 않는다
-          const typing=(p.id in drafts);
-          return Object.assign({}, p, { status:r.status, contacted_at:r.contacted_at,
-            joined_manual:r.joined_manual, updated_at:r.updated_at, updated_by:r.updated_by,
-            memo: typing ? p.memo : r.memo });
+          const merged=Object.assign({}, p, r);              // 기관명·연락처 수정까지 그대로 반영
+          if(p.id in drafts) merged.memo=p.memo;             // 내가 입력 중인 메모는 지킨다
+          return merged;
         });
-        if(n) this.setState({ prospects:next, proSyncedAt:new Date().toISOString() });
+        this.setState({ prospects:next, proSyncedAt:new Date().toISOString() });
       } else {
         this.setState({ proSyncedAt:new Date().toISOString() });
       }
     }catch(e){}
     this._proBusy=false;
   }
-
   async reload(){
     const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),

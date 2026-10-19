@@ -198,7 +198,7 @@
     // 여러 사람이 같은 화면을 보므로, 마지막으로 본 시각 이후 바뀐 행만 주기적으로 받아온다
     async listProspectChanges(since) {
       var sb = await ready();
-      var q = sb.from('booth_prospects').select('id,status,memo,contacted_at,joined_manual,updated_at,updated_by,name,med_type,tel,mgr_name,mgr_dept,mgr_email,target_countries,address,org_type,src_key');
+      var q = sb.from('booth_prospects').select('id,seq,source,status,memo,contacted_at,joined_manual,updated_at,updated_by,name,med_type,tel,mgr_name,mgr_dept,mgr_email,target_countries,address,org_type,src_key');
       if (since) q = q.gt('updated_at', since);
       var r = await q;
       if (r.error) return [];
@@ -279,6 +279,13 @@
       if (r.error) return { ok: false, error: r.error.message };
       if (!r.data || !r.data.length) return { ok: false, error: '원본 명단은 삭제할 수 없습니다' };
       return { ok: true };
+    },
+    // 삭제는 '바뀐 행' 조회로 알 수 없다. 건수만 가볍게 받아 와 비교한다(행은 받지 않음).
+    async countProspects() {
+      var sb = await ready();
+      var r = await sb.from('booth_prospects').select('id', { count: 'exact', head: true });
+      if (r.error) return null;
+      return typeof r.count === 'number' ? r.count : null;
     },
     async updateProspect(id, fields) {
       var sb = await ready();
