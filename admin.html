@@ -1508,7 +1508,7 @@ class Component extends DCLogic {
         +'</style></head><body>'
         +'<h1>2026 부산국제의료관광컨벤션 · 부스 유치 명단</h1>'
         +'<p class="sub">'+esc(tag)+' '+pFiltered.length+'건 · 출력 '+esc(new Date().toLocaleString('ko-KR'))
-        +' · 표시 ○ 유치 희망 / △ 검토중 / ✕ 거절 · 회색 줄은 부스 신청을 마친 기관</p><table><thead><tr>';
+        +' · 표시 ○ 유치 희망 / △ 검토중 / ✕ 거절 / – 미접촉 · 회색 줄은 부스 신청을 마친 기관</p><table><thead><tr>';
       cols.forEach(c=>{ h+='<th'+(c[1]?' style="width:'+c[1]+'px"':'')+'>'+esc(c[0])+'</th>'; });
       h+='</tr></thead><tbody>';
       pFiltered.forEach(p=>{
@@ -1521,7 +1521,7 @@ class Component extends DCLogic {
           +'<td>'+esc((p.mgr_name||'')+(p.mgr_dept?' / '+p.mgr_dept:''))+'</td>'
           +'<td>'+esc(p.mgr_email||'')+'</td>'
           +'<td>'+esc(p.target_countries||'')+'</td>'
-          +'<td class="m">'+esc(j?'-':(st[1]||'-'))+'</td>'
+          +'<td class="m">'+esc(st[1]||'-')+'</td>'   // 신청완료한 곳도 눌러 둔 표시(○△✕)를 그대로 찍는다
           +'<td>'+esc(p.memo||'')+'</td></tr>';
       });
       h+='</tbody></table></body></html>';
