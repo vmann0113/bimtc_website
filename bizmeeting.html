@@ -400,7 +400,13 @@
                   <div style="font-size:16px;font-weight:800;color:#0F2440;margin-bottom:3px;">{{ m.partner }}</div>
                   <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;">{{ m.note }}</div>
                 </div>
-                <span style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:8px 14px;border-radius:8px;flex-shrink:0;">{{ m.table }}</span>
+                <span style="font-family:'Pretendard',sans-serif;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;padding:8px 14px;border-radius:8px;flex-shrink:0;{{ m.tableStyle }}">{{ m.table }}</span>
+                <sc-if value="{{ m.hasUrl }}" hint-placeholder-val="{{ false }}">
+                  <a href="{{ m.meetUrl }}" target="_blank" rel="noopener" style="background:#7a5cc4;color:#fff;text-decoration:none;padding:10px 18px;border-radius:9px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;flex-shrink:0;font-family:'Pretendard',sans-serif;">{{ joinLabel }}</a>
+                </sc-if>
+                <sc-if value="{{ m.waitUrl }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:12.5px;color:#b78a3c;background:#FBF6E9;border:1px solid #efe2c4;padding:8px 13px;border-radius:9px;flex-shrink:0;line-height:1.5;">{{ waitLabel }}</span>
+                </sc-if>
                 <div style="display:flex;gap:8px;flex-shrink:0;">
                   <button onClick="{{ m.reschedule }}" style="background:#fff;color:#0B5FA5;border:1px solid #b9d3ea;padding:9px 16px;border-radius:9px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">시간 변경</button>
                   <button onClick="{{ m.cancel }}" style="background:#fff;color:#c0392b;border:1px solid #f0c9c4;padding:9px 16px;border-radius:9px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">취소</button>
@@ -532,19 +538,20 @@ class Component extends DCLogic {
     ]);
     const myId = this.state.user ? this.state.user.id : null;
     const requestedIds = new Set(sent.filter(r=>r.status!=='declined').map(r=>r.to_profile));
-    const partnersMapped = partners.map(p=>({ id:p.id, name:p.name||'(이름 미입력)', type:this.typeLabel(p.type),
+    const partnersMapped = partners.map(p=>({ id:p.id, name:p.name||'(이름 미입력)', type:this.typeLabel(p.type), ptype:p.type, attendMode:p.attend_mode||'onsite',
       person:this.personName(p), job:p.job_title||'',
       country:p.country||'', org:p.category||'', tags:p.interests||[], status: requestedIds.has(p.id)?'requested':'none' }));
     const requestsMapped = inbox.map(r=>({ id:r.id, from_profile:r.from_profile, name:(r.from&&r.from.name)||'요청자', type:this.typeLabel(r.from&&r.from.type),
       person:this.personName(r.from),
       country:(r.from&&r.from.country)||'', org:(r.from&&r.from.category)||'', msg:r.message||'', status:r.status,
-      day:r.day, slot_idx:r.slot_idx, from:r.from, interpreter:!!r.interpreter }));
+      day:r.day, slot_idx:r.slot_idx, from:r.from, from_profile:r.from_profile, interpreter:!!r.interpreter, mode:r.mode||'onsite',
+      isOnline:(r.mode||'onsite')==='online' }));
     const sentMapped = sent.map(r=>({ id:r.id, name:(r.to&&r.to.name)||'대상', type:this.typeLabel(r.to&&r.to.type),
       day:r.day, slot_idx:r.slot_idx, status:r.status, interpreter:!!r.interpreter }));
     const resMap={};
     resvs.forEach(r=>{ const mine = (r.owner_profile===myId || r.guest_profile===myId);
       const counterpart = r.owner_profile===myId ? (r.guest_name||r.partner_name||'') : (r.host_name||'');
-      resMap[`${r.day}-${r.table_idx}-${r.slot_idx}`]={ by: mine?'me':'other', partner:counterpart, id:r.id, place:r.place||'' }; });
+      resMap[`${r.day}-${r.table_idx}-${r.slot_idx}`]={ by: mine?'me':'other', partner:counterpart, id:r.id, place:r.place||'', mode:r.mode||'onsite', meetUrl:r.meet_url||'', platform:r.platform||'' }; });
     this.setState({ partners:partnersMapped, requests:requestsMapped, sent:sentMapped, reservations:resMap });
   }
 
@@ -562,9 +569,18 @@ class Component extends DCLogic {
   flash(msg){ this.setState({ toast:msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 2400); }
   async doLogout(){ await window.BimtcDB.logout(); window.location.href='index.html'; }
 
+  // 미팅 방식은 바이어 쪽 참가 방식이 정한다. 내가 바이어면 내 설정, 아니면 상대(바이어) 설정.
+  buyerMode(partner){
+    const me=this.state.user||{};
+    const mine=(me.type==='buyer') ? (me.attend_mode||'onsite') : null;
+    const theirs=(partner && partner.ptype==='buyer') ? (partner.attendMode||'onsite') : null;
+    return mine || theirs || 'onsite';
+  }
   // ----- 파트너 미팅 요청: 날짜·시간 피커 -----
   async openPicker(partner){
-    this.setState({ pickerMode:'request', rescheduleId:null, pickerId:partner.id, pickerName:partner.name, pickDay:'D1', pickSlot:null, pickerBusy:{}, pickInterp:false });
+    const bm=this.buyerMode(partner);
+    this.setState({ pickerMode:'request', rescheduleId:null, pickerId:partner.id, pickerName:partner.name, pickDay:'D1', pickSlot:null, pickerBusy:{}, pickInterp:false,
+      pickBuyerMode:bm, pickMode:(bm==='online'?'online':'onsite') });
     try{ const busy = await window.BimtcDB.partnerBusy(partner.id); this.setState({ pickerBusy:busy }); }catch(e){}
   }
   openReschedule(m){
@@ -586,7 +602,7 @@ class Component extends DCLogic {
       this.flash(dl+'로 미팅 시간을 변경했습니다');
       return;
     }
-    const res = await window.BimtcDB.addRequest({ to_profile:this.state.pickerId, message:'비즈니스 미팅을 요청합니다.', day:this.state.pickDay, slot:this.state.pickSlot, interpreter:this.state.pickInterp });
+    const res = await window.BimtcDB.addRequest({ to_profile:this.state.pickerId, message:'비즈니스 미팅을 요청합니다.', day:this.state.pickDay, slot:this.state.pickSlot, interpreter:this.state.pickInterp, mode:this.state.pickMode||'onsite' });
     this.setState({requesting:false});
     if(!res.ok){ this.flash('요청 실패: '+res.error); return; }
     const dl = (this.state.pickDay==='D1'?'11.13':'11.14')+' '+this.SLOTS[this.state.pickSlot];
@@ -694,7 +710,14 @@ class Component extends DCLogic {
     const myMeetings = Object.keys(reservations).filter(k=>reservations[k].by==='me').map(k=>{
       const [d, ti, si] = k.split('-'); const siN = parseInt(si,10);
       const rid = reservations[k].id;
-      return { id:rid, sortKey:(d==='D1'?0:1000)+siN, day:this.DAYLABEL[d], dayKey:d, slotIdx:siN, time:this.SLOTS[siN], table:(reservations[k].place||'참가기업 부스'), partner:reservations[k].partner||'상대 미상', note:'1:1 비즈니스 미팅 · 30분 · 참가기업 부스에서 진행',
+      const rr=reservations[k]; const online=(rr.mode||'onsite')==='online';
+      const PLN={tencent:'텐센트 회의',zoom:'Zoom',teams:'Teams',webex:'Webex',other:'화상 미팅'};
+      return { id:rid, sortKey:(d==='D1'?0:1000)+siN, day:this.DAYLABEL[d], dayKey:d, slotIdx:siN, time:this.SLOTS[siN],
+        table: online ? (PLN[rr.platform]||'온라인 화상미팅') : (rr.place||'참가기업 부스'),
+        tableStyle: online ? 'color:#7a5cc4;background:#F3EEFB;' : 'color:#0d8f6b;background:#E7F6F0;',
+        isOnline:online, hasUrl:!!(online&&rr.meetUrl), waitUrl:!!(online&&!rr.meetUrl), meetUrl:rr.meetUrl||'',
+        partner:rr.partner||'상대 미상',
+        note: online ? '1:1 비즈니스 미팅 · 30분 · 화상으로 진행' : '1:1 비즈니스 미팅 · 30분 · 참가기업 부스에서 진행',
         reschedule:()=>this.openReschedule({ id:rid, partner:reservations[k].partner||'미팅', dayKey:d, slotIdx:siN }), cancel:()=>this.cancelMeeting(rid) };
     }).sort((a,b)=>a.sortKey-b.sortKey);
     // 보낸 요청 (대기중)
@@ -828,6 +851,7 @@ class Component extends DCLogic {
       d2Style: "padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;" + (day==='D2'?'background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;'),
 
       myMeetings, hasMeetings:myMeetings.length>0, noMeetings:myMeetings.length===0,
+      joinLabel:'미팅 참가 →', waitLabel:'사무국이 화상 링크를 준비 중입니다',
       sentPending, hasSent:sentPending.length>0,
       toast:this.state.toast,
     };

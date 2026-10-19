@@ -428,7 +428,7 @@
       var sb = await ready();
       var u = (await sb.auth.getUser()).data.user;
       if (!u) return { ok: false, error: '로그인이 만료되었습니다. 다시 로그인해 주세요.' };
-      var res = await sb.from('match_requests').insert({ from_profile: u.id, to_profile: r.to_profile, message: r.message || '', day: r.day || null, slot_idx: (r.slot != null ? r.slot : null), interpreter: !!r.interpreter }).select().single();
+      var res = await sb.from('match_requests').insert({ from_profile: u.id, to_profile: r.to_profile, message: r.message || '', day: r.day || null, slot_idx: (r.slot != null ? r.slot : null), interpreter: !!r.interpreter, mode: r.mode || 'onsite' }).select().single();
       return res.error ? { ok: false, error: res.error.message } : { ok: true, row: res.data };
     },
     // 특정 파트너가 요청/예약으로 이미 잡힌 (day-slot) 목록
@@ -495,7 +495,7 @@
 
       var ins = await sb.from('reservations').insert({
         owner_profile: u.id, guest_profile: req.from_profile, day: day, slot_idx: slot,
-        table_idx: null, place: place, host_name: myName || '',
+        table_idx: null, place: place, mode: req.mode || 'onsite', host_name: myName || '',
         guest_name: (req.from && req.from.name) || req.fromName || '',
         partner_name: (req.from && req.from.name) || '', interpreter: !!req.interpreter
       }).select().single();
