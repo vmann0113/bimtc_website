@@ -589,10 +589,18 @@
                       <span onClick="{{ pc.onClick }}" style="{{ pc.style }}">{{ pc.label }}</span>
                     </sc-for>
                   </div>
-                  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                    <input value="{{ m.linkVal }}" onInput="{{ m.setLink }}" placeholder="화상 미팅 링크를 붙여넣으세요 (https://...)" style="flex:1;min-width:220px;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:13.5px;outline:none;" />
-                    <button onClick="{{ m.save }}" style="background:#0B5FA5;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">저장</button>
-                  </div>
+                  <sc-if value="{{ m.selfHosted }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                      <div style="flex:1;min-width:220px;font-size:12.5px;color:#0d8f6b;background:#E7F6F0;border:1px solid #c7ebdc;border-radius:9px;padding:10px 12px;line-height:1.6;">홈페이지에 미팅방이 자동으로 만들어집니다. <b>링크를 넣지 않아도 됩니다.</b> 양쪽 모두 설치 없이 [미팅 참가]로 들어갑니다.</div>
+                      <button onClick="{{ m.save }}" style="background:#11A37B;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">이걸로 저장</button>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ m.needLink }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                      <input value="{{ m.linkVal }}" onInput="{{ m.setLink }}" placeholder="화상 미팅 링크를 붙여넣으세요 (https://...)" style="flex:1;min-width:220px;padding:10px 12px;border:1px solid #d8e0ea;border-radius:9px;font-size:13.5px;outline:none;" />
+                      <button onClick="{{ m.save }}" style="background:#0B5FA5;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">저장</button>
+                    </div>
+                  </sc-if>
                   <sc-if value="{{ m.hasLink }}" hint-placeholder-val="{{ false }}">
                     <div style="font-size:12px;color:#0d8f6b;margin-top:8px;word-break:break-all;">저장됨 · {{ m.savedLink }}</div>
                   </sc-if>
@@ -1143,7 +1151,7 @@ class Component extends DCLogic {
     // 라운지 테이블 격자는 폐지. 현장 미팅은 참가기업 부스에서, 온라인은 화상으로 진행한다.
     const bDay=this.state.boardDay||'D1';
     const bdTab="cursor:pointer;padding:9px 18px;border-radius:999px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;font-family:'Pretendard',sans-serif;";
-    const PLATFORMS=[['tencent','텐센트 회의'],['zoom','Zoom'],['teams','Teams'],['webex','Webex'],['other','기타']];
+    const PLATFORMS=[['bimtc','홈페이지 화상미팅 (설치 불필요)'],['tencent','텐센트 회의'],['zoom','Zoom'],['teams','Teams'],['webex','Webex'],['other','기타']];
     // 중국 본토는 Google Meet 차단, Zoom 도 불안정하다. 사무국이 보고 고를 수 있게 표시해 둔다.
     const isChina=(c)=>/china|中国|중국|prc/i.test(String(c||''));
     const profById={}; (this.state.members||[]).forEach(p=>{ profById[p.id]=p; });
@@ -1190,6 +1198,7 @@ class Component extends DCLogic {
         interp:!!r.interpreter,
         chinaWarn:!!(online&&china),
         linkVal:url, setLink:(e)=>setMtgLink(r.id, e.target.value),
+        selfHosted: plat==='bimtc', needLink: plat!=='bimtc',
         platChips:PLATFORMS.map(([k,l])=>({ label:l, onClick:()=>setMtgPlat(r.id,k),
           style:"cursor:pointer;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;"
             +(plat===k?'background:#0F2440;color:#fff;border:1px solid #0F2440;':'background:#fff;border:1px solid #dde5ee;color:#5e7289;') })),
@@ -1199,7 +1208,7 @@ class Component extends DCLogic {
     });
     const mtgCount={ all:allResv.length, day:dayResv.length,
       online:dayResv.filter(r=>r.mode==='online').length,
-      noLink:dayResv.filter(r=>r.mode==='online'&&!r.meet_url).length };
+      noLink:dayResv.filter(r=>r.mode==='online'&&r.platform!=='bimtc'&&!r.meet_url).length };
 
     const cmsRows=notices.map(c=>({ id:c.id, tag:c.tag||'안내', title:c.title, date:(c.published_at||'').replace(/-/g,'.'),
       on:c.published, tglBg:c.published?'#11A37B':'#cdd6e2', tglLeft:c.published?'18px':'2px', toggle:()=>this.toggleCms(c.id, !c.published),

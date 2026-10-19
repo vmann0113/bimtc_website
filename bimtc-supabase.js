@@ -45,6 +45,14 @@
   var DB = {
     ready: ready,
     client: function () { return _client; },
+    // 화상 미팅 시그널링용 채널. client() 는 초기화 전에 null 일 수 있어 ready() 를 거친다.
+    async realtimeChannel(name, opts) {
+      var sb = await ready();
+      return sb.channel(name, opts || {});
+    },
+    async realtimeRemove(ch) {
+      try { var sb = await ready(); sb.removeChannel(ch); } catch (e) {}
+    },
 
     // ---------- Auth ----------
     async signup(o) {
@@ -512,6 +520,29 @@
     async listReservations(day) { var sb = await ready(); var q = sb.from('reservations').select('*'); if (day) q = q.eq('day', day); var r = await q; return r.data || []; },
     async myReservations() { var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return []; var r = await sb.from('reservations').select('*').or('owner_profile.eq.' + u.id + ',guest_profile.eq.' + u.id); return r.data || []; },
     // 사무국이 확정 미팅에 화상 링크를 넣는다 (중국 바이어는 텐센트 회의 등 접속 가능한 것으로)
+    // 홈페이지 자체 화상미팅 — 내가 당사자인 미팅만 가져온다
+    async getMeeting(id) {
+      var sb = await ready();
+      var u = (await sb.auth.getUser()).data.user;
+      if (!u) return { ok: false, error: '로그인이 필요합니다' };
+      var r = await sb.from('reservations').select('*').eq('id', id).maybeSingle();
+      if (r.error) return { ok: false, error: r.error.message };
+      var m = r.data;
+      if (!m) return { ok: false, error: '미팅을 찾을 수 없습니다' };
+      var mine = (m.owner_profile === u.id) || (m.guest_profile === u.id);
+      var adm = false;
+      try { var pr = await sb.from('profiles').select('is_admin').eq('id', u.id).maybeSingle(); adm = !!(pr.data && pr.data.is_admin); } catch (e) {}
+      if (!mine && !adm) return { ok: false, error: '이 미팅의 참가자가 아닙니다' };
+      // 먼저 요청한 쪽(owner)이 연결을 거는 쪽이 되도록 고정한다. 둘이 동시에 걸면 연결이 꼬인다.
+      return { ok: true, meeting: m, meId: u.id, isCaller: m.owner_profile === u.id };
+    },
+    async getIceServers() {
+      var sb = await ready();
+      var r = await sb.from('site_settings').select('value').eq('key', 'webrtc').maybeSingle();
+      var v = (r.data && r.data.value) || {};
+      return (v.iceServers && v.iceServers.length) ? v.iceServers
+        : [{ urls: 'stun:stun.l.google.com:19302' }];
+    },
     async setMeetingLink(id, platform, url) {
       var sb = await ready();
       var r = await sb.from('reservations')
