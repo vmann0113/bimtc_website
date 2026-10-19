@@ -131,7 +131,8 @@
         fam_tour: !!a.fam_tour, returning_company: a.returning_company || null,
         discount: a.discount || 0, early_bird: a.early_bird || null,
         logo_url: a.logo_url || null, logo_name: a.logo_name || null,
-        applicant: a.applicant || {}
+        applicant: a.applicant || {},
+        rentals: a.rentals || {}        // 수정에서는 항상 보낸다. 안 그러면 비품을 모두 뺄 수 없다.
       }, a.rentals)).eq('id', id).select();
       if (r.error) return { ok: false, error: r.error.message };
       if (!r.data || !r.data.length) return { ok: false, error: '수정할 수 없는 상태입니다 (입금완료·반려된 신청은 사무국으로 연락해 주세요)' };
