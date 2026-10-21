@@ -978,7 +978,7 @@ class Component extends DCLogic {
       const id=pre+'-'+String(zcnt[pre]).padStart(2,'0');
       const app=idApp[id];
       const zc=(zmap[e.cell.z]&&zmap[e.cell.z].color)||'#cdd8e4';
-      const xoff=e.cell.z==='z5'?0.5:0;
+      const xoff=0; // 독립부스도 본 배치도와 같은 열에 맞춘다
       let bg=zc+'55', color='#7e93a8', extra='', label=String(zcnt[pre]);
       if(modal.mode==='one'){
         if(oneIds.includes(id)){ bg='#FF6B5A'; color='#fff'; extra='box-shadow:0 2px 8px rgba(224,57,43,0.55);z-index:2;'; }

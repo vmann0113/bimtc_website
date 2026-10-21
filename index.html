@@ -1641,7 +1641,7 @@ class Component extends DCLogic {
       const bid=pre+'-'+String(zcnt[pre]).padStart(2,'0');
       const isTaken=!!taken[bid];
       const zc=(zmap[e.cell.z]&&zmap[e.cell.z].color)||'#cdd8e4';
-      const xoff=e.cell.z==='z5'?0.5:0;
+      const xoff=0; // 독립부스도 본 배치도와 같은 열에 맞춘다
       const zk=e.cell.z;
       const owner=boothOwner[bid];
       return { onClick:()=>openZone(zk), title:bid+(owner?' · '+owner:(isTaken?' · '+L('신청 완료','Taken'):'')), num:String(zcnt[pre]),
