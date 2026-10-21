@@ -182,8 +182,8 @@
       [[2, 3], [5, 6], [8, 9]].forEach(function (cc) { block(b[0], b[1], cc[0], cc[1], b[2]); });
     });
     // 하단 독립부스 구역 (온라인 선택 불가 · 사무국 전화 배정) — 렌더러가 +0.5칸 이동해 중앙 정렬
-    // 좌측 빈 슬롯 3칸(S-01~06) · 통로 · 부산서구 3칸(S-07~12, 메디컬 21번과 좌측 정렬) · 통로 · 이샘병원 2칸(S-13~16)
-    [[0, 2], [5, 7], [9, 10]].forEach(function (cc) { block(30, 31, cc[0], cc[1], 'z5'); });
+    // 빈 슬롯 3칸(S-01~06, 메디컬 14번과 우측 정렬) · 통로 · 부산서구 3칸(S-07~12, 메디컬 21번과 좌측 정렬) · 통로 · 이샘병원 2칸(S-13~16)
+    [[1, 3], [5, 7], [9, 10]].forEach(function (cc) { block(30, 31, cc[0], cc[1], 'z5'); });
     return { rows: 35, cols: 12, zones: zones, cells: cells, doors: { B10: 1 },
       typeColors: { stage: '#c3c8cf', seating: '#A8CE6B', biz: '#D284C7' }, special: [], blueprint: '0813' };
   })();
