@@ -32,6 +32,18 @@
   ::selection{background:#0B5FA5;color:#fff;}
   @media print{ .no-print{display:none !important;} .print-only{display:block !important;} body{background:#fff;} }
   .print-only{display:none;}
+  /* 비품 렌탈 행 — 좁은 화면에서는 수량·금액을 아랫줄로 내려 품목명이 끊기지 않게 한다 */
+  .rentrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid #eef2f7;}
+  .rentrow .rt-img{width:44px;height:44px;flex:0 0 44px;border:1px solid #e9eef5;border-radius:9px;background:#fff;object-fit:contain;}
+  .rentrow .rt-name{flex:1 1 auto;min-width:0;}
+  .rentrow .rt-qty{display:flex;align-items:center;gap:8px;flex:0 0 auto;}
+  .rentrow .rt-amt{flex:0 0 86px;width:86px;text-align:right;font-size:13.5px;font-weight:700;}
+  @media (max-width:620px){
+    .rentrow{flex-wrap:wrap;row-gap:6px;}
+    .rentrow .rt-name{flex:1 1 55%;}
+    .rentrow .rt-qty{margin-left:54px;}
+    .rentrow .rt-amt{flex:1 1 auto;width:auto;}
+  }
 </style>
 <script src="bimtc-config.js"></script>
 <script src="bimtc-supabase.js"></script>
@@ -367,6 +379,7 @@
       <div style="background:#F9FBFD;border:1px solid #e9eef5;border-radius:14px;padding:clamp(16px,2.6vw,24px);margin-bottom:16px;">
         <div style="font-size:16px;font-weight:800;margin-bottom:6px;">{{ s_rental }}</div>
         <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:0 0 10px;line-height:1.6;">{{ s_rental_note }}</p>
+        <a href="uploads/rental_catalog.pdf" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #b9d3ea;color:#0B5FA5;text-decoration:none;padding:9px 15px;border-radius:9px;font-size:13.5px;font-weight:700;margin:0 0 12px;">{{ s_rental_cat }}</a>
         <input value="{{ rentalQuery }}" onInput="{{ setRentalQuery }}" placeholder="{{ s_rental_ph }}" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #d8e0ea;border-radius:9px;font-size:14px;font-family:'Pretendard',sans-serif;" />
         <sc-if value="{{ rentalPicked }}" hint-placeholder-val="{{ '' }}">
           <div style="font-size:13.5px;font-weight:700;color:#0B5FA5;margin-top:10px;">{{ rentalPicked }}</div>
@@ -380,17 +393,19 @@
               </div>
             </sc-if>
             <sc-if value="{{ a.isItem }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid #eef2f7;">
-                <div style="flex:1;min-width:0;">
+              <div class="rentrow">
+                <img class="rt-img" src="{{ a.img }}" alt="{{ a.name }}" loading="lazy" onerror="{{ a.imgErr }}" />
+                <div class="rt-name">
                   <div style="font-size:14.5px;font-weight:600;color:#22384e;">{{ a.name }}</div>
-                  <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ a.sub }}</div>
+                  <div style="font-size:14px;font-weight:800;color:#0B5FA5;">{{ a.unitW }}</div>
+                  <div style="font-size:12.5px;color:#8295ab;">{{ a.sub }}</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-                  <button onClick="{{ a.dec }}" style="width:30px;height:30px;border-radius:8px;border:1px solid #d8e0ea;background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:#5E7289;">−</button>
-                  <span style="width:28px;text-align:center;font-size:15px;font-weight:700;">{{ a.qty }}</span>
-                  <button onClick="{{ a.inc }}" style="width:30px;height:30px;border-radius:8px;border:1px solid #d8e0ea;background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:#0B5FA5;">+</button>
+                <div class="rt-qty">
+                  <button onClick="{{ a.dec }}" style="width:28px;height:28px;border-radius:8px;border:1px solid #d8e0ea;background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:#5E7289;">−</button>
+                  <span style="width:26px;text-align:center;font-size:15px;font-weight:700;">{{ a.qty }}</span>
+                  <button onClick="{{ a.inc }}" style="width:28px;height:28px;border-radius:8px;border:1px solid #d8e0ea;background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:#0B5FA5;">+</button>
                 </div>
-                <div style="width:110px;text-align:right;font-size:14px;font-weight:700;color:{{ a.lineColor }};flex-shrink:0;">{{ a.lineW }}</div>
+                <div class="rt-amt" style="color:{{ a.lineColor }};">{{ a.lineW }}</div>
               </div>
             </sc-if>
           </sc-for>
@@ -1051,8 +1066,11 @@ class Component extends DCLogic {
       RENT.forEach(it=>{ if(!byCat[it.c]){ byCat[it.c]=[]; cats.push(it.c); } byCat[it.c].push(it); });
       const mk=(it)=>{ const q=rsel[it.key]||0;
         return { isItem:true, isCat:false, name:it.n,
-          sub:[this.won(it.p), it.note, it.s].filter(Boolean).join(' · '),
-          qty:q, lineW:this.won((it.p||0)*q), lineColor:q>0?'#22384e':'#c0ccda',
+          img:'uploads/rental/'+it.key+'.webp',
+          imgErr:(e)=>{ try{ e.target.style.visibility='hidden'; }catch(x){} },
+          unitW:this.won(it.p||0),
+          sub:[it.s, it.note].filter(Boolean).join(' · '),
+          qty:q, lineW:q>0?this.won((it.p||0)*q):'', lineColor:q>0?'#22384e':'#c0ccda',
           inc:()=>this.incRental(it.key), dec:()=>this.decRental(it.key) }; };
       if(rq){
         RENT.filter(it=>((it.n||'')+' '+(it.c||'')).toLowerCase().includes(rq)).slice(0,60).forEach(it=>rentalRows.push(mk(it)));
@@ -1214,6 +1232,7 @@ class Component extends DCLogic {
       rentalPicked: rentalPickedN ? (L('선택한 비품 ','Selected ')+rentalPickedN+L('종 · 합계 ',' items · ')+this.won(c.rentalCost)) : '',
       s_rental:L('비품 렌탈','Equipment Rental'),
       s_rental_note:L('필요한 비품을 수량과 함께 신청하세요. 금액은 부가세 별도이며 견적에 합산됩니다. 목록에 없는 품목(커피머신·키오스크·냉동쇼케이스 등)은 사무국으로 문의해 주세요.','Add rental items with quantities. Prices exclude VAT and are added to your quote. For items not listed (coffee machine, kiosk, freezer showcase, etc.) please contact the secretariat.'),
+      s_rental_cat:L('비품 카탈로그 PDF 내려받기 ↓','Download rental catalogue (PDF) ↓'),
       s_rental_ph:L('품목 검색 (예: 의자, 테이블, TV, 냉장고)','Search items (e.g. chair, table, TV)'),
       planCells, planFixtures, planDoors, planZones, planBoxStyle,
       boothCount:c.count, boothCostW:this.won(c.boothCost),
