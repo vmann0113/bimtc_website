@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Online Buyer Application · BIMTC 2026</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<!--
+  온라인 바이어 사전신청 폼 (가입 없이 접수)
+  · 회원가입(profiles)과 섞지 않고 public.online_buyer_leads 에 따로 모은다.
+    사무국이 검토해 확정된 건만 나중에 정식 바이어 신청으로 옮긴다.
+  · 표에는 직접 손대지 못하게 하고 online_buyer_apply 함수 하나만 호출한다(RLS).
+  · 중국 접속을 위해 외부 CDN·폰트를 쓰지 않는다. 관리 화면은 admin.html 의 '온라인 바이어 신청'.
+-->
+<style>
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{margin:0;background:#EEF1F6;color:#0F2440;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans","PingFang SC","Microsoft YaHei","Malgun Gothic",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5;word-break:keep-all;overflow-wrap:break-word;}
+  .top{background:#0A2236;color:#fff;}
+  .top .bar{height:4px;background:linear-gradient(90deg,#0B5FA5,#11A37B);}
+  .top .in{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;}
+  .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0B5FA5,#11A37B);position:relative;flex-shrink:0;}
+  .logo:before,.logo:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:2px;}
+  .logo:before{width:12px;height:3px;} .logo:after{width:3px;height:12px;}
+  .langs{display:flex;gap:4px;}
+  .langs button{background:transparent;border:1px solid rgba(255,255,255,.25);color:#cfdbe7;padding:5px 10px;border-radius:999px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .langs button.on{background:#fff;color:#0A2236;border-color:#fff;font-weight:700;}
+  main{max-width:760px;margin:0 auto;padding:20px 16px 60px;}
+  .hero{background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 20px;margin-bottom:14px;}
+  .hero h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em;}
+  .hero .sub{color:#0B5FA5;font-weight:700;font-size:13.5px;margin:0 0 2px;}
+  .hero .ev{color:#5E7289;font-size:13.5px;margin:0 0 12px;}
+  .hero .for{display:inline-block;background:#E8F6F0;color:#0d8f6b;font-weight:700;font-size:13.5px;padding:4px 10px;border-radius:8px;margin-bottom:10px;}
+  .hero p{margin:0;color:#33485e;}
+  .req-note{color:#c0392b;font-size:13px;margin-top:10px;}
+  section.card{background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:18px 20px;margin-bottom:14px;}
+  section.card h2{font-size:16px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #eef1f6;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;}
+  .f{min-width:0;} .f.full{grid-column:1/-1;}
+  @media (max-width:560px){.grid{grid-template-columns:1fr;}}
+  label.l{display:block;font-weight:700;font-size:13.5px;color:#33485e;margin-bottom:6px;}
+  label.l .r{color:#c0392b;margin-left:2px;}
+  .hint{font-size:12.5px;color:#8295ab;margin-top:4px;}
+  input[type=text],input[type=email],input[type=tel],input[type=number],input[type=date],input[type=time],select,textarea{width:100%;padding:11px 12px;border:1px solid #d8e0ea;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#0F2440;outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:#0B5FA5;box-shadow:0 0 0 3px rgba(11,95,165,.12);}
+  textarea{min-height:76px;resize:vertical;}
+  .opts{display:flex;flex-wrap:wrap;gap:8px;}
+  .opts label{display:flex;align-items:center;gap:7px;border:1px solid #d8e0ea;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14.5px;background:#fff;}
+  .opts label.on{border-color:#0B5FA5;background:#EEF5FC;color:#0B5FA5;font-weight:700;}
+  .opts input{margin:0;accent-color:#0B5FA5;}
+  .f.bad input,.f.bad select,.f.bad textarea,.f.bad .opts label{border-color:#e0533c;}
+  .consent{background:#F6F8FB;border:1px solid #e6ebf2;border-radius:12px;padding:14px 16px;font-size:13.5px;color:#33485e;}
+  .consent b{display:block;margin-bottom:6px;color:#0F2440;}
+  .consent .agree{display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:700;color:#0F2440;cursor:pointer;}
+  .consent .agree input{width:18px;height:18px;accent-color:#0B5FA5;}
+  .consent.bad{border-color:#e0533c;}
+  .actions{margin-top:18px;}
+  .btn{display:block;width:100%;background:#16294F;color:#fff;border:none;padding:15px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;}
+  .btn:disabled{opacity:.6;cursor:default;}
+  .btn.ghost{background:#fff;color:#0B5FA5;border:1px solid #0B5FA5;}
+  .msg{border-radius:10px;padding:11px 14px;font-size:14px;margin-top:12px;}
+  .msg.err{background:#fdecea;border:1px solid #f5c6cb;color:#c0392b;}
+  .center{text-align:center;padding:48px 20px;}
+  .done-ic{width:56px;height:56px;border-radius:50%;background:#11A37B;color:#fff;font-size:30px;line-height:56px;margin:0 auto 14px;}
+  .muted{color:#8295ab;font-size:13px;}
+  .link-box{background:#F6F8FB;border:1px solid #e6ebf2;border-radius:12px;padding:16px;margin:20px auto 0;max-width:520px;text-align:left;}
+  .link-box b{display:block;margin-bottom:8px;}
+  .link-url{background:#fff;border:1px dashed #c9d6e6;border-radius:8px;padding:10px 12px;font-size:13.5px;word-break:break-all;color:#0B5FA5;margin-bottom:8px;user-select:all;}
+.sched{background:#F6F8FB;border:1px solid #e6ebf2;border-radius:12px;padding:14px 16px;margin:14px 0 0;}
+  .sched>b{display:block;font-size:14px;margin-bottom:8px;color:#0B5FA5;}
+  .sched table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .sched th{text-align:left;vertical-align:top;white-space:nowrap;padding:7px 12px 7px 0;color:#33485e;font-weight:700;border-top:1px solid #e6ebf2;}
+  .sched td{padding:7px 0;border-top:1px solid #e6ebf2;color:#5E7289;}
+  .sched td b{display:block;color:#0F2440;}
+  .sched-h{margin-top:8px;font-weight:700;font-size:13.5px;color:#0d8f6b;}
+    footer{text-align:center;color:#8295ab;font-size:12.5px;margin-top:22px;}
+  [hidden]{display:none !important;}
+  .mode{display:flex;gap:8px;flex-wrap:wrap;}
+  .mode button{flex:1 1 120px;border:1px solid #d8e0ea;background:#fff;color:#33485e;border-radius:10px;padding:12px 10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .mode button.on{border-color:#0B5FA5;background:#0B5FA5;color:#fff;}
+  .f.bad .mode button{border-color:#e0533c;}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+</style>
+</head>
+<body>
+<div class="top"><div class="bar"></div><div class="in">
+  <div class="brand"><div class="logo"></div><span>BIMTC 2026</span></div>
+  <div class="langs" id="langs"></div>
+</div></div>
+<main id="app"><div class="center muted" id="boot">Loading…</div></main>
+
+<script>
+(function () {
+  // bimtc-supabase.js 와 같은 프로젝트·공개(anon) 키. 이 키로는 online_buyer_apply 만 호출된다(RLS).
+  var SUPABASE_URL = 'https://xkomxbskwvtofpglback.supabase.co';
+  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrb214YnNrd3Z0b2ZwZ2xiYWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjIxNzYsImV4cCI6MjEwMDAzODE3Nn0.YVBpieLDFP4AyeapuiRmjrDyZYdAHfiudnUdRPG65mo';
+
+  var LANGS = [['en', 'EN'], ['zh', '中文'], ['ru', 'RU'], ['mn', 'MN']];
+
+  var T = {
+    en: {
+      title: 'Online Buyer Application', sub: 'BIMTC 2026 · Busan International Medical Tourism Convention',
+      ev: 'November 13–14, 2026 · BEXCO, Busan, Korea',
+      badge: 'No account needed',
+      intro: 'Register your interest to meet Korean medical and wellness providers. Online buyers meet exhibitors 1:1 by video on November 13–14 — you do not need to travel to Busan. The secretariat will review your application and contact you by email with the next steps.',
+      req_note: '* Required',
+      s_you: 'About you', s_contact: 'Contact details', s_meet: 'Meeting preference',
+      last: 'Last name', last_ph: 'e.g. Chen', first: 'First name', first_ph: 'e.g. Sarah',
+      country: 'Country / Region', country_ph: 'e.g. United Arab Emirates',
+      company: 'Company / Organization', company_ph: 'e.g. OOO Travel Agency',
+      industry: 'Industry / Business type', industry_ph: 'e.g. Travel agency, Medical tourism agency',
+      job: 'Job title', job_ph: 'e.g. Manager',
+      dept: 'Department', dept_ph: 'e.g. Overseas Sales',
+      email: 'Email', email_ph: 'name@company.com',
+      email2: 'Email (confirm)', h_email: 'We send the meeting link and all notices to this address.',
+      mobile: 'Mobile phone', h_mobile: 'Include country code, e.g. +7 701 000 0000',
+      landline: 'Company phone (optional)',
+      mode: 'How will you attend?', m_online: 'Online', m_onsite: 'On-site', m_both: 'Both',
+      h_mode: 'Online — 1:1 video meetings on Nov 13–14. On-site — you travel to BEXCO, Busan.',
+      interests: 'What are you looking for?', interests_ph: 'e.g. plastic surgery, dermatology, health screening, wellness resorts, partner hospitals in Busan',
+      h_interests: 'Tell us what you want to source. We use this to match you with the right exhibitors.',
+      consent_t: 'Collection and use of personal information',
+      consent_b: 'Items collected: name, country, company, job title, department, email, phone, business interests. Purpose: reviewing your application, arranging business meetings and sending event notices. Retention: deleted within one year of the event, or on your request. You may decline, but we cannot process your application without this information.',
+      agree: 'I agree to the collection and use of my personal information.',
+      submit: 'Submit application', sending: 'Sending…',
+      err_req: 'Please fill in the required fields.', err_email: 'Please enter a valid email address.',
+      err_email2: 'Email addresses do not match.', err_agree: 'Please agree to the privacy notice.',
+      err_send: 'Could not submit. Please check your connection and try again.',
+      done_t: 'Application received', done_new: 'Thank you. The secretariat will review your application and email you the next steps.',
+      done_upd: 'Thank you. We updated your earlier application with these details.',
+      done_mail: 'Questions:', again: 'Submit another application'
+    },
+    zh: {
+      title: '线上买家申请', sub: 'BIMTC 2026 · 釜山国际医疗旅游会展',
+      ev: '2026年11月13–14日 · 韩国釜山 BEXCO',
+      badge: '无需注册账号',
+      intro: '登记您的参会意向，与韩国医疗及健康机构洽谈。线上买家可在11月13–14日通过视频与参展商进行一对一洽谈，无需来釜山。组委会审核后将通过邮件与您联系。',
+      req_note: '* 必填',
+      s_you: '基本信息', s_contact: '联系方式', s_meet: '参会方式',
+      last: '姓', last_ph: '例：Chen', first: '名', first_ph: '例：Sarah',
+      country: '国家 / 地区', country_ph: '例：China',
+      company: '公司 / 机构', company_ph: '例：OOO 旅行社',
+      industry: '行业 / 业务类型', industry_ph: '例：旅行社、医疗旅游中介',
+      job: '职务', job_ph: '例：经理',
+      dept: '部门', dept_ph: '例：海外事业部',
+      email: '电子邮箱', email_ph: 'name@company.com',
+      email2: '电子邮箱（确认）', h_email: '洽谈链接和所有通知都会发送到此邮箱。',
+      mobile: '手机号码', h_mobile: '请加国家代码，例：+86 138 0000 0000',
+      landline: '公司电话（选填）',
+      mode: '参会方式', m_online: '线上', m_onsite: '现场', m_both: '两者皆可',
+      h_mode: '线上 — 11月13–14日视频一对一洽谈。现场 — 亲临釜山 BEXCO。',
+      interests: '您希望洽谈的内容', interests_ph: '例：整形外科、皮肤科、健康体检、康养度假村、釜山合作医院',
+      h_interests: '请说明您的采购需求，我们据此为您匹配合适的参展商。',
+      consent_t: '个人信息收集与使用',
+      consent_b: '收集项目：姓名、国家、公司、职务、部门、邮箱、电话、业务需求。使用目的：审核申请、安排商务洽谈、发送活动通知。保存期限：活动结束后一年内删除，或依您的要求删除。您可以拒绝，但将无法受理您的申请。',
+      agree: '我同意收集和使用本人个人信息。',
+      submit: '提交申请', sending: '提交中…',
+      err_req: '请填写必填项。', err_email: '请输入有效的电子邮箱。',
+      err_email2: '两次输入的邮箱不一致。', err_agree: '请同意个人信息条款。',
+      err_send: '提交失败，请检查网络后重试。',
+      done_t: '申请已提交', done_new: '感谢您的申请。组委会审核后将通过邮件与您联系。',
+      done_upd: '感谢您。已用本次内容更新您此前的申请。',
+      done_mail: '咨询：', again: '再提交一份申请'
+    }
+  };
+
+  T.ru = {
+    title: 'Заявка онлайн-байера', sub: 'BIMTC 2026 · Пусанская международная конвенция медицинского туризма',
+    ev: '13–14 ноября 2026 · BEXCO, Пусан, Республика Корея',
+    badge: 'Регистрация аккаунта не нужна',
+    intro: 'Оставьте заявку на встречи с корейскими медицинскими и велнес-центрами. Онлайн-байеры проводят встречи 1:1 по видеосвязи 13–14 ноября — приезжать в Пусан не нужно. Секретариат рассмотрит заявку и напишет вам на email.',
+    req_note: '* Обязательно',
+    s_you: 'О вас', s_contact: 'Контакты', s_meet: 'Формат участия',
+    last: 'Фамилия', last_ph: 'напр. Ivanov', first: 'Имя', first_ph: 'напр. Ivan',
+    country: 'Страна / регион', country_ph: 'напр. Kazakhstan',
+    company: 'Компания / организация', company_ph: 'напр. OOO Travel Agency',
+    industry: 'Отрасль / вид деятельности', industry_ph: 'напр. турагентство, агентство медицинского туризма',
+    job: 'Должность', job_ph: 'напр. Manager',
+    dept: 'Отдел', dept_ph: 'напр. Overseas Sales',
+    email: 'Email', email_ph: 'name@company.com',
+    email2: 'Email (повторно)', h_email: 'На этот адрес придёт ссылка на встречу и все уведомления.',
+    mobile: 'Мобильный телефон', h_mobile: 'С кодом страны, напр. +7 701 000 0000',
+    landline: 'Телефон компании (необязательно)',
+    mode: 'Как вы примете участие?', m_online: 'Онлайн', m_onsite: 'Очно', m_both: 'Оба варианта',
+    h_mode: 'Онлайн — видеовстречи 1:1 13–14 ноября. Очно — приезд в BEXCO, Пусан.',
+    interests: 'Что вас интересует?', interests_ph: 'напр. пластическая хирургия, дерматология, чек-ап, велнес-курорты, клиники-партнёры в Пусане',
+    h_interests: 'Опишите ваш запрос — мы подберём подходящих экспонентов.',
+    consent_t: 'Сбор и использование персональных данных',
+    consent_b: 'Собираемые данные: имя, страна, компания, должность, отдел, email, телефон, деловые интересы. Цель: рассмотрение заявки, организация деловых встреч и рассылка уведомлений. Срок хранения: удаление в течение года после мероприятия или по вашему требованию. Вы вправе отказаться, но тогда заявку рассмотреть невозможно.',
+    agree: 'Я согласен на сбор и использование моих персональных данных.',
+    submit: 'Отправить заявку', sending: 'Отправка…',
+    err_req: 'Заполните обязательные поля.', err_email: 'Введите корректный email.',
+    err_email2: 'Адреса email не совпадают.', err_agree: 'Подтвердите согласие.',
+    err_send: 'Не удалось отправить. Проверьте соединение и повторите.',
+    done_t: 'Заявка принята', done_new: 'Спасибо. Секретариат рассмотрит заявку и напишет вам на email.',
+    done_upd: 'Спасибо. Мы обновили вашу предыдущую заявку этими данными.',
+    done_mail: 'Вопросы:', again: 'Отправить ещё одну заявку'
+  };
+  T.mn = {
+    title: 'Онлайн худалдан авагчийн өргөдөл', sub: 'BIMTC 2026 · Пусан Олон Улсын Эмнэлгийн Аялал Жуулчлалын Чуулган',
+    ev: '2026 оны 11-р сарын 13–14 · BEXCO, Пусан, БНСУ',
+    badge: 'Бүртгэл шаардлагагүй',
+    intro: 'Солонгосын эмнэлэг, эрүүл мэндийн байгууллагуудтай уулзах хүсэлтээ бүртгүүлнэ үү. Онлайн худалдан авагчид 11-р сарын 13–14-нд видеогоор 1:1 уулзалт хийнэ — Пусан руу явах шаардлагагүй. Нарийн бичгийн дарга нарын газар хянаад танд имэйлээр хариу өгнө.',
+    req_note: '* Заавал',
+    s_you: 'Таны тухай', s_contact: 'Холбоо барих', s_meet: 'Оролцох хэлбэр',
+    last: 'Овог', last_ph: 'жишээ: Bat', first: 'Нэр', first_ph: 'жишээ: Oyun',
+    country: 'Улс / бүс', country_ph: 'жишээ: Mongolia',
+    company: 'Байгууллага', company_ph: 'жишээ: OOO Travel Agency',
+    industry: 'Салбар / үйл ажиллагаа', industry_ph: 'жишээ: аялал жуулчлалын агентлаг',
+    job: 'Албан тушаал', job_ph: 'жишээ: Manager',
+    dept: 'Хэлтэс', dept_ph: 'жишээ: Overseas Sales',
+    email: 'И-мэйл', email_ph: 'name@company.com',
+    email2: 'И-мэйл (баталгаажуулах)', h_email: 'Уулзалтын холбоос болон бүх мэдэгдлийг энэ хаягаар илгээнэ.',
+    mobile: 'Гар утас', h_mobile: 'Улсын кодтой, жишээ: +976 9900 0000',
+    landline: 'Байгууллагын утас (сонголт)',
+    mode: 'Хэрхэн оролцох вэ?', m_online: 'Онлайн', m_onsite: 'Биечлэн', m_both: 'Хоёулаа',
+    h_mode: 'Онлайн — 11-р сарын 13–14-нд видео 1:1 уулзалт. Биечлэн — Пусан BEXCO-д ирнэ.',
+    interests: 'Юу сонирхож байна вэ?', interests_ph: 'жишээ: гоо сайхны мэс засал, арьс судлал, эрүүл мэндийн үзлэг, рашаан сувилал, Пусан дахь түнш эмнэлэг',
+    h_interests: 'Хүссэн зүйлээ бичнэ үү. Үүнд тулгуурлан тохирох оролцогчтой холбоно.',
+    consent_t: 'Хувийн мэдээлэл цуглуулах, ашиглах',
+    consent_b: 'Цуглуулах мэдээлэл: нэр, улс, байгууллага, албан тушаал, хэлтэс, и-мэйл, утас, сонирхол. Зорилго: өргөдөл хянах, бизнес уулзалт зохион байгуулах, мэдэгдэл илгээх. Хадгалах хугацаа: арга хэмжээнээс хойш нэг жилийн дотор устгана, эсвэл таны хүсэлтээр. Татгалзаж болох ч өргөдлийг хянах боломжгүй болно.',
+    agree: 'Би хувийн мэдээллээ цуглуулж, ашиглахыг зөвшөөрч байна.',
+    submit: 'Өргөдөл илгээх', sending: 'Илгээж байна…',
+    err_req: 'Заавал бөглөх талбарыг бөглөнө үү.', err_email: 'Зөв и-мэйл хаяг оруулна уу.',
+    err_email2: 'И-мэйл хаяг таарахгүй байна.', err_agree: 'Зөвшөөрлөө өгнө үү.',
+    err_send: 'Илгээж чадсангүй. Сүлжээгээ шалгаад дахин оролдоно уу.',
+    done_t: 'Өргөдөл хүлээн авлаа', done_new: 'Баярлалаа. Нарийн бичгийн газар хянаад танд имэйлээр хариу өгнө.',
+    done_upd: 'Баярлалаа. Өмнөх өргөдлийг тань энэ мэдээллээр шинэчиллээ.',
+    done_mail: 'Асуулт:', again: 'Дахин өргөдөл илгээх'
+  };
+
+  var SEC_MAIL = 'bmia0528@naver.com';
+  var app = document.getElementById('app');
+  var lang = (function () {
+    var m = (location.search || '').match(/[?&]lang=(en|zh|ru|mn)/);
+    if (m) return m[1];
+    try { var v = localStorage.getItem('bimtc_apply_lang'); if (v && T[v]) return v; } catch (e) {}
+    var n = (navigator.language || 'en').toLowerCase();
+    if (n.indexOf('zh') === 0) return 'zh';
+    if (n.indexOf('ru') === 0) return 'ru';
+    if (n.indexOf('mn') === 0) return 'mn';
+    return 'en';
+  })();
+  var form = { attend_mode: 'online' };
+  var sending = false, errKey = '', badSet = {};
+
+  function t(k) { return (T[lang] && T[lang][k]) || T.en[k] || k; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function renderLangs() {
+    var box = document.getElementById('langs');
+    box.innerHTML = LANGS.map(function (l) {
+      return '<button type="button" data-l="' + l[0] + '" class="' + (l[0] === lang ? 'on' : '') + '">' + l[1] + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(box.querySelectorAll('button'), function (b) {
+      b.onclick = function () {
+        lang = b.getAttribute('data-l');
+        try { localStorage.setItem('bimtc_apply_lang', lang); } catch (e) {}
+        document.documentElement.setAttribute('lang', lang);
+        renderLangs(); render();
+      };
+    });
+  }
+
+  // 한 칸 그리기
+  function field(key, labelKey, opt) {
+    opt = opt || {};
+    var req = !!opt.req, ph = opt.ph ? t(opt.ph) : '', hint = opt.hint ? t(opt.hint) : '';
+    return '<div class="f' + (opt.full ? ' full' : '') + (badSet[key] ? ' bad' : '') + '">'
+      + '<label class="l" for="f_' + key + '">' + esc(t(labelKey)) + (req ? '<span class="r">*</span>' : '') + '</label>'
+      + (opt.area
+        ? '<textarea id="f_' + key + '" data-k="' + key + '" placeholder="' + esc(ph) + '">' + esc(form[key] || '') + '</textarea>'
+        : '<input id="f_' + key + '" data-k="' + key + '" type="' + (opt.type || 'text') + '" value="' + esc(form[key] || '') + '" placeholder="' + esc(ph) + '" autocomplete="' + (opt.ac || 'on') + '" />')
+      + (hint ? '<div class="hint">' + esc(hint) + '</div>' : '')
+      + '</div>';
+  }
+
+  function render() {
+    var modes = [['online', 'm_online'], ['onsite', 'm_onsite'], ['both', 'm_both']];
+    app.innerHTML =
+      '<div class="hero">'
+      + '<div class="sub">' + esc(t('sub')) + '</div>'
+      + '<h1>' + esc(t('title')) + '</h1>'
+      + '<div class="ev">' + esc(t('ev')) + '</div>'
+      + '<div class="for">' + esc(t('badge')) + '</div>'
+      + '<p>' + esc(t('intro')) + '</p>'
+      + '<div class="req-note">' + esc(t('req_note')) + '</div>'
+      + '</div>'
+
+      + '<section class="card"><h2>' + esc(t('s_you')) + '</h2><div class="grid">'
+      + field('last_name', 'last', { req: true, ph: 'last_ph', ac: 'family-name' })
+      + field('first_name', 'first', { req: true, ph: 'first_ph', ac: 'given-name' })
+      + field('country', 'country', { req: true, ph: 'country_ph', ac: 'country-name' })
+      + field('company', 'company', { req: true, ph: 'company_ph', ac: 'organization' })
+      + field('industry', 'industry', { ph: 'industry_ph' })
+      + field('job_title', 'job', { ph: 'job_ph', ac: 'organization-title' })
+      + field('dept', 'dept', { ph: 'dept_ph' })
+      + '</div></section>'
+
+      + '<section class="card"><h2>' + esc(t('s_contact')) + '</h2><div class="grid">'
+      + field('email', 'email', { req: true, ph: 'email_ph', type: 'email', ac: 'email', hint: 'h_email' })
+      + field('email2', 'email2', { req: true, ph: 'email_ph', type: 'email', ac: 'off' })
+      + field('phone', 'mobile', { type: 'tel', ac: 'tel', hint: 'h_mobile' })
+      + field('landline', 'landline', { type: 'tel' })
+      + '</div></section>'
+
+      + '<section class="card"><h2>' + esc(t('s_meet')) + '</h2><div class="grid">'
+      + '<div class="f full"><label class="l">' + esc(t('mode')) + '<span class="r">*</span></label>'
+      + '<div class="mode">' + modes.map(function (m) {
+          return '<button type="button" data-m="' + m[0] + '" class="' + (form.attend_mode === m[0] ? 'on' : '') + '">' + esc(t(m[1])) + '</button>';
+        }).join('') + '</div>'
+      + '<div class="hint">' + esc(t('h_mode')) + '</div></div>'
+      + field('interests', 'interests', { full: true, area: true, ph: 'interests_ph', hint: 'h_interests' })
+      + '</div></section>'
+
+      + '<section class="card">'
+      + '<div class="consent' + (badSet.agree ? ' bad' : '') + '"><b>' + esc(t('consent_t')) + '</b>' + esc(t('consent_b'))
+      + '<label class="agree"><input type="checkbox" id="f_agree"' + (form.agree ? ' checked' : '') + ' /> ' + esc(t('agree')) + '</label></div>'
+      + '<div class="hp"><label>Company website<input type="text" id="f_hp" tabindex="-1" autocomplete="off" /></label></div>'
+      + '<div class="actions"><button class="btn" id="go"' + (sending ? ' disabled' : '') + '>' + esc(t(sending ? 'sending' : 'submit')) + '</button></div>'
+      + (errKey ? '<div class="msg err">' + esc(t(errKey)) + '</div>' : '')
+      + '</section>'
+
+      + '<footer>BIMTC 2026 Secretariat · ' + SEC_MAIL + '</footer>';
+
+    Array.prototype.forEach.call(app.querySelectorAll('[data-k]'), function (el) {
+      el.oninput = function () { form[el.getAttribute('data-k')] = el.value; };
+    });
+    Array.prototype.forEach.call(app.querySelectorAll('.mode button'), function (b) {
+      b.onclick = function () { form.attend_mode = b.getAttribute('data-m'); render(); };
+    });
+    document.getElementById('f_agree').onchange = function (e) { form.agree = e.target.checked; };
+    document.getElementById('go').onclick = submit;
+  }
+
+  function done(updated) {
+    app.innerHTML = '<section class="card"><div class="center">'
+      + '<div class="done-ic">✓</div>'
+      + '<h1 style="font-size:20px;margin:0 0 8px;">' + esc(t('done_t')) + '</h1>'
+      + '<p style="color:#33485e;margin:0 auto;max-width:460px;">' + esc(t(updated ? 'done_upd' : 'done_new')) + '</p>'
+      + '<p class="muted" style="margin-top:16px;">' + esc(t('done_mail')) + ' ' + SEC_MAIL + '</p>'
+      + '<div class="actions" style="max-width:320px;margin:22px auto 0;"><button class="btn ghost" id="again">' + esc(t('again')) + '</button></div>'
+      + '</div></section>';
+    document.getElementById('again').onclick = function () {
+      form = { attend_mode: 'online' }; errKey = ''; badSet = {};
+      render(); window.scrollTo(0, 0);
+    };
+    window.scrollTo(0, 0);
+  }
+
+  function submit() {
+    if (sending) return;
+    var mail = (form.email || '').trim(), mail2 = (form.email2 || '').trim();
+    badSet = {}; errKey = '';
+    ['last_name', 'first_name', 'country', 'company', 'email'].forEach(function (k) {
+      if (!(form[k] || '').trim()) { badSet[k] = 1; errKey = errKey || 'err_req'; }
+    });
+    if (!errKey && !/^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(mail)) { badSet.email = 1; errKey = 'err_email'; }
+    if (!errKey && mail.toLowerCase() !== mail2.toLowerCase()) { badSet.email2 = 1; errKey = 'err_email2'; }
+    if (!errKey && !form.agree) { badSet.agree = 1; errKey = 'err_agree'; }
+    // 자동 등록 거르기 — 사람 눈에 안 보이는 칸이 채워져 있으면 받은 척만 한다
+    var hp = document.getElementById('f_hp');
+    if (!errKey && hp && hp.value) { done(false); return; }
+    if (errKey) {
+      render();
+      var first = app.querySelector('.f.bad input, .f.bad textarea') || app.querySelector('.consent.bad');
+      if (first && first.scrollIntoView) first.scrollIntoView({ block: 'center' });
+      if (first && first.focus) try { first.focus(); } catch (e) {}
+      return;
+    }
+
+    sending = true; render();
+    var body = {
+      last_name: form.last_name, first_name: form.first_name, country: form.country,
+      company: form.company, industry: form.industry, job_title: form.job_title, dept: form.dept,
+      email: mail, phone: form.phone, landline: form.landline,
+      attend_mode: form.attend_mode, interests: form.interests, lang: lang
+    };
+    fetch(SUPABASE_URL + '/rest/v1/rpc/online_buyer_apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON },
+      body: JSON.stringify({ p: body })
+    }).then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (res) {
+        sending = false;
+        if (res && res.ok) { done(!!res.updated); return; }
+        errKey = (res && res.error === 'email') ? 'err_email' : (res && res.error === 'missing') ? 'err_req' : 'err_send';
+        if (res && res.error === 'missing' && res.field) badSet[res.field] = 1;
+        render();
+      })
+      .catch(function () { sending = false; errKey = 'err_send'; render(); });
+  }
+
+  document.documentElement.setAttribute('lang', lang);
+  renderLangs();
+  render();
+})();
+</script>
+</body>
+</html>

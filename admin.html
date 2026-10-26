@@ -522,6 +522,64 @@
         </div>
       </sc-if>
 
+      <!-- ONLINE BUYER LEADS -->
+      <sc-if value="{{ isOblead }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">온라인 바이어 신청</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 20px;line-height:1.6;">회원가입 없이 받은 <b>별도 명단</b>입니다. 회원 명단과 섞이지 않습니다. 검토해서 <b style="color:#0d8f6b;">확정</b>으로 표시한 뒤, 정식 바이어로 가입 안내를 보내고 <b>신청 전환</b>으로 바꿔 주세요. 모집 링크 <b style="color:#0B5FA5;">bimtc.busan.com/buyer-online</b></p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0F2440;">{{ obTotal }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">총 접수</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0B5FA5;">{{ obNew }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">신규</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#b78a3c;">{{ obReview }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">검토중</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0d8f6b;">{{ obConfirmed }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">확정</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#5E7289;">{{ obOnline }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">온라인 희망</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ obTabs }}" as="ot" hint-placeholder-count="6">
+              <span onClick="{{ ot.onClick }}" style="{{ ot.style }}">{{ ot.label }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input value="{{ obQuery }}" onInput="{{ setObQuery }}" placeholder="이름·회사·국가·메일·관심분야 검색" style="padding:10px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;width:250px;" />
+            <button onClick="{{ obExport }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">엑셀(CSV) 받기</button>
+          </div>
+        </div>
+        <sc-if value="{{ noObLeads }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:40px 24px;text-align:center;color:#8295ab;font-size:14px;">{{ obEmptyMsg }}</div>
+        </sc-if>
+        <sc-for list="{{ obRows }}" as="o" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:16px 18px;margin-bottom:10px;">
+            <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+              <div style="flex:1 1 230px;min-width:0;">
+                <div style="font-size:15.5px;font-weight:800;color:#0F2440;">{{ o.name }} <span style="font-weight:600;color:#8295ab;font-size:13px;">{{ o.country }}</span></div>
+                <div style="font-size:14px;color:#33485e;margin-top:2px;">{{ o.company }}</div>
+                <div style="font-size:12.5px;color:#8295ab;margin-top:1px;">{{ o.sub }}</div>
+              </div>
+              <div style="flex:1 1 200px;min-width:0;">
+                <a href="{{ o.mailHref }}" style="font-size:13.5px;color:#0B5FA5;text-decoration:none;font-weight:700;word-break:break-all;">{{ o.email }}</a>
+                <div style="font-size:13px;color:#5E7289;margin-top:2px;">{{ o.phone }}</div>
+                <div style="margin-top:6px;"><span style="{{ o.modeStyle }}">{{ o.mode }}</span></div>
+              </div>
+              <div style="flex:0 0 auto;text-align:right;">
+                <div style="font-size:12.5px;color:#8295ab;">{{ o.at }}</div>
+                <div style="font-size:12px;color:#b78a3c;font-weight:700;">{{ o.again }}</div>
+                <select value="{{ o.stValue }}" onChange="{{ o.onStatus }}" style="margin-top:6px;padding:8px 10px;border:1px solid #d8e0ea;border-radius:9px;font-size:13.5px;font-weight:700;font-family:'Pretendard',sans-serif;background:#fff;color:#0F2440;cursor:pointer;"><option value="new">신규</option><option value="review">검토중</option><option value="confirmed">확정</option><option value="rejected">반려</option><option value="moved">신청 전환</option></select>
+                <button onClick="{{ o.del }}" style="margin-left:6px;background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
+              </div>
+            </div>
+            <sc-if value="{{ o.hasInterests }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;padding:9px 12px;background:#F7F9FC;border-radius:10px;font-size:13.5px;color:#33485e;line-height:1.6;">{{ o.interests }}</div>
+            </sc-if>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;">
+              <input value="{{ o.memo }}" onInput="{{ o.onMemo }}" placeholder="사무국 메모 (바이어에게 보이지 않습니다)" style="flex:1;padding:9px 12px;border:1px solid #e6ebf2;border-radius:9px;font-size:13.5px;outline:none;font-family:'Pretendard',sans-serif;" />
+              <sc-if value="{{ o.memoDirty }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ o.saveMemo }}" style="background:#0d8f6b;color:#fff;border:none;padding:9px 15px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">메모 저장</button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </sc-if>
+
       <!-- MATCHING -->
       <sc-if value="{{ isMatch }}" hint-placeholder-val="{{ false }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">비즈미팅 매칭 관리</h1>
@@ -771,6 +829,7 @@ class Component extends DCLogic {
     restricted: {},
     boardDay: 'D1', resvRows: [], mtgLink: {}, mtgPlat: {},
     prospects: [], pFilter: 'all', pQuery: '', pMemo: {},
+    obLeads: [], obFilter: 'all', obQuery: '', obMemo: {},
     addOpen: false, addMode: 'one', addForm: {}, addBulk: '', addBusy: false,
     pSort: 'seq', pDesc: false, editId: null,
     cmsFlash: false,
@@ -885,13 +944,14 @@ class Component extends DCLogic {
     this._proBusy=false;
   }
   async reload(){
-    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects] = await Promise.all([
+    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects, obLeads] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
       window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
       window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers(),
       window.BimtcDB.listInquiries().catch(()=>[]),
       window.BimtcDB.listNotifications().catch(()=>[]),
-      window.BimtcDB.listProspects().catch(()=>[])
+      window.BimtcDB.listProspects().catch(()=>[]),
+      window.BimtcDB.listOnlineBuyerLeads().catch(()=>[])
     ]);
     // 11.13(D1)·11.14(D2) 를 구분하지 않으면 한쪽 예약이 다른 날에도 잡힌 것처럼 보인다
     const reserved={}; resvs.forEach(r=>{ reserved[r.day+'-'+r.table_idx+'-'+r.slot_idx]=r.interpreter?2:1; });
@@ -903,7 +963,7 @@ class Component extends DCLogic {
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
     this.proMark(prospects||[]);
     this.setState({ apps, regs, matches, notices, reserved, restricted: closed||{}, booths, members, inquiries: inquiries||[],
-      notifications: notifications||[], prospects: prospects||[], resvRows: resvs||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false });
+      notifications: notifications||[], prospects: prospects||[], obLeads: obLeads||[], resvRows: resvs||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false });
   }
 
   async saveAnswer(id){
@@ -1096,6 +1156,7 @@ class Component extends DCLogic {
       {k:'booths',label:'부스 신청·승인',badge:pendingBooths},
       {k:'prospect',label:'부스 유치 업무'},
       {k:'members',label:'회원 명단'},
+      {k:'oblead',label:'온라인 바이어 신청',badge:(this.state.obLeads||[]).filter(x=>x.status==='new').length},
       {k:'reg',label:'사전등록 명단'},
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
       {k:'lounge',label:'미팅 현황'},
@@ -1103,6 +1164,87 @@ class Component extends DCLogic {
       {k:'noti',label:'알림함',badge:(this.state.notifications||[]).filter(n=>n.status==='pending').length},
       {k:'cms',label:'공지·콘텐츠'},
     ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>{ this.setState({view:n.k}); if(n.k==='prospect') setTimeout(()=>this.pollProspects(),60); }}));
+
+    // ── 온라인 바이어 사전신청 (가입 없이 받은 별도 명단) ──
+    // 회원가입과 섞지 않고 따로 모아 두고, 사무국이 확정한 건만 나중에 정식 신청으로 옮긴다.
+    const OB_ST=[['new','신규'],['review','검토중'],['confirmed','확정'],['rejected','반려'],['moved','신청 전환']];
+    const OB_LB={}; OB_ST.forEach(([k,l])=>{ OB_LB[k]=l; });
+    const OB_COL={new:'#0B5FA5',review:'#b78a3c',confirmed:'#0d8f6b',rejected:'#c0392b',moved:'#5E7289'};
+    const OB_MODE={online:'온라인',onsite:'현장',both:'둘 다'};
+    const obAll=this.state.obLeads||[];
+    const obCount=(k)=> k==='all' ? obAll.length : obAll.filter(x=>(x.status||'new')===k).length;
+    const obTabs=[['all','전체']].concat(OB_ST).map(([k,l])=>({ label:l+' '+obCount(k), onClick:()=>this.setState({obFilter:k}),
+      style:'padding:8px 15px;border-radius:999px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;cursor:pointer;white-space:nowrap;'
+        + (this.state.obFilter===k ? 'background:#0B5FA5;color:#fff;' : 'background:#fff;color:#5E7289;border:1px solid #e6ebf2;') }));
+    const obQ=(this.state.obQuery||'').trim().toLowerCase();
+    const obHit=(x)=>!obQ || [x.last_name,x.first_name,x.country,x.company,x.industry,x.job_title,x.email,x.phone,x.interests,x.memo]
+      .filter(Boolean).join(' ').toLowerCase().indexOf(obQ)>=0;
+    const obList=obAll.filter(x=>(this.state.obFilter==='all'||(x.status||'new')===this.state.obFilter) && obHit(x));
+
+    const obSetStatus=async(id,st)=>{
+      const cur=obAll.find(x=>x.id===id); if(!cur||cur.status===st) return;
+      this.setState({ obLeads:obAll.map(x=>x.id===id?{...x,status:st}:x) });
+      const r=await window.BimtcDB.updateOnlineBuyerLead(id,{ status:st, moved_at: st==='moved'?new Date().toISOString():null });
+      if(!r.ok){ this.setState({ obLeads:obAll.map(x=>x.id===id?{...x,status:cur.status}:x), toast:'상태 변경 실패: '+r.error }); return; }
+      this.flash('상태를 '+(OB_LB[st]||st)+'(으)로 바꿨습니다');
+    };
+    const obSetMemo=(id,val)=>{ const d={...(this.state.obMemo||{})}; d[id]=val; this.setState({obMemo:d}); };
+    const obSaveMemo=async(id)=>{
+      const d={...(this.state.obMemo||{})}; if(!(id in d)) return;
+      const val=d[id]; delete d[id];
+      this.setState({ obMemo:d, obLeads:obAll.map(x=>x.id===id?{...x,memo:val}:x) });
+      const r=await window.BimtcDB.updateOnlineBuyerLead(id,{ memo:val });
+      if(!r.ok) this.setState({ toast:'메모 저장 실패: '+r.error });
+    };
+    const obDelete=async(id)=>{
+      const x=obAll.find(y=>y.id===id); if(!x) return;
+      if(!confirm((x.company||'')+' ('+(x.email||'')+') 신청을 삭제할까요? 되돌릴 수 없습니다.')) return;
+      const r=await window.BimtcDB.deleteOnlineBuyerLead(id);
+      if(!r.ok){ this.setState({toast:'삭제 실패: '+r.error}); return; }
+      this.setState({ obLeads:obAll.filter(y=>y.id!==id) });
+      this.flash('삭제했습니다');
+    };
+    const obExport=()=>{
+      const head=['접수일시','상태','성','이름','국가','회사','업종','직책','부서','이메일','휴대전화','회사전화','참가방식','관심분야','작성언어','재제출','사무국 메모'];
+      const rows=obList.map(x=>[
+        this.shortTime(x.created_at), OB_LB[x.status||'new']||x.status, x.last_name, x.first_name, x.country,
+        x.company, x.industry, x.job_title, x.dept, x.email, x.phone, x.landline,
+        OB_MODE[x.attend_mode]||x.attend_mode, x.interests, x.lang, x.submit_count, x.memo ]);
+      const esc=(v)=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+      const csv='\uFEFF'+[head].concat(rows).map(r=>r.map(esc).join(',')).join('\r\n');
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+      a.download='온라인바이어신청_'+new Date().toISOString().slice(0,10)+'.csv';
+      a.click(); URL.revokeObjectURL(a.href);
+    };
+    const obRows=obList.map(x=>{
+      const st=x.status||'new';
+      return {
+        id:x.id,
+        name:[x.last_name,x.first_name].filter(Boolean).join(' '),
+        country:x.country||'-',
+        company:x.company||'-',
+        sub:[x.industry,x.job_title,x.dept].filter(Boolean).join(' · ')||'-',
+        mode:OB_MODE[x.attend_mode]||x.attend_mode,
+        modeStyle:'display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;'
+          + (x.attend_mode==='online'?'background:#E8F2FC;color:#0B5FA5;':x.attend_mode==='both'?'background:#E8F6F0;color:#0d8f6b;':'background:#F1F4F8;color:#5E7289;'),
+        email:x.email||'-', phone:x.phone||'',
+        interests:x.interests||'',
+        hasInterests:!!x.interests,
+        at:this.shortTime(x.created_at),
+        again:(x.submit_count||1)>1 ? '재제출 '+x.submit_count+'회' : '',
+        stLabel:OB_LB[st]||st,
+        stStyle:'display:inline-block;padding:4px 11px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap;color:#fff;background:'+(OB_COL[st]||'#5E7289')+';',
+        stValue:st,
+        onStatus:(e)=>obSetStatus(x.id, e.target.value),
+        memo:(this.state.obMemo||{})[x.id] !== undefined ? this.state.obMemo[x.id] : (x.memo||''),
+        onMemo:(e)=>obSetMemo(x.id, e.target.value),
+        saveMemo:()=>obSaveMemo(x.id),
+        memoDirty:(this.state.obMemo||{})[x.id] !== undefined,
+        del:()=>obDelete(x.id),
+        mailHref:'mailto:'+(x.email||'')+'?subject='+encodeURIComponent('[BIMTC 2026] Your online buyer application')
+      };
+    });
 
     const inquiries=this.state.inquiries||[];
     const iTab=this.state.inqTab;
@@ -1654,6 +1796,12 @@ class Component extends DCLogic {
       hasSentNoti:(this.state.notifications||[]).some(n=>n.status==='sent'),
       sentNotiCount:(this.state.notifications||[]).filter(n=>n.status==='sent').length,
       prospectTabs, prospectRows, exportProspects, printProspects,
+      obTabs, obRows, obExport,
+      obQuery:this.state.obQuery||'', setObQuery:(e)=>this.setState({obQuery:e.target.value}),
+      obTotal:String(obAll.length), obNew:String(obCount('new')), obReview:String(obCount('review')),
+      obConfirmed:String(obCount('confirmed')), obOnline:String(obAll.filter(x=>x.attend_mode!=='onsite').length),
+      noObLeads:obRows.length===0,
+      obEmptyMsg:obAll.length===0?'아직 접수된 온라인 바이어 신청이 없습니다. 모집 링크(bimtc.busan.com/buyer-online)를 보내 주세요.':'조건에 맞는 신청이 없습니다.',
       addOpen:!!this.state.addOpen, addIsBulk:(this.state.addMode||'one')==='bulk',
       addIsEdit:(this.state.addMode||'one')==='edit', addNotEdit:(this.state.addMode||'one')!=='edit',
       addIsOne:(this.state.addMode||'one')==='one'||(this.state.addMode||'one')==='edit',
@@ -1689,7 +1837,7 @@ class Component extends DCLogic {
       pNo:String(pCount('rejected')), pNone:String(pCount('none')),
       pShown:String(pFiltered.length),
       pEmptyMsg:prospects.length===0?'유치 대상 명단이 비어 있습니다. booth_prospect_2_data.sql 을 실행해 명단을 올려 주세요.':'조건에 맞는 기관이 없습니다.',
-      isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',
+      isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',isOblead:v==='oblead',
       memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       gateLogin:this.state.gate==='login', gateDenied:this.state.gate==='denied', gateReady:this.state.gate==='ready',
       ...this.ebVals(),

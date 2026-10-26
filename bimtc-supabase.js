@@ -307,6 +307,30 @@
       var r = await sb.from('booth_prospects').update(f).eq('id', id);
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
+    // ── 온라인 바이어 사전신청 (가입 없이 받은 별도 명단) ──
+    // 신청 접수는 공개 함수 online_buyer_apply 가 하고(buyer-apply.html), 여기는 관리자용 조회·정리만 한다.
+    async listOnlineBuyerLeads() {
+      var sb = await ready();
+      var r = await sb.from('online_buyer_leads').select('*').order('created_at', { ascending: false });
+      if (r.error) return [];
+      return r.data || [];
+    },
+    async updateOnlineBuyerLead(id, fields) {
+      var sb = await ready();
+      var f = {};
+      if (fields.status !== undefined) f.status = fields.status;
+      if (fields.memo !== undefined) f.memo = fields.memo;
+      if (fields.moved_at !== undefined) f.moved_at = fields.moved_at;
+      if (fields.moved_profile !== undefined) f.moved_profile = fields.moved_profile;
+      if (!Object.keys(f).length) return { ok: true };
+      var r = await sb.from('online_buyer_leads').update(f).eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
+    async deleteOnlineBuyerLead(id) {
+      var sb = await ready();
+      var r = await sb.from('online_buyer_leads').delete().eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     async listBoothApplications() { var sb = await ready(); var r = await sb.from('booth_applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
     async adminDeleteMember(profileId) {
       var sb = await ready();

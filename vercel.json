@@ -2,7 +2,8 @@
   "cleanUrls": true,
   "redirects": [
     { "source": "/buyer", "destination": "/?join=buyer&lang=en", "permanent": false },
-    { "source": "/buyer-online", "destination": "/?join=buyer&mode=online&lang=en", "permanent": false },
+    { "source": "/buyer-online", "destination": "/buyer-apply", "permanent": false },
+    { "source": "/buyer-signup", "destination": "/?join=buyer&mode=online&lang=en", "permanent": false },
     { "source": "/buyer-ko", "destination": "/?join=buyer&lang=ko", "permanent": false }
   ],
   "rewrites": [
