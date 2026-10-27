@@ -8,6 +8,7 @@
     { "source": "/biz", "destination": "/bizmeeting", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/main", "destination": "/main.dc.html" }
+    { "source": "/main", "destination": "/main.dc.html" },
+    { "source": "/i/:code", "destination": "/i.html" }
   ]
 }

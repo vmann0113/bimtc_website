@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BIMTC</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0A2236">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!--
+  신규 부스 후보 개인 홍보 화면 — 홈페이지·관리자 화면 어디에도 링크하지 않는다.
+  · 데이터: public.outreach_leads (booth_prospects 와 별개). RLS 로 소유자 계정 한 명만 읽기/쓰기.
+  · 후보마다 맞춤 안내 링크 https://bimtc.busan.com/i/<코드> — 열람·버튼 클릭이 기록되어 여기에 뜬다.
+  · 메일은 내 메일 프로그램으로 열리고, 보내기는 직접 누른다.
+-->
+<script src="bimtc-supabase.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#EEF1F6;color:#0F2440;font-family:'Pretendard',-apple-system,sans-serif;font-size:14px;word-break:keep-all}
+  input,button,select,textarea{font-family:inherit}
+  a{color:inherit}
+  .top{position:sticky;top:0;z-index:20;background:#0A2236;color:#fff}
+  .top .in{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;padding:12px clamp(14px,4vw,26px)}
+  .top h1{font-size:16px;margin:0}
+  .top .r{display:flex;gap:10px;align-items:center;font-size:13px;color:#9fb4c7}
+  .btn{border:1px solid #c9d4df;background:#fff;color:#0F2440;border-radius:8px;padding:7px 11px;font-weight:700;cursor:pointer;font-size:12.5px;text-decoration:none;display:inline-block;white-space:nowrap}
+  .btn.dark{background:#16294F;border-color:#16294F;color:#fff}
+  .btn.ghost{background:transparent;color:#cfe0f2;border-color:#3b5470}
+  .main{padding:16px clamp(12px,3vw,26px) 40px;max-width:1200px;margin:0 auto}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:12px}
+  .st{background:#fff;border-radius:12px;padding:12px 14px;cursor:pointer;border:2px solid transparent}
+  .st.on{border-color:#16294F}
+  .st b{display:block;font-size:22px;color:#16294F}
+  .st span{color:#6b7f95;font-size:12px}
+  .hot{background:#FFF7E0;border:1px solid #F3D27A;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+  .hot h3{margin:0 0 8px;font-size:14px;color:#8A5A00}
+  .hot .it{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:5px 0;border-top:1px dashed #F0DDA4}
+  .hot .it:first-of-type{border-top:0}
+  .tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+  .tools input,.tools select{border:1px solid #c9d4df;border-radius:8px;padding:7px 10px;font-size:13px;background:#fff}
+  .tools input{min-width:190px}
+  .chip{border:1px solid #c9d4df;background:#fff;border-radius:20px;padding:5px 11px;cursor:pointer;font-size:12.5px}
+  .chip.on{background:#16294F;color:#fff;border-color:#16294F}
+  .list{display:grid;gap:8px}
+  .row{background:#fff;border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:8px 18px;border-left:4px solid #DCE3EB}
+  .row.s-interested{border-left-color:#11A37B}.row.s-applied{border-left-color:#2F6FDE;background:#F6F9FF}.row.s-rejected{border-left-color:#B4233C;opacity:.7}.row.s-called{border-left-color:#E0A100}.row.s-absent{border-left-color:#A3B1C2}
+  .nm{font-weight:800;font-size:15px}
+  .bd{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:5px;vertical-align:1px;background:#EEF2F6;color:#4b5d72}
+  .bd.A{background:#FDE7EC;color:#B4233C}.bd.B{background:#FFF1D6;color:#8A5A00}.bd.C{background:#EEF2F6;color:#6b7f95}
+  .bd.j{background:#E3EDFF;color:#2F6FDE}.bd.v{background:#E2F6EE;color:#0B7A5A}
+  .why{color:#5b6d82;font-size:12.5px;margin-top:4px;line-height:1.5}
+  .ct{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:13px}
+  .ct a{color:#1F5FA8;text-decoration:none}
+  .seg{display:flex;flex-wrap:wrap;gap:4px}
+  .seg button{border:1px solid #d3dde6;background:#fff;border-radius:7px;padding:5px 8px;font-size:12.5px;cursor:pointer;color:#4b5d72}
+  .seg button.on{background:#16294F;border-color:#16294F;color:#fff;font-weight:700}
+  .acts{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;align-items:center}
+  .memo{width:100%;border:1px solid #dde4ec;border-radius:7px;padding:6px 8px;font-size:12.5px;margin-top:7px;resize:vertical;min-height:32px}
+  .meta{font-size:12px;color:#6b7f95;margin-top:5px}
+  .ok{display:flex;gap:5px;align-items:center;font-size:12.5px;cursor:pointer}
+  .empty{padding:40px;text-align:center;color:#6b7f95;background:#fff;border-radius:12px}
+  .gate{max-width:360px;margin:60px auto;background:#fff;border-radius:14px;padding:26px}
+  .gate h1{font-size:19px;margin:0 0 4px}
+  .gate label{display:block;font-size:12.5px;color:#4b5d72;margin:12px 0 4px}
+  .gate input{width:100%;border:1px solid #c9d4df;border-radius:8px;padding:10px}
+  .gate .btn{width:100%;margin-top:16px;padding:11px;font-size:14px}
+  .err{color:#B4233C;margin-top:10px;font-size:13px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0A2236;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:50}
+  @media (max-width:760px){
+    .row{grid-template-columns:1fr}
+    .tools input{flex:1 1 100%}
+    .stats{grid-template-columns:repeat(3,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><h1>신규 부스 후보 · 개인 홍보</h1>
+  <div class="r" id="topRight" hidden><span id="who"></span><button class="btn ghost" id="logout">로그아웃</button></div></div></div>
+<div class="main" id="view"><div class="empty">불러오는 중…</div></div>
+<script>
+(function () {
+  var DB = window.BimtcDB, sb = null, ROWS = [], JOINED = [], SINCE = null;
+  var F = { q: '', cat: '', pri: '', st: '', x: '' };
+  var view = document.getElementById('view');
+  var SITE = 'https://bimtc.busan.com';
+  var ST = [['none', '미접촉'], ['absent', '부재'], ['called', '안내함'], ['interested', '관심'], ['applied', '신청'], ['rejected', '거절']];
+  var STN = {}; ST.forEach(function (s) { STN[s[0]] = s[1]; });
+  var COLS = 'id,code,seq,category,name,district,tel,email,homepage,reason,priority,source_url,status,consent,memo,contacted_at,views,first_viewed_at,last_viewed_at,clicks,last_clicked_at,updated_at';
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function dt(s) { if (!s) return ''; var d = new Date(s), p = function (n) { return String(n).padStart(2, '0'); }; return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+  function ago(s) { var m = Math.round((Date.now() - new Date(s)) / 6e4); return m < 1 ? '방금' : m < 60 ? m + '분 전' : m < 1440 ? Math.round(m / 60) + '시간 전' : Math.round(m / 1440) + '일 전'; }
+  function link(r) { return SITE + '/i/' + r.code; }
+  function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1800); }
+  function copy(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('복사했습니다'); }, function () { prompt('복사해서 쓰세요', t); }); }
+
+  // ---------- 가입·신청 자동 감지 (회사명 정규화 비교) ----------
+  function norm(s) { return String(s || '').toLowerCase().replace(/\(주\)|㈜|주식회사|\(사\)|\(재\)|co\.,?\s*ltd\.?|inc\.?/g, '').replace(/[\s·.,\-_'"()\/&]+/g, ''); }
+  function keys(name) {
+    var raw = String(name || '').replace(/\(주\)|㈜|\(사\)/g, '');
+    return raw.split(/[()\/]/).map(norm).filter(function (k) { return k.length >= 3; });
+  }
+  function joinedOf(r) {
+    var ks = keys(r.name), hit = '';
+    JOINED.forEach(function (j) {
+      var o = norm(j.org); if (o.length < 3) return;
+      if (ks.some(function (k) { return o.indexOf(k) >= 0 || k.indexOf(o) >= 0; })) { if (j.kind === 'applied') hit = 'applied'; else if (!hit) hit = 'member'; }
+    });
+    return hit;
+  }
+
+  // ---------- 메일·문자 문안 ----------
+  var PITCH = {
+    '관광·숙박': '이번 행사에 오는 해외 바이어 대부분이 의료관광 에이전시·여행사여서, 귀사의 유치·숙박·체류 서비스를 송출 파트너에게 직접 소개하실 수 있습니다.',
+    '웰니스': '해외 의료관광 에이전시가 진료 뒤 회복·휴양 일정을 함께 짜는 만큼, 귀사의 웰니스 프로그램을 의료관광 상품에 넣을 파트너를 만나실 수 있습니다.',
+    '뷰티·코스메디': '의료관광객이 시술·진료와 함께 K-뷰티를 찾는 만큼, 귀사 제품·서비스를 해외 에이전시와 의료기관 참가사에 소개하실 수 있습니다.',
+    '헬스케어 스타트업': '병원·의료기관과 해외 의료관광 바이어가 한곳에 모여, 귀사의 디지털 헬스 솔루션을 실제 사용처에 보여 주실 수 있습니다.',
+    '의료기기·신기술': '병원·의료기관과 해외 바이어가 한곳에 모여, 귀사의 의료기기·신기술을 도입 결정권자 앞에서 시연하실 수 있습니다.',
+    '푸드·건강식품': '해외 의료관광객과 바이어에게 귀사 제품을 의료관광 일정의 기념품·건강식품으로 소개하실 수 있습니다.',
+    '놀이·체험': '의료관광객이 진료 사이사이 부산 체험 일정을 찾는 만큼, 귀사의 체험 상품을 해외 에이전시의 체류 프로그램으로 소개하실 수 있습니다.'
+  };
+  function early() { return Date.now() < Date.parse('2026-11-01T00:00:00+09:00'); }
+  function mailText(r) {
+    var ad = !r.consent;
+    var subj = (ad ? '(광고) ' : '') + '[2026 부산국제의료관광컨벤션] ' + r.name + ' 부스 참가 안내';
+    var L = [r.name + ' 담당자님께', '', '안녕하세요. 2026 부산국제의료관광컨벤션(BIMTC) 사무국입니다.' + (r.consent ? ' 통화로 요청하신 참가 안내를 보내 드립니다.' : ''),
+      PITCH[r.category] || '13개국 해외 바이어와 부스에서 1:1 비즈니스 상담을 하실 수 있습니다.', '',
+      '· 일시: 2026. 11. 13.(금)~14.(토), 벡스코 제1전시장 3A홀',
+      '· 해외 바이어: 13개국 65명 (카자흐스탄·몽골·러시아 등, 대부분 의료관광 에이전시·여행사)',
+      '· 상담: 참가기업 부스에서 1:1, 홈페이지 사전 매칭으로 일정 확정',
+      '· 참가비(1부스 3m×3m, VAT 별도): 조립부스 200만 원 / 독립부스 180만 원'];
+    if (early()) L.push('  → 2차 얼리버드 10% 할인 10. 31.(토)까지: 조립 180만 원 / 독립 162만 원');
+    L.push('· 최종 마감: 11. 6.(금)', '', '귀사 맞춤 안내: ' + link(r), '', '문의 051-461-4276~8 · bmia0528@naver.com', '2026 부산국제의료관광컨벤션 사무국');
+    if (ad) L.push('', '본 메일은 광고성 정보입니다. 수신을 원하지 않으시면 이 메일에 "수신거부"라고 회신해 주세요.');
+    return { subj: subj, body: L.join('\n') };
+  }
+  function smsText(r) {
+    return '[BIMTC 사무국] ' + r.name + ' 담당자님, 통화로 말씀드린 2026 부산국제의료관광컨벤션 참가 안내입니다.\n' +
+      '13개국 해외 바이어 65명과 부스에서 1:1 상담 · 11/13~14 벡스코\n' +
+      (early() ? '2차 얼리버드 10% 할인 10/31까지\n' : '최종 마감 11/6\n') + link(r) + '\n문의 051-461-4276';
+  }
+  function consentOk(r) {
+    return r.consent || confirm('아직 [안내 요청받음] 표시가 없습니다.\n광고성 메일·문자는 받는 쪽의 사전 동의가 필요합니다(정보통신망법 제50조).\n통화로 안내 요청을 받았다면 표시를 먼저 켜 주세요.\n\n그래도 (광고) 표기를 붙여 계속할까요?');
+  }
+
+  // ---------- 로그인 ----------
+  function renderLogin(msg) {
+    document.getElementById('topRight').hidden = true;
+    view.innerHTML = '<div class="gate"><h1>로그인</h1>' +
+      '<label>이메일</label><input id="liE" type="email" autocomplete="username"><label>비밀번호</label><input id="liP" type="password" autocomplete="current-password">' +
+      (msg ? '<div class="err">' + esc(msg) + '</div>' : '') + '<button class="btn dark" id="liB">로그인</button></div>';
+    function go() {
+      var b = document.getElementById('liB'); b.disabled = true; b.textContent = '로그인 중…';
+      DB.login(document.getElementById('liE').value.trim(), document.getElementById('liP').value).then(function (r) {
+        if (!r.ok) return renderLogin('이메일 또는 비밀번호를 확인해 주세요.');
+        boot();
+      });
+    }
+    document.getElementById('liB').onclick = go;
+    document.getElementById('liP').onkeydown = function (e) { if (e.key === 'Enter') go(); };
+  }
+  document.getElementById('logout').onclick = function () { DB.logout().then(function () { ROWS = []; renderLogin(); }); };
+
+  function boot() {
+    DB.ready().then(function (c) { sb = c; return sb.auth.getUser(); }).then(function (res) {
+      var u = res.data && res.data.user;
+      if (!u) return renderLogin();
+      document.getElementById('who').textContent = u.email;
+      document.getElementById('topRight').hidden = false;
+      load();
+    });
+  }
+  function load() {
+    sb.from('outreach_leads').select(COLS).order('seq').then(function (r) {
+      if (r.error) { view.innerHTML = '<div class="empty">불러오지 못했습니다: ' + esc(r.error.message) + '</div>'; return; }
+      ROWS = r.data || [];
+      if (!ROWS.length) { view.innerHTML = '<div class="empty">이 계정으로는 볼 수 있는 명단이 없습니다.</div>'; return; }
+      SINCE = ROWS.reduce(function (m, x) { return x.updated_at > m ? x.updated_at : m; }, '');
+      render();
+      sb.rpc('outreach_joined').then(function (j) { if (!j.error) { JOINED = j.data || []; render(); } });
+      setInterval(poll, 30000);
+    });
+  }
+  // 30초마다 바뀐 행만 받아 열람·클릭 표시를 갱신한다. 입력 중인 메모는 건드리지 않는다.
+  function poll() {
+    if (!SINCE) return;
+    sb.from('outreach_leads').select(COLS).gt('updated_at', SINCE).then(function (r) {
+      if (r.error || !r.data || !r.data.length) return;
+      var typing = document.activeElement && document.activeElement.classList.contains('memo');
+      r.data.forEach(function (n) { var i = ROWS.findIndex(function (x) { return x.id === n.id; }); if (i >= 0) ROWS[i] = n; if (n.updated_at > SINCE) SINCE = n.updated_at; });
+      if (!typing) render();
+    });
+  }
+  function save(r, patch) {
+    if (patch.status && patch.status !== 'none' && !r.contacted_at) patch.contacted_at = new Date().toISOString();
+    return sb.from('outreach_leads').update(patch).eq('id', r.id).select(COLS).single().then(function (res) {
+      if (res.error) { alert('저장하지 못했습니다: ' + res.error.message); return; }
+      Object.assign(r, res.data); if (res.data.updated_at > SINCE) SINCE = res.data.updated_at;
+    });
+  }
+
+  // ---------- 화면 ----------
+  function filtered() {
+    var q = F.q.trim().toLowerCase();
+    return ROWS.filter(function (r) {
+      if (F.cat && r.category !== F.cat) return false;
+      if (F.pri && r.priority !== F.pri) return false;
+      if (F.st && r.status !== F.st) return false;
+      if (F.x === 'email' && !r.email) return false;
+      if (F.x === 'tel' && !r.tel) return false;
+      if (F.x === 'viewed' && !r.views) return false;
+      if (F.x === 'clicked' && !r.clicks) return false;
+      if (F.x === 'joined' && !joinedOf(r)) return false;
+      if (q && [r.name, r.category, r.district, r.tel, r.email, r.reason, r.memo].join(' ').toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+  function cnt(fn) { return ROWS.filter(fn).length; }
+  function render() {
+    var list = filtered();
+    var cats = []; ROWS.forEach(function (r) { if (cats.indexOf(r.category) < 0) cats.push(r.category); });
+    var hot = ROWS.filter(function (r) { return r.last_viewed_at && Date.now() - new Date(r.last_viewed_at) < 72 * 36e5 && r.status !== 'applied' && r.status !== 'rejected'; })
+      .sort(function (a, b) { return a.last_viewed_at < b.last_viewed_at ? 1 : -1; });
+    var stat = function (k, n, l) { return '<div class="st' + (F.st === k ? ' on' : '') + '" data-st="' + k + '"><b>' + n + '</b><span>' + l + '</span></div>'; };
+    view.innerHTML =
+      '<div class="stats">' + stat('', ROWS.length, '전체') + ST.map(function (s) { return stat(s[0], cnt(function (r) { return r.status === s[0]; }), s[1]); }).join('') +
+        '<div class="st" data-x="viewed"><b>' + cnt(function (r) { return r.views > 0; }) + '</b><span>링크 연 곳</span></div>' +
+        '<div class="st" data-x="clicked"><b>' + cnt(function (r) { return r.clicks > 0; }) + '</b><span>신청·전화 누른 곳</span></div></div>' +
+      (hot.length ? '<div class="hot"><h3>최근 72시간 안에 안내 링크를 연 곳 — 지금 전화하기 좋습니다</h3>' + hot.map(function (r) {
+        return '<div class="it"><b>' + esc(r.name) + '</b><span>' + ago(r.last_viewed_at) + ' · ' + r.views + '회 열람' + (r.clicks ? ' · 버튼 ' + r.clicks + '회' : '') + ' · ' + STN[r.status] + '</span>' +
+          (r.tel ? '<a class="btn" href="tel:' + esc(r.tel) + '">' + esc(r.tel) + '</a>' : '') + '</div>';
+      }).join('') + '</div>' : '') +
+      '<div class="tools"><input id="q" placeholder="회사명·연락처·메모 검색" value="' + esc(F.q) + '">' +
+        '<select id="cat"><option value="">분야 전체</option>' + cats.map(function (c) { return '<option' + (F.cat === c ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>' +
+        ['', 'A', 'B', 'C'].map(function (p) { return '<button class="chip' + (F.pri === p ? ' on' : '') + '" data-pri="' + p + '">' + (p ? '우선 ' + p : '우선순위 전체') + '</button>'; }).join('') +
+        [['', '전부'], ['tel', '전화 있음'], ['email', '이메일 있음'], ['viewed', '링크 열람'], ['clicked', '버튼 클릭'], ['joined', '가입·신청 감지']].map(function (c) { return '<button class="chip' + (F.x === c[0] ? ' on' : '') + '" data-x="' + c[0] + '">' + c[1] + '</button>'; }).join('') +
+        '<span style="flex:1"></span><span style="color:#6b7f95;font-size:12.5px">' + list.length + '곳</span><button class="btn" id="xl">엑셀</button></div>' +
+      '<div class="list">' + (list.length ? list.map(rowHtml).join('') : '<div class="empty">조건에 맞는 곳이 없습니다.</div>') + '</div>';
+
+    var q = document.getElementById('q');
+    q.oninput = function () { F.q = q.value; var pos = q.selectionStart; render(); var n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
+    document.getElementById('cat').onchange = function () { F.cat = this.value; render(); };
+    view.querySelectorAll('[data-pri]').forEach(function (c) { c.onclick = function () { F.pri = c.dataset.pri; render(); }; });
+    view.querySelectorAll('[data-x]').forEach(function (c) { c.onclick = function () { F.x = F.x === c.dataset.x ? '' : c.dataset.x; render(); }; });
+    view.querySelectorAll('.st[data-st]').forEach(function (c) { c.onclick = function () { F.st = c.dataset.st; render(); }; });
+    document.getElementById('xl').onclick = excel;
+    view.querySelectorAll('.row').forEach(bindRow);
+  }
+  function rowHtml(r) {
+    var j = joinedOf(r);
+    return '<div class="row s-' + r.status + '" data-id="' + r.id + '"><div>' +
+      '<div><span class="nm">' + esc(r.name) + '</span><span class="bd">' + esc(r.category) + '</span><span class="bd ' + esc(r.priority) + '">' + esc(r.priority) + '</span>' +
+        (j ? '<span class="bd j">' + (j === 'applied' ? '부스 신청 감지' : '회원 가입 감지') + '</span>' : '') +
+        (r.views ? '<span class="bd v">열람 ' + r.views + (r.clicks ? ' · 클릭 ' + r.clicks : '') + '</span>' : '') + '</div>' +
+      '<div class="why">' + esc(r.reason) + '</div>' +
+      '<div class="ct">' + (r.district ? '<span>' + esc(r.district) + '</span>' : '') +
+        (r.tel ? '<a href="tel:' + esc(r.tel) + '">☎ ' + esc(r.tel) + '</a>' : '<span style="color:#B4233C">전화 없음</span>') +
+        (r.email ? '<span>' + esc(r.email) + '</span>' : '') +
+        (r.homepage ? '<a href="' + esc(r.homepage) + '" target="_blank" rel="noopener">홈페이지</a>' : '') +
+        (r.source_url ? '<a href="' + esc(String(r.source_url).split(/\s|;/)[0]) + '" target="_blank" rel="noopener">출처</a>' : '') + '</div>' +
+      '<div class="meta">' + (r.contacted_at ? '첫 연락 ' + dt(r.contacted_at) : '') + (r.last_viewed_at ? ' · 마지막 열람 ' + dt(r.last_viewed_at) : '') + (r.last_clicked_at ? ' · 마지막 클릭 ' + dt(r.last_clicked_at) : '') + '</div>' +
+      '</div><div>' +
+      '<div class="seg">' + ST.map(function (s) { return '<button data-s="' + s[0] + '" class="' + (r.status === s[0] ? 'on' : '') + '">' + s[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="acts"><label class="ok"><input type="checkbox" class="cs"' + (r.consent ? ' checked' : '') + '>안내 요청받음</label></div>' +
+      '<div class="acts"><button class="btn a-cp">링크 복사</button><a class="btn" href="' + link(r) + '?pv=1" target="_blank" rel="noopener">미리보기</a>' +
+        (r.email ? '<button class="btn dark a-ml">메일 쓰기</button>' : '') + '<button class="btn a-mc">메일 문안 복사</button><button class="btn a-sm">문자·카톡 문안</button></div>' +
+      '<textarea class="memo" placeholder="메모 (통화 내용, 담당자, 다시 걸 날짜)">' + esc(r.memo) + '</textarea>' +
+      '</div></div>';
+  }
+  function bindRow(el) {
+    var r = ROWS.find(function (x) { return String(x.id) === el.dataset.id; });
+    el.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { save(r, { status: b.dataset.s }).then(render); }; });
+    el.querySelector('.cs').onchange = function () { save(r, { consent: this.checked }); };
+    el.querySelector('.memo').onchange = function () { save(r, { memo: this.value }); };
+    el.querySelector('.a-cp').onclick = function () { copy(link(r)); };
+    el.querySelector('.a-sm').onclick = function () { if (consentOk(r)) copy(smsText(r)); };
+    el.querySelector('.a-mc').onclick = function () { if (!consentOk(r)) return; var m = mailText(r); copy('제목: ' + m.subj + '\n\n' + m.body); };
+    var ml = el.querySelector('.a-ml');
+    if (ml) ml.onclick = function () {
+      if (!consentOk(r)) return;
+      var m = mailText(r);
+      location.href = 'mailto:' + encodeURIComponent(r.email) + '?subject=' + encodeURIComponent(m.subj) + '&body=' + encodeURIComponent(m.body);
+      if (r.status === 'none') save(r, { status: 'called' }).then(render);
+    };
+  }
+  function excel() {
+    var go = function (X) {
+      var rows = filtered().map(function (r) {
+        var j = joinedOf(r);
+        return { '순번': r.seq, '분야': r.category, '회사명': r.name, '우선순위': r.priority, '소재지': r.district || '', '대표전화': r.tel || '', '이메일': r.email || '', '홈페이지': r.homepage || '',
+          '상태': STN[r.status], '안내 요청': r.consent ? 'O' : '', '첫 연락': r.contacted_at ? new Date(r.contacted_at).toLocaleString('ko-KR') : '', '열람': r.views, '마지막 열람': r.last_viewed_at ? new Date(r.last_viewed_at).toLocaleString('ko-KR') : '',
+          '버튼 클릭': r.clicks, '가입·신청 감지': j === 'applied' ? '부스 신청' : j === 'member' ? '회원 가입' : '', '맞춤 링크': link(r), '메모': r.memo || '', '추천 이유': r.reason || '' };
+      });
+      var ws = X.utils.json_to_sheet(rows), wb = X.utils.book_new();
+      ws['!cols'] = [6, 14, 30, 8, 14, 15, 26, 30, 8, 8, 18, 6, 18, 8, 12, 32, 30, 60].map(function (w) { return { wch: w }; });
+      X.utils.book_append_sheet(wb, ws, '신규 후보');
+      var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
+      X.writeFile(wb, '신규부스후보_홍보현황_' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '.xlsx');
+    };
+    if (window.XLSX) return go(window.XLSX);
+    var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload = function () { go(window.XLSX); }; document.head.appendChild(s);
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
