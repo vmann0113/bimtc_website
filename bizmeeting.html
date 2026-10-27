@@ -473,7 +473,7 @@
 class Component extends DCLogic {
   MATCH_OPEN_AT = '2026-11-01T00:00:00+09:00'; // 2차 얼리버드 마감(10/31) 이후 오픈
   state = {
-    matchClosed: true,   // 사무국이 관리자 화면에서 열기 전까지는 닫힘 (조회 실패 시에도 닫힘)
+    matchClosed: false,  // 오픈 여부를 확인하기 전에는 안내창을 띄우지 않는다 (확인 실패 시 componentDidMount 에서 닫힘 처리)
     lang: (function(){ try{ return localStorage.getItem('bimtc_lang')==='en' ? 'en' : 'ko'; }catch(e){ return 'ko'; } })(),
     view: 'guide',
     applyStep: 1,
@@ -520,7 +520,7 @@ class Component extends DCLogic {
         }catch(e){}
       }
       await this.reload();
-    }catch(e){ this.flash(this.L('로딩 오류: ','Loading error: ')+e.message); }
+    }catch(e){ this.setState({ matchClosed:true }); this.flash(this.L('로딩 오류: ','Loading error: ')+e.message); }
   }
 
   async reload(){
