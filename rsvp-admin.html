@@ -84,7 +84,8 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function yn(v) { return v === '참석' ? '<span class="y">참석</span>' : v === '불참' ? '<span class="n">불참</span>' : '-'; }
   function dt(s) { var d = new Date(s), p = function (n) { return String(n).padStart(2, '0'); }; return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
-  function rsvpLink() { return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'rsvp'; }
+  // 초청 대상에게 보낼 공식 주소로 고정한다. 현재 주소로 만들면 로컬 시험·vercel 주소로 열었을 때 그 주소가 복사된다.
+  function rsvpLink() { return 'https://bimtc.busan.com/rsvp'; }
 
   function renderLogin(msg) {
     document.getElementById('topRight').hidden = true;
