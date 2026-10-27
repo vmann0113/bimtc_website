@@ -58,6 +58,11 @@
   .done h2{font-family:'Noto Serif KR',serif;color:#213661;font-size:21px;margin:0 0 10px}
   .foot{text-align:center;font-size:13px;color:#7a8898;margin-top:22px;line-height:1.8}
   .foot a{color:#1F7FBF;text-decoration:none}
+  .prow{display:flex;gap:14px;align-items:flex-start}
+  .thumb{width:84px;height:110px;flex:0 0 84px;border:1px solid #d8e0ea;border-radius:10px;background:#f4f7fb;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#9aa9bd;font-size:11.5px;text-align:center;line-height:1.4}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .pbtn{display:inline-block;border:1px solid #1F7FBF;background:#fff;color:#1F7FBF;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  .pbtn.sub2{border-color:#d8e0ea;color:#5b6878;margin-left:6px}
 </style>
 </head>
 <body>
@@ -90,6 +95,21 @@
           <div class="seg"><label><input type="radio" name="lunch" value="참석"><span>참석</span></label><label><input type="radio" name="lunch" value="불참"><span>불참</span></label></div>
         </div>
       </div>
+      <div class="group" id="photoGroup">
+        <div class="f" id="photoField">
+          <label class="t">증명사진<span class="req">*</span></label>
+          <div class="hint" style="margin:0 0 10px">행사 자료집·명찰 제작에 사용됩니다. 최근 6개월 이내 상반신 사진을 올려 주세요. 휴대폰으로 찍은 사진도 괜찮습니다.</div>
+          <div class="prow">
+            <div class="thumb" id="thumb">미리보기</div>
+            <div>
+              <input type="file" id="photo" accept="image/*" style="display:none">
+              <button type="button" class="pbtn" id="pick">사진 선택</button>
+              <button type="button" class="pbtn sub2" id="pclear" style="display:none">지우기</button>
+              <div class="hint" id="pinfo" style="margin:8px 0 0">아직 선택하지 않았습니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="group">
         <label class="t" style="display:block;font-weight:700;font-size:14px;margin-bottom:4px;color:#213661">수행원(동반자)<span class="sub">있는 경우</span></label>
         <div class="hint" style="margin:0 0 8px">수행원이 함께 오시면 성함과 연락처를 적어 주세요.</div>
@@ -103,7 +123,7 @@
 
       <div class="hp" aria-hidden="true"><input type="text" id="hp" tabindex="-1" autocomplete="off"></div>
       <div class="consent">
-        수집 항목: 소속, 직위, 성명, 연락처, 이메일, 수행원 성명·연락처, 차량번호 · 이용 목적: 개막식 참석 확인, 행사 안내 및 주차 등록 · 보유 기간: 행사 종료 후 1년
+        수집 항목: 소속, 직위, 성명, 연락처, 이메일, 증명사진, 수행원 성명·연락처, 차량번호 · 이용 목적: 개막식 참석 확인, 행사 자료집·명찰 제작, 행사 안내 및 주차 등록 · 보유 기간: 행사 종료 후 1년
         <label><input type="checkbox" id="consent"> 개인정보 수집·이용에 동의합니다.<span class="req">*</span></label>
       </div>
       <div class="err" id="err"></div>
@@ -120,10 +140,74 @@
   var $ = function (id) { return document.getElementById(id); };
   var radio = function (n) { var c = document.querySelector('input[name="' + n + '"]:checked'); return c ? c.value : ''; };
 
-  // 불참이면 네트워킹·오찬 질문을 숨긴다
+  // 불참이면 네트워킹·오찬 질문과 증명사진 칸을 숨긴다 (사진은 참석자만 필요)
   document.querySelectorAll('input[name="ceremony"]').forEach(function (r) {
-    r.onchange = function () { $('more').style.display = radio('ceremony') === '불참' ? 'none' : ''; };
+    r.onchange = function () {
+      var off = radio('ceremony') === '불참';
+      $('more').style.display = off ? 'none' : '';
+      $('photoGroup').style.display = off ? 'none' : '';
+    };
   });
+
+  // ── 증명사진 ──
+  // 휴대폰 사진은 수 MB 라 그대로 보내면 안 된다. 브라우저에서 긴 변 720px 로 줄이고
+  // 400KB 아래가 될 때까지 품질을 낮춘 JPEG 로 만들어 본문에 담아 보낸다.
+  var photoData = '';
+  var MAXPX = 720, MAXLEN = 540000;   // 서버(rsvp_submit)와 같은 기준
+
+  function shrink(file, done, failed) {
+    var fr = new FileReader();
+    fr.onerror = function () { failed('사진을 읽지 못했습니다. 다른 파일로 시도해 주세요.'); };
+    fr.onload = function () {
+      var img = new Image();
+      img.onerror = function () { failed('이미지 파일이 아닌 것 같습니다. JPG 또는 PNG 사진을 올려 주세요.'); };
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) return failed('사진을 읽지 못했습니다.');
+        var sc = Math.min(1, MAXPX / Math.max(w, h));
+        var cw = Math.max(1, Math.round(w * sc)), ch = Math.max(1, Math.round(h * sc));
+        var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+        var cx = cv.getContext('2d');
+        cx.fillStyle = '#fff'; cx.fillRect(0, 0, cw, ch);
+        cx.drawImage(img, 0, 0, cw, ch);
+        var q = 0.86, url = '';
+        for (var i = 0; i < 6; i++) {
+          url = cv.toDataURL('image/jpeg', q);
+          if (url.length <= MAXLEN) break;
+          q -= 0.12;
+        }
+        if (url.length > MAXLEN) return failed('사진 용량이 너무 큽니다. 다른 사진으로 시도해 주세요.');
+        done(url, cw, ch, url.length);
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  }
+
+  $('pick').onclick = function () { $('photo').click(); };
+  $('pclear').onclick = function () {
+    photoData = ''; $('photo').value = '';
+    $('thumb').textContent = '미리보기';
+    $('pinfo').textContent = '아직 선택하지 않았습니다.';
+    $('pclear').style.display = 'none';
+  };
+  $('photo').onchange = function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    $('photoField').classList.remove('bad');
+    $('pinfo').textContent = '사진을 준비하는 중…';
+    shrink(f, function (url, w, h, len) {
+      photoData = url;
+      $('thumb').innerHTML = '';
+      var im = new Image(); im.src = url; $('thumb').appendChild(im);
+      $('pinfo').textContent = '사진이 첨부되었습니다 · ' + w + '×' + h + ' · ' + Math.round(len / 1400) + 'KB';
+      $('pclear').style.display = '';
+    }, function (msg) {
+      photoData = ''; $('photo').value = '';
+      $('pinfo').textContent = '';
+      fail(msg);
+    });
+  };
 
   function fail(msg, el) { var e = $('err'); e.textContent = msg; e.style.display = 'block'; if (el) el.focus(); }
 
@@ -136,7 +220,7 @@
       ceremony: radio('ceremony'), networking: radio('ceremony') === '불참' ? '불참' : radio('networking'),
       lunch: radio('ceremony') === '불참' ? '불참' : radio('lunch'),
       companion_name: $('companion_name').value.trim(), companion_phone: $('companion_phone').value.trim(), car_no: $('car_no').value.trim(),
-      note: $('note').value.trim(),
+      note: $('note').value.trim(), photo: photoData,
       consent: $('consent').checked, hp: $('hp').value
     };
     if (!p.org) return fail('소속을 입력해 주세요.', $('org'));
@@ -145,6 +229,11 @@
     if (!/^[0-9+\-\s()]{9,}$/.test(p.phone)) return fail('연락처를 확인해 주세요.', $('phone'));
     if (p.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.email)) return fail('이메일 형식을 확인해 주세요.', $('email'));
     if (!p.ceremony) return fail('개막식 참석 여부를 선택해 주세요.');
+    if (p.ceremony === '참석' && !p.photo) {
+      $('photoField').classList.add('bad');
+      $('photoField').scrollIntoView({ block: 'center' });
+      return fail('증명사진을 첨부해 주세요. 자료집·명찰 제작에 필요합니다.');
+    }
     if (p.companion_phone && !/^[0-9+\-\s()]{9,}$/.test(p.companion_phone)) return fail('수행원 연락처를 확인해 주세요.', $('companion_phone'));
     if (p.companion_phone && !p.companion_name) return fail('수행원 성명을 입력해 주세요.', $('companion_name'));
     if (!p.consent) return fail('개인정보 수집·이용에 동의해 주세요.', $('consent'));

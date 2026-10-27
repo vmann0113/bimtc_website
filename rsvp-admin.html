@@ -65,6 +65,11 @@
     .stats{grid-template-columns:repeat(2,1fr)}
   }
   @media print{.top,.tools,.link,.noprint{display:none!important}body{background:#fff}.tw{overflow:visible}table{min-width:0;font-size:11px}th{position:static}}
+.pth{width:38px;height:50px;object-fit:cover;border:1px solid #dde4ec;border-radius:5px;cursor:pointer;display:block;margin:0 auto}
+  .pv{position:fixed;inset:0;background:rgba(10,20,35,.82);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:99;padding:20px}
+  .pv img{max-width:min(92vw,420px);max-height:72vh;border-radius:10px;background:#fff}
+  .pv .nm{color:#fff;font-weight:700;font-size:15px}
+  .pv a,.pv button{background:#fff;color:#16294F;border:none;border-radius:9px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit}
 </style>
 </head>
 <body>
@@ -126,6 +131,18 @@
     });
   }
   function cnt(fn) { return ROWS.filter(fn).length; }
+  function showPhoto(r) {
+    var fn = ((r.org || '') + '_' + (r.name || '')).replace(/[\\/:*?"<>|\s]+/g, '_') + '.jpg';
+    var d = document.createElement('div');
+    d.className = 'pv';
+    d.innerHTML = '<div class="nm">' + esc(r.org) + ' · ' + esc(r.name) + '</div>' +
+      '<img src="' + r.photo + '" alt="">' +
+      '<div><a download="' + fn + '" href="' + r.photo + '">사진 저장</a> ' +
+      '<button type="button">닫기</button></div>';
+    d.onclick = function (e) { if (e.target === d || e.target.tagName === 'BUTTON') document.body.removeChild(d); };
+    document.body.appendChild(d);
+  }
+
   function render() {
     var list = filtered();
     var chips = [['', '전체'], ['att', '개막식 참석'], ['no', '불참'], ['net', '네트워킹 참석'], ['lunch', '오찬 참석'], ['car', '차량 등록'], ['todo', '미확인']];
@@ -137,15 +154,16 @@
         '<div class="st"><b>' + cnt(function (r) { return r.ceremony === '불참'; }) + '</b><span>불참</span></div>' +
         '<div class="st"><b>' + cnt(function (r) { return r.networking === '참석'; }) + '</b><span>VIP 네트워킹 (213호)</span></div>' +
         '<div class="st"><b>' + cnt(function (r) { return r.lunch === '참석'; }) + '</b><span>개막 오찬 (214~216호)</span></div>' +
+        '<div class="st"><b>' + cnt(function (r) { return !!r.photo; }) + '</b><span>증명사진</span></div>' +
         '<div class="st"><b>' + cnt(function (r) { return !!r.car_no; }) + '</b><span>차량 등록</span></div>' +
         '<div class="st"><b>' + cnt(function (r) { return !!(r.companion_name || r.companions); }) + '</b><span>수행원 동반</span></div>' +
       '</div>' +
       '<div class="tools"><input id="q" placeholder="소속·성명·연락처 검색" value="' + esc(F.q) + '">' +
         chips.map(function (c) { return '<button class="chip' + (F.f === c[0] ? ' on' : '') + '" data-f="' + c[0] + '">' + c[1] + '</button>'; }).join('') +
         '<span style="flex:1"></span><button class="btn" id="xl">엑셀 다운로드</button><button class="btn" id="pr">인쇄</button></div>' +
-      '<div class="tw">' + (list.length ? '<table><thead><tr><th class="noprint">확인</th><th>#</th><th>회신일시</th><th>소속</th><th>직위</th><th>성명</th><th>연락처</th><th>이메일</th><th>개막식</th><th>네트워킹</th><th>오찬</th><th>수행원</th><th>수행원 연락처</th><th>차량번호</th><th>요청사항</th><th>메모</th><th class="noprint"></th></tr></thead><tbody>' +
+      '<div class="tw">' + (list.length ? '<table><thead><tr><th class="noprint">확인</th><th>#</th><th>회신일시</th><th>소속</th><th>직위</th><th class="noprint">사진</th><th>성명</th><th>연락처</th><th>이메일</th><th>개막식</th><th>네트워킹</th><th>오찬</th><th>수행원</th><th>수행원 연락처</th><th>차량번호</th><th>요청사항</th><th>메모</th><th class="noprint"></th></tr></thead><tbody>' +
         list.map(function (r, i) {
-          return '<tr class="' + (r.checked ? 'done' : '') + '" data-id="' + r.id + '"><td data-l="확인" class="c noprint"><input type="checkbox" class="ck"' + (r.checked ? ' checked' : '') + '></td><td data-l="#">' + (i + 1) + '</td><td data-l="회신일시">' + dt(r.created_at) + '</td><td data-l="소속">' + esc(r.org) + '</td><td data-l="직위">' + esc(r.job_title) + '</td><td data-l="성명"><b>' + esc(r.name) + '</b></td><td data-l="연락처"><a href="tel:' + esc(r.phone) + '" style="color:inherit">' + esc(r.phone) + '</a></td><td data-l="이메일">' + esc(r.email) + '</td><td data-l="개막식" class="c">' + yn(r.ceremony) + '</td><td data-l="네트워킹" class="c">' + yn(r.networking) + '</td><td data-l="오찬" class="c">' + yn(r.lunch) + '</td><td data-l="수행원">' + esc(r.companion_name || r.companions) + '</td><td data-l="수행원 연락처">' + (r.companion_phone ? '<a href="tel:' + esc(r.companion_phone) + '" style="color:inherit">' + esc(r.companion_phone) + '</a>' : '') + '</td><td data-l="차량번호"><b>' + esc(r.car_no) + '</b></td><td data-l="요청사항">' + esc(r.note) + '</td><td data-l="메모"><input class="memo" value="' + esc(r.memo) + '"></td><td data-l="" class="noprint"><button class="btn del" style="padding:4px 8px">삭제</button></td></tr>';
+          return '<tr class="' + (r.checked ? 'done' : '') + '" data-id="' + r.id + '"><td data-l="확인" class="c noprint"><input type="checkbox" class="ck"' + (r.checked ? ' checked' : '') + '></td><td data-l="#">' + (i + 1) + '</td><td data-l="회신일시">' + dt(r.created_at) + '</td><td data-l="소속">' + esc(r.org) + '</td><td data-l="직위">' + esc(r.job_title) + '</td><td data-l="사진" class="c noprint">' + (r.photo ? '<img src="' + r.photo + '" alt="" class="pth" title="눌러서 크게 보기">' : '<span style="color:#b9c4d2;font-size:12px">없음</span>') + '</td><td data-l="성명"><b>' + esc(r.name) + '</b></td><td data-l="연락처"><a href="tel:' + esc(r.phone) + '" style="color:inherit">' + esc(r.phone) + '</a></td><td data-l="이메일">' + esc(r.email) + '</td><td data-l="개막식" class="c">' + yn(r.ceremony) + '</td><td data-l="네트워킹" class="c">' + yn(r.networking) + '</td><td data-l="오찬" class="c">' + yn(r.lunch) + '</td><td data-l="수행원">' + esc(r.companion_name || r.companions) + '</td><td data-l="수행원 연락처">' + (r.companion_phone ? '<a href="tel:' + esc(r.companion_phone) + '" style="color:inherit">' + esc(r.companion_phone) + '</a>' : '') + '</td><td data-l="차량번호"><b>' + esc(r.car_no) + '</b></td><td data-l="요청사항">' + esc(r.note) + '</td><td data-l="메모"><input class="memo" value="' + esc(r.memo) + '"></td><td data-l="" class="noprint"><button class="btn del" style="padding:4px 8px">삭제</button></td></tr>';
         }).join('') + '</tbody></table>' : '<div class="empty">' + (ROWS.length ? '조건에 맞는 회신이 없습니다.' : '아직 접수된 회신이 없습니다.') + '</div>') + '</div>';
 
     var q = document.getElementById('q');
@@ -156,6 +174,8 @@
     document.getElementById('xl').onclick = excel;
     view.querySelectorAll('tbody tr').forEach(function (tr) {
       var r = ROWS.find(function (x) { return x.id === tr.dataset.id; });
+      var th = tr.querySelector('.pth');
+      if (th) th.onclick = function () { showPhoto(r); };
       tr.querySelector('.ck').onchange = function () { var v = this.checked; sb.from('opening_rsvps').update({ checked: v }).eq('id', r.id).then(function (res) { if (!res.error) { r.checked = v; render(); } }); };
       tr.querySelector('.memo').onchange = function () { var v = this.value; sb.from('opening_rsvps').update({ memo: v }).eq('id', r.id).then(function (res) { if (!res.error) r.memo = v; }); };
       tr.querySelector('.del').onclick = function () {
@@ -168,10 +188,10 @@
     var go = function (X) {
       var rows = filtered().map(function (r, i) {
         return { '번호': i + 1, '회신일시': new Date(r.created_at).toLocaleString('ko-KR'), '소속': r.org, '직위': r.job_title, '성명': r.name, '연락처': r.phone, '이메일': r.email || '',
-          '개막식': r.ceremony || '', 'VIP 네트워킹': r.networking || '', '개막 오찬': r.lunch || '', '수행원': r.companion_name || r.companions || '', '수행원 연락처': r.companion_phone || '', '차량번호': r.car_no || '', '요청사항': r.note || '', '확인': r.checked ? 'O' : '', '메모': r.memo || '' };
+          '개막식': r.ceremony || '', 'VIP 네트워킹': r.networking || '', '개막 오찬': r.lunch || '', '수행원': r.companion_name || r.companions || '', '수행원 연락처': r.companion_phone || '', '증명사진': r.photo ? 'O' : '', '차량번호': r.car_no || '', '요청사항': r.note || '', '확인': r.checked ? 'O' : '', '메모': r.memo || '' };
       });
       var ws = X.utils.json_to_sheet(rows), wb = X.utils.book_new();
-      ws['!cols'] = [6, 20, 24, 14, 10, 16, 24, 8, 12, 10, 20, 16, 12, 30, 6, 24].map(function (w) { return { wch: w }; });
+      ws['!cols'] = [6, 20, 24, 14, 10, 16, 24, 8, 12, 10, 20, 16, 8, 12, 30, 6, 24].map(function (w) { return { wch: w }; });
       X.utils.book_append_sheet(wb, ws, '개막식 회신');
       var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
       X.writeFile(wb, 'BIMTC2026_개막식회신_' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()) + '.xlsx');
