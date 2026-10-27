@@ -331,6 +331,20 @@
       var r = await sb.from('online_buyer_leads').delete().eq('id', id);
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
+    // 사무국이 전화로 본인 확인을 한 뒤 임시 비밀번호를 발급한다.
+    // 실제 변경은 Edge Function(admin-reset-password)에서만 하고, 거기서 관리자인지 다시 확인한다.
+    async adminResetPassword(profileId) {
+      var sb = await ready();
+      var r = await sb.functions.invoke('admin-reset-password', { body: { user_id: profileId } });
+      if (r.error) {
+        var msg = '';
+        try { msg = (await r.error.context.json()).error; } catch (e) { }
+        return { ok: false, error: msg || r.error.message || '비밀번호 재설정에 실패했습니다.' };
+      }
+      var d = r.data || {};
+      if (!d.ok) return { ok: false, error: d.error || '비밀번호 재설정에 실패했습니다.' };
+      return { ok: true, password: d.password, name: d.name, email: d.email };
+    },
     async listBoothApplications() { var sb = await ready(); var r = await sb.from('booth_applications').select('*').order('created_at', { ascending: false }); return r.data || []; },
     async adminDeleteMember(profileId) {
       var sb = await ready();
