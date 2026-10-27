@@ -1405,6 +1405,15 @@ class Component extends DCLogic {
         this.setState(nx);
       }
     }
+    // 메일 링크가 만료·무효면 Supabase 가 #error=... 로 돌려보낸다. 그냥 홈이 떠서 영문을 모르던 것을 안내한다.
+    if(typeof location!=='undefined' && /[#&]error=/.test(location.hash||'')){
+      const ec=((location.hash||'').match(/error_code=([^&]+)/)||[])[1]||'';
+      this.setState({ page:'login', authMode:'forgot', authInfo:'', authError:
+        /expired/i.test(ec)
+          ? this.L('메일 링크가 만료되었습니다. 아래에서 재설정 메일을 다시 받아 주세요.','This link has expired — please request a new reset email below.')
+          : this.L('메일 링크가 유효하지 않습니다. 아래에서 재설정 메일을 다시 받아 주세요.','This link is not valid — please request a new reset email below.') });
+      try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    }
     if(typeof location!=='undefined' && /type=recovery/.test(location.hash||'')){ this.setState({ page:'login', authMode:'setpw', authError:'', authInfo:this.L('본인 확인이 완료되었습니다. 새 비밀번호를 입력해 주세요.','Identity verified — please enter a new password.') }); }
     (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState(Object.assign({ me:u, isAdmin:!!u.is_admin }, this._joinLink?{}:{ loginRole:(u.type||'exhibitor') })); }catch(e){} })();
     (async()=>{ try{ const ns=await window.BimtcDB.publishedNotices(); if(ns&&ns.length) this.setState({ dbNotices:ns }); }catch(e){} })();
