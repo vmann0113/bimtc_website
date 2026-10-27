@@ -455,18 +455,13 @@
     },
 
     // ---------- 파트너(프로필) ----------
+    // 파트너 목록은 RPC 로만 받는다. 이메일·전화 등 민감정보는 내려오지 않고,
+    // 참가기업은 사무국 승인 부스가 있는 곳만 나온다.
     async listPartners() {
       var sb = await ready();
-      var u = (await sb.auth.getUser()).data.user;
-      var me = u ? (await sb.from('profiles').select('type').eq('id', u.id).maybeSingle()).data : null;
-      var r = await sb.from('profiles').select('*');
-      var rows = (r.data || []).filter(function (p) {
-        if (u && p.id === u.id) return false;
-        if (p.type === 'visitor') return false;           // 방문객은 파트너 대상 아님
-        if (me && me.type) return p.type !== me.type;      // 상대 유형만 노출(참가기업↔바이어)
-        return p.type === 'exhibitor' || p.type === 'buyer';
-      });
-      return rows;
+      var r = await sb.rpc('match_partners');
+      if (r.error) return [];
+      return r.data || [];
     },
 
     // ---------- 1:1 요청 (날짜·시간 포함) ----------
@@ -493,10 +488,29 @@
       (rv.data || []).forEach(function (x) { busy[x.day + '-' + x.slot_idx] = 1; });
       return busy;
     },
+    // 받은/보낸 요청도 RPC 로 받는다 (상대 정보는 민감정보 제외)
+    async _matchRequests() {
+      var sb = await ready();
+      var r = await sb.rpc('my_match_requests');
+      if (r.error) return [];
+      return (r.data || []).map(function (x) {
+        var other = {
+          id: x.other_id, name: x.other_name, type: x.other_type, country: x.other_country,
+          category: x.other_category, first_name: x.other_first_name, last_name: x.other_last_name,
+          job_title: x.other_job_title, attend_mode: x.other_attend_mode
+        };
+        return {
+          id: x.id, direction: x.direction, from_profile: x.from_profile, to_profile: x.to_profile,
+          message: x.message, status: x.status, created_at: x.created_at, day: x.day,
+          slot_idx: x.slot_idx, interpreter: x.interpreter, mode: x.mode,
+          from: x.direction === 'in' ? other : null,
+          to: x.direction === 'out' ? other : null
+        };
+      });
+    },
     async inboxRequests() {
-      var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return [];
-      var r = await sb.from('match_requests').select('*, from:profiles!match_requests_from_profile_fkey(name,type,country,category,first_name,last_name,job_title)').eq('to_profile', u.id).order('created_at', { ascending: false });
-      return r.data || [];
+      var rows = await this._matchRequests();
+      return rows.filter(function (x) { return x.direction === 'in'; });
     },
     async sentRequests() {
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return [];
@@ -504,9 +518,8 @@
       return r.data || [];
     },
     async sentRequestsDetailed() {
-      var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return [];
-      var r = await sb.from('match_requests').select('*, to:profiles!match_requests_to_profile_fkey(name,type,country,category,first_name,last_name,job_title)').eq('from_profile', u.id).order('created_at', { ascending: false });
-      return r.data || [];
+      var rows = await this._matchRequests();
+      return rows.filter(function (x) { return x.direction === 'out'; });
     },
     async deleteRequest(id) { var sb = await ready(); var r = await sb.from('match_requests').delete().eq('id', id); return r.error ? { ok: false, error: r.error.message } : { ok: true }; },
     async setRequestStatus(id, status) {
@@ -519,14 +532,12 @@
     // 요청 수락 → 예약 생성(빈 테이블 자동 배정) + 양측 정보 기록
     // 미팅은 '참가기업 자기 부스'에서 한다. (라운지 테이블 배정 방식 폐지)
     // 요청한 쪽이 참가기업이든 바이어든, 장소는 언제나 참가기업의 부스다.
+    // 내 부스가 아니라 '상대 참가기업'의 부스를 읽어야 하므로 RPC 로 조회한다
     async boothPlaceOf(profileId) {
       var sb = await ready();
-      var r = await sb.from('booth_applications').select('booth_ids,status')
-        .eq('profile_id', profileId).eq('status', 'approved');
-      var ids = [];
-      (r.data || []).forEach(function (a) { (a.booth_ids || []).forEach(function (b) { if (ids.indexOf(b) < 0) ids.push(b); }); });
-      ids.sort();
-      return ids.length ? (ids.join(', ') + ' 부스') : '독립부스 (사무국 안내)';
+      var r = await sb.rpc('booth_place_of', { p_profile: profileId });
+      if (r.error || !r.data) return '독립부스 (사무국 안내)';
+      return r.data;
     },
     async acceptRequest(req, myName) {
       var sb = await ready();
@@ -574,6 +585,17 @@
       // 먼저 요청한 쪽(owner)이 연결을 거는 쪽이 되도록 고정한다. 둘이 동시에 걸면 연결이 꼬인다.
       return { ok: true, meeting: m, meId: u.id, isCaller: m.owner_profile === u.id };
     },
+    // ---------- 비즈매칭 오픈 스위치 ----------
+    async bizMatchingOpen() {
+      var sb = await ready();
+      var r = await sb.from('site_settings').select('value').eq('key', 'biz_matching').maybeSingle();
+      return !!(r.data && r.data.value && r.data.value.open);
+    },
+    async setBizMatchingOpen(on) {
+      var sb = await ready();
+      var r = await sb.from('site_settings').upsert({ key: 'biz_matching', value: { open: !!on }, updated_at: new Date().toISOString() });
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     async getIceServers() {
       var sb = await ready();
       var r = await sb.from('site_settings').select('value').eq('key', 'webrtc').maybeSingle();
@@ -601,15 +623,14 @@
       var r = await sb.from('reservations').delete().eq('id', id);
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
+    // 미팅은 참가기업 부스에서 한다. 라운지 테이블 배정은 폐지됐으므로 날짜·시간만 바꾼다.
+    // 같은 사람이 같은 시간에 두 건을 갖는 것은 DB 트리거(guard_meeting_overlap)가 막는다.
     async rescheduleReservation(id, day, slot) {
       var sb = await ready();
-      var ex = await sb.from('reservations').select('id,table_idx').eq('day', day).eq('slot_idx', slot);
-      var used = {}; (ex.data || []).forEach(function (x) { if (x.id !== id) used[x.table_idx] = 1; });
-      var table = -1; for (var i = 0; i < 10; i++) { if (!used[i]) { table = i; break; } }
-      if (table < 0) return { ok: false, error: '해당 시간대에 빈 테이블이 없습니다.' };
-      var up = await sb.from('reservations').update({ day: day, slot_idx: slot, table_idx: table }).eq('id', id).select().single();
-      if (up.error) return { ok: false, error: (up.error.code === '23505' ? '해당 시간이 이미 예약되었습니다.' : up.error.message) };
-      return { ok: true, table: table };
+      var up = await sb.from('reservations').update({ day: day, slot_idx: slot }).eq('id', id).select();
+      if (up.error) return { ok: false, error: up.error.message };
+      if (!up.data || !up.data.length) return { ok: false, error: '권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true };
     },
 
     // ---------- 매칭(관리자) ----------
