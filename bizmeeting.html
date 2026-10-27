@@ -802,7 +802,7 @@ class Component extends DCLogic {
       signedIn: !!u,
       notSignedIn: !u,
       userName: u ? (u.name||this.L('회원','Member')) : this.L('로그인 필요','Sign in required'),
-      userMeta: u ? ((u.name||'')+' · '+this.typeLabel(u.type)) : '',
+      userMeta: u ? this.typeLabel(u.type) : '',
       userInitial: u && u.name ? u.name.slice(0,1) : '?',
       doLogout: ()=>this.doLogout(),
       pickerOpen: this.state.pickerId!=null,
