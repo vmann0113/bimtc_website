@@ -85,14 +85,19 @@
           <span style="color:#cdd6e2;">·</span>
           <span>2026.11.13–14 · BEXCO</span>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border:1px solid #e3e9f1;border-radius:999px;">
-          <div style="display:flex;flex-direction:column;line-height:1.2;text-align:right;">
-            <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;">{{ userName }}</span>
-            <span style="font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#8295ab;">{{ userMeta }}</span>
+        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border:1px solid #e3e9f1;border-radius:999px;">
+            <div style="display:flex;flex-direction:column;line-height:1.2;text-align:right;">
+              <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;">{{ userName }}</span>
+              <span style="font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#8295ab;">{{ userMeta }}</span>
+            </div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);">{{ userInitial }}</div>
+            <span onClick="{{ doLogout }}" style="font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#8295ab;cursor:pointer;padding-left:4px;border-left:1px solid #e3e9f1;margin-left:2px;">{{ t.k004 }}</span>
           </div>
-          <div style="width:32px;height:32px;border-radius:50%;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);">{{ userInitial }}</div>
-          <span onClick="{{ doLogout }}" style="font-size:clamp(11px,calc(15.13px - 0.35vw),13px);color:#8295ab;cursor:pointer;padding-left:4px;border-left:1px solid #e3e9f1;margin-left:2px;">{{ t.k004 }}</span>
-        </div>
+        </sc-if>
+        <sc-if value="{{ notSignedIn }}" hint-placeholder-val="{{ false }}">
+          <a href="index.html" style="display:inline-flex;align-items:center;padding:9px 18px;border:1px solid #b9d3ea;border-radius:999px;background:#fff;color:#0B5FA5;text-decoration:none;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;font-family:'Pretendard',sans-serif;">{{ t.k097 }}</a>
+        </sc-if>
       </div>
     </div>
   </div>
@@ -794,6 +799,8 @@ class Component extends DCLogic {
       notAllowed: this.state.notAllowed,
       boothPending: this.state.boothPending,
       ready: !this.state.needBooth && !this.state.needLogin && !this.state.boothPending && !this.state.notAllowed,
+      signedIn: !!u,
+      notSignedIn: !u,
       userName: u ? (u.name||this.L('회원','Member')) : this.L('로그인 필요','Sign in required'),
       userMeta: u ? ((u.name||'')+' · '+this.typeLabel(u.type)) : '',
       userInitial: u && u.name ? u.name.slice(0,1) : '?',
@@ -817,6 +824,7 @@ class Component extends DCLogic {
         k002:L('비즈미팅 · BUSINESS MATCHING','BUSINESS MATCHING'),
         k003:L('← 홈으로','← Home'),
         k004:L('로그아웃','Sign out'),
+        k097:L('로그인','Sign in'),
         k005:L('비즈미팅 이용 대상이 아닙니다','Business Matching is not available for this account'),
         k006:L('비즈미팅은 참가기업·바이어 회원만 이용할 수 있습니다.','Only exhibitor and buyer members can use Business Matching.'),
         k007:L('방문객 회원은 사전등록·행사 정보 이용이 가능합니다.','Visitor members can use pre-registration and event information.'),
