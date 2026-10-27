@@ -98,7 +98,7 @@
       <div class="group" id="photoGroup">
         <div class="f" id="photoField">
           <label class="t">증명사진<span class="req">*</span></label>
-          <div class="hint" style="margin:0 0 10px">행사 자료집·명찰 제작에 사용됩니다. 최근 6개월 이내 상반신 사진을 올려 주세요. 휴대폰으로 찍은 사진도 괜찮습니다.</div>
+          <div class="hint" style="margin:0 0 10px">행사 자료집·명찰 제작에 사용됩니다. 최근 6개월 이내 상반신 사진을 올려 주세요. 휴대폰으로 찍은 사진도 괜찮습니다. 인쇄용이므로 메신저로 받은 사진보다 <b>원본 사진</b>을 권장합니다.</div>
           <div class="prow">
             <div class="thumb" id="thumb">미리보기</div>
             <div>
@@ -150,10 +150,30 @@
   });
 
   // ── 증명사진 ──
-  // 휴대폰 사진은 수 MB 라 그대로 보내면 안 된다. 브라우저에서 긴 변 720px 로 줄이고
-  // 400KB 아래가 될 때까지 품질을 낮춘 JPEG 로 만들어 본문에 담아 보낸다.
-  var photoData = '';
-  var MAXPX = 720, MAXLEN = 540000;   // 서버(rsvp_submit)와 같은 기준
+  // 자료집·명찰 인쇄용이라 해상도를 지킨다.
+  //  · 긴 변 1200px 까지만 줄인다 (3:4 사진이면 900×1200 → 300dpi 로 7.6×10cm 까지 선명)
+  //  · 짧은 변 400px 미만은 받지 않는다 (증명사진 3.5×4.5cm 300dpi = 413×531 이 하한)
+  //  · 크게 줄일 때는 절반씩 나눠 줄여 계단 현상을 막고, JPEG 품질 0.92 에서 시작한다
+  // 목록 화면용 썸네일(긴 변 240px)을 따로 만들어 같이 보낸다.
+  var photoData = '', thumbData = '';
+  var MAXPX = 1200, MINSHORT = 400, MAXLEN = 1450000;   // 서버(rsvp_submit) 한도 1,500,000
+
+  function resize(img, w, h) {
+    var cv = document.createElement('canvas'), cx = cv.getContext('2d');
+    var cw = img.naturalWidth || img.width, ch = img.naturalHeight || img.height;
+    cv.width = cw; cv.height = ch; cx.drawImage(img, 0, 0);
+    while (cw / 2 >= w) {                 // 절반씩 단계적으로 축소
+      cw = Math.round(cw / 2); ch = Math.round(ch / 2);
+      var t = document.createElement('canvas'); t.width = cw; t.height = ch;
+      var tx = t.getContext('2d'); tx.imageSmoothingQuality = 'high'; tx.drawImage(cv, 0, 0, cw, ch);
+      cv = t;
+    }
+    var out = document.createElement('canvas'); out.width = w; out.height = h;
+    var ox = out.getContext('2d');
+    ox.fillStyle = '#fff'; ox.fillRect(0, 0, w, h);
+    ox.imageSmoothingQuality = 'high'; ox.drawImage(cv, 0, 0, w, h);
+    return out;
+  }
 
   function shrink(file, done, failed) {
     var fr = new FileReader();
@@ -164,20 +184,23 @@
       img.onload = function () {
         var w = img.naturalWidth, h = img.naturalHeight;
         if (!w || !h) return failed('사진을 읽지 못했습니다.');
-        var sc = Math.min(1, MAXPX / Math.max(w, h));
-        var cw = Math.max(1, Math.round(w * sc)), ch = Math.max(1, Math.round(h * sc));
-        var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
-        var cx = cv.getContext('2d');
-        cx.fillStyle = '#fff'; cx.fillRect(0, 0, cw, ch);
-        cx.drawImage(img, 0, 0, cw, ch);
-        var q = 0.86, url = '';
-        for (var i = 0; i < 6; i++) {
-          url = cv.toDataURL('image/jpeg', q);
-          if (url.length <= MAXLEN) break;
-          q -= 0.12;
+        if (Math.min(w, h) < MINSHORT) return failed('사진 해상도가 너무 낮습니다(' + w + '×' + h + '). 인쇄 시 깨지지 않도록 가로·세로 모두 ' + MINSHORT + 'px 이상인 원본 사진을 올려 주세요. 메신저로 받은 사진은 화질이 줄어 있을 수 있습니다.');
+        var url = '', cw, ch, px = MAXPX;
+        for (var k = 0; k < 4; k++) {        // 용량 초과면 품질 → 크기 순으로 낮춘다
+          var sc = Math.min(1, px / Math.max(w, h));
+          cw = Math.round(w * sc); ch = Math.round(h * sc);
+          var cv = resize(img, cw, ch);
+          for (var q = 0.92; q >= 0.8; q -= 0.04) {
+            url = cv.toDataURL('image/jpeg', q);
+            if (url.length <= MAXLEN) break;
+          }
+          if (url.length <= MAXLEN || Math.min(cw, ch) * 0.85 < MINSHORT) break;
+          px = Math.round(px * 0.85);
         }
         if (url.length > MAXLEN) return failed('사진 용량이 너무 큽니다. 다른 사진으로 시도해 주세요.');
-        done(url, cw, ch, url.length);
+        var ts = 240 / Math.max(w, h);
+        var thumb = resize(img, Math.round(w * ts), Math.round(h * ts)).toDataURL('image/jpeg', 0.8);
+        done(url, cw, ch, url.length, thumb);
       };
       img.src = fr.result;
     };
@@ -186,7 +209,7 @@
 
   $('pick').onclick = function () { $('photo').click(); };
   $('pclear').onclick = function () {
-    photoData = ''; $('photo').value = '';
+    photoData = ''; thumbData = ''; $('photo').value = '';
     $('thumb').textContent = '미리보기';
     $('pinfo').textContent = '아직 선택하지 않았습니다.';
     $('pclear').style.display = 'none';
@@ -194,16 +217,17 @@
   $('photo').onchange = function () {
     var f = this.files && this.files[0];
     if (!f) return;
-    $('photoField').classList.remove('bad');
+    $('photoField').classList.remove('bad'); $('err').style.display = 'none';
     $('pinfo').textContent = '사진을 준비하는 중…';
-    shrink(f, function (url, w, h, len) {
-      photoData = url;
+    shrink(f, function (url, w, h, len, thumb) {
+      photoData = url; thumbData = thumb;
       $('thumb').innerHTML = '';
       var im = new Image(); im.src = url; $('thumb').appendChild(im);
       $('pinfo').textContent = '사진이 첨부되었습니다 · ' + w + '×' + h + ' · ' + Math.round(len / 1400) + 'KB';
       $('pclear').style.display = '';
     }, function (msg) {
-      photoData = ''; $('photo').value = '';
+      photoData = ''; thumbData = ''; $('photo').value = '';
+      $('thumb').textContent = '미리보기'; $('pclear').style.display = 'none';
       $('pinfo').textContent = '';
       fail(msg);
     });
@@ -220,7 +244,7 @@
       ceremony: radio('ceremony'), networking: radio('ceremony') === '불참' ? '불참' : radio('networking'),
       lunch: radio('ceremony') === '불참' ? '불참' : radio('lunch'),
       companion_name: $('companion_name').value.trim(), companion_phone: $('companion_phone').value.trim(), car_no: $('car_no').value.trim(),
-      note: $('note').value.trim(), photo: photoData,
+      note: $('note').value.trim(), photo: photoData, photo_thumb: thumbData,
       consent: $('consent').checked, hp: $('hp').value
     };
     if (!p.org) return fail('소속을 입력해 주세요.', $('org'));
