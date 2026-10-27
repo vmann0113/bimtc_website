@@ -142,6 +142,7 @@
       <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#8295ab;margin:0 0 30px;line-height:1.6;">{{ done_d }}</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         <button onClick="{{ downloadInvoice }}" style="background:#0B5FA5;color:#fff;border:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ dl_inv }}</button>
+        <a href="uploads/bimtc2026_exhibitor_manual.pdf" target="_blank" rel="noopener" style="background:#fff;color:#0B5FA5;text-decoration:none;border:1.5px solid #b9d3ea;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;">{{ s_manual_btn }}</a>
         <a href="index.html" style="background:#fff;color:#5E7289;text-decoration:none;border:1px solid #d8e0ea;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:700;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;">{{ homeLabel }}</a>
       </div>
     </div>
@@ -178,6 +179,7 @@
             </div>
           </sc-for>
         </div>
+        <a href="uploads/bimtc2026_exhibitor_manual.pdf" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #b9d3ea;color:#0B5FA5;text-decoration:none;padding:9px 15px;border-radius:9px;font-size:13.5px;font-weight:700;margin:14px 0 0;">{{ s_manual_link }}</a>
         <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:16px 0 0;line-height:1.65;">{{ myAppsNote }}</p>
       </div>
     </div>
@@ -496,6 +498,7 @@
           <button onClick="{{ downloadInvoice }}" style="flex:1 1 220px;background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:14px;border-radius:11px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ dlPreview }}</button>
           <button onClick="{{ submit }}" style="{{ submitBtnStyle }}">{{ submitLabel }}</button>
         </div>
+        <a href="uploads/bimtc2026_exhibitor_manual.pdf" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #b9d3ea;color:#0B5FA5;text-decoration:none;padding:9px 15px;border-radius:9px;font-size:13.5px;font-weight:700;margin:12px 0 0;">{{ s_manual_link }}</a>
         <p style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#9aa9bd;margin:12px 0 0;line-height:1.6;">{{ q_note }}</p>
       </div>
       </sc-if>
@@ -1233,6 +1236,8 @@ class Component extends DCLogic {
       s_rental:L('비품 렌탈','Equipment Rental'),
       s_rental_note:L('필요한 비품을 수량과 함께 신청하세요. 금액은 부가세 별도이며 견적에 합산됩니다. 목록에 없는 품목(커피머신·키오스크·냉동쇼케이스 등)은 사무국으로 문의해 주세요.','Add rental items with quantities. Prices exclude VAT and are added to your quote. For items not listed (coffee machine, kiosk, freezer showcase, etc.) please contact the secretariat.'),
       s_rental_cat:L('비품 카탈로그 PDF 내려받기 ↓','Download rental catalogue (PDF) ↓'),
+      s_manual_link:L('참가업체 매뉴얼 PDF 내려받기 ↓','Download Exhibitor Manual (PDF) ↓'),
+      s_manual_btn:L('참가업체 매뉴얼 (PDF)','Exhibitor Manual (PDF)'),
       s_rental_ph:L('품목 검색 (예: 의자, 테이블, TV, 냉장고)','Search items (e.g. chair, table, TV)'),
       planCells, planFixtures, planDoors, planZones, planBoxStyle,
       boothCount:c.count, boothCostW:this.won(c.boothCost),
