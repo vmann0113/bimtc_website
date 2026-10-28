@@ -376,6 +376,14 @@
       if (!r.data || !r.data.length) return { ok: false, error: '권한이 없거나 대상을 찾지 못했습니다' };
       return { ok: true };
     },
+    // 반려된 신청만 지울 수 있다. 서버 함수가 관리자 여부·상태를 다시 확인하고,
+    // 지우기 전에 booth_applications_deleted 로 내용을 옮겨 둔다.
+    async deleteBoothApplication(id) {
+      var sb = await ready();
+      var r = await sb.rpc('delete_booth_application', { p_id: id });
+      if (r.error) return { ok: false, error: r.error.message };
+      return r.data || { ok: false, error: '알 수 없는 오류' };
+    },
     async setBoothPaid(id, on) { var sb = await ready(); var r = await sb.from('booth_applications').update({ paid: on, paid_at: on ? new Date().toISOString() : null }).eq('id', id); return !r.error; },
     async myApprovedBooths() {
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return { count: 0, approved: 0 };
