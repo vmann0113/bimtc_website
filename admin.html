@@ -477,7 +477,7 @@
             <span style="width:80px;flex-shrink:0;">국가</span>
             <span style="width:74px;flex-shrink:0;">가입일</span>
             <span style="width:104px;flex-shrink:0;text-align:right;">비즈미팅</span>
-            <span style="width:172px;flex-shrink:0;text-align:right;">관리</span>
+            <span style="width:172px;flex-shrink:0;text-align:right;position:sticky;right:0;background:#F7F9FC;padding-left:12px;box-shadow:-10px 0 10px -6px rgba(16,40,70,0.10);">관리</span>
           </div>
           <sc-for list="{{ membersView }}" as="m" hint-placeholder-count="6">
             <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
@@ -494,7 +494,7 @@
                 <sc-if value="{{ m.canGrant }}" hint-placeholder-val="{{ false }}"><button onClick="{{ m.grant }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">매칭 권한 부여</button></sc-if>
                 <sc-if value="{{ m.hasMatch }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 10px;border-radius:999px;white-space:nowrap;">매칭 가능</span></sc-if>
               </span>
-              <span style="width:172px;flex-shrink:0;text-align:right;white-space:nowrap;"><button onClick="{{ m.resetPw }}" disabled="{{ m.pwBusy }}" style="{{ m.pwStyle }}">{{ m.pwLabel }}</button> <button onClick="{{ m.del }}" style="background:#fff;color:#c0392b;border:1px solid #ecc8c2;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button></span>
+              <span style="width:172px;flex-shrink:0;text-align:right;white-space:nowrap;position:sticky;right:0;background:#fff;padding-left:12px;box-shadow:-10px 0 10px -6px rgba(16,40,70,0.10);"><button onClick="{{ m.resetPw }}" disabled="{{ m.pwBusy }}" style="{{ m.pwStyle }}">{{ m.pwLabel }}</button> <button onClick="{{ m.del }}" style="background:#fff;color:#c0392b;border:1px solid #ecc8c2;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button></span>
             </div>
           </sc-for>
           </div>
