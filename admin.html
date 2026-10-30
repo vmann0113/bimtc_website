@@ -357,38 +357,41 @@
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#b78a3c;font-weight:700;margin-bottom:5px;">접수 (미승인)</div><div style="font-size:19px;font-weight:800;color:#b78a3c;">{{ bcPending }}</div></div>
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#0B5FA5;font-weight:700;margin-bottom:5px;">승인 · 입금대기</div><div style="font-size:19px;font-weight:800;color:#0B5FA5;">{{ bcAwait }}</div></div>
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#0d8f6b;font-weight:700;margin-bottom:5px;">입금완료</div><div style="font-size:19px;font-weight:800;color:#0d8f6b;">{{ bcPaid }}</div></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#7a5cc4;font-weight:700;margin-bottom:5px;">계산서 발행 대기</div><div style="font-size:19px;font-weight:800;color:#7a5cc4;">{{ bcTaxWait }}</div></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
           <sc-for list="{{ boothFilters }}" as="bft" hint-placeholder-count="5"><span onClick="{{ bft.onClick }}" style="{{ bft.style }}">{{ bft.label }}</span></sc-for>
           <span style="flex:1;"></span>
           <button onClick="{{ openMapAll }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">부스 신청현황 보기 (판매현황)</button>
         </div>
-        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
-          <div style="display:flex;gap:14px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
-            <span style="width:180px;flex-shrink:0;">기업 / 담당자</span>
-            <span style="width:80px;flex-shrink:0;">부스</span>
-            <span style="flex:1;min-width:0;">위치</span>
-            <span style="width:120px;flex-shrink:0;text-align:right;">입금액</span>
-            <span style="width:44px;flex-shrink:0;text-align:center;">로고</span>
-            <span style="width:84px;flex-shrink:0;text-align:center;">입금</span>
-            <span style="width:150px;flex-shrink:0;text-align:right;">상태 / 승인</span>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow-x:auto;">
+          <div style="display:flex;gap:10px;padding:14px 16px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;box-sizing:border-box;min-width:760px;">
+            <span style="flex:1 1 180px;min-width:100px;">기업 / 담당자</span>
+            <span style="width:68px;flex-shrink:0;">부스</span>
+            <span style="flex:1 1 90px;min-width:0;">위치</span>
+            <span style="width:96px;flex-shrink:0;text-align:right;">입금액</span>
+            <span style="width:36px;flex-shrink:0;text-align:center;">로고</span>
+            <span style="width:170px;flex-shrink:0;text-align:center;">입금 / 계산서</span>
+            <span style="width:136px;flex-shrink:0;text-align:right;">상태 / 승인</span>
             <span style="width:44px;flex-shrink:0;"></span>
           </div>
           <sc-for list="{{ boothsView }}" as="b" hint-placeholder-count="4">
-            <div style="display:flex;gap:14px;padding:15px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
-              <div style="width:180px;flex-shrink:0;min-width:0;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.company }} <span onClick="{{ b.showLoc }}" style="font-size:11.5px;font-weight:800;color:#0B5FA5;background:#EAF2FC;border-radius:6px;padding:2px 7px;cursor:pointer;vertical-align:1px;">위치보기</span></div><div style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.contact }} · {{ b.email }}</div></div>
-              <span style="width:80px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ b.type }} {{ b.count }}</span>
+            <div style="display:flex;gap:10px;padding:15px 16px;border-bottom:1px solid #eef2f7;align-items:center;box-sizing:border-box;min-width:760px;">
+              <div style="flex:1 1 180px;min-width:100px;"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.company }} <span onClick="{{ b.showLoc }}" style="font-size:11.5px;font-weight:800;color:#0B5FA5;background:#EAF2FC;border-radius:6px;padding:2px 7px;cursor:pointer;vertical-align:1px;">위치보기</span></div><div style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);color:#8295ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.contact }} · {{ b.email }}</div></div>
+              <span style="width:68px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14px);color:#33485e;">{{ b.type }} {{ b.count }}</span>
               <span style="flex:1;min-width:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.ids }}</span>
-              <span style="width:120px;flex-shrink:0;text-align:right;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;color:#0B5FA5;">{{ b.total }}</span>
-              <span style="width:44px;flex-shrink:0;text-align:center;">
+              <span style="width:96px;flex-shrink:0;text-align:right;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;color:#0B5FA5;">{{ b.total }}</span>
+              <span style="width:36px;flex-shrink:0;text-align:center;">
                 <sc-if value="{{ b.hasLogo }}" hint-placeholder-val="{{ false }}"><a href="{{ b.logoHref }}" target="_blank" download title="{{ b.logoTitle }}" style="font-size:13px;font-weight:800;color:#0B5FA5;text-decoration:none;background:#EAF2FC;border-radius:7px;padding:5px 9px;">↓</a></sc-if>
                 <sc-if value="{{ b.noLogo }}" hint-placeholder-val="{{ true }}"><span style="color:#c3cedb;font-size:13px;">-</span></sc-if>
               </span>
-              <span style="width:84px;flex-shrink:0;display:flex;justify-content:center;">
+              <span style="width:170px;flex-shrink:0;display:flex;justify-content:center;gap:5px;">
                 <sc-if value="{{ b.notPaid }}" hint-placeholder-val="{{ true }}"><button onClick="{{ b.markPaid }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:7px 9px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">입금확인</button></sc-if>
                 <sc-if value="{{ b.paid }}" hint-placeholder-val="{{ false }}"><button onClick="{{ b.unmarkPaid }}" title="클릭하면 취소됩니다" style="background:#E7F6F0;color:#0d8f6b;border:1.5px solid #c7ebdc;padding:7px 9px;border-radius:8px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">입금완료 ✓</button></sc-if>
+                <sc-if value="{{ b.noTax }}" hint-placeholder-val="{{ true }}"><button onClick="{{ b.markTax }}" title="세금계산서를 발행했으면 눌러 주세요" style="background:#fff;color:#8a63c4;border:1.5px solid #d3c4ea;padding:7px 9px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">계산서</button></sc-if>
+                <sc-if value="{{ b.tax }}" hint-placeholder-val="{{ false }}"><button onClick="{{ b.unmarkTax }}" title="{{ b.taxTitle }}" style="background:#f1ebfb;color:#7a5cc4;border:1.5px solid #ddd0f0;padding:7px 9px;border-radius:8px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">계산서 ✓</button></sc-if>
               </span>
-              <div style="width:150px;flex-shrink:0;display:flex;justify-content:flex-end;">
+              <div style="width:136px;flex-shrink:0;display:flex;justify-content:flex-end;">
                 <sc-if value="{{ b.isPending }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex;gap:8px;">
                     <button onClick="{{ b.approve }}" style="background:#11A37B;color:#fff;border:none;padding:8px 15px;border-radius:8px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">승인</button>
@@ -404,7 +407,7 @@
                   </div>
                 </sc-if>
               </div>
-              <span onClick="{{ b.toggleDetail }}" style="width:44px;flex-shrink:0;text-align:right;font-size:13px;font-weight:700;color:#0B5FA5;cursor:pointer;">{{ b.detailBtn }}</span>
+              <span onClick="{{ b.toggleDetail }}" style="width:40px;flex-shrink:0;text-align:right;font-size:13px;font-weight:700;color:#0B5FA5;cursor:pointer;">{{ b.detailBtn }}</span>
             </div>
             <sc-if value="{{ b.isDetail }}" hint-placeholder-val="{{ false }}">
               <div style="background:#F7F9FC;border-bottom:1px solid #eef2f7;padding:16px 24px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 26px;">
@@ -1191,6 +1194,7 @@ class Component extends DCLogic {
     rows.push({k:'부가세', v:won(b.vat)});
     rows.push({k:'합계', v:won(b.total)});
     rows.push({k:'입금 상태', v:b.paid?('입금완료'+(b.paid_at?' ('+String(b.paid_at).slice(0,10)+')':'')):'입금 전'});
+    rows.push({k:'세금계산서', v:b.tax_invoice?('발행완료'+(b.tax_invoice_at?' ('+String(b.tax_invoice_at).slice(0,10)+')':'')):'미발행'});
     return rows;
   }
   async toggleCell(ti,si){
@@ -1491,16 +1495,20 @@ class Component extends DCLogic {
       a.download='BIMTC_회원명단_'+(({all:'전체',exhibitor:'참가기업',buyer:'바이어',buyer_online:'온라인바이어',visitor:'방문객'})[mTab]||mTab)+'.csv'; a.click();
     };
     const bfv=this.state.boothFilter||'all';
-    const bFiltered=booths.filter(b=> bfv==='all'?true : bfv==='submitted'?b.status==='submitted' : bfv==='awaiting'?(b.status==='approved'&&!b.paid) : bfv==='paid'?!!b.paid : b.status==='rejected');
+    const bFiltered=booths.filter(b=> bfv==='all'?true : bfv==='submitted'?b.status==='submitted' : bfv==='awaiting'?(b.status==='approved'&&!b.paid) : bfv==='paid'?!!b.paid : bfv==='taxwait'?(!!b.paid&&!b.tax_invoice) : bfv==='rejected'?b.status==='rejected' : true);
     const boothsView=bFiltered.map(b=>({ id:b.id, company:b.company||'(기업명)', contact:b.contact||'', email:b.email||'',
       type:b.booth_type==='space'?'독립부스':'조립부스', count:(b.booth_ids||[]).length, ids:(b.booth_ids||[]).join(', ')||'-',
       total:won(b.total), date:this.short(b.created_at), status:b.status,
       isPending:b.status==='submitted', isApproved:b.status==='approved', isRejected:b.status==='rejected',
       hasLogo:!!b.logo_url, noLogo:!b.logo_url, logoHref:b.logo_url||'', logoTitle:b.logo_name||'',
       paid:!!b.paid, notPaid:!b.paid,
+      tax:!!b.tax_invoice, noTax:!b.tax_invoice,
+      taxTitle:b.tax_invoice_at?('발행 '+String(b.tax_invoice_at).slice(0,10)+' · 클릭하면 취소됩니다'):'클릭하면 취소됩니다',
       showLoc:()=>this.setState({mapModal:{mode:'one',ids:b.booth_ids||[],company:b.company||''}}),
       markPaid:async()=>{ const ok=await window.BimtcDB.setBoothPaid(b.id,true); await this.reload(); this.flash(ok?'입금완료로 표시했습니다':'저장 실패 — paid_column.sql 실행 필요'); },
       unmarkPaid:async()=>{ if(typeof window!=='undefined'&&!window.confirm('입금완료 표시를 취소할까요?')) return; const ok=await window.BimtcDB.setBoothPaid(b.id,false); await this.reload(); this.flash(ok?'입금완료 표시를 취소했습니다':'저장 실패'); },
+      markTax:async()=>{ const ok=await window.BimtcDB.setBoothTaxInvoice(b.id,true); await this.reload(); this.flash(ok?'세금계산서 발행으로 표시했습니다':'저장 실패 — 계산서 칸이 아직 없습니다'); },
+      unmarkTax:async()=>{ if(typeof window!=='undefined'&&!window.confirm('세금계산서 발행 표시를 취소할까요?')) return; const ok=await window.BimtcDB.setBoothTaxInvoice(b.id,false); await this.reload(); this.flash(ok?'세금계산서 발행 표시를 취소했습니다':'저장 실패'); },
       isDetail:this.state.boothDetailId===b.id, detailBtn:this.state.boothDetailId===b.id?'닫기':'상세',
       toggleDetail:()=>this.setState({boothDetailId:this.state.boothDetailId===b.id?null:b.id}),
       detailRows:this.boothDetail(b),
@@ -1520,19 +1528,20 @@ class Component extends DCLogic {
     };
     const today10=()=>new Date().toISOString().slice(0,10);
     const pairs=(obj,nameOf)=>Object.keys(obj||{}).filter(k=>Number(obj[k])>0).map(k=>nameOf(k)+' x'+obj[k]).join(', ');
-    const FILTER_LABEL={all:'전체', submitted:'접수', awaiting:'승인입금대기', paid:'입금완료', rejected:'반려'};
+    const FILTER_LABEL={all:'전체', submitted:'접수', awaiting:'승인입금대기', paid:'입금완료', taxwait:'계산서대기', rejected:'반려'};
 
     // ① 부스 신청 내역 — 화면에서 고른 필터 그대로, 한 업체 = 한 줄
     const exportBooths=()=>{
       if(!bFiltered.length){ this.flash('내보낼 신청이 없습니다'); return; }
       const rmap=this._rentals||{};
-      const head=['신청일','상태','입금여부','입금일','기업명','영문상호','대표자','사업자번호','업태','종목','주소','홈페이지',
+      const head=['신청일','상태','입금여부','입금일','계산서발행','계산서발행일','기업명','영문상호','대표자','사업자번호','업태','종목','주소','홈페이지',
         '담당자','담당부서','연락처','이메일','전화','팩스','전시품목','부스타입','부스수','부스위치','재참가','얼리버드',
         '부가서비스','비품','비품합계','할인','공급가','부가세','최종금액','팸투어'];
       const rows=[head].concat(bFiltered.map(b=>{
         const ap=b.applicant||{};
         const st=b.paid?'입금완료':(b.status==='approved'?'승인':(b.status==='rejected'?'반려':'접수'));
         return [ String(b.created_at||'').slice(0,10), st, b.paid?'Y':'N', b.paid_at?String(b.paid_at).slice(0,10):'',
+          b.tax_invoice?'Y':'N', b.tax_invoice_at?String(b.tax_invoice_at).slice(0,10):'',
           b.company||'', ap.companyEn||'', ap.ceo||'', ap.bizno||'', ap.bizType||'', ap.bizItem||'', ap.addr||'', ap.homepage||'',
           b.contact||'', ap.dept||'', b.phone||'', b.email||'', ap.tel||'', ap.fax||'', ap.items||'',
           b.booth_type==='space'?'독립부스':'조립부스', (b.booth_ids||[]).length, (b.booth_ids||[]).join(' '),
@@ -1992,12 +2001,13 @@ class Component extends DCLogic {
       saveAppEdit:()=>this.saveAppEdit(), cancelAppEdit:()=>this.setState({bEdit:null}),
       mapCells:this.adminMap().mapCells, mapFixtures:this.adminMap().mapFixtures,
       mapBoxStyle:this.adminMap().mapBoxStyle, mapLegend:this.adminMap().mapLegend,
+      bcTaxWait:booths.filter(b=>b.paid&&!b.tax_invoice).length+'건',
       bcTotal:booths.filter(b=>b.status!=='rejected').length+'건',
       bcBoothN:booths.filter(b=>b.status!=='rejected').reduce((s,b)=>s+((b.booth_ids||[]).length),0)+'개',
       bcPending:booths.filter(b=>b.status==='submitted').length+'건',
       bcAwait:booths.filter(b=>b.status==='approved'&&!b.paid).length+'건',
       bcPaid:booths.filter(b=>!!b.paid).length+'건',
-      boothFilters:[['all','전체'],['submitted','접수(미승인)'],['awaiting','승인·입금대기'],['paid','입금완료'],['rejected','반려']].map(([k,l])=>({label:l,onClick:()=>this.setState({boothFilter:k}),style:"padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;"+((this.state.boothFilter||'all')===k?'background:#0B5FA5;color:#fff;':'background:#fff;border:1px solid #d8e0ea;color:#5E7289;')})),
+      boothFilters:[['all','전체'],['submitted','접수(미승인)'],['awaiting','승인·입금대기'],['paid','입금완료'],['taxwait','계산서 발행 대기'],['rejected','반려']].map(([k,l])=>({label:l,onClick:()=>this.setState({boothFilter:k}),style:"padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;"+((this.state.boothFilter||'all')===k?'background:#0B5FA5;color:#fff;':'background:#fff;border:1px solid #d8e0ea;color:#5E7289;')})),
       toast:this.state.toast,
 
       kpis:[

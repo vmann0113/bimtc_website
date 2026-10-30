@@ -384,6 +384,13 @@
       if (r.error) return { ok: false, error: r.error.message };
       return r.data || { ok: false, error: '알 수 없는 오류' };
     },
+    // 세금계산서 발행 표시. 입금 여부와 별개로 켜고 끈다.
+    async setBoothTaxInvoice(id, on) {
+      var sb = await ready();
+      var r = await sb.from('booth_applications')
+        .update({ tax_invoice: on, tax_invoice_at: on ? new Date().toISOString() : null }).eq('id', id);
+      return !r.error;
+    },
     async setBoothPaid(id, on) { var sb = await ready(); var r = await sb.from('booth_applications').update({ paid: on, paid_at: on ? new Date().toISOString() : null }).eq('id', id); return !r.error; },
     async myApprovedBooths() {
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return { count: 0, approved: 0 };
