@@ -1555,14 +1555,14 @@ class Component extends DCLogic {
       if(!s.auEmail){ this.setState({authError:L('가입하신 이메일을 입력해 주세요.','Please enter your registered email.')}); return; }
       this.setState({authBusy:true, authError:'', authInfo:''});
       const r=await window.BimtcDB.resetPassword(s.auEmail);
-      this.setState({authBusy:false, authError:r.ok?'':r.error, authInfo:r.ok?L('비밀번호 재설정 메일을 보냈습니다. 메일함(스팸함 포함)에서 링크를 열어 새 비밀번호를 설정해 주세요.','Password-reset email sent. Open the link in your inbox (check spam) to set a new password.'):''});
+      this.setState({authBusy:false, authError:r.ok?'':this.authErr(r.error), authInfo:r.ok?L('비밀번호 재설정 메일을 보냈습니다. 메일함(스팸함 포함)에서 링크를 열어 새 비밀번호를 설정해 주세요.','Password-reset email sent. Open the link in your inbox (check spam) to set a new password.'):''});
       return;
     }
     if(s.authMode==='setpw'){
       if(!s.auPw || s.auPw.length<6){ this.setState({authError:L('새 비밀번호를 6자 이상 입력해 주세요.','New password must be at least 6 characters.')}); return; }
       this.setState({authBusy:true, authError:'', authInfo:''});
       const r=await window.BimtcDB.updatePassword(s.auPw);
-      if(!r.ok){ this.setState({authBusy:false, authError:r.error}); return; }
+      if(!r.ok){ this.setState({authBusy:false, authError:this.authErr(r.error)}); return; }
       this.setState({authBusy:false, authMode:'login', auPw:'', authInfo:L('비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.','Password changed. Please sign in with your new password.')});
       try{ await window.BimtcDB.logout(); }catch(e){}
       this.setState({ me:null, isAdmin:false });
@@ -1590,7 +1590,7 @@ class Component extends DCLogic {
         res = await window.BimtcDB.signup({ email:s.auEmail, password:s.auPw, type:s.loginRole, name:s.auName, country:s.auCountry, dept:s.auDept, phone:(s.auDial+' '+s.auPhone).trim(),
           firstName:s.auFirst, lastName:s.auLast, jobTitle:s.auJob, industry:s.auIndustry, landline:s.auLand,
           attendMode:(s.loginRole==='buyer' ? (s.auMode||'onsite') : 'onsite') });
-        if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
+        if(!res.ok){ this.setState({authBusy:false, authError:this.authErr(res.error)}); return; }
         const sess0 = res.session || ((await window.BimtcDB.client().auth.getSession()).data.session);
         if(sess0 && s.loginRole==='visitor'){ this.setState({authBusy:false, page:'visit', toast:this.L('가입이 완료되었습니다. 참관 사전등록을 진행해 주세요.','Signed up. Please complete visitor pre-registration.')}); return; }
         const sess = sess0;
@@ -1598,9 +1598,34 @@ class Component extends DCLogic {
         await this.afterAuth(); return;
       }
       res = await window.BimtcDB.login(s.auEmail, s.auPw);
-      if(!res.ok){ this.setState({authBusy:false, authError:res.error}); return; }
+      if(!res.ok){ this.setState({authBusy:false, authError:this.authErr(res.error)}); return; }
       await this.afterAuth();
-    }catch(e){ this.setState({authBusy:false, authError:e.message}); }
+    }catch(e){ this.setState({authBusy:false, authError:this.authErr(e.message)}); }
+  }
+  // Supabase 가 돌려주는 영문 오류를 그대로 보여 주면 회원이 무슨 일인지 모른다.
+  authErr(msg){
+    const m=String(msg||'').toLowerCase();
+    const L=(ko,en)=>this.L(ko,en);
+    if(!m) return L('처리하지 못했습니다. 잠시 후 다시 시도해 주세요.','Something went wrong. Please try again.');
+    if(m.includes('weak')||m.includes('pwned')||m.includes('easy to guess'))
+      return L('너무 흔한 비밀번호입니다. 다른 비밀번호로 다시 시도해 주세요.','That password is too common. Please choose a different one.');
+    if(m.includes('at least')||m.includes('should be at least'))
+      return L('비밀번호는 6자 이상이어야 합니다.','Password must be at least 6 characters.');
+    if(m.includes('different from the old'))
+      return L('지금 쓰고 계신 비밀번호와 다른 것으로 정해 주세요.','Please choose a password different from your current one.');
+    if(m.includes('invalid login credentials'))
+      return L('이메일 또는 비밀번호가 맞지 않습니다.','Incorrect email or password.');
+    if(m.includes('email not confirmed'))
+      return L('이메일 인증이 아직 끝나지 않았습니다. 받은 메일의 링크를 먼저 열어 주세요.','Your email is not verified yet. Please open the link we sent you.');
+    if(m.includes('already registered')||m.includes('already exists'))
+      return L('이미 가입된 이메일입니다. 로그인하거나 비밀번호 찾기를 이용해 주세요.','This email is already registered. Please sign in or reset your password.');
+    if(m.includes('invalid format')||m.includes('validate email'))
+      return L('이메일 주소 형식이 올바르지 않습니다.','That email address is not valid.');
+    if(m.includes('rate limit')||m.includes('for security purposes'))
+      return L('요청이 너무 잦습니다. 1분쯤 뒤에 다시 시도해 주세요.','Too many attempts. Please try again in about a minute.');
+    if(m.includes('failed to fetch')||m.includes('network'))
+      return L('연결이 되지 않았습니다. 인터넷 상태를 확인한 뒤 다시 시도해 주세요.','Connection failed. Please check your network and try again.');
+    return msg;
   }
   typeName(t){
     const en=this.state.lang==='en';
@@ -2289,13 +2314,16 @@ class Component extends DCLogic {
       saveProfile: async()=>{
         this.setState({peSaving:true});
         const r=await window.BimtcDB.updateProfile({ name:this.state.peName, dept:this.state.peDept, phone:this.state.pePhone, country:this.state.peCountry });
-        let pwMsg='';
-        if(r.ok && this.state.pePw){ const p=await window.BimtcDB.updatePassword(this.state.pePw); pwMsg=p.ok?'':(' · '+p.error); }
+        const triedPw=!!this.state.pePw;
+        let pwErr='';
+        if(r.ok && triedPw){ const p=await window.BimtcDB.updatePassword(this.state.pePw); pwErr=p.ok?'':this.authErr(p.error); }
         this.setState({peSaving:false});
-        if(!r.ok){ this.flash(L('저장 실패: ','Save failed: ')+r.error); return; }
+        if(!r.ok){ this.flash(L('저장 실패: ','Save failed: ')+this.authErr(r.error)); return; }
         try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState({me:u}); }catch(e){}
+        // 비밀번호가 거부됐는데 '저장되었습니다' 만 보이면 바뀐 줄 알고 창을 닫는다.
+        if(pwErr){ this.setState({pePw:''}); this.flash(L('비밀번호는 바뀌지 않았습니다 — ','Password not changed — ')+pwErr); return; }
         this.setState({profileEditOpen:false, pePw:''});
-        this.flash(L('회원정보가 저장되었습니다','Profile updated')+pwMsg);
+        this.flash(L('회원정보가 저장되었습니다','Profile updated')+(triedPw?L(' · 비밀번호도 변경되었습니다',' · password changed'):''));
       },
       auName:this.state.auName, auCountry:this.state.auCountry, auEmail:this.state.auEmail, auPw:this.state.auPw,
       auDept:this.state.auDept, auDial:this.state.auDial, auPhone:this.state.auPhone,
