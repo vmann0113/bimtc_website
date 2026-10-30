@@ -1246,7 +1246,10 @@ class Component extends DCLogic {
       {k:'inq',label:'문의 관리',badge:(this.state.inquiries||[]).filter(q=>!q.answer).length},
       {k:'noti',label:'알림함',badge:(this.state.notifications||[]).filter(n=>n.status==='pending').length},
       {k:'cms',label:'공지·콘텐츠'},
-    ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>{ this.setState({view:n.k}); if(n.k==='prospect') setTimeout(()=>this.pollProspects(),60); }}));
+      // 별도 화면(같은 관리자 로그인으로 열림)
+      {k:'rsvp',label:'개막식 초청 회신 ↗',href:'rsvp-admin.html'},
+      {k:'invite',label:'초청바이어 정보 ↗',href:'invite-admin.html'},
+    ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>{ if(n.href){ window.location.href=n.href; return; } this.setState({view:n.k}); if(n.k==='prospect') setTimeout(()=>this.pollProspects(),60); }}));
 
     // ── 온라인 바이어 사전신청 (가입 없이 받은 별도 명단) ──
     // 회원가입과 섞지 않고 따로 모아 두고, 사무국이 확정한 건만 나중에 정식 신청으로 옮긴다.
