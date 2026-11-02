@@ -172,7 +172,22 @@
 
       <!-- BOOTH PROSPECTS (부스 유치 업무) -->
       <sc-if value="{{ isProspect }}" hint-placeholder-val="{{ false }}">
-        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부스 유치 업무</h1>
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 14px;letter-spacing:-0.02em;">부스 유치 업무</h1>
+        <div style="background:linear-gradient(135deg,#0B5FA5 0%,#0d8f6b 100%);border-radius:16px;padding:20px 24px;margin:0 0 18px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px;">
+          <div style="min-width:240px;">
+            <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),13.5px);font-weight:700;color:#d6e8f7;margin-bottom:7px;">{{ proMoneyHead }}</div>
+            <div style="font-size:clamp(26px,3.2vw,36px);font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.1;">{{ proMoneyTotal }}</div>
+            <div style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13px);color:#cfe4f6;margin-top:7px;line-height:1.5;">{{ proMoneySub }}</div>
+          </div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap;margin-left:auto;">
+            <sc-for list="{{ proMoneyChips }}" as="pm" hint-placeholder-count="5">
+              <div style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.24);border-radius:11px;padding:9px 13px;">
+                <div style="font-size:11.5px;color:#dbeaf7;font-weight:700;margin-bottom:3px;white-space:nowrap;">{{ pm.k }}</div>
+                <div style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:800;color:#fff;white-space:nowrap;">{{ pm.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
         <p style="font-size:14px;color:#5E7289;margin:0 0 20px;line-height:1.6;">유치 대상 의료기관 명단입니다. 전화·문자로 유치 업무를 한 뒤 <b style="color:#0d8f6b;">○ 희망</b> · <b style="color:#b78a3c;">△ 검토중</b> · <b style="color:#c0392b;">✕ 거절</b> 로 표시하세요. 부스 신청을 마친 기관은 자동으로 회색 처리됩니다.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0F2440;">{{ pTotal }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">총 대상</span></div>
@@ -1711,6 +1726,25 @@ class Component extends DCLogic {
 
     const pBtn=(on,color,bg)=>'width:30px;height:28px;flex-shrink:0;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:\'Pretendard\',sans-serif;line-height:1;'
       +(on?('background:'+color+';color:#fff;border:1px solid '+color+';'):('background:'+bg+';color:'+color+';border:1px solid #dde5ee;'));
+    // 유치 실적 금액 — 반려·취소를 뺀 부스 신청 금액 합계.
+    // 저장된 금액(subtotal·vat·total·rental_total)만 더한다. 단가 x 칸수로 부스비를 역산하면
+    // 사무국이 금액을 조정한 건(협찬·무상·공동관)에서 실제보다 훨씬 크게 나온다.
+    const proM=(()=>{
+      const live=(this.state.booths||[]).filter(b=>b.status!=='rejected'&&b.status!=='cancelled');
+      let sub=0, tot=0, rental=0, paidAmt=0, cells=0, paidN=0, freeN=0;
+      live.forEach(b=>{
+        cells+=(b.booth_ids||[]).length;
+        sub+=Number(b.subtotal||0); tot+=Number(b.total||0); rental+=Number(b.rental_total||0);
+        if(b.paid){ paidAmt+=Number(b.total||0); paidN++; }
+        if(!Number(b.total||0)) freeN++;      // 협찬·무상 등 금액 0원 건
+      });
+      // 명단에서 유치한 기관의 금액 — 기관명이 자동 매칭된 신청만 센다
+      const jn={}; Object.keys(joinedBy).forEach(k=>{ jn[joinedBy[k]]=1; });
+      let listAmt=0, listN=0;
+      live.forEach(b=>{ if(jn[b.company]){ listAmt+=Number(b.total||0); listN++; } });
+      return { n:live.length, cells, sub, tot, rental, paidAmt, paidN, freeN, listAmt, listN };
+    })();
+
     const prospectRows=pFiltered.map(p=>{
       const joined=pJoinedOf(p);
       const st=PRO_ST[p.status||'none']||PRO_ST.none;
@@ -1928,6 +1962,17 @@ class Component extends DCLogic {
       reloadProspects:async()=>{ await this.reload(); this.flash('명단을 새로 불러왔습니다'); },
       noProspects:prospectRows.length===0,
       pQuery:this.state.pQuery||'', setPQuery:(e)=>this.setState({pQuery:e.target.value}),
+      proMoneyTotal:won(proM.tot),
+      proMoneyHead:'총 부스비용 합산금액 · 신청 '+proM.n+'건 · 부스 '+proM.cells+'개 (반려·취소 제외)',
+      proMoneySub:'공급가 '+won(proM.sub)+' + 부가세 '+won(proM.tot-proM.sub)
+        +(proM.freeN?(' · 금액 0원(협찬·무상) '+proM.freeN+'건 포함'):''),
+      proMoneyChips:[
+        {k:'입금 완료 ('+proM.paidN+'건)',v:won(proM.paidAmt)},
+        {k:'미입금',v:won(proM.tot-proM.paidAmt)},
+        {k:'부스·부가서비스',v:won(proM.sub-proM.rental)},
+        {k:'비품 렌탈',v:won(proM.rental)},
+        {k:'명단 유치분 ('+proM.listN+'건)',v:won(proM.listAmt)}
+      ],
       pTotal:String(prospects.length), pJoined:String(pCount('joined')),
       pWant:String(pCount('interested')), pHold:String(pCount('pending')),
       pNo:String(pCount('rejected')), pNone:String(pCount('none')),
