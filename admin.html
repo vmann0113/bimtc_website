@@ -364,6 +364,7 @@
           <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
             <button onClick="{{ exportBooths }}" style="background:#0B5FA5;color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">신청 내역 받기 (CSV)</button>
             <button onClick="{{ exportRentals }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">비품 집계 받기 (CSV)</button>
+            <button onClick="{{ printRentalOrder }}" title="렌탈업체에 보낼 발주 집계표 — 품목별 수량과 부스별 반입 목록" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">비품 발주서 출력</button>
             <button onClick="{{ dlAllLogos }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:10px 16px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ dlAllLogosLabel }}</button>
           </div>
         </div>
@@ -434,6 +435,9 @@
                 <div style="background:#F7F9FC;border-bottom:1px solid #eef2f7;padding:0 24px 18px;display:flex;gap:10px;flex-wrap:wrap;">
                   <button onClick="{{ b.startEdit }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:9px 16px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">신청 정보 수정</button>
                   <button onClick="{{ b.printInv }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 16px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">인보이스 출력 · PDF 저장</button>
+                  <sc-if value="{{ b.hasRental }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ b.printRental }}" title="비품 렌탈 금액만 담은 견적서입니다" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:9px 16px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">비품 견적서 출력</button>
+                  </sc-if>
                 </div>
               </sc-if>
               <sc-if value="{{ b.editing }}" hint-placeholder-val="{{ false }}">
@@ -1183,6 +1187,19 @@ class Component extends DCLogic {
     if(!window.BimtcInvoice){ this.flash('인보이스 모듈을 불러오지 못했습니다 — 새로고침 후 다시 시도해 주세요'); return; }
     if(!window.BimtcInvoice.open(b)) this.flash('팝업이 차단되었습니다 — 브라우저에서 팝업을 허용해 주세요');
   }
+  // 비품만 담은 견적서 — 참가기업이 내부 품의·예산에 쓰는 문서
+  printRentalQuote(b){
+    if(!window.BimtcInvoice || !window.BimtcInvoice.openRental){ this.flash('견적서 모듈을 불러오지 못했습니다 — 새로고침 후 다시 시도해 주세요'); return; }
+    if(!window.BimtcInvoice.openRental(b)) this.flash('팝업이 차단되었습니다 — 브라우저에서 팝업을 허용해 주세요');
+  }
+  // 렌탈업체에 넘기는 발주 집계 — 품목별 총수량 + 부스별 반입 목록
+  printRentalOrder(){
+    if(!window.BimtcInvoice || !window.BimtcInvoice.openRentalOrder){ this.flash('발주서 모듈을 불러오지 못했습니다 — 새로고침 후 다시 시도해 주세요'); return; }
+    const has=(b)=>Object.keys(b.rentals||{}).some(k=>Number((b.rentals||{})[k])>0);
+    const list=(this.state.booths||[]).filter(b=>b.status!=='rejected'&&b.status!=='cancelled');
+    if(!list.filter(has).length){ this.flash('신청된 비품이 없습니다'); return; }
+    if(!window.BimtcInvoice.openRentalOrder(list)) this.flash('팝업이 차단되었습니다 — 브라우저에서 팝업을 허용해 주세요');
+  }
   boothDetail(b){
     const won=(v)=>((v||0).toLocaleString())+'원';
     const ap=b.applicant||{};
@@ -1533,6 +1550,8 @@ class Component extends DCLogic {
       editing:!!(this.state.bEdit&&this.state.bEdit.id===b.id), notEditing:!(this.state.bEdit&&this.state.bEdit.id===b.id),
       startEdit:()=>{ const CFG=window.BIMTC_CONFIG||{}; const unit=(CFG.boothLayout&&CFG.boothLayout.unitPrice&&CFG.boothLayout.unitPrice[b.booth_type])||0; const bc=unit*((b.booth_ids||[]).length); const addon=Math.max(0,(b.subtotal||0)-bc+(b.discount||0)); this.setState({boothDetailId:b.id, bEdit:{id:b.id, company:b.company||'', contact:b.contact||'', phone:b.phone||'', email:b.email||'', boothType:b.booth_type||'package', boothIds:(b.booth_ids||[]).join(', '), subtotal:String(b.subtotal||0), vat:String(b.vat||0), total:String(b.total||0), ebKey:b.early_bird||'', retOn:b.returning_company?'y':'n', retName:b.returning_company||'', addonAmt:String(addon), discount:String(b.discount||0), bizno:(b.applicant&&b.applicant.bizno)||'', ceo:(b.applicant&&b.applicant.ceo)||'', addr:(b.applicant&&b.applicant.addr)||'', applicant:b.applicant||{}}}); },
       printInv:()=>this.printInvoice(b),
+      hasRental:Object.keys(b.rentals||{}).some(k=>Number((b.rentals||{})[k])>0),
+      printRental:()=>this.printRentalQuote(b),
       approve:()=>this.approveBooth(b.id), reject:()=>this.rejectBooth(b.id),
       canUnapprove:b.status==='approved'&&!b.paid, unapprove:()=>this.unapproveBooth(b),
       del:()=>this.delBooth(b) }));
@@ -2008,6 +2027,7 @@ class Component extends DCLogic {
       doAdminLogin:()=>this.doAdminLogin(), loginLabel:this.state.loginBusy?'로그인 중…':'로그인',
       boothsView, pendingBooths, dlAllLogos, dlAllLogosLabel:'로고 전체 다운로드 (ZIP)',
       exportBooths, exportRentals,
+      printRentalOrder:()=>this.printRentalOrder(),
       mapModalOn:!!this.state.mapModal,
       openMapAll:()=>this.setState({mapModal:{mode:'all'}}),
       closeMapModal:()=>this.setState({mapModal:null}),
