@@ -66,7 +66,7 @@
         <span style="font-size:15px;font-weight:800;color:#FF6B5A;background:#fff;padding:5px 14px;border-radius:999px;">{{ ebStripBadge }}</span>
         <span style="font-size:17px;color:#fff;font-weight:800;letter-spacing:-0.01em;">{{ ebStripText }}</span>
         <sc-if value="{{ ebStripOpen }}" hint-placeholder-val="{{ false }}">
-          <a href="{{ ebStripHref }}" style="font-size:14px;font-weight:800;color:#FF6B5A;background:#fff;padding:7px 16px;border-radius:999px;text-decoration:none;font-family:'Pretendard',sans-serif;">{{ t.eb_strip_cta }}</a>
+          <span onClick="{{ ebStripGo }}" style="font-size:14px;font-weight:800;color:#FF6B5A;background:#fff;padding:7px 16px;border-radius:999px;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ ebStripCta }}</span>
         </sc-if>
       </div>
     </div>
@@ -1675,12 +1675,30 @@ class Component extends DCLogic {
     let eb;
     if(ebKey&&C){ eb=ebKey==='none'?null:(C.earlyBird||[]).find(p=>p.key===ebKey); } // 미리보기 강제 스위치 (렌더 시점 평가)
     else eb=C&&C.earlyBirdLive&&C.earlyBirdLive(); // 관리자가 ON 했거나 접수가 수동 오픈된 경우에만 '접수중'
-    if(!eb) return { ebStripBadge:'COMING SOON', ebStripText:L('8월 21일(금) 15:00 부스 신청·사전등록 오픈','Booth application & pre-registration open Aug 21 (Fri) 15:00'), ebStripOpen:false };
+    if(!eb){
+      // 얼리버드가 끝났다고 8월 오픈 안내로 되돌아가면 안 된다. 개최일까지 남은 날을 보여 준다.
+      const OPEN=new Date('2026-11-13T00:00:00+09:00').getTime();
+      const CLOSE=new Date('2026-11-14T18:00:00+09:00').getTime();
+      const now=Date.now();
+      if(now>CLOSE) return { ebStripBadge:'THANK YOU',
+        ebStripText:L('2026 부산국제의료관광컨벤션이 성황리에 마무리되었습니다. 함께해 주셔서 감사합니다.','The 2026 Busan International Medical Tourism Convention has concluded. Thank you for joining us.'),
+        ebStripOpen:false };
+      if(now>=OPEN) return { ebStripBadge:'NOW OPEN',
+        ebStripText:L('지금 열리고 있습니다 · BEXCO 제1전시장 3A홀 10:00–18:00','Happening now · BEXCO Hall 1 (3A) 10:00–18:00'),
+        ebStripCta:L('참관 안내 →','Visitor info →'), ebStripGo:()=>this.go('visit'), ebStripOpen:true };
+      const dd=Math.ceil((OPEN-now)/86400000);
+      return { ebStripBadge:'D-'+dd,
+        ebStripText:L('개막까지 '+dd+'일 · 11월 13일(금)~14일(토) BEXCO 제1전시장 3A홀','Opening in '+dd+(dd===1?' day':' days')+' · Nov 13 (Fri)–14 (Sat), BEXCO Hall 1 (3A)'),
+        ebStripCta:L('참관객 사전등록 →','Pre-register →'), ebStripGo:()=>this.go('visit'), ebStripOpen:true };
+    }
     const rate=Math.round((eb.discountRate||0)*100);
     const end=(eb.end||'').slice(5,10).replace('-','/');
     const m=(typeof location!=='undefined'?(location.search||''):'').match(/[?&]eb=(phase1|phase2|none)/);
-    return { ebStripBadge:'NOW OPEN', ebStripHref:'booth.html'+(m?('?eb='+m[1]):''),
+    const href='booth.html'+(m?('?eb='+m[1]):'');
+    return { ebStripBadge:'NOW OPEN', ebStripHref:href,
       ebStripText:L(eb.label+' 접수중 · 부스비 '+rate+'% 할인'+(end?' (~'+end+')':''), (eb.labelEn||eb.label)+' now open · '+rate+'% off booth fees'+(end?' (until '+end+')':'')),
+      ebStripCta:L('부스 신청하기 →','Apply now →'),
+      ebStripGo:()=>{ if(typeof location!=='undefined') location.href=href; },
       ebStripOpen:true };
   }
   applyCta(){
