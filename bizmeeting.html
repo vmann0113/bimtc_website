@@ -445,7 +445,7 @@
           <button onClick="{{ pickD2 }}" style="{{ pickD2Style }}">{{ t.k085 }}</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:8px;max-height:280px;overflow-y:auto;margin-bottom:22px;">
-          <sc-for list="{{ pickerSlots }}" as="s" hint-placeholder-count="16">
+          <sc-for list="{{ pickerSlots }}" as="s" hint-placeholder-count="14">
             <button onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</button>
           </sc-for>
         </div>
@@ -497,6 +497,9 @@ class Component extends DCLogic {
 
   SLOTS = ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
   LUNCH = [4,5];
+  // 관람 종료 17:00 이후 슬롯(17:00·17:30)은 새 요청에서 숨긴다. SLOTS 는 기존 요청의
+  // slot_idx 표시용이라 줄이지 않는다(admin.html·meet.js 와 동일 유지).
+  SLOT_END = 14;
   DAYLABEL = { D1:'11.13', D2:'11.14' };
   DAYLABEL_EN = { D1:'Nov 13', D2:'Nov 14' };
 
@@ -763,7 +766,7 @@ class Component extends DCLogic {
     const facts = [
       { v:'30', k:this.L('분 단위 미팅','minute time slots') },
       { v:this.L('30분','30 min'), k:this.L('미팅 1회 (슬롯)','per meeting (1 slot)') },
-      { v:this.L('2일','2 days'), k:'11.13–14 · 10:00–18:00' },
+      { v:this.L('2일','2 days'), k:'11.13–14 · 10:00–17:00' },
       { v:'1:1', k:this.L('사전 매칭 미팅','pre-matched meetings') },
     ];
     // 값은 한국어로 저장하고(사무국이 그대로 본다) 화면에만 영어를 보여 준다
@@ -787,7 +790,7 @@ class Component extends DCLogic {
       else if(sel){ style+="background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;cursor:pointer;"; }
       else { style+="background:#fff;color:#33485e;border:1px solid #d3deea;cursor:pointer;"; }
       return { label:time, style, onClick:()=> (lunch||busy)?null:this.selectSlot(si) };
-    });
+    }).slice(0, this.SLOT_END);
     const pkTabBase="flex:1;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;";
     const u = this.state.user;
 

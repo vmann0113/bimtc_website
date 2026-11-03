@@ -670,7 +670,7 @@
               </div>
             </sc-for>
           </div>
-          <div style="margin-top:20px;padding:18px 20px;border-radius:12px;background:#EAF2FC;border:1px solid #cfe0f2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);line-height:1.65;color:#33485e;">{{ t.vi_hours }}: <strong>2026.11.13–14, 10:00–18:00</strong><br>{{ t.vi_free }}</div>
+          <div style="margin-top:20px;padding:18px 20px;border-radius:12px;background:#EAF2FC;border:1px solid #cfe0f2;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);line-height:1.65;color:#33485e;">{{ t.vi_hours }}: <strong>2026.11.13–14, 10:00–17:00</strong><br>{{ t.vi_free }}</div>
         </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:clamp(19px,4.5vw,34px);box-shadow:0 12px 34px rgba(15,36,64,0.05);">
           <sc-if value="{{ visitClosed }}" hint-placeholder-val="{{ true }}">
@@ -1678,13 +1678,13 @@ class Component extends DCLogic {
     if(!eb){
       // 얼리버드가 끝났다고 8월 오픈 안내로 되돌아가면 안 된다. 개최일까지 남은 날을 보여 준다.
       const OPEN=new Date('2026-11-13T00:00:00+09:00').getTime();
-      const CLOSE=new Date('2026-11-14T18:00:00+09:00').getTime();
+      const CLOSE=new Date('2026-11-14T17:00:00+09:00').getTime();
       const now=Date.now();
       if(now>CLOSE) return { ebStripBadge:'THANK YOU',
         ebStripText:L('2026 부산국제의료관광컨벤션이 성황리에 마무리되었습니다. 함께해 주셔서 감사합니다.','The 2026 Busan International Medical Tourism Convention has concluded. Thank you for joining us.'),
         ebStripOpen:false };
       if(now>=OPEN) return { ebStripBadge:'NOW OPEN',
-        ebStripText:L('지금 열리고 있습니다 · BEXCO 제1전시장 3A홀 10:00–18:00','Happening now · BEXCO Hall 1 (3A) 10:00–18:00'),
+        ebStripText:L('지금 열리고 있습니다 · BEXCO 제1전시장 3A홀 10:00–17:00','Happening now · BEXCO Hall 1 (3A) 10:00–17:00'),
         ebStripCta:L('참관 안내 →','Visitor info →'), ebStripGo:()=>this.go('visit'), ebStripOpen:true };
       const dd=Math.ceil((OPEN-now)/86400000);
       return { ebStripBadge:'D-'+dd,
@@ -2151,7 +2151,7 @@ class Component extends DCLogic {
       // home data
       statsA: [ {num:'131',label:L('참가기업','Exhibitors')}, {num:'207',label:L('전시 부스','Booths')}, {num:'396',label:L('비즈니스 상담','Business meetings')}, {num:'65,202',label:L('관람객','Visitors')} ],
       overviewA: [
-        {k:L('일시','Date'),v:L('2026. 11. 13(금) – 11. 14(토) / 10:00–18:00','Nov 13(Fri)–14(Sat), 2026 / 10:00–18:00')},
+        {k:L('일시','Date'),v:L('2026. 11. 13(금) – 11. 14(토) / 10:00–17:00','Nov 13(Fri)–14(Sat), 2026 / 10:00–17:00')},
         {k:L('장소','Venue'),v:L('BEXCO 제1전시장 3A홀, 부산','BEXCO Hall 3A, Busan')},
         {k:L('주최','Hosts'),v:L('부산광역시 · 부산일보사','Busan Metropolitan City · Busan Ilbo')},
         {k:L('주관','Organizer'),v:L('(사)부산권의료산업협의회 (BMIA)','Busan Medical Industry Association (BMIA)')},
