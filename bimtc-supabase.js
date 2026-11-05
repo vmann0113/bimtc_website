@@ -396,7 +396,16 @@
       var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return { count: 0, approved: 0 };
       var r = await sb.from('booth_applications').select('status').eq('profile_id', u.id);
       var rows = (r.data || []).filter(function (x) { return x.status !== 'cancelled'; });
-      return { count: rows.length, approved: rows.filter(function (x) { return x.status === 'approved'; }).length };
+      var cnt = rows.length;
+      var app = rows.filter(function (x) { return x.status === 'approved'; }).length;
+      // 공동관(부산진구 등) 입주 기관은 자기 이름의 부스 신청이 없다.
+      // 배정받은 입주 부스도 승인된 부스로 세어 비즈미팅을 열어 준다.
+      try {
+        var t = await sb.rpc('my_pavilion_booths');
+        var n = (t && Array.isArray(t.data)) ? t.data.length : 0;
+        if (n > 0) { cnt += n; app += n; }
+      } catch (e) {}
+      return { count: cnt, approved: app };
     },
 
     async currentUser() {
