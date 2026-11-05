@@ -1959,7 +1959,7 @@ class Component extends DCLogic {
       floor_soon:L('참가기업 확정 후 공개됩니다.','Exhibitors will be listed once confirmed.'),
       floorOpenBadge:L('배치도 공개','Floor map open'), floorViewCta:L('부스 배치도 보기 →','View floor map →'),
       floor_apply_cta:L('부스 신청하기 →','Apply for a booth →'),
-      exb_prog_note:L('※ 프로그램은 사정에 따라 변경될 수 있습니다. 본 시간표는 예시가 포함된 기본계획입니다.','* The program is subject to change. This schedule is a draft plan including sample items.'),
+      exb_prog_note:L('※ 메인무대 프로그램 기준입니다. 바이어 비즈니스 상담회는 양일 상시 각 참가기업 부스에서 진행되며, 세부 일정은 사정에 따라 변경될 수 있습니다.','* Main-stage program. Buyer business meetings run throughout both days at each exhibitor booth. Details are subject to change.'),
       co_bc:L('HOME / 커뮤니티','HOME / Community'), co_title:L('커뮤니티','Community'), co_empty:L('등록된 게시물이 없습니다.','No posts yet.'),
       lg_logout:L('로그아웃','Log out'), lg_withdraw:L('회원 탈퇴','Delete account'),
       lg_forgot:L('비밀번호를 잊으셨나요?','Forgot your password?'), lg_back_login:L('로그인으로 돌아가기','Back to login'),
@@ -2047,8 +2047,24 @@ class Component extends DCLogic {
 
 
     const timetable = [
-      { day:L('11.13 (금)','Nov 13 (Fri)'), rows:[ {time:'10:00',title:L('개막식 · 개회 선언','Opening Ceremony')}, {time:'11:00',title:L('국제 심포지엄 (Session 1)','Intl. Symposium (Session 1)')}, {time:'13:00',title:L('바이어 비즈니스 상담회','Buyer Business Meetings')}, {time:'15:00',title:L('명의 초청 건강강좌','Health Lecture by Top Doctors')}, {time:'16:30',title:L('의료 체험 프로그램','Medical Experience Program')} ] },
-      { day:L('11.14 (토)','Nov 14 (Sat)'), rows:[ {time:'10:00',title:L('국제 세미나 (Session 2)','Intl. Seminar (Session 2)')}, {time:'11:30',title:L('바이어 비즈니스 상담회','Buyer Business Meetings')}, {time:'13:30',title:L('웰니스 체험존 · 네트워킹','Wellness Zone & Networking')}, {time:'15:00',title:L('우수 참가기업 시상','Exhibitor Awards')}, {time:'17:00',title:L('폐회','Closing')} ] },
+      { day:L('11.13 (금)','Nov 13 (Fri)'), rows:[
+        {time:'10:30',title:L('사전 네트워킹 (213호)','Pre-networking (Room 213)')},
+        {time:'11:00',title:L('개막식 · 부산의료산업대상 시상식','Opening Ceremony & Busan Medical Industry Awards')},
+        {time:'13:00',title:L('해외바이어·의료기관 협약 체결식 ①','MOU Signing with Overseas Buyers (1)')},
+        {time:'14:00',title:L('부산의료관광웰니스 국제심포지엄','Busan Medical Tourism & Wellness Intl. Symposium')},
+        {time:'15:30',title:L('해외바이어·의료기관 협약 체결식 ②','MOU Signing with Overseas Buyers (2)')},
+        {time:'16:00',title:L('치매 명의 특강','Special Lecture on Dementia')},
+        {time:'17:00',title:L('참관객 경품추첨','Visitor Prize Draw')},
+        {time:L('상시','All day'),title:L('바이어 비즈니스 상담회 · 참가기업 부스','Buyer Business Meetings - at exhibitor booths')} ] },
+      { day:L('11.14 (토)','Nov 14 (Sat)'), rows:[
+        {time:'10:00',title:L('어린이·가족 응급처치 교육','First Aid Class for Children & Families')},
+        {time:'11:00',title:L('힐링 프로그램 (SUP 요가 · 명상 · 하타요가&싱잉볼)','Healing Programs (SUP Yoga, Meditation, Hatha Yoga & Singing Bowl)')},
+        {time:'12:00',title:L('어린이 눈건강 교실',"Children's Eye Health Class")},
+        {time:'12:30',title:L('3세대 근력 챌린지','3-Generation Strength Challenge')},
+        {time:'14:00',title:L('코스메디뷰티 세미나','Cosme-Medi Beauty Seminar')},
+        {time:'15:30',title:L('외국인유학생 건강축제','Health Festival for International Students')},
+        {time:'17:00',title:L('참관객 · 참가업체 경품추첨','Visitor & Exhibitor Prize Draw')},
+        {time:L('상시','All day'),title:L('바이어 비즈니스 상담회 · 참가기업 부스','Buyer Business Meetings - at exhibitor booths')} ] },
     ];
 
     // community data
