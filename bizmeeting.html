@@ -309,7 +309,7 @@
                 <span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;padding:4px 10px;border-radius:999px;background:{{ p.tagBg }};color:{{ p.tagColor }};">{{ p.type }}</span>
               </div>
               <h3 style="font-size:16.5px;font-weight:800;margin:0 0 4px;color:#0F2440;">{{ p.name }}</h3>
-              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:14px;">{{ p.country }} · {{ p.org }}</div>
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:14px;">{{ p.meta }}</div>
               <sc-if value="{{ p.onlineOnly }}" hint-placeholder-val="{{ false }}"><div style="display:inline-flex;align-items:center;gap:5px;background:#F3EEFB;border:1px solid #ddd0f0;color:#7a5cc4;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;border-radius:8px;padding:5px 10px;margin:-8px 0 14px;">{{ t.k057 }}</div></sc-if>
               <sc-if value="{{ p.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;font-weight:600;margin:-10px 0 14px;">{{ t.k058 }} {{ p.person }} <span style="color:#8295ab;font-weight:400;">{{ p.job }}</span></div></sc-if>
               <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">
@@ -344,7 +344,7 @@
                   <span style="font-size:16.5px;font-weight:800;color:#0F2440;">{{ r.name }}</span>
                   <span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;padding:3px 9px;border-radius:999px;background:{{ r.tagBg }};color:{{ r.tagColor }};">{{ r.type }}</span>
                 </div>
-                <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:8px;">{{ r.country }} · {{ r.org }}</div>
+                <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:8px;">{{ r.meta }}</div>
                 <sc-if value="{{ r.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;font-weight:600;margin:-4px 0 8px;">{{ t.k058 }} {{ r.person }}</div></sc-if>
                 <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">{{ t.k064 }}</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div><sc-if value="{{ r.isOnline }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;background:#F3EEFB;border:1px solid #ddd0f0;color:#7a5cc4;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;border-radius:8px;padding:6px 11px;margin-bottom:8px;margin-left:8px;">{{ t.k065 }}</span></sc-if><sc-if value="{{ r.interpreter }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;background:#EAF2FC;border:1px solid #cfe0f2;color:#0B5FA5;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;border-radius:8px;padding:6px 11px;margin-bottom:8px;margin-left:8px;">{{ t.k066 }}</span></sc-if>
                 <div style="font-size:14px;color:#33485e;">“{{ r.msg }}”</div>
@@ -535,10 +535,10 @@ class Component extends DCLogic {
     const requestedIds = new Set(sent.filter(r=>r.status!=='declined').map(r=>r.to_profile));
     const partnersMapped = partners.map(p=>({ id:p.id, name:p.name||this.L('(이름 미입력)','(no name)'), type:this.typeLabel(p.type), ptype:p.type, attendMode:p.attend_mode||'onsite',
       person:this.personName(p), job:p.job_title||'',
-      country:p.country||'', org:p.category||'', tags:(p.interests||[]).map(c=>this.fieldLabel(c)), status: requestedIds.has(p.id)?'requested':'none' }));
+      country:p.country||'', org:((p.category||p.industry||'')+'').trim(), tags:(p.interests||[]).map(c=>this.fieldLabel(c)), status: requestedIds.has(p.id)?'requested':'none' }));
     const requestsMapped = inbox.map(r=>({ id:r.id, from_profile:r.from_profile, name:(r.from&&r.from.name)||this.L('요청자','Requester'), type:this.typeLabel(r.from&&r.from.type), ptype:(r.from&&r.from.type)||'',
       person:this.personName(r.from),
-      country:(r.from&&r.from.country)||'', org:(r.from&&r.from.category)||'', msg:r.message||'', status:r.status,
+      country:(r.from&&r.from.country)||'', org:(((r.from&&(r.from.category||r.from.industry))||'')+'').trim(), msg:r.message||'', status:r.status,
       day:r.day, slot_idx:r.slot_idx, from:r.from, from_profile:r.from_profile, interpreter:!!r.interpreter, mode:r.mode||'onsite',
       isOnline:(r.mode||'onsite')==='online' }));
     const sentMapped = sent.map(r=>({ id:r.id, name:(r.to&&r.to.name)||this.L('대상','Partner'), type:this.typeLabel(r.to&&r.to.type), ptype:(r.to&&r.to.type)||'',
@@ -748,11 +748,13 @@ class Component extends DCLogic {
     const partnersView = this.state.partners.map(p=>({
       ...p, requested:p.status==='requested', notRequested:p.status!=='requested',
       onlineOnly:(p.attendMode||'onsite')==='online',
+      meta:[(p.country||'').trim(), (p.org||'').trim()].filter(Boolean).join(' · '),
       initial:this.initialOf(p.name), ...this.avatarColors(p.ptype==='buyer'), openPicker:()=>this.openPicker(p)
     }));
     const requestsView = this.state.requests.map(r=>({
       ...r, isPending:r.status==='pending', isAccepted:r.status==='accepted', isDeclined:r.status==='declined',
       slotLabel: slotLabelOf(r.day, r.slot_idx),
+      meta:[(r.country||'').trim(), (r.org||'').trim()].filter(Boolean).join(' · '),
       initial:this.initialOf(r.name), ...this.avatarColors(r.ptype==='buyer'), accept:()=>this.accept(r), decline:()=>this.decline(r.id)
     }));
 

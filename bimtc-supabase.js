@@ -520,7 +520,8 @@
       return (r.data || []).map(function (x) {
         var other = {
           id: x.other_id, name: x.other_name, type: x.other_type, country: x.other_country,
-          category: x.other_category, first_name: x.other_first_name, last_name: x.other_last_name,
+          category: x.other_category, industry: x.other_industry,
+          first_name: x.other_first_name, last_name: x.other_last_name,
           job_title: x.other_job_title, attend_mode: x.other_attend_mode
         };
         return {
