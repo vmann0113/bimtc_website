@@ -230,6 +230,9 @@
         </div>
         <div style="border:1px solid #cbe9dd;border-radius:18px;padding:clamp(20px,4.5vw,36px);background:linear-gradient(160deg,#EFF9F4,#ffffff);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(17,163,123,0.06);">
           <div style="font-family:'Pretendard',sans-serif;font-size:14px;color:#9cccb9;margin-bottom:18px;">02</div>
+          <sc-if value="{{ bizOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="display:inline-flex;align-items:center;gap:7px;align-self:flex-start;background:#11A37B;color:#fff;font-size:12.5px;font-weight:800;border-radius:999px;padding:6px 13px;margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;"></span>{{ bizPill }}</div>
+          </sc-if>
           <h3 style="font-size:22px;font-weight:800;color:#0A2236;margin:0 0 12px;">{{ t.part2_title }}</h3>
           <p style="font-size:15px;line-height:1.65;color:#52677d;margin:0 0 22px;">{{ t.part2_desc }}</p>
           <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
@@ -470,6 +473,9 @@
       <div>
         <h2 style="font-size:clamp(24px,4.00vw,36px);font-weight:800;color:#fff;letter-spacing:-0.02em;margin:0 0 12px;">{{ t.cta_band_title }}<br>{{ t.cta_band_title2 }}</h2>
         <p style="font-size:16px;color:rgba(255,255,255,0.86);margin:0;">{{ t.cta_band_sub }}</p>
+        <sc-if value="{{ bizOpen }}" hint-placeholder-val="{{ false }}">
+          <p style="display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:#0A2236;background:#fff;border-radius:999px;padding:8px 16px;margin:14px 0 0;"><span style="width:7px;height:7px;border-radius:50%;background:#11A37B;"></span>{{ bizBandNote }}</p>
+        </sc-if>
         <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:rgba(255,255,255,0.7);margin:8px 0 0;">{{ t.cta_biz_note }}</p>
       </div>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
@@ -1412,7 +1418,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { page: 'home', lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(), exTab: 'companies', commTab: 'notice', loginRole: 'exhibitor', visitorDone: false, toast: null,
+  state = { page: 'home', lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(), exTab: 'companies', commTab: 'notice', loginRole: 'exhibitor', visitorDone: false, toast: null, bizOpen:false,
     vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both',
     crEmail:'', crSearched:false, crRows:[],
     authMode:'login', auName:'', auCountry:'', auEmail:'', auPw:'', authError:'', authBusy:false,
@@ -1487,6 +1493,7 @@ class Component extends DCLogic {
     (async()=>{ try{ const ns=await window.BimtcDB.publishedNotices(); if(ns&&ns.length) this.setState({ dbNotices:ns }); }catch(e){} })();
     (async()=>{ try{ const xs=await window.BimtcDB.listPublicExhibitors(); if(xs&&xs.length) this.setState({ pubExhibitors:xs }); }catch(e){} })();
     (async()=>{ try{ const tk=await window.BimtcDB.takenBooths(); if(tk) this.setState({ takenMap:tk }); }catch(e){} })();
+    (async()=>{ try{ const bo=await window.BimtcDB.bizMatchingOpen(); if(bo) this.setState({ bizOpen:true }); }catch(e){} })();
   }
   componentWillUnmount(){ if(this._tick) clearInterval(this._tick); if(this._rz&&typeof window!=='undefined') window.removeEventListener('resize',this._rz); }
   initMaps(){
@@ -1649,15 +1656,23 @@ class Component extends DCLogic {
     if(me && me.type==='visitor'){ this.setState({ page:'visit' }); this.flash(L('로그인되었습니다 · 참관 사전등록을 진행해 주세요','Signed in — please complete visitor pre-registration')); return; }
     const cfg = window.BIMTC_CONFIG;
     if(me && me.type==='exhibitor'){
-      // 참가기업: 부스 신청이 열려 있으면 곧장 신청 페이지로
+      // 참가기업: 확정된 부스가 있고 비즈매칭이 열려 있으면 비즈미팅으로, 그렇지 않으면 부스 신청 페이지로
       const ebOn = cfg && Object.values(cfg.earlyBirdOverride||{}).indexOf('on')>=0;
       const boothOpen = cfg && ((cfg.apply.booth && cfg.apply.booth.open) || ebOn);
+      let bizOn=false; try{ bizOn = await window.BimtcDB.bizMatchingOpen(); }catch(e){}
+      if(bizOn){
+        let st=null; try{ st = await window.BimtcDB.myApprovedBooths(); }catch(e){}
+        if(st && st.approved>0){ if(typeof window!=='undefined') window.location.href = 'bizmeeting.html'; return; }
+      }
       if(boothOpen){ if(typeof window!=='undefined') window.location.href = 'booth.html'; return; }
+      if(bizOn){ if(typeof window!=='undefined') window.location.href = 'bizmeeting.html'; return; }
       this.setState({ page:'home' });
       this.flash(L('로그인되었습니다 · 부스 신청 오픈 시 바로 신청하실 수 있습니다','Signed in — booth application opens soon'));
       return;
     }
     if(me && me.type==='buyer'){
+      let bizOn=false; try{ bizOn = await window.BimtcDB.bizMatchingOpen(); }catch(e){}
+      if(bizOn){ if(typeof window!=='undefined') window.location.href = 'bizmeeting.html'; return; }
       this.setState({ page:'home' });
       this.flash(L('로그인되었습니다 · 비즈매칭 신청은 2차 얼리버드 마감(10/31) 이후 오픈 예정입니다','Signed in — matching applications open after the 2nd early-bird ends (Oct 31)'));
       return;
@@ -1717,8 +1732,11 @@ class Component extends DCLogic {
       btn: boothOpen? L('부스 신청하기','Apply for a Booth') : L('부스 신청 안내 보기','See Booth Application Guide'),
       go: boothOpen? ()=>{ if(typeof window!=='undefined') window.location.href='booth.html'; } : ()=>this.go('exhibit') };
     if(me.type==='buyer') return { on:true,
-      msg:L('바이어 회원 가입이 완료되었습니다. 비즈매칭(참가기업과의 1:1 미팅) 신청은 2차 얼리버드 마감(10/31) 이후 오픈 예정이며, 오픈 시 이메일과 공지로 안내드립니다.','Your buyer account is ready. Business-matching applications open after Oct 31 — we will notify you by email and notice.'),
-      btn:L('행사 안내 보기','See Event Guide'), go:()=>this.go('about') };
+      msg:this.state.bizOpen
+        ? L('바이어 회원 가입이 완료되었습니다. 비즈매칭(참가기업과의 1:1 미팅)이 진행 중입니다 — 지금 바로 상담을 신청하실 수 있습니다.','Your buyer account is ready. Business matching is open — you can request meetings right away.')
+        : L('바이어 회원 가입이 완료되었습니다. 비즈매칭(참가기업과의 1:1 미팅) 신청은 오픈 시 이메일과 공지로 안내드립니다.','Your buyer account is ready. We will notify you by email and notice when business matching opens.'),
+      btn:this.state.bizOpen?L('비즈미팅 신청하기','Go to business meetings'):L('행사 안내 보기','See Event Guide'),
+      go:this.state.bizOpen?(()=>{ if(typeof window!=='undefined') window.location.href='bizmeeting.html'; }):(()=>this.go('about')) };
     if(me.type==='visitor') return { on:true,
       msg:L('참관객 사전등록을 하시면 현장에서 대기 없이 바로 입장하실 수 있습니다.','Pre-register to skip the line and enter directly on site.'),
       btn:L('사전등록 하러 가기','Go to Pre-registration'), go:()=>this.go('visit') };
@@ -2012,6 +2030,7 @@ class Component extends DCLogic {
     const tagPill = (text, color) => React.createElement('span', { style: { fontFamily: "'Pretendard',sans-serif", fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', padding: '5px 0', width: '52px', textAlign: 'center', borderRadius: '6px', color: color, background: color + '22', flexShrink: 0 } }, text);
     const statusPill = (text, color) => React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '7px', fontSize: '13px', fontWeight: 700, color: color, flexShrink: 0, width: '74px' } }, React.createElement('span', { style: { width: '6px', height: '6px', borderRadius: '50%', background: color } }), text);
     const dleft = (iso)=>Math.max(0, Math.ceil((new Date(iso+'T00:00:00+09:00').getTime() - Date.now())/86400000));
+    const bizOpen = !!this.state.bizOpen;
     const launched=(()=>{ try{ const C=window.BIMTC_CONFIG||{}; if(C.apply&&C.apply.booth&&C.apply.booth.open) return true; if(Object.values(C.earlyBirdOverride||{}).indexOf('on')>=0) return true; const la=C.launchAt||'2026-08-21T15:00:00'; return Date.now()>=new Date(/(Z|\+)/.test(la)?la:la+'+09:00').getTime(); }catch(e){ return false; } })();
     // 얼리버드 문구는 단계가 바뀌면 같이 바뀌어야 한다. 숫자를 글에 박아 두지 말 것.
     const ebNow=(()=>{ try{ const C=window.BIMTC_CONFIG||{}; return (C.currentEarlyBird&&C.currentEarlyBird())||null; }catch(e){ return null; } })();
@@ -2181,7 +2200,9 @@ class Component extends DCLogic {
       scheduleB: [
         { date:'2026.08.21 – 11.12', title:L('참관객 사전등록 접수','Visitor pre-registration'), tagEl:tagPill(L('등록','REG'),'#25C281'), statusEl:launched?statusPill(L('진행중','Open'),'#11A37B'):statusPill(L('예정','Soon'),'#7a9aab') },
         { date: ebNow ? L('2026.08.21 – '+ebEndDot,'From 2026.08.21 · until '+ebEndDot) : L('2026.08.21 – 마감 추후 공지','From 2026.08.21 · deadline TBA'), title: ebNow ? L('참가기업 부스 신청 접수 ('+ebNow.label+' '+ebPct+'%)','Exhibitor booth application ('+(ebNow.labelEn||ebNow.label)+' '+ebPct+'% off)') : L('참가기업 부스 신청 접수','Exhibitor booth application'), tagEl:tagPill(L('모집','APPLY'),'#2E90D6'), statusEl:launched?statusPill(L('진행중','Open'),'#11A37B'):statusPill(L('예정','Soon'),'#7a9aab') },
-        { date:L('2026.10.31 이후','After 2026.10.31'), title:L('바이어 비즈미팅 매칭 신청 (2차 얼리버드 마감 후 오픈)','Buyer meeting matching (opens after 2nd early-bird)'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
+        bizOpen
+          ? { date:L('지금 접수 중','Open now'), title:L('바이어 비즈미팅 매칭 신청','Buyer meeting matching'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('진행중','Open'),'#11A37B') }
+          : { date:L('2026.10.31 이후','After 2026.10.31'), title:L('바이어 비즈미팅 매칭 신청 (2차 얼리버드 마감 후 오픈)','Buyer meeting matching (opens after 2nd early-bird)'), tagEl:tagPill(L('매칭','MATCH'),'#25C281'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.13', title:L('개막식 & 의료관광 콘퍼런스','Opening & Conference'), tagEl:tagPill(L('행사','EVENT'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.13 – 14', title:L('메디컬·관광웰니스·플레잉 존 운영','Medical · Tourism & Wellness · Playing zones'), tagEl:tagPill(L('전시','EXPO'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
         { date:'2026.11.14', title:L('웰니스 체험존 · 네트워킹 라운지','Wellness zone & networking'), tagEl:tagPill(L('부대','EXTRA'),'#E0A23C'), statusEl:statusPill(L('예정','Soon'),'#7a9aab') },
@@ -2271,6 +2292,9 @@ class Component extends DCLogic {
       searchNoHitMsg:L('결과 없음 — 예: 부스, 사전등록, 오시는 길','No results — try: booth, register, directions'),
       searchHits:this.searchVals().hits, searchNoHit:this.searchVals().noHit,
       exTabs, exFilters, exhibitors, timetable,
+      bizOpen,
+      bizPill:L('비즈매칭 진행 중','Matching open now'),
+      bizBandNote:L('참가기업·바이어 비즈매칭이 진행 중입니다 · 로그인하면 바로 상담을 신청할 수 있습니다.','Business matching is open — sign in to request meetings now.'),
       exbListOn:(()=>{ const C=window.BIMTC_CONFIG; if(!C||!C.earlyBird||!C.earlyBird[0]) return false; const e1=new Date((C.earlyBird[0].end||'2026-09-30')+'T23:59:59+09:00'); return Date.now()>e1.getTime(); })(),
       exbListTitle:L('참가기업 배치 리스트','Exhibitor Placement List'),
       exbListColBooth:L('부스 위치','Booth'), exbListColCompany:L('기업명','Company'),
