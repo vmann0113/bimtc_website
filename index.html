@@ -1790,13 +1790,28 @@ class Component extends DCLogic {
     // 부산일보 신청서에 의산협 로고('의산협로고.png')가 올라가 있어 기업명과 맞지 않는다.
     // 사무국이 올바른 파일로 바꾸면 주소가 달라지므로 이 목록을 비우면 다시 노출된다.
     const HIDELOGO=['2e7c5e03-77b9-4888-9bc2-2721a97e7800/1787634765300.png'];
+    // 인쇄용으로 올라온 로고(ai·pdf·eps·zip)를 사무국이 웹용 PNG 로 바꿔 둔 것.
+    // 신청서 파일은 그대로 두고 여기서만 바꿔 쓴다. 가이드 시안지로 온 건 국문 가로형 한 개만 잘라 썼다.
+    // 사무국이 나중에 올바른 이미지 파일로 다시 올리면 이 줄만 지우면 원래 파일이 나온다.
+    const LOGOFIX={
+      '(주)부산티엔씨':'busantnc', '(주)에스피메드':'spmed', '(주)클라우드호스피탈':'cloudhospital',
+      '고신대학교복음병원':'kosin', '누네빛안과':'nunebit', '대구광역시 중구':'daegujunggu',
+      '동남권원자력의학원':'dirams', '동아대학교병원':'donga', '부산 동구청':'donggu',
+      '부산경제진흥원':'bepa', '부산관광공사':'bto', '부산광역시':'busancity',
+      '부산대학교병원':'pnuh', '부산시한의사회':'bsakom', '엘토브':'eltov',
+      '예이린 사회적협동조합':'yeyirin', '우리들병원':'wooridul', '이샘병원':'esaem',
+      '인제대학교 해운대백병원':'haeundaepaik', '자연안에한의원':'jayeonane', '주식회사 담하':'damha',
+      '주식회사큐어앤케어':'cureandcare', '청맥병원':'cheongmaek', '크레이지서퍼스':'crazysurfers',
+      '트립닥':'tripdoc', '하얏트 플레이스 부산 연산':'hyattplace', '부산일보':'busanilbo' };
     const all=(this.state.pubExhibitors||[]).map(x=>{
       const ids=(x.booth_ids||[]).slice().sort();
       const pre=String(ids[0]||'').split('-')[0];
       const z=ZONE[pre]||['기타','Other','#5E7289','#eef2f7'];
       const name=String(x.company||'').trim();
+      const fix=LOGOFIX[name];
       return { company:name, ids, pre, zoneKo:z[0], zoneLabel:L(z[0],z[1]), zc:z[2], zbg:z[3],
-               logo:(x.logo_url&&WEBIMG.test(x.logo_url)&&!HIDELOGO.some(h=>x.logo_url.indexOf(h)>=0))?x.logo_url:'' };
+               logo:fix ? ('uploads/logos/logo_'+fix+'.png')
+                 : ((x.logo_url&&WEBIMG.test(x.logo_url)&&!HIDELOGO.some(h=>x.logo_url.indexOf(h)>=0))?x.logo_url:'') };
     }).filter(c=>c.company).sort((a,b)=>String(a.ids[0]||'').localeCompare(String(b.ids[0]||'')));
 
     // 부스가 많은 기업은 번호를 다 적으면 카드가 넘친다
