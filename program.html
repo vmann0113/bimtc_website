@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>부대행사 사전신청 · 2026 부산국제의료관광컨벤션</title>
+<meta name="description" content="2026 부산국제의료관광컨벤션(11월 13일~14일, 벡스코 제1전시장 3A홀) 부대행사 프로그램 사전신청. 입장 무료.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BIMTC 2026">
+<meta property="og:title" content="2026 BIMTC 부대행사 사전신청">
+<meta property="og:description" content="11월 13일(금)~14일(토) · 벡스코 제1전시장 3A홀 · 무료입장">
+<meta property="og:image" content="uploads/keyvisual.png">
+<meta property="og:locale" content="ko_KR">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<link rel="apple-touch-icon" href="uploads/apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!--
+  부대행사 프로그램 사전신청 (program.html) — 회원가입 없이 이름·연락처만 받는다.
+  프로그램 목록·정원·열림 여부는 site_settings.program_signup 에 있고, 이 화면은 그것만 보고 그린다.
+  저장은 program_signup_apply RPC 로만 들어간다(표는 사무국만 조회 가능 · RLS).
+  같은 프로그램에 같은 번호로 다시 넣으면 덮어쓴다 — 중복 명단이 생기지 않는다.
+  관리 화면: admin.html > 부대행사 사전신청
+-->
+<style>
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{margin:0;background:#EEF1F6;color:#15233a;font-family:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;font-size:15px;line-height:1.6;word-break:keep-all;overflow-wrap:break-word}
+  input,textarea,button,select{font-family:inherit;font-size:16px}
+  .wrap{max-width:580px;margin:0 auto;padding:0 0 44px}
+  /* 키비주얼은 세로 포스터라 머리글에 쓰면 화면을 다 차지한다 — 얇은 띠로 대신한다 */
+  .hero{margin:28px 12px 0;position:relative;background:linear-gradient(118deg,#16294F 0%,#0B5FA5 58%,#11A37B 100%);border-radius:16px 16px 0 0;padding:22px 20px 20px;color:#fff}
+  .hero .kicker{font-size:11.5px;font-weight:800;letter-spacing:.22em;opacity:.78;margin:0 0 7px}
+  .hero .mw{font-size:clamp(21px,6.4vw,27px);font-weight:800;letter-spacing:-.02em;margin:0;line-height:1.15}
+  .hero .mw em{font-style:normal;opacity:.6;margin:0 5px;font-weight:600}
+  .hero .ko{font-size:13.5px;font-weight:600;opacity:.88;margin:7px 0 0}
+  .lang{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:700;text-decoration:none}
+  .card{background:#fff;margin:0 12px;border-radius:0 0 16px 16px;padding:24px 20px 28px;box-shadow:0 8px 30px rgba(20,50,90,.08)}
+  h1{font-size:22px;font-weight:800;color:#0A2236;margin:0 0 6px;text-align:center;letter-spacing:-.02em}
+  .sub1{text-align:center;color:#5E7289;font-size:14px;margin:0 0 18px}
+  .info{background:#F3F7FA;border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.75;margin-bottom:20px}
+  .info div{display:flex;gap:10px;padding:2px 0}
+  .info b{color:#0B5FA5;flex:none;width:40px}
+  .sec{font-weight:800;font-size:15px;color:#0A2236;margin:22px 0 10px}
+  .sec .req{color:#D6336C;margin-left:2px}
+  .plist{display:flex;flex-direction:column;gap:9px}
+  .p{position:relative}
+  .p input{position:absolute;opacity:0;pointer-events:none}
+  .p span.box{display:block;border:1.5px solid #d8e0ea;border-radius:12px;padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s}
+  .p input:checked+span.box{border-color:#0B5FA5;background:#F2F8FE}
+  .p input:focus-visible+span.box{box-shadow:0 0 0 3px rgba(11,95,165,.25)}
+  .p .tt{display:flex;align-items:flex-start;gap:9px}
+  .p .tick{width:20px;height:20px;border-radius:6px;border:1.5px solid #c3cfdd;background:#fff;flex:none;margin-top:1px;position:relative}
+  .p input:checked+span.box .tick{border-color:#0B5FA5;background:#0B5FA5}
+  .p input:checked+span.box .tick::after{content:'';position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+  .p .tt > span:last-child{display:block;min-width:0}
+  .p .nm{display:block;font-weight:700;color:#0A2236;font-size:15px;line-height:1.4}
+  .p .wh{display:block;color:#0B5FA5;font-size:13px;font-weight:700;margin-top:3px}
+  .p .ds{display:block;color:#6b7c90;font-size:13px;margin-top:2px;line-height:1.5}
+  .p .cnt{display:block;color:#8295ab;font-size:12.5px;margin-top:4px}
+  .p.full span.box{background:#F5F7FA;border-color:#e3e9f0;cursor:not-allowed}
+  .p.full .nm,.p.full .wh{color:#9aa8b8}
+  .f{margin-bottom:15px}
+  .f label.t{display:block;font-weight:700;font-size:14px;margin-bottom:6px;color:#0A2236}
+  .req{color:#D6336C;margin-left:2px}
+  .sub{font-size:13px;color:#8295ab;font-weight:500;margin-left:4px}
+  .f input[type=text],.f input[type=tel],.f textarea{width:100%;border:1.5px solid #d8e0ea;border-radius:10px;padding:12px 13px;background:#fff;color:#15233a;outline:none}
+  .f input:focus,.f textarea:focus{border-color:#0B5FA5;box-shadow:0 0 0 3px rgba(11,95,165,.12)}
+  .f textarea{min-height:70px;resize:vertical}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .consent{background:#F7F9FB;border-radius:10px;padding:12px 14px;font-size:13px;color:#5E7289;margin:6px 0 16px}
+  .consent label{display:flex;gap:9px;align-items:flex-start;color:#15233a;font-weight:600;font-size:14px;margin-top:8px;cursor:pointer}
+  .consent input{width:19px;height:19px;margin:2px 0 0;flex:none;accent-color:#0B5FA5}
+  .err{display:none;background:#FDEDEF;color:#B4233C;border-radius:10px;padding:10px 13px;font-size:14px;margin-bottom:12px}
+  .btn{display:block;width:100%;border:0;border-radius:12px;background:#0B5FA5;color:#fff;font-size:17px;font-weight:800;padding:16px;cursor:pointer}
+  .btn:disabled{opacity:.55;cursor:default}
+  .note{font-size:12.5px;color:#8295ab;margin-top:10px;text-align:center;line-height:1.7}
+  .done{text-align:center;padding:26px 4px 6px}
+  .done .ic{width:64px;height:64px;border-radius:50%;background:#E7F6F0;color:#11A37B;font-size:34px;line-height:64px;margin:0 auto 14px}
+  .done h2{font-size:21px;font-weight:800;color:#0A2236;margin:0 0 10px}
+  .done ul{list-style:none;padding:0;margin:14px 0 0;text-align:left;background:#F3F7FA;border-radius:12px;padding:14px 16px}
+  .done li{padding:4px 0;font-weight:700;color:#0A2236;font-size:14.5px}
+  .done li small{display:block;font-weight:600;color:#5E7289;font-size:13px}
+  .foot{text-align:center;font-size:13px;color:#7a8898;margin-top:22px;line-height:1.8}
+  .foot a{color:#0B5FA5;text-decoration:none}
+  .skel{color:#8295ab;font-size:14px;padding:14px 0;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <p class="kicker">BIMTC 2026</p>
+    <p class="mw">MEDI<em>&#215;</em>WELLNESS</p>
+    <p class="ko" id="hero_ko">2026 부산국제의료관광컨벤션</p>
+    <a class="lang" id="lang" href="?lang=en">EN</a>
+  </div>
+  <div class="card" id="card">
+    <h1 id="h1">부대행사 사전신청</h1>
+    <p class="sub1" id="sub1">무대 프로그램은 미리 신청하시면 자리를 마련해 드립니다.</p>
+    <div class="info">
+      <div><b id="l_when">일시</b><span id="v_when">2026년 11월 13일(금) ~ 14일(토) 10:00~17:00</span></div>
+      <div><b id="l_where">장소</b><span id="v_where">벡스코 제1전시장 3A홀 · 메인무대</span></div>
+      <div><b id="l_fee">참가비</b><span id="v_fee">무료입장 · 사전신청도 무료</span></div>
+    </div>
+
+    <form id="f" novalidate>
+      <div class="sec" id="s_prog">신청할 프로그램<span class="req">*</span></div>
+      <div class="plist" id="plist"><div class="skel" id="skel">프로그램을 불러오는 중…</div></div>
+
+      <div class="sec" id="s_who">신청자</div>
+      <div class="f"><label class="t" for="name" id="l_name">성명<span class="req">*</span></label><input type="text" id="name" autocomplete="name" required></div>
+      <div class="f"><label class="t" for="phone" id="l_phone">연락처(휴대전화)<span class="req">*</span></label><input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" required></div>
+      <div class="f"><label class="t" for="note" id="l_note">남길 말<span class="sub" id="l_note_s">선택</span></label><textarea id="note" maxlength="200"></textarea></div>
+
+      <div class="hp" aria-hidden="true"><input type="text" id="hp" tabindex="-1" autocomplete="off"></div>
+      <div class="consent" id="consentbox">
+        <span id="consent_t">수집 항목: 성명, 연락처 · 이용 목적: 부대행사 참가 확인 및 변경 안내 · 보유 기간: 행사 종료 후 6개월</span>
+        <label><input type="checkbox" id="consent"> <span id="consent_l">개인정보 수집·이용에 동의합니다.</span><span class="req">*</span></label>
+      </div>
+      <div class="err" id="err"></div>
+      <button class="btn" id="btn" type="submit">사전신청하기</button>
+      <p class="note" id="foot_note">같은 번호로 다시 신청하시면 먼저 넣으신 내용이 수정됩니다.<br>신청하지 않으셔도 현장에서 참여하실 수 있으나, 자리는 사전신청자가 우선입니다.</p>
+    </form>
+  </div>
+  <div class="foot">
+    <span id="f_office">2026 부산국제의료관광컨벤션 사무국</span><br>
+    T. 051-461-4276~8 · <a href="mailto:bmia0528@naver.com">bmia0528@naver.com</a><br>
+    <a href="/">bimtc.busan.com</a>
+  </div>
+</div>
+<script>
+(function () {
+  // bimtc-supabase.js 와 같은 프로젝트·공개(anon) 키.
+  // 이 키로 할 수 있는 것은 program_signup_status / program_signup_apply 호출뿐이다(RLS).
+  var SUPABASE_URL = 'https://xkomxbskwvtofpglback.supabase.co';
+  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrb214YnNrd3Z0b2ZwZ2xiYWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjIxNzYsImV4cCI6MjEwMDAzODE3Nn0.YVBpieLDFP4AyeapuiRmjrDyZYdAHfiudnUdRPG65mo';
+  var $ = function (id) { return document.getElementById(id); };
+
+  var qs = new URLSearchParams(location.search);
+  var EN = (qs.get('lang') || '').toLowerCase() === 'en';
+  var T = {
+    h1: 'Pre-register for Programs',
+    sub1: 'Register in advance and we will keep a seat for you.',
+    l_when: 'Date', l_where: 'Venue', l_fee: 'Fee',
+    v_when: 'Nov 13 (Fri) - 14 (Sat), 2026 · 10:00-17:00',
+    v_where: 'BEXCO Exhibition Center 1, Hall 3A · Main Stage',
+    v_fee: 'Free admission · Pre-registration is free',
+    s_prog: 'Choose programs', s_who: 'Your details',
+    l_name: 'Name', l_phone: 'Mobile number', l_note: 'Message', l_note_s: 'optional',
+    consent_t: 'Collected: name, phone · Purpose: attendance confirmation and schedule notices · Kept for 6 months after the event',
+    consent_l: 'I agree to the collection and use of my personal information.',
+    btn: 'Pre-register',
+    foot_note: 'Submitting again with the same number updates your earlier entry.<br>Walk-ins are welcome, but pre-registered guests are seated first.',
+    f_office: '2026 BIMTC Organizing Office',
+    hero_ko: 'Busan International Medical Tourism Convention 2026',
+    loading: 'Loading programs...', closed: 'Pre-registration is not open at the moment.',
+    full: 'Fully booked', people: ' registered',
+    e_prog: 'Please choose at least one program.',
+    e_name: 'Please enter your name.', e_phone: 'Please check your mobile number.',
+    e_consent: 'Please agree to the collection and use of your personal information.',
+    e_send: 'Could not submit. Please try again, or call the office at +82-51-461-4276.',
+    e_full: 'That program filled up while you were registering: ',
+    sending: 'Submitting...',
+    done_h: 'Thank you - you are registered', done_p: 'We will contact you only if the schedule changes.',
+    title: 'Pre-register for Programs · BIMTC 2026'
+  };
+  var K = {
+    loading: '프로그램을 불러오는 중…', closed: '지금은 사전신청을 받고 있지 않습니다.',
+    full: '정원 마감', people: '명 신청',
+    e_prog: '신청할 프로그램을 하나 이상 선택해 주세요.',
+    e_name: '성명을 입력해 주세요.', e_phone: '연락처를 확인해 주세요.',
+    e_consent: '개인정보 수집·이용에 동의해 주세요.',
+    e_send: '신청하지 못했습니다. 잠시 후 다시 시도하시거나 사무국(051-461-4276)으로 연락해 주세요.',
+    e_full: '신청하시는 사이에 정원이 찼습니다: ',
+    sending: '신청하는 중…',
+    done_h: '사전신청이 완료되었습니다', done_p: '일정이 바뀌는 경우에만 따로 연락드리겠습니다.'
+  };
+  var t = function (k) { return EN ? T[k] : K[k]; };
+
+  if (EN) {
+    document.documentElement.lang = 'en';
+    document.title = T.title;
+    ['h1','sub1','l_when','l_where','l_fee','v_when','v_where','v_fee','s_prog','s_who',
+     'l_name','l_phone','l_note','l_note_s','consent_t','consent_l','f_office','hero_ko'].forEach(function (id) {
+      if ($(id)) $(id).textContent = T[id];
+    });
+    $('btn').textContent = T.btn;
+    $('foot_note').innerHTML = T.foot_note;
+    $('lang').href = location.pathname; $('lang').textContent = '한국어';
+    $('skel').textContent = T.loading;
+  }
+
+  function fail(msg, el) { var e = $('err'); e.innerHTML = msg; e.style.display = 'block'; if (el) el.focus(); e.scrollIntoView({ block: 'center' }); }
+
+  function rpc(fn, body) {
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body || {})
+    }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); };
+  var PROGS = [];
+
+  // 프로그램 목록은 설정에서 읽어 그린다 — 사무국이 열고 닫거나 정원을 바꿔도 이 파일은 손대지 않는다.
+  rpc('program_signup_status').then(function (d) {
+    if (!d || !d.open || !d.programs || !d.programs.length) {
+      $('f').innerHTML = '<p class="skel">' + esc(t('closed')) + '</p>';
+      return;
+    }
+    PROGS = d.programs.filter(function (p) { return p.open; });
+    if (!PROGS.length) { $('f').innerHTML = '<p class="skel">' + esc(t('closed')) + '</p>'; return; }
+    $('plist').innerHTML = PROGS.map(function (p, i) {
+      var nm = esc(EN ? (p.en || p.ko) : p.ko);
+      var wh = esc(EN ? (p.when_en || p.when_ko) : p.when_ko);
+      var ds = EN ? '' : esc(p.note_ko || '');
+      var cnt = p.count > 0 ? (EN ? (p.count + T.people) : (p.count + K.people)) : '';
+      if (p.cap > 0) cnt = (cnt || (EN ? '0' + T.people : '0' + K.people)) + ' / ' + p.cap;
+      return '<label class="p' + (p.full ? ' full' : '') + '">' +
+        '<input type="checkbox" value="' + esc(p.key) + '" data-i="' + i + '"' + (p.full ? ' disabled' : '') + '>' +
+        '<span class="box"><span class="tt"><span class="tick"></span><span>' +
+        '<span class="nm">' + nm + (p.full ? ' · ' + esc(t('full')) : '') + '</span>' +
+        '<span class="wh">' + wh + '</span>' +
+        (ds ? '<span class="ds">' + ds + '</span>' : '') +
+        (cnt ? '<span class="cnt">' + esc(cnt) + '</span>' : '') +
+        '</span></span></span></label>';
+    }).join('');
+  }).catch(function () {
+    $('plist').innerHTML = '<p class="skel">' + esc(t('e_send')) + '</p>';
+  });
+
+  $('f').onsubmit = function (ev) {
+    ev.preventDefault();
+    $('err').style.display = 'none';
+    var picked = [].slice.call($('plist').querySelectorAll('input:checked')).map(function (c) { return PROGS[+c.dataset.i]; });
+    var name = $('name').value.trim(), phone = $('phone').value.trim(), note = $('note').value.trim();
+    if (!picked.length) return fail(t('e_prog'));
+    if (!name) return fail(t('e_name'), $('name'));
+    if (!/^[0-9+\-\s()]{9,}$/.test(phone)) return fail(t('e_phone'), $('phone'));
+    if (!$('consent').checked) return fail(t('e_consent'), $('consent'));
+
+    var b = $('btn'); b.disabled = true; b.textContent = t('sending');
+    // 프로그램마다 한 건씩 넣는다. 하나라도 실패하면 무엇이 실패했는지 그대로 알려 준다.
+    var done = [], failed = [];
+    picked.reduce(function (chain, p) {
+      return chain.then(function () {
+        return rpc('program_signup_apply', { p: { program: p.key, name: name, phone: phone, note: note, lang: EN ? 'en' : 'ko', hp: $('hp').value } })
+          .then(function (r) {
+            if (r && r.ok) done.push(p); else failed.push({ p: p, why: (r && r.error) || '' });
+          });
+      });
+    }, Promise.resolve()).then(function () {
+      if (!done.length) {
+        b.disabled = false; b.textContent = EN ? T.btn : '사전신청하기';
+        var fullOnes = failed.filter(function (x) { return x.why === 'full'; });
+        return fail(fullOnes.length
+          ? esc(t('e_full')) + fullOnes.map(function (x) { return esc(EN ? (x.p.en || x.p.ko) : x.p.ko); }).join(', ')
+          : esc(t('e_send')));
+      }
+      $('card').innerHTML = '<div class="done"><div class="ic">&#10003;</div>' +
+        '<h2>' + esc(t('done_h')) + '</h2>' +
+        '<p style="margin:0;color:#5E7289">' + esc(t('done_p')) + '</p>' +
+        '<ul>' + done.map(function (p) {
+          return '<li>' + esc(EN ? (p.en || p.ko) : p.ko) + '<small>' + esc(EN ? (p.when_en || p.when_ko) : p.when_ko) + '</small></li>';
+        }).join('') + '</ul>' +
+        (failed.length ? '<p style="margin:14px 0 0;color:#B4233C;font-size:13.5px">' +
+          esc(t('e_full')) + failed.map(function (x) { return esc(EN ? (x.p.en || x.p.ko) : x.p.ko); }).join(', ') + '</p>' : '') +
+        '</div>';
+      window.scrollTo(0, 0);
+    }).catch(function () {
+      b.disabled = false; b.textContent = EN ? T.btn : '사전신청하기';
+      fail(esc(t('e_send')));
+    });
+  };
+})();
+</script>
+</body>
+</html>

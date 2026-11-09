@@ -607,6 +607,78 @@
         </sc-for>
       </sc-if>
 
+      <!-- 부대행사 사전신청 -->
+      <sc-if value="{{ isPsign }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">부대행사 사전신청</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 18px;line-height:1.6;">무대 프로그램을 회원가입 없이 <b>이름·연락처만</b> 받은 명단입니다. 회원 명단과 섞이지 않습니다. 신청 링크 <b style="color:#0B5FA5;">bimtc.busan.com/program</b> · 같은 번호로 다시 신청하면 덮어쓰므로 중복 명단이 생기지 않습니다.</p>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-left:5px solid {{ psAccent }};border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:250px;">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px;">
+              <span style="font-size:16px;font-weight:800;color:#0F2440;">사전신청 접수</span>
+              <span style="{{ psPillStyle }}">{{ psPillLabel }}</span>
+            </div>
+            <div style="font-size:13.5px;color:#5E7289;line-height:1.6;">{{ psDesc }}</div>
+          </div>
+          <button onClick="{{ psToggleOpen }}" style="{{ psBtnStyle }}">{{ psBtnLabel }}</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <sc-for list="{{ psCards }}" as="pc" hint-placeholder-count="5">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 16px;min-width:180px;">
+              <div style="font-size:13.5px;font-weight:800;color:#0F2440;line-height:1.35;">{{ pc.name }}</div>
+              <div style="font-size:12px;color:#8295ab;margin-top:2px;">{{ pc.when }}</div>
+              <div style="margin-top:7px;display:flex;align-items:center;gap:8px;">
+                <span style="font-size:20px;font-weight:700;color:#0B5FA5;">{{ pc.n }}</span>
+                <span style="font-size:12.5px;color:#8295ab;">명{{ pc.capLabel }}</span>
+                <span onClick="{{ pc.onToggle }}" style="{{ pc.stStyle }}">{{ pc.stLabel }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ psTabs }}" as="pt" hint-placeholder-count="6">
+              <span onClick="{{ pt.onClick }}" style="{{ pt.style }}">{{ pt.label }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input value="{{ psQuery }}" onInput="{{ setPsQuery }}" placeholder="성명·연락처·메모 검색" style="padding:10px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:14px;outline:none;width:220px;" />
+            <button onClick="{{ psExport }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">엑셀(CSV) 받기</button>
+          </div>
+        </div>
+        <sc-if value="{{ noPsign }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:40px 24px;text-align:center;color:#8295ab;font-size:14px;">{{ psEmptyMsg }}</div>
+        </sc-if>
+        <sc-for list="{{ psRowsView }}" as="s" hint-placeholder-count="4">
+          <div style="{{ s.rowStyle }}">
+            <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+              <div style="flex:1 1 200px;min-width:0;">
+                <div style="font-size:15.5px;font-weight:800;color:#0F2440;">{{ s.name }}</div>
+                <a href="{{ s.phoneHref }}" style="font-size:13.5px;color:#0B5FA5;text-decoration:none;font-weight:700;">{{ s.phone }}</a>
+              </div>
+              <div style="flex:1 1 220px;min-width:0;">
+                <div style="font-size:14px;font-weight:700;color:#33485e;">{{ s.prog }}</div>
+                <div style="font-size:12.5px;color:#8295ab;margin-top:1px;">{{ s.when }}</div>
+              </div>
+              <div style="flex:0 0 auto;text-align:right;">
+                <div style="font-size:12.5px;color:#8295ab;">{{ s.at }}</div>
+                <div style="font-size:12px;color:#b78a3c;font-weight:700;">{{ s.again }}</div>
+                <select value="{{ s.stValue }}" onChange="{{ s.onStatus }}" style="margin-top:6px;padding:8px 10px;border:1px solid #d8e0ea;border-radius:9px;font-size:13.5px;font-weight:700;font-family:'Pretendard',sans-serif;background:#fff;color:#0F2440;cursor:pointer;"><option value="received">접수</option><option value="confirmed">확인</option><option value="cancelled">취소</option></select>
+                <button onClick="{{ s.del }}" style="margin-left:6px;background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
+              </div>
+            </div>
+            <sc-if value="{{ s.hasNote }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;padding:9px 12px;background:#F7F9FC;border-radius:10px;font-size:13.5px;color:#33485e;line-height:1.6;">{{ s.note }}</div>
+            </sc-if>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;">
+              <input value="{{ s.memo }}" onInput="{{ s.onMemo }}" placeholder="사무국 메모 (신청자에게 보이지 않습니다)" style="flex:1;padding:9px 12px;border:1px solid #e6ebf2;border-radius:9px;font-size:13.5px;outline:none;font-family:'Pretendard',sans-serif;" />
+              <sc-if value="{{ s.memoDirty }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ s.saveMemo }}" style="background:#0d8f6b;color:#fff;border:none;padding:9px 15px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">메모 저장</button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </sc-if>
+
       <!-- MATCHING -->
       <sc-if value="{{ isMatch }}" hint-placeholder-val="{{ false }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">비즈미팅 매칭 관리</h1>
@@ -888,6 +960,7 @@ class Component extends DCLogic {
     boardDay: 'D1', resvRows: [], mtgLink: {}, mtgPlat: {},
     prospects: [], pFilter: 'all', pQuery: '', pMemo: {},
     obLeads: [], obFilter: 'all', obQuery: '', obMemo: {},
+    psRows: [], psCfg: null, psFilter: 'all', psQuery: '', psMemo: {}, psBusy: false,
     addOpen: false, addMode: 'one', addForm: {}, addBulk: '', addBusy: false,
     pSort: 'seq', pDesc: false, editId: null,
     cmsFlash: false,
@@ -1002,14 +1075,16 @@ class Component extends DCLogic {
     this._proBusy=false;
   }
   async reload(){
-    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects, obLeads] = await Promise.all([
+    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects, obLeads, psRows, psCfg] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
       window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
       window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers(),
       window.BimtcDB.listInquiries().catch(()=>[]),
       window.BimtcDB.listNotifications().catch(()=>[]),
       window.BimtcDB.listProspects().catch(()=>[]),
-      window.BimtcDB.listOnlineBuyerLeads().catch(()=>[])
+      window.BimtcDB.listOnlineBuyerLeads().catch(()=>[]),
+      window.BimtcDB.listProgramSignups().catch(()=>[]),
+      window.BimtcDB.programSignupConfig().catch(()=>({ open:false, programs:[] }))
     ]);
     // 11.13(D1)·11.14(D2) 를 구분하지 않으면 한쪽 예약이 다른 날에도 잡힌 것처럼 보인다
     const reserved={}; resvs.forEach(r=>{ reserved[r.day+'-'+r.table_idx+'-'+r.slot_idx]=r.interpreter?2:1; });
@@ -1022,7 +1097,9 @@ class Component extends DCLogic {
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
     this.proMark(prospects||[]);
     this.setState({ apps, regs, matches, notices, reserved, restricted: closed||{}, booths, members, inquiries: inquiries||[],
-      notifications: notifications||[], prospects: prospects||[], obLeads: obLeads||[], resvRows: resvs||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false, bizOpen });
+      notifications: notifications||[], prospects: prospects||[], obLeads: obLeads||[],
+      psRows: psRows||[], psCfg: psCfg||{ open:false, programs:[] },
+      resvRows: resvs||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false, bizOpen });
   }
 
   // 비즈미팅 매칭 오픈/마감 (참가기업·바이어 화면이 이 값만 본다)
@@ -1282,6 +1359,7 @@ class Component extends DCLogic {
       {k:'members',label:'회원 명단'},
       {k:'oblead',label:'온라인 바이어 신청',badge:(this.state.obLeads||[]).filter(x=>x.status==='new').length},
       {k:'reg',label:'사전등록 명단'},
+      {k:'psign',label:'부대행사 사전신청',badge:(this.state.psRows||[]).filter(x=>x.status==='received').length},
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
       {k:'lounge',label:'미팅 현황'},
       {k:'inq',label:'문의 관리',badge:(this.state.inquiries||[]).filter(q=>!q.answer).length},
@@ -1291,6 +1369,98 @@ class Component extends DCLogic {
       {k:'rsvp',label:'개막식 초청 회신 ↗',href:'rsvp-admin.html'},
       {k:'invite',label:'초청바이어 정보 ↗',href:'invite-admin.html'},
     ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>{ if(n.href){ window.location.href=n.href; return; } this.setState({view:n.k}); if(n.k==='prospect') setTimeout(()=>this.pollProspects(),60); }}));
+
+
+    // ── 부대행사 사전신청 (회원가입 없이 이름·연락처만 받은 명단) ──
+    // 신청 링크는 bimtc.busan.com/program · 프로그램 목록과 정원은 site_settings.program_signup 에 있다.
+    const PS_ST=[['received','접수'],['confirmed','확인'],['cancelled','취소']];
+    const PS_LB={}; PS_ST.forEach(([k,l])=>{ PS_LB[k]=l; });
+    const psCfg=this.state.psCfg||{ open:false, programs:[] };
+    const psProgs=psCfg.programs||[];
+    const psName=(k)=>{ const p=psProgs.find(x=>x.key===k); return p?p.ko:k; };
+    const psWhen=(k)=>{ const p=psProgs.find(x=>x.key===k); return p?(p.when_ko||''):''; };
+    const psAll=this.state.psRows||[];
+    const psLive=psAll.filter(x=>x.status!=='cancelled');
+    const psQ=(this.state.psQuery||'').trim().toLowerCase();
+    const psHit=(x)=>!psQ || [x.name,x.phone,x.note,x.memo,psName(x.program)].filter(Boolean).join(' ').toLowerCase().indexOf(psQ)>=0;
+    const psList=psAll.filter(x=>(this.state.psFilter==='all'||x.program===this.state.psFilter) && psHit(x));
+    const psCount=(k)=> k==='all' ? psLive.length : psLive.filter(x=>x.program===k).length;
+    const psTabs=[{k:'all',l:'전체'}].concat(psProgs.map(p=>({k:p.key,l:p.ko}))).map(o=>({
+      label:o.l+' '+psCount(o.k), onClick:()=>this.setState({psFilter:o.k}),
+      style:'padding:8px 15px;border-radius:999px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;cursor:pointer;white-space:nowrap;'
+        + (this.state.psFilter===o.k ? 'background:#0B5FA5;color:#fff;' : 'background:#fff;color:#5E7289;border:1px solid #e6ebf2;') }));
+
+    const psSetStatus=async(id,st)=>{
+      const cur=psAll.find(x=>x.id===id); if(!cur||cur.status===st) return;
+      this.setState({ psRows:psAll.map(x=>x.id===id?{...x,status:st}:x) });
+      const r=await window.BimtcDB.updateProgramSignup(id,{ status:st, updated_at:new Date().toISOString() });
+      if(!r.ok){ this.setState({ psRows:psAll.map(x=>x.id===id?{...x,status:cur.status}:x), toast:'상태 변경 실패: '+r.error }); return; }
+      this.flash('상태를 '+(PS_LB[st]||st)+'(으)로 바꿨습니다');
+    };
+    const psSetMemo=(id,val)=>{ const d={...(this.state.psMemo||{})}; d[id]=val; this.setState({psMemo:d}); };
+    const psSaveMemo=async(id)=>{
+      const d={...(this.state.psMemo||{})}; if(!(id in d)) return;
+      const val=d[id]; delete d[id];
+      this.setState({ psMemo:d, psRows:psAll.map(x=>x.id===id?{...x,memo:val}:x) });
+      const r=await window.BimtcDB.updateProgramSignup(id,{ memo:val, updated_at:new Date().toISOString() });
+      if(!r.ok) this.setState({ toast:'메모 저장 실패: '+r.error });
+    };
+    const psDelete=async(id)=>{
+      const x=psAll.find(y=>y.id===id); if(!x) return;
+      if(!confirm(psName(x.program)+' · '+(x.name||'')+' ('+(x.phone||'')+') 신청을 지울까요?\n되돌릴 수 없습니다. 취소하신 분은 지우지 말고 상태를 [취소]로 바꿔 주세요.')) return;
+      const r=await window.BimtcDB.deleteProgramSignup(id);
+      if(!r.ok){ this.setState({toast:'삭제 실패: '+r.error}); return; }
+      this.setState({ psRows:psAll.filter(y=>y.id!==id) });
+      this.flash('삭제했습니다');
+    };
+    const psExport=()=>{
+      const head=['접수일시','프로그램','일시','상태','성명','연락처','남길 말','작성언어','재신청','사무국 메모'];
+      const rows=psList.map(x=>[ this.shortTime(x.created_at), psName(x.program), psWhen(x.program),
+        PS_LB[x.status]||x.status, x.name, x.phone, x.note, x.lang, x.submit_count, x.memo ]);
+      const esc=(v)=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+      const csv='\uFEFF'+[head].concat(rows).map(r=>r.map(esc).join(',')).join('\r\n');
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+      a.download='부대행사_사전신청_'+new Date().toISOString().slice(0,10)+'.csv';
+      a.click(); URL.revokeObjectURL(a.href);
+    };
+    const psToggleOpen=async()=>{
+      if(this.state.psBusy) return;
+      const next={...psCfg, open:!psCfg.open};
+      this.setState({psBusy:true});
+      const r=await window.BimtcDB.saveProgramSignupConfig(next);
+      this.setState({psBusy:false});
+      if(!r.ok){ this.setState({toast:'저장 실패: '+r.error}); return; }
+      this.setState({psCfg:next});
+      this.flash(next.open?'사전신청을 열었습니다':'사전신청을 닫았습니다');
+    };
+    const psToggleProg=async(key)=>{
+      if(this.state.psBusy) return;
+      const next={...psCfg, programs:psProgs.map(p=>p.key===key?{...p,open:!p.open}:p)};
+      this.setState({psBusy:true});
+      const r=await window.BimtcDB.saveProgramSignupConfig(next);
+      this.setState({psBusy:false});
+      if(!r.ok){ this.setState({toast:'저장 실패: '+r.error}); return; }
+      this.setState({psCfg:next});
+      this.flash(psName(key)+' 신청을 '+(next.programs.find(p=>p.key===key).open?'열었습니다':'닫았습니다'));
+    };
+    const psCards=psProgs.map(p=>({
+      name:p.ko, when:p.when_ko||'', n:psCount(p.key),
+      capLabel:(p.cap>0?(' / 정원 '+p.cap+'명'):''),
+      stLabel:p.open?'접수 중':'마감', onToggle:()=>psToggleProg(p.key),
+      stStyle:'display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;'
+        +(p.open?'background:#E8F6F0;color:#0d8f6b;':'background:#F1F4F8;color:#8295ab;') }));
+    const psRowsView=psList.map(x=>({
+      id:x.id, name:x.name||'-', phone:x.phone||'', phoneHref:'tel:'+String(x.phone||'').replace(/[^0-9+]/g,''),
+      prog:psName(x.program), when:psWhen(x.program),
+      at:this.shortTime(x.created_at), again:(x.submit_count>1?('재신청 '+x.submit_count+'회'):''),
+      note:x.note||'', hasNote:!!x.note,
+      stValue:x.status, onStatus:(e)=>psSetStatus(x.id, e.target.value),
+      rowStyle:'background:#fff;border:1px solid '+(x.status==='cancelled'?'#f0dcd9':'#e6ebf2')+';border-radius:14px;padding:15px 18px;margin-bottom:10px;'
+        +(x.status==='cancelled'?'opacity:0.65;':''),
+      memo:(this.state.psMemo&&(x.id in this.state.psMemo))?this.state.psMemo[x.id]:(x.memo||''),
+      memoDirty:!!(this.state.psMemo&&(x.id in this.state.psMemo)),
+      onMemo:(e)=>psSetMemo(x.id, e.target.value), saveMemo:()=>psSaveMemo(x.id), del:()=>psDelete(x.id) }));
 
     // ── 온라인 바이어 사전신청 (가입 없이 받은 별도 명단) ──
     // 회원가입과 섞지 않고 따로 모아 두고, 사무국이 확정한 건만 나중에 정식 신청으로 옮긴다.
@@ -1954,6 +2124,19 @@ class Component extends DCLogic {
       hasSentNoti:(this.state.notifications||[]).some(n=>n.status==='sent'),
       sentNotiCount:(this.state.notifications||[]).filter(n=>n.status==='sent').length,
       prospectTabs, prospectRows, exportProspects, printProspects,
+      psTabs, psCards, psRowsView, psExport, psToggleOpen,
+      psQuery:this.state.psQuery||'', setPsQuery:(e)=>this.setState({psQuery:e.target.value}),
+      noPsign:psRowsView.length===0,
+      psEmptyMsg:(psAll.length===0?'아직 사전신청이 없습니다.':'검색 조건에 맞는 신청이 없습니다.'),
+      psAccent:psCfg.open?'#11A37B':'#8295ab',
+      psPillLabel:psCfg.open?'접수 중':'닫힘',
+      psPillStyle:'display:inline-block;padding:3px 11px;border-radius:999px;font-size:12.5px;font-weight:800;'
+        +(psCfg.open?'background:#E7F6F0;color:#0d8f6b;':'background:#F1F4F8;color:#8295ab;'),
+      psDesc:psCfg.open?'bimtc.busan.com/program 에서 누구나 신청할 수 있습니다. 프로그램별로 따로 닫을 수도 있습니다.'
+                       :'지금은 신청 화면에 "사전신청을 받고 있지 않습니다"라고 보입니다.',
+      psBtnLabel:psCfg.open?'전체 마감하기':'전체 열기',
+      psBtnStyle:'border:none;border-radius:11px;padding:12px 20px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:\'Pretendard\',sans-serif;white-space:nowrap;'
+        +(psCfg.open?'background:#fff;color:#5E7289;border:1px solid #d8e0ea;':'background:#0B5FA5;color:#fff;'),
       obTabs, obRows, obExport,
       obQuery:this.state.obQuery||'', setObQuery:(e)=>this.setState({obQuery:e.target.value}),
       obTotal:String(obAll.length), obNew:String(obCount('new')), obReview:String(obCount('review')),
@@ -2017,7 +2200,7 @@ class Component extends DCLogic {
       bizBtnLabel:this.state.bizBusy?'처리 중…':(this.state.bizOpen?'매칭 마감하기':'지금 매칭 오픈하기'),
       bizBtnStyle:'border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;font-family:inherit;white-space:nowrap;cursor:'+(this.state.bizBusy?'default':'pointer')+';border:none;'+(this.state.bizOpen?'background:#fff;color:#c0392b;border:1.5px solid #f0c8c2;':'background:#0B5FA5;color:#fff;'),
       toggleBiz:()=>this.toggleBizOpen(),
-      isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',isOblead:v==='oblead',
+      isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',isOblead:v==='oblead',isPsign:v==='psign',
       memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       pwModalOn:!!this.state.pwModal,
       pwWho:this.state.pwModal?((this.state.pwModal.name||'')+' ('+(this.state.pwModal.email||'')+')'):'',

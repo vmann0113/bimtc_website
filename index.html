@@ -941,7 +941,14 @@
     <sc-if value="{{ exProgram }}" hint-placeholder-val="{{ false }}">
     <section style="background:#ffffff;color:#0A2236;">
       <div style="max-width:1180px;margin:0 auto;padding:clamp(35px,6.5vw,64px) clamp(16px,4.5vw,32px);">
-        <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 24px;letter-spacing:-0.02em;">{{ t.exb_prog }}</h2>
+        <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 18px;letter-spacing:-0.02em;">{{ t.exb_prog }}</h2>
+        <a href="program" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#F2F8FE;border:1px solid #cfe3f7;border-radius:14px;padding:16px 20px;margin:0 0 22px;text-decoration:none;">
+          <span style="flex:1;min-width:220px;">
+            <span style="display:block;font-size:15.5px;font-weight:800;color:#0A2236;">{{ t.prog_pre_t }}</span>
+            <span style="display:block;font-size:13.5px;color:#5E7289;margin-top:3px;line-height:1.6;">{{ t.prog_pre_d }}</span>
+          </span>
+          <span style="flex:none;background:#0B5FA5;color:#fff;border-radius:10px;padding:11px 19px;font-size:14.5px;font-weight:800;white-space:nowrap;">{{ t.prog_pre_b }}</span>
+        </a>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:24px;">
           <sc-for list="{{ timetable }}" as="d" hint-placeholder-count="2">
             <div style="background:#F4F8F6;border:1px solid #e2ece7;border-radius:16px;padding:26px;">
@@ -1911,6 +1918,10 @@ class Component extends DCLogic {
       sched_over:L('SCHEDULE','SCHEDULE'), sched_title:L('주요 일정 안내','Key Schedule'),
       over_over:L('OVERVIEW','OVERVIEW'), over_title:L('행사 개요','Event Overview'), over_more:L('행사 소개 자세히 보기 →','Learn more about BIMTC →'),
       prog_over:L('PROGRAM','PROGRAM'), prog_title:L('프로그램 하이라이트','Program Highlights'),
+      // 무대 프로그램 사전신청 (program.html · 회원가입 없이 이름·연락처만)
+      prog_pre_t:L('부대행사 사전신청','Pre-register for programs'),
+      prog_pre_d:L('무대 프로그램은 미리 신청하시면 자리를 마련해 드립니다. 신청하지 않으셔도 참여하실 수 있습니다.','Register in advance and we will keep a seat for you. Walk-ins are welcome too.'),
+      prog_pre_b:L('사전신청하기','Pre-register'),
       access_over:L('ACCESS & VENUE','ACCESS & VENUE'), access_title:L('행사장 안내','Venue & Access'),
       access_way:L('오시는 길','Directions'), access_map:L('지도 크게 보기 →','View larger map →'),
       floor_title:L('부스 배치도 (플로어맵)','Booth Layout (Floor Map)'), floor_desc:L('BEXCO 제1전시장 부스 배치와 참가기업 위치를 확인하세요. 카테고리별 전시 구역 안내 제공.','Check the booth layout and exhibitor locations at BEXCO Hall 1. Zone guide by category provided.'), floor_btn:L('부스 배치도 보기','View booth layout'), floor_soon:L('준비 중입니다','Coming soon'), floor_soon_desc:L('부스 배치도는 현재 준비 중입니다. 확정되는 대로 공개할 예정입니다.','The booth layout is being prepared and will be published once confirmed.'),

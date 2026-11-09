@@ -602,6 +602,36 @@
       return { ok: true, place: place };
     },
 
+    // ---------- 부대행사 사전신청 (가입 없이 받은 명단) ----------
+    // 접수는 program_signup_apply RPC 로만 들어오고, 여기(관리자)서만 읽고 고칠 수 있다(RLS).
+    async listProgramSignups() {
+      var sb = await ready();
+      var r = await sb.from('program_signups').select('*').order('created_at', { ascending: false });
+      return r.data || [];
+    },
+    async updateProgramSignup(id, patch) {
+      var sb = await ready();
+      var r = await sb.from('program_signups').update(patch).eq('id', id).select();
+      if (r.error) return { ok: false, error: r.error.message };
+      if (!r.data || !r.data.length) return { ok: false, error: '권한이 없거나 대상을 찾지 못했습니다' };
+      return { ok: true };
+    },
+    async deleteProgramSignup(id) {
+      var sb = await ready();
+      var r = await sb.from('program_signups').delete().eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
+    // 프로그램 목록·정원·열림 여부. 공개 화면(program.html)도 같은 설정을 본다.
+    async programSignupConfig() {
+      var sb = await ready();
+      var r = await sb.from('site_settings').select('value').eq('key', 'program_signup').maybeSingle();
+      return (r.data && r.data.value) || { open: false, programs: [] };
+    },
+    async saveProgramSignupConfig(obj) {
+      var sb = await ready();
+      var r = await sb.from('site_settings').upsert({ key: 'program_signup', value: obj, updated_at: new Date().toISOString() });
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
     // ---------- 예약 ----------
     async listReservations(day) { var sb = await ready(); var q = sb.from('reservations').select('*'); if (day) q = q.eq('day', day); var r = await q; return r.data || []; },
     async myReservations() { var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return []; var r = await sb.from('reservations').select('*').or('owner_profile.eq.' + u.id + ',guest_profile.eq.' + u.id); return r.data || []; },
