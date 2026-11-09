@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>현장 등록 · 2026 부산국제의료관광컨벤션</title>
+<meta name="description" content="2026 부산국제의료관광컨벤션 현장 방문객 등록. 입력 후 데스크에서 팔찌를 받으세요.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BIMTC 2026">
+<meta property="og:title" content="2026 BIMTC 현장 등록">
+<meta property="og:description" content="11월 13일(금)~14일(토) · 벡스코 제1전시장 3A홀 · 무료입장">
+<meta property="og:image" content="uploads/keyvisual.png">
+<meta property="og:locale" content="ko_KR">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="uploads/favicon.png">
+<link rel="apple-touch-icon" href="uploads/apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!--
+  현장 등록 (walkin.html) — 행사장 X배너 QR 로 들어온다. 회원가입 없이 바로 입력한다.
+  줄 서서 쓰는 화면이라 한 번에 보이게 짧게 만들었다. 받는 것은 이름·연락처(필수)와
+  소속·관심분야(선택)뿐이다. 저장은 사전등록과 같은 표 visitor_registrations 로 들어간다.
+  ★ 사전등록은 이메일이 필수라 전부 들어 있고(2026-11-09 기준 377건 모두), 현장등록은
+    이메일을 받지 않는다. 그래서 사무국 화면은 '이메일 없음 = 현장등록'으로 구분한다.
+    사전등록에서 이메일을 선택으로 바꾸면 이 구분이 깨지므로 그때는 별도 칸이 필요하다.
+  끝나면 큰 확인 화면이 뜬다 — 데스크 직원은 그 화면을 보고 팔찌를 준다(따로 조회 화면은 없다).
+-->
+<style>
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{margin:0;background:#EEF1F6;color:#15233a;font-family:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;font-size:15px;line-height:1.6;word-break:keep-all;overflow-wrap:break-word}
+  input,button,select{font-family:inherit;font-size:16px}
+  .wrap{max-width:560px;margin:0 auto;padding:0 0 44px}
+  .hero{margin:20px 12px 0;position:relative;background:linear-gradient(118deg,#16294F 0%,#0B5FA5 58%,#11A37B 100%);border-radius:16px 16px 0 0;padding:20px 20px 18px;color:#fff}
+  .hero .kicker{font-size:11.5px;font-weight:800;letter-spacing:.22em;opacity:.78;margin:0 0 7px}
+  .hero .mw{font-size:clamp(20px,6vw,25px);font-weight:800;letter-spacing:-.02em;margin:0;line-height:1.15}
+  .hero .mw em{font-style:normal;opacity:.6;margin:0 5px;font-weight:600}
+  .hero .ko{font-size:13px;font-weight:600;opacity:.88;margin:6px 0 0}
+  .lang{position:absolute;top:13px;right:13px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:700;text-decoration:none}
+  .card{background:#fff;margin:0 12px;border-radius:0 0 16px 16px;padding:22px 20px 26px;box-shadow:0 8px 30px rgba(20,50,90,.08)}
+  h1{font-size:23px;font-weight:800;color:#0A2236;margin:0 0 6px;text-align:center;letter-spacing:-.02em}
+  .sub1{text-align:center;color:#5E7289;font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:7px;margin:0 0 20px}
+  .steps div{flex:1;background:#F3F7FA;border-radius:10px;padding:9px 6px;text-align:center;font-size:12.5px;font-weight:700;color:#5E7289;line-height:1.45}
+  .steps div b{display:block;color:#0B5FA5;font-size:11px;letter-spacing:.08em;margin-bottom:2px}
+  .steps div.on{background:#E7F0FA;color:#0A2236}
+  .f{margin-bottom:14px}
+  .f label.t{display:block;font-weight:700;font-size:14px;margin-bottom:6px;color:#0A2236}
+  .req{color:#D6336C;margin-left:2px}
+  .sub{font-size:13px;color:#8295ab;font-weight:500;margin-left:4px}
+  .f input[type=text],.f input[type=tel]{width:100%;border:1.5px solid #d8e0ea;border-radius:10px;padding:13px 13px;background:#fff;color:#15233a;outline:none;font-size:17px}
+  .f input:focus{border-color:#0B5FA5;box-shadow:0 0 0 3px rgba(11,95,165,.12)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chips label{position:relative}
+  .chips input{position:absolute;opacity:0;pointer-events:none}
+  .chips span{display:block;padding:9px 15px;border-radius:999px;border:1.5px solid #d3deea;background:#F4F8FD;color:#33485e;font-size:14.5px;font-weight:600;cursor:pointer}
+  .chips input:checked+span{background:#0B5FA5;border-color:#0B5FA5;color:#fff}
+  .chips input:focus-visible+span{box-shadow:0 0 0 3px rgba(11,95,165,.25)}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .consent{background:#F7F9FB;border-radius:10px;padding:12px 14px;font-size:13px;color:#5E7289;margin:14px 0 16px}
+  .consent label{display:flex;gap:9px;align-items:flex-start;color:#15233a;font-weight:600;font-size:14px;margin-top:8px;cursor:pointer}
+  .consent input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:#0B5FA5}
+  .err{display:none;background:#FDEDEF;color:#B4233C;border-radius:10px;padding:10px 13px;font-size:14px;margin-bottom:12px}
+  .btn{display:block;width:100%;border:0;border-radius:12px;background:#0B5FA5;color:#fff;font-size:18px;font-weight:800;padding:17px;cursor:pointer}
+  .btn:disabled{opacity:.55;cursor:default}
+  .note{font-size:12.5px;color:#8295ab;margin-top:10px;text-align:center;line-height:1.7}
+  .done{text-align:center;padding:14px 4px 6px}
+  .done .ic{width:78px;height:78px;border-radius:50%;background:#E7F6F0;color:#11A37B;font-size:44px;line-height:78px;margin:0 auto 16px}
+  .done h2{font-size:23px;font-weight:800;color:#0A2236;margin:0 0 6px}
+  .done .nm{font-size:30px;font-weight:800;color:#0B5FA5;margin:12px 0 2px;letter-spacing:-.02em}
+  .done .tm{font-size:14px;color:#7a8898;margin:0 0 18px}
+  .done .band{background:#16294F;color:#fff;border-radius:14px;padding:18px 16px;font-size:18px;font-weight:800;line-height:1.5}
+  .done .band small{display:block;font-weight:600;font-size:13.5px;opacity:.78;margin-top:5px}
+  .again{display:inline-block;margin-top:18px;color:#0B5FA5;font-size:14px;font-weight:700;text-decoration:none;border-bottom:1px solid #cfe0f2}
+  .foot{text-align:center;font-size:13px;color:#7a8898;margin-top:20px;line-height:1.8}
+  .foot a{color:#0B5FA5;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <p class="kicker">BIMTC 2026</p>
+    <p class="mw">MEDI<em>&#215;</em>WELLNESS</p>
+    <p class="ko" id="hero_ko">2026 부산국제의료관광컨벤션</p>
+    <a class="lang" id="lang" href="?lang=en">EN</a>
+  </div>
+  <div class="card" id="card">
+    <h1 id="h1">현장 등록</h1>
+    <p class="sub1" id="sub1">아래를 입력하시고 데스크에서 팔찌를 받으세요.</p>
+
+    <div class="steps">
+      <div><b>01</b><span id="st1">QR 스캔</span></div>
+      <div class="on"><b>02</b><span id="st2">정보 입력</span></div>
+      <div><b>03</b><span id="st3">팔찌 수령</span></div>
+    </div>
+
+    <form id="f" novalidate>
+      <div class="f"><label class="t" for="name" id="l_name">성명<span class="req">*</span></label><input type="text" id="name" autocomplete="name" required></div>
+      <div class="f"><label class="t" for="phone" id="l_phone">연락처(휴대전화)<span class="req">*</span></label><input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" required></div>
+      <div class="f"><label class="t" for="org" id="l_org">소속<span class="sub" id="l_org_s">선택</span></label><input type="text" id="org" autocomplete="organization" placeholder="기관/회사명"></div>
+
+      <div class="f">
+        <label class="t" id="l_int">관심 분야<span class="sub" id="l_int_s">선택 · 여러 개 가능</span></label>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <div class="hp" aria-hidden="true"><input type="text" id="hp" tabindex="-1" autocomplete="off"></div>
+      <div class="consent">
+        <span id="consent_t">수집 항목: 성명, 연락처, 소속, 관심 분야 · 이용 목적: 행사 입장 확인 및 안내 · 보유 기간: 행사 종료 후 6개월</span>
+        <label><input type="checkbox" id="consent"> <span id="consent_l">개인정보 수집·이용에 동의합니다.</span><span class="req">*</span></label>
+      </div>
+      <div class="err" id="err"></div>
+      <button class="btn" id="btn" type="submit">등록하기</button>
+      <p class="note" id="foot_note">입장료는 없습니다. 등록을 마치면 화면을 데스크에 보여 주세요.</p>
+    </form>
+  </div>
+  <div class="foot">
+    <span id="f_office">2026 부산국제의료관광컨벤션 사무국</span><br>
+    T. 051-461-4276~8 · <a href="mailto:bmia0528@naver.com">bmia0528@naver.com</a><br>
+    <a href="/">bimtc.busan.com</a>
+  </div>
+</div>
+<script>
+(function () {
+  // bimtc-supabase.js 와 같은 프로젝트·공개(anon) 키.
+  // visitor_registrations 는 넣기만 되고 읽기는 사무국(is_admin)만 된다 — RLS 로 막혀 있다.
+  var SUPABASE_URL = 'https://xkomxbskwvtofpglback.supabase.co';
+  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrb214YnNrd3Z0b2ZwZ2xiYWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjIxNzYsImV4cCI6MjEwMDAzODE3Nn0.YVBpieLDFP4AyeapuiRmjrDyZYdAHfiudnUdRPG65mo';
+  var $ = function (id) { return document.getElementById(id); };
+
+  var qs = new URLSearchParams(location.search);
+  var EN = (qs.get('lang') || '').toLowerCase() === 'en';
+
+  // 관심 분야는 홈페이지 사전등록 화면(index.html interestChips)과 같은 항목·같은 저장값을 쓴다.
+  var INTERESTS = [
+    ['건강검진', 'Check-up'], ['성형·뷰티', 'Cosmetic'], ['피부·레이저', 'Skin/Laser'],
+    ['웰니스', 'Wellness'], ['치과', 'Dental'], ['한방', 'Korean Med.'],
+    ['재활', 'Rehab'], ['관광', 'Tourism']
+  ];
+
+  var T = {
+    h1: 'On-site Registration',
+    sub1: 'Fill this in, then collect your wristband at the desk.',
+    st1: 'Scan QR', st2: 'Enter details', st3: 'Get wristband',
+    l_name: 'Name', l_phone: 'Mobile number', l_org: 'Affiliation', l_org_s: 'optional',
+    l_int: 'Interests', l_int_s: 'optional · choose any',
+    org_ph: 'Organization',
+    consent_t: 'Collected: name, phone, affiliation, interests · Purpose: entry confirmation and event information · Kept for 6 months after the event',
+    consent_l: 'I agree to the collection and use of my personal information.',
+    btn: 'Register', sending: 'Registering...',
+    foot_note: 'Admission is free. Show this screen at the desk once you are done.',
+    f_office: '2026 BIMTC Organizing Office',
+    hero_ko: 'Busan International Medical Tourism Convention 2026',
+    e_name: 'Please enter your name.',
+    e_phone: 'Please check your mobile number.',
+    e_consent: 'Please agree to the collection and use of your personal information.',
+    e_send: 'Could not register. Please try again, or ask a staff member at the desk.',
+    done_h: 'You are registered', band: 'Please collect your wristband at the desk.',
+    band_s: 'Show this screen to a staff member.',
+    again: 'Register another visitor',
+    title: 'On-site Registration · BIMTC 2026'
+  };
+  var K = {
+    btn: '등록하기', sending: '등록하는 중…',
+    e_name: '성명을 입력해 주세요.',
+    e_phone: '연락처를 확인해 주세요.',
+    e_consent: '개인정보 수집·이용에 동의해 주세요.',
+    e_send: '등록하지 못했습니다. 다시 시도하시거나 데스크 직원에게 말씀해 주세요.',
+    done_h: '등록되었습니다', band: '데스크에서 팔찌를 받으세요.',
+    band_s: '이 화면을 직원에게 보여 주세요.',
+    again: '다른 분 등록하기'
+  };
+  var t = function (k) { return EN ? T[k] : K[k]; };
+
+  if (EN) {
+    document.documentElement.lang = 'en';
+    document.title = T.title;
+    ['h1', 'sub1', 'st1', 'st2', 'st3', 'l_name', 'l_phone', 'l_org', 'l_org_s',
+     'l_int', 'l_int_s', 'consent_t', 'consent_l', 'f_office', 'hero_ko'].forEach(function (id) {
+      if ($(id)) $(id).textContent = T[id];
+    });
+    $('btn').textContent = T.btn;
+    $('foot_note').textContent = T.foot_note;
+    $('org').placeholder = T.org_ph;
+    $('lang').href = location.pathname;
+    $('lang').textContent = '한국어';
+  }
+
+  // 관심 분야 칩
+  var chips = $('chips');
+  INTERESTS.forEach(function (pair, i) {
+    var l = document.createElement('label');
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = pair[0]; cb.id = 'int' + i;
+    var sp = document.createElement('span');
+    sp.textContent = EN ? pair[1] : pair[0];
+    l.appendChild(cb); l.appendChild(sp);
+    chips.appendChild(l);
+  });
+
+  function showErr(msg) {
+    var e = $('err');
+    if (!msg) { e.style.display = 'none'; e.textContent = ''; return; }
+    e.textContent = msg; e.style.display = 'block';
+    e.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+
+  // 방문일은 오늘 날짜로 정한다. 행사일이 아니면 both 로 둔다(사전 점검·설치일 등).
+  function visitDay() {
+    var d = new Date();
+    var ymd = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+    if (ymd === '2026-11-13') return 'D1';
+    if (ymd === '2026-11-14') return 'D2';
+    return 'both';
+  }
+
+  function hhmm() {
+    var d = new Date();
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  function done(name) {
+    $('card').innerHTML =
+      '<div class="done">' +
+      '<div class="ic">&#10003;</div>' +
+      '<h2></h2>' +
+      '<p class="nm"></p>' +
+      '<p class="tm"></p>' +
+      '<div class="band"><span></span><small></small></div>' +
+      '<a class="again" href="' + location.pathname + (EN ? '?lang=en' : '') + '"></a>' +
+      '</div>';
+    var d = $('card').firstChild;
+    d.querySelector('h2').textContent = t('done_h');
+    d.querySelector('.nm').textContent = name;
+    d.querySelector('.tm').textContent = hhmm();
+    d.querySelector('.band span').textContent = t('band');
+    d.querySelector('.band small').textContent = t('band_s');
+    d.querySelector('.again').textContent = t('again');
+    window.scrollTo(0, 0);
+  }
+
+  $('f').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    showErr('');
+    if ($('hp').value) { return; }                       // 자동 입력 거르기
+    var name = $('name').value.trim();
+    var phone = $('phone').value.trim();
+    var org = $('org').value.trim();
+    if (!name) { showErr(t('e_name')); $('name').focus(); return; }
+    if (phone.replace(/[^0-9]/g, '').length < 9) { showErr(t('e_phone')); $('phone').focus(); return; }
+    if (!$('consent').checked) { showErr(t('e_consent')); return; }
+
+    var interests = [].slice.call(chips.querySelectorAll('input:checked')).map(function (c) { return c.value; });
+
+    $('btn').disabled = true;
+    $('btn').textContent = t('sending');
+
+    fetch(SUPABASE_URL + '/rest/v1/visitor_registrations', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        name: name.slice(0, 80),
+        phone: phone.slice(0, 40),
+        email: null,                                      // 현장등록 표시 — 위 주석 참고
+        org: org ? org.slice(0, 120) : null,
+        interests: interests,
+        visit_day: visitDay()
+      })
+    }).then(function (r) {
+      if (!r.ok) { throw new Error('HTTP ' + r.status); }
+      done(name);
+    }).catch(function () {
+      $('btn').disabled = false;
+      $('btn').textContent = t('btn');
+      showErr(t('e_send'));
+    });
+  });
+})();
+</script>
+</body>
+</html>

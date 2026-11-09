@@ -525,20 +525,22 @@
 
       <sc-if value="{{ isReg }}" hint-placeholder-val="{{ false }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">참관객 사전등록 명단</h1>
-        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">사전등록 현황입니다. CSV로 내보내 현장 명단으로 활용하세요.</p>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 22px;">사전등록과 현장등록(행사장 QR · <b style="color:#0B5FA5;">bimtc.busan.com/walkin</b>)이 함께 나옵니다. CSV로 내보내 명단으로 활용하세요.</p>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
           <div style="display:flex;gap:10px;">
             <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#0B5FA5;">{{ regTotal }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:8px;">총 등록</span></div>
             <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#11A37B;">{{ regToday }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:8px;">오늘</span></div>
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 20px;"><span style="font-family:'Pretendard',sans-serif;font-size:20px;font-weight:600;color:#0d8f6b;">{{ regWalkin }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:8px;">현장등록</span></div>
           </div>
           <button onClick="{{ exportCsv }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV 내보내기</button>
         </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;overflow:hidden;">
           <div style="display:flex;gap:16px;padding:14px 24px;background:#F7F9FC;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;border-bottom:1px solid #eef2f7;">
-            <span style="width:90px;">이름</span><span style="flex:1;">소속</span><span style="flex:1.2;">관심분야</span><span style="width:90px;">방문일</span><span style="width:120px;">등록일시</span>
+            <span style="width:48px;">구분</span><span style="width:90px;">이름</span><span style="flex:1;">소속</span><span style="flex:1.2;">관심분야</span><span style="width:90px;">방문일</span><span style="width:120px;">등록일시</span>
           </div>
           <sc-for list="{{ regs }}" as="r" hint-placeholder-count="6">
             <div style="display:flex;gap:16px;padding:14px 24px;border-bottom:1px solid #eef2f7;align-items:center;">
+              <span style="width:48px;"><span style="{{ r.kindStyle }}">{{ r.kind }}</span></span>
               <span style="width:90px;font-size:14px;font-weight:700;">{{ r.name }}</span>
               <span style="flex:1;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#33485e;">{{ r.org }}</span>
               <span style="flex:1.2;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ r.field }}</span>
@@ -1335,7 +1337,7 @@ class Component extends DCLogic {
     this.flash(ok?'공지가 저장되었습니다':'저장 실패 (권한 확인)');
   }
   exportCsv(){
-    const rows=[['이름','소속','관심분야','방문일','등록일시']].concat(this.state.regs.map(r=>[r.name||'', r.org||'', (r.interests||[]).join(' '), r.visit_day||'', r.created_at||'']));
+    const rows=[['구분','이름','연락처','이메일','소속','관심분야','방문일','등록일시']].concat(this.state.regs.map(r=>[(r.email&&String(r.email).trim())?'사전':'현장', r.name||'', r.phone||'', r.email||'', r.org||'', (r.interests||[]).join(' '), r.visit_day||'', r.created_at||'']));
     const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download='bimtc_visitors.csv'; a.click(); URL.revokeObjectURL(url);
@@ -2100,8 +2102,14 @@ class Component extends DCLogic {
       setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },500);
     };
 
+    // 사전등록(홈 > 참관안내)은 이메일이 필수라 전부 들어 있고, 현장등록(walkin.html)은 안 받는다.
+    // 그래서 이메일이 비면 현장 등록으로 본다. 사전등록에서 이메일을 선택으로 바꾸면 이 구분이 깨진다.
+    const regKind=(r)=> (r.email && String(r.email).trim()) ? '사전' : '현장';
     const regs=regsData.map(r=>({ name:r.name||'ooo', org:r.org||'개인', field:(r.interests||[]).join('·'),
-      day: r.visit_day==='D1'?'11.13':r.visit_day==='D2'?'11.14':'양일', at:this.shortTime(r.created_at) }));
+      day: r.visit_day==='D1'?'11.13':r.visit_day==='D2'?'11.14':'양일', at:this.shortTime(r.created_at),
+      kind: regKind(r),
+      kindStyle: "display:inline-block;width:38px;text-align:center;padding:3px 0;border-radius:6px;font-size:12px;font-weight:800;"
+        + (regKind(r)==='현장' ? "background:#E7F6F0;color:#0d8f6b;" : "background:#EEF3F9;color:#5E7289;") }));
 
     return {
       navItems:nav,
@@ -2285,6 +2293,7 @@ class Component extends DCLogic {
       appsView,
       regs,
       regTotal: String(regsData.length),
+      regWalkin: String(regsData.filter(r=>!(r.email && String(r.email).trim())).length),
       regToday: '+' + regsData.filter(r=>{ if(!r.created_at) return false; const d=new Date(r.created_at); const n=new Date(); return d.toDateString()===n.toDateString(); }).length,
       exportCsv: ()=>this.exportCsv(),
       matchRows,
