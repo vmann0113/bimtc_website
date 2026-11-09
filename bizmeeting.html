@@ -310,6 +310,7 @@
               </div>
               <h3 style="font-size:16.5px;font-weight:800;margin:0 0 4px;color:#0F2440;">{{ p.name }}</h3>
               <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:14px;">{{ p.meta }}</div>
+              <sc-if value="{{ p.onsiteBuyer }}" hint-placeholder-val="{{ false }}"><div style="display:inline-flex;align-items:center;gap:6px;background:#E7F6F0;border:1px solid #bfe7d8;color:#0d8f6b;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:800;border-radius:8px;padding:5px 10px;margin:-8px 0 14px;"><span style="width:7px;height:7px;border-radius:50%;background:#11A37B;display:inline-block;"></span>{{ t.k057b }}</div></sc-if>
               <sc-if value="{{ p.onlineOnly }}" hint-placeholder-val="{{ false }}"><div style="display:inline-flex;align-items:center;gap:5px;background:#F3EEFB;border:1px solid #ddd0f0;color:#7a5cc4;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;border-radius:8px;padding:5px 10px;margin:-8px 0 14px;">{{ t.k057 }}</div></sc-if>
               <sc-if value="{{ p.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;font-weight:600;margin:-10px 0 14px;">{{ t.k058 }} {{ p.person }} <span style="color:#8295ab;font-weight:400;">{{ p.job }}</span></div></sc-if>
               <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">
@@ -748,6 +749,7 @@ class Component extends DCLogic {
     const partnersView = this.state.partners.map(p=>({
       ...p, requested:p.status==='requested', notRequested:p.status!=='requested',
       onlineOnly:(p.attendMode||'onsite')==='online',
+      onsiteBuyer:p.ptype==='buyer' && (p.attendMode||'onsite')!=='online',
       meta:[(p.country||'').trim(), (p.org||'').trim()].filter(Boolean).join(' · '),
       initial:this.initialOf(p.name), ...this.avatarColors(p.ptype==='buyer'), openPicker:()=>this.openPicker(p)
     }));
@@ -877,6 +879,7 @@ class Component extends DCLogic {
         k055:L('이전','Back'),
         k056:L('매칭된 참가기업·바이어에게 1:1 미팅을 요청하세요.','Send a 1:1 meeting request to an exhibitor or buyer.'),
         k057:L('온라인 참가 · 화상 미팅','Online participant · video meeting'),
+        k057b:L('현장 방문 · 부스 상담','On-site · meet at your booth'),
         k058:L('담당자','Contact'),
         k059:L('✓ 요청함','✓ Requested'),
         k060:L('날짜·시간 선택 후 요청','Choose a time and request'),
