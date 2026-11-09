@@ -1433,6 +1433,71 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  // 현장 상호간판 표기 (1107-3 상호간판.pdf + 2026-11-09 사무국 수정본).
+  // 신청서에 적힌 상호는 세금계산서·입금 확인에 쓰이므로 그대로 두고, 화면에 뜨는 이름만 간판과 맞춘다.
+  // 부스번호(정렬했을 때 첫 번호)로 찾는다. 독립부스 S-01~16 은 상호간판을 쓰지 않아 목록에 없다.
+  SIGNNAME = {
+      'M-01':['자연안에 한의원','Nature Korean Medicine Clinic'],   // 자연안에한의원
+      'M-02':['(주)클라우드호스피탈','CloudHospital'],
+      'M-04':['주식회사 담하','DAMHA'],
+      'M-05':['동남권원자력의학원','DIRAMS Cancer Center'],
+      'M-07':['우리들병원','Busan Wooridul Spine Hospital'],
+      'M-08':['인제대학교 해운대백병원','Inje University Haeundae Paik Hospital'],
+      'M-10':['리저브성형외과','RESERVE PLASTIC SURGERY'],
+      'M-11':['고운세상 김양제장봉석피부과','Kim Yang-che & Jang Bong-seok Skin Clinic'],   // 고운세상김양제장봉석피부과의원
+      'M-12':['한중건강관리협회','KC Medical'],
+      'M-13':['부산대학교병원','Pusan National University Hospital'],
+      'M-15':['고신대학교복음병원','Kosin University Gospel Hospital'],
+      'M-17':['부산진구-서면메디컬스트리트','Busanjin District-Seomyeon Medical Street'],   // 부산진구
+      'M-19':['굿핸즈','GoodHands'],
+      'M-22':['동아대학교병원','DONG-A UNIVERSITY HOSPITAL'],
+      'M-26':['부산광역시한의사회','Busan Association of Korean Medicine'],   // 부산시한의사회
+      'M-27':['삼육부산병원','BUSAN ADVENTIST HOSPITAL'],
+      'M-28':['은성의료재단 좋은병원들 좋은강안.문화.삼선병원','EUNSUNG MEDICAL FOUNDATION GOOD GANG-AN. MOONHWA. SAMSUN HOSPITAL'],   // 은성의료재단 좋은병원들
+      'M-30':['더바디성형외과','THE BODY PLASTIC SURGERY'],   // 더바디성형외과의원
+      'M-31':['라인업치과병원','Line-Up Dental Hospital'],
+      'M-32':['김병준 레다스 흉부외과 의원','KIM BYOUNG JOON LEDAS VARICOSE VEIN CLINIC'],   // 김병준 레다스 흉부외과
+      'M-33':['청맥병원','Cheongmac Hospital'],
+      'M-34':['(사)한국장기기증협회','KOREA ORGAN DONATION SOCIETY'],
+      'M-35':['누네빛안과','NUNEVIT EYE CLINIC'],
+      'M-36':['서면뉴욕치과','Seomyeon New York Dental'],
+      'M-37':['전남광주메디헬스산업전','Jeonnam-Gwangju Medi-health Fair'],
+      'M-38':['새론의원','Saeron Clinic'],
+      'W-01':['엘토브','eltov'],
+      'W-03':['에스엠비 웰니스','SMB WELLNESS'],   // SMB웰니스
+      'W-04':['고려의료관광개발','www.Koreamtd.com'],
+      'W-05':['트립닥','TripDoc'],
+      'W-07':['동의과학대학교 응급구조과','DIT EMT'],   // 동의과학대학교 (다른 부서, 별도 2칸)
+      'W-09':['베스트 피트니스','VASTT FITNESS'],   // 베스트피트니스
+      'W-10':['크레이지서퍼스','Crazysurfers'],
+      'W-11':['부산메디패스 X 메디캐디코리아','BUSAN MEDIPASS X MEDICADDY KOREA'],   // 메디캐디코리아 (표기: 부산메디패스 X 메디캐디코리아)
+      'W-14':['빛으로','THE VITRO'],
+      'W-15':['킵코퍼레이션','Kiip Corp.'],
+      'W-17':['동의과학대학교 의료피부미용과','DONG-EUI INSTITUTE OF TECHNOLOGY DEPT. OF MEDICAL AESTHETICS'],   // 동의과학대학교
+      'W-18':['마날트레이드','MANALTRADE'],
+      'W-19':['(주)부산티엔씨','BusanTNC Co., Ltd.'],
+      'W-20':['주식회사 큐어앤케어','Inc. CURE&CARE'],   // 주식회사큐어앤케어
+      'W-21':['(주)에스피메드','SPMED Co., Ltd.'],
+      'W-22':['예이린 사회적협동조합','YEIRIN Social Cooperative'],
+      'W-23':['홍법사(싱잉볼치유의소리)','Hongbeopsa Temple(singingbowl)'],
+      'W-24':['부산 동구청','BUSAN DONGGU METROPOLITAN CITY'],
+      'W-25':['월드스파','Worldspa'],   // 주식회사 월드스파
+      'W-26':['주식회사 유유위','UUW'],
+      'W-27':['대구광역시 중구','JUNG-GU, Daegu Metropolitan City'],
+      'W-28':['하얏트 플레이스 부산 연산','Hyatt Place Busan Yeonsan'],
+      'W-30':['(사)부산권의료산업협의회','BUSAN MEDICAL INDUSTRY ASSOCIATION'],   // 부산일보
+  };
+  // 참가기업 목록을 받아 표시 이름을 간판 표기로 바꾼다. 영문 이름도 같이 붙인다.
+  withSignNames(xs){
+    return (xs||[]).map(x=>{
+      const ids=(x.booth_ids||[]).slice().sort();
+      const n=this.SIGNNAME[ids[0]];
+      return n ? Object.assign({}, x, { company:n[0], company_en:n[1] }) : x;
+    });
+  }
+  // 화면에 띄울 이름 — 영문 화면에서는 간판 영문을 쓴다.
+  dispName(x){ return this.L(x.company||'', x.company_en||x.company||''); }
+
   state = { page: 'home', lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(), exTab: 'companies', commTab: 'notice', loginRole: 'exhibitor', visitorDone: false, toast: null, bizOpen:false,
     vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both',
     crEmail:'', crSearched:false, crRows:[],
@@ -1476,7 +1541,7 @@ class Component extends DCLogic {
     (async()=>{ try{
       const lay=await window.BimtcDB.getLayout().catch(()=>null);
       const ex=window.BimtcDB.listPublicExhibitors?await window.BimtcDB.listPublicExhibitors():[];
-      this.setState({ pubLayout:lay, pubExhibitors:ex||[] });
+      this.setState({ pubLayout:lay, pubExhibitors:this.withSignNames(ex) });
     }catch(e){} })();
     if(typeof window!=='undefined'){ this._rz=()=>{ if(window.innerWidth!==this.state.vw) this.setState({ vw:window.innerWidth }); }; window.addEventListener('resize',this._rz); }
     this._tick = setInterval(()=>this.setState({ now:Date.now() }), 1000);
@@ -1506,7 +1571,7 @@ class Component extends DCLogic {
     if(typeof location!=='undefined' && /type=recovery/.test(location.hash||'')){ this.setState({ page:'login', authMode:'setpw', authError:'', authInfo:this.L('본인 확인이 완료되었습니다. 새 비밀번호를 입력해 주세요.','Identity verified — please enter a new password.') }); }
     (async()=>{ try{ const u=await window.BimtcDB.currentUser(); if(u) this.setState(Object.assign({ me:u, isAdmin:!!u.is_admin }, this._joinLink?{}:{ loginRole:(u.type||'exhibitor') })); }catch(e){} })();
     (async()=>{ try{ const ns=await window.BimtcDB.publishedNotices(); if(ns&&ns.length) this.setState({ dbNotices:ns }); }catch(e){} })();
-    (async()=>{ try{ const xs=await window.BimtcDB.listPublicExhibitors(); if(xs&&xs.length) this.setState({ pubExhibitors:xs }); }catch(e){} })();
+    (async()=>{ try{ const xs=await window.BimtcDB.listPublicExhibitors(); if(xs&&xs.length) this.setState({ pubExhibitors:this.withSignNames(xs) }); }catch(e){} })();
     (async()=>{ try{ const tk=await window.BimtcDB.takenBooths(); if(tk) this.setState({ takenMap:tk }); }catch(e){} })();
     (async()=>{ try{ const bo=await window.BimtcDB.bizMatchingOpen(); if(bo) this.setState({ bizOpen:true }); }catch(e){} })();
   }
@@ -1787,31 +1852,29 @@ class Component extends DCLogic {
                  P:['플레잉존','Playing','#b78a3c','#FBF6E9'], S:['독립부스','Space-only','#7a5cc4','#efeafb'] };
     // 참가기업이 올린 로고는 .ai/.eps/.zip 등 인쇄용이 많다. 브라우저가 띄울 수 있는 것만 쓴다.
     const WEBIMG=/\.(png|jpe?g|svg|webp|gif)(\?|$)/i;
-    // 부산일보 신청서에 의산협 로고('의산협로고.png')가 올라가 있어 기업명과 맞지 않는다.
-    // 사무국이 올바른 파일로 바꾸면 주소가 달라지므로 이 목록을 비우면 다시 노출된다.
-    const HIDELOGO=['2e7c5e03-77b9-4888-9bc2-2721a97e7800/1787634765300.png'];
     // 인쇄용으로 올라온 로고(ai·pdf·eps·zip)를 사무국이 웹용 PNG 로 바꿔 둔 것.
     // 신청서 파일은 그대로 두고 여기서만 바꿔 쓴다. 가이드 시안지로 온 건 국문 가로형 한 개만 잘라 썼다.
-    // 사무국이 나중에 올바른 이미지 파일로 다시 올리면 이 줄만 지우면 원래 파일이 나온다.
+    // 부스번호로 찾는다 — 상호간판 표기 때문에 회사 이름이 바뀌어도 안 깨지게 한다.
+    // 사무국이 나중에 올바른 이미지 파일로 다시 올리면 그 줄만 지우면 원래 파일이 나온다.
     const LOGOFIX={
-      '(주)부산티엔씨':'busantnc', '(주)에스피메드':'spmed', '(주)클라우드호스피탈':'cloudhospital',
-      '고신대학교복음병원':'kosin', '누네빛안과':'nunebit', '대구광역시 중구':'daegujunggu',
-      '동남권원자력의학원':'dirams', '동아대학교병원':'donga', '부산 동구청':'donggu',
-      '부산경제진흥원':'bepa', '부산관광공사':'bto', '부산광역시':'busancity',
-      '부산대학교병원':'pnuh', '부산시한의사회':'bsakom', '엘토브':'eltov',
-      '예이린 사회적협동조합':'yeyirin', '우리들병원':'wooridul', '이샘병원':'esaem',
-      '인제대학교 해운대백병원':'haeundaepaik', '자연안에한의원':'jayeonane', '주식회사 담하':'damha',
-      '주식회사큐어앤케어':'cureandcare', '청맥병원':'cheongmaek', '크레이지서퍼스':'crazysurfers',
-      '트립닥':'tripdoc', '하얏트 플레이스 부산 연산':'hyattplace', '부산일보':'busanilbo' };
+      'M-01':'jayeonane', 'M-02':'cloudhospital', 'M-04':'damha', 'M-05':'dirams',
+      'M-07':'wooridul', 'M-08':'haeundaepaik', 'M-13':'pnuh', 'M-15':'kosin',
+      'M-22':'donga', 'M-26':'bsakom', 'M-33':'cheongmaek', 'M-35':'nunebit',
+      'S-01':'busancity', 'S-02':'bto', 'S-06':'bepa', 'S-13':'esaem',
+      'W-01':'eltov', 'W-05':'tripdoc', 'W-10':'crazysurfers', 'W-19':'busantnc',
+      'W-20':'cureandcare', 'W-21':'spmed', 'W-22':'yeyirin', 'W-24':'donggu',
+      'W-27':'daegujunggu', 'W-28':'hyattplace',
+      // W-30·31 은 (사)부산권의료산업협의회다 — 신청서에 올라온 의산협 로고가 맞다(2026-11-09 상호간판 확인)
+      'W-30':'bmia' };
     const all=(this.state.pubExhibitors||[]).map(x=>{
       const ids=(x.booth_ids||[]).slice().sort();
       const pre=String(ids[0]||'').split('-')[0];
       const z=ZONE[pre]||['기타','Other','#5E7289','#eef2f7'];
-      const name=String(x.company||'').trim();
-      const fix=LOGOFIX[name];
+      const name=String(this.dispName(x)||'').trim();
+      const fix=LOGOFIX[ids[0]];
       return { company:name, ids, pre, zoneKo:z[0], zoneLabel:L(z[0],z[1]), zc:z[2], zbg:z[3],
                logo:fix ? ('uploads/logos/logo_'+fix+'.png')
-                 : ((x.logo_url&&WEBIMG.test(x.logo_url)&&!HIDELOGO.some(h=>x.logo_url.indexOf(h)>=0))?x.logo_url:'') };
+                 : ((x.logo_url&&WEBIMG.test(x.logo_url))?x.logo_url:'') };
     }).filter(c=>c.company).sort((a,b)=>String(a.ids[0]||'').localeCompare(String(b.ids[0]||'')));
 
     // 부스가 많은 기업은 번호를 다 적으면 카드가 넘친다
@@ -1863,7 +1926,7 @@ class Component extends DCLogic {
     // 부스 → 참가기업명. public_exhibitors 는 '승인된' 기업만 담긴 공개 뷰라,
     // 아직 승인 전인 신청 건의 기업명은 노출되지 않는다(그 경우 '신청 완료'만 표시).
     const boothOwner={};
-    (this.state.pubExhibitors||[]).forEach(x=>{ (x.booth_ids||[]).forEach(id=>{ if(x.company) boothOwner[id]=x.company; }); });
+    (this.state.pubExhibitors||[]).forEach(x=>{ const nm=this.dispName(x); (x.booth_ids||[]).forEach(id=>{ if(nm) boothOwner[id]=nm; }); });
     const sells=entries.filter(e=>e.cell.t==='sell').sort((a,b)=>(a.c-b.c)||(b.r-a.r));
     const zcnt={};
     const floorCells=sells.map(e=>{
@@ -1896,7 +1959,7 @@ class Component extends DCLogic {
       z5:L('독립부스 전용 구역','Space-only booth area'),
     };
     const exh=this.state.pubExhibitors||[];
-    const compsFor=(pre)=>{ const m={}; exh.forEach(a=>{ const ids=(a.booth_ids||[]).filter(id=>String(id).indexOf(pre+'-')===0); if(ids.length){ const k=a.company||''; (m[k]=m[k]||[]).push(...ids); } }); return Object.keys(m).map(k=>{ const ids=m[k].sort(); return ids.join(', ')+' · '+k; }); };
+    const compsFor=(pre)=>{ const m={}; exh.forEach(a=>{ const ids=(a.booth_ids||[]).filter(id=>String(id).indexOf(pre+'-')===0); if(ids.length){ const k=this.dispName(a)||''; (m[k]=m[k]||[]).push(...ids); } }); return Object.keys(m).map(k=>{ const ids=m[k].sort(); return ids.join(', ')+' · '+k; }); };
     const floorZones=Lay.zones.map(z=>{
       const pre=ZPRE[z.key]||'';
       const comps=pre?compsFor(pre):[];
@@ -2334,7 +2397,7 @@ class Component extends DCLogic {
       exbListOn:(()=>{ const C=window.BIMTC_CONFIG; if(!C||!C.earlyBird||!C.earlyBird[0]) return false; const e1=new Date((C.earlyBird[0].end||'2026-09-30')+'T23:59:59+09:00'); return Date.now()>e1.getTime(); })(),
       exbListTitle:L('참가기업 배치 리스트','Exhibitor Placement List'),
       exbListColBooth:L('부스 위치','Booth'), exbListColCompany:L('기업명','Company'),
-      exbListRows:(this.state.pubExhibitors||[]).map(x=>({booths:(x.booth_ids||[]).join(', ')||'-', company:x.company||''})),
+      exbListRows:(this.state.pubExhibitors||[]).map(x=>({booths:(x.booth_ids||[]).join(', ')||'-', company:this.dispName(x)||''})),
       exbListEmpty:(this.state.pubExhibitors||[]).length===0,
       exbListEmptyMsg:L('확정된 참가기업이 아직 없습니다.','No confirmed exhibitors yet.'),
       ...this.floorVals(),
