@@ -379,6 +379,9 @@
                 </sc-if>
               </div>
               <div style="font-size:13.5px;font-weight:800;color:#0A2236;line-height:1.35;letter-spacing:-0.015em;word-break:keep-all;overflow-wrap:break-word;">{{ c.company }}</div>
+              <sc-if value="{{ c.hasPav }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:11px;font-weight:600;color:#8ea0b4;margin-top:3px;line-height:1.35;word-break:keep-all;">{{ c.pav }}</div>
+              </sc-if>
               <div style="margin-top:auto;font-family:'Pretendard',sans-serif;font-size:11.5px;font-weight:700;color:#8295ab;">{{ c.boothLabel }}</div>
             </div>
           </sc-for>
@@ -846,6 +849,9 @@
                     </sc-if>
                   </div>
                   <div style="font-size:clamp(14.5px,calc(18.63px - 0.35vw),16.5px);font-weight:800;color:#0A2236;line-height:1.38;letter-spacing:-0.015em;word-break:keep-all;overflow-wrap:break-word;">{{ c.company }}</div>
+                  <sc-if value="{{ c.hasPav }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13px);font-weight:600;color:#7a8ba0;margin-top:4px;line-height:1.4;word-break:keep-all;">{{ c.pav }}</div>
+                  </sc-if>
                   <div style="margin-top:auto;display:flex;align-items:center;gap:6px;border-top:1px solid #eef2f7;padding-top:10px;">
                     <span style="width:5px;height:5px;border-radius:50%;background:#0B5FA5;flex:none;"></span>
                     <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),13.5px);font-weight:700;color:#5E7289;word-break:keep-all;">{{ c.boothLabel }}</span>
@@ -1497,6 +1503,17 @@ class Component extends DCLogic {
   }
   // 화면에 띄울 이름 — 영문 화면에서는 간판 영문을 쓴다.
   dispName(x){ return this.L(x.company||'', x.company_en||x.company||''); }
+  // 여러 기관이 함께 쓰는 공동관. 부스번호로 찾아 기관 이름 아래 한 줄로 적는다.
+  // S-01~06 은 부산광역시·부산경제진흥원·부산관광공사 세 기관이 같이 쓴다(2026-11-09 사무국 확인).
+  PAVILION = {
+    'S-01':['부산광역시 공동관','Busan Metropolitan City Pavilion'],
+    'S-02':['부산광역시 공동관','Busan Metropolitan City Pavilion'],
+    'S-03':['부산광역시 공동관','Busan Metropolitan City Pavilion'],
+    'S-04':['부산광역시 공동관','Busan Metropolitan City Pavilion'],
+    'S-05':['부산광역시 공동관','Busan Metropolitan City Pavilion'],
+    'S-06':['부산광역시 공동관','Busan Metropolitan City Pavilion']
+  };
+  pavName(ids){ const p=this.PAVILION[(ids||[])[0]]; return p?this.L(p[0],p[1]):''; }
 
   state = { page: 'home', lang:(()=>{ try{ return localStorage.getItem('bimtc_lang')||'ko'; }catch(e){ return 'ko'; } })(), exTab: 'companies', commTab: 'notice', loginRole: 'exhibitor', visitorDone: false, toast: null, bizOpen:false,
     vName:'', vPhone:'', vEmail:'', vOrg:'', vInterests:[], vDay:'both',
@@ -1872,7 +1889,7 @@ class Component extends DCLogic {
       const z=ZONE[pre]||['기타','Other','#5E7289','#eef2f7'];
       const name=String(this.dispName(x)||'').trim();
       const fix=LOGOFIX[ids[0]];
-      return { company:name, ids, pre, zoneKo:z[0], zoneLabel:L(z[0],z[1]), zc:z[2], zbg:z[3],
+      return { company:name, ids, pre, zoneKo:z[0], zoneLabel:L(z[0],z[1]), zc:z[2], zbg:z[3], pav:this.pavName(ids),
                logo:fix ? ('uploads/logos/logo_'+fix+'.png')
                  : ((x.logo_url&&WEBIMG.test(x.logo_url))?x.logo_url:'') };
     }).filter(c=>c.company).sort((a,b)=>String(a.ids[0]||'').localeCompare(String(b.ids[0]||'')));
@@ -1884,7 +1901,7 @@ class Component extends DCLogic {
     const initialOf=(name)=> name.replace(/^\((주|사|재)\)\s*/,'').replace(/^(주식회사|사단법인|재단법인|의료법인)\s*/,'').trim().charAt(0)||name.charAt(0);
     const initialStyle="font-size:22px;font-weight:800;color:#b9c6d6;font-family:'Pretendard',sans-serif;letter-spacing:-0.02em;";
     const toCard=(c)=>({ company:c.company, hasLogo:!!c.logo, noLogo:!c.logo, logo:c.logo,
-      initial:initialOf(c.company), initialStyle,
+      initial:initialOf(c.company), initialStyle, pav:c.pav||'', hasPav:!!c.pav,
       boothLabel:boothText(c.ids), zoneLabel:c.zoneLabel,
       typeLabel:c.pre==='S'?'':L('조립부스','Package'),
       cardStyle:"background:#fff;border:1px solid #e6ebf2;border-radius:15px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(16,40,70,0.04);",
@@ -1959,7 +1976,7 @@ class Component extends DCLogic {
       z5:L('독립부스 전용 구역','Space-only booth area'),
     };
     const exh=this.state.pubExhibitors||[];
-    const compsFor=(pre)=>{ const m={}; exh.forEach(a=>{ const ids=(a.booth_ids||[]).filter(id=>String(id).indexOf(pre+'-')===0); if(ids.length){ const k=this.dispName(a)||''; (m[k]=m[k]||[]).push(...ids); } }); return Object.keys(m).map(k=>{ const ids=m[k].sort(); return ids.join(', ')+' · '+k; }); };
+    const compsFor=(pre)=>{ const m={}; exh.forEach(a=>{ const ids=(a.booth_ids||[]).filter(id=>String(id).indexOf(pre+'-')===0); if(ids.length){ const k=this.dispName(a)||''; (m[k]=m[k]||[]).push(...ids); } }); return Object.keys(m).map(k=>{ const ids=m[k].sort(); const pv=this.pavName(ids); return ids.join(', ')+' · '+k+(pv?' ('+pv+')':''); }); };
     const floorZones=Lay.zones.map(z=>{
       const pre=ZPRE[z.key]||'';
       const comps=pre?compsFor(pre):[];
