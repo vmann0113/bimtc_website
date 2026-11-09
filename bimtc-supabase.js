@@ -547,6 +547,18 @@
       return rows.filter(function (x) { return x.direction === 'out'; });
     },
     async deleteRequest(id) { var sb = await ready(); var r = await sb.from('match_requests').delete().eq('id', id); return r.error ? { ok: false, error: r.error.message } : { ok: true }; },
+    // 사무국 대신 확정: 메일·전화로 양측 동의를 받고 누르면 상태 변경 + 예약 생성까지 한다.
+    // 상태만 바꾸면 '미팅 현황'과 타임테이블이 비어 있게 되므로 서버 함수 한 번으로 묶는다.
+    async adminAcceptRequest(id) {
+      var sb = await ready();
+      var r = await sb.rpc('admin_accept_request', { p_request: id });
+      if (r.error) {
+        var m = r.error.message || '';
+        if (/이미 다른 미팅/.test(m)) return { ok: false, error: '그 시간에는 한쪽이 이미 다른 미팅을 잡아 두었습니다. 시간을 바꿔 주세요.' };
+        return { ok: false, error: m };
+      }
+      return r.data || { ok: true };
+    },
     async setRequestStatus(id, status) {
       var sb = await ready();
       var r = await sb.from('match_requests').update({ status: status }).eq('id', id).select();

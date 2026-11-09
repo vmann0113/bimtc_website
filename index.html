@@ -1820,7 +1820,8 @@ class Component extends DCLogic {
     const zmap={}; Lay.zones.forEach(z=>zmap[z.key]=z);
     const TC=Lay.typeColors||{};
     const TYPEC={ common:TC.common||'#E0A23C', organizer:TC.organizer||'#64748b', biz:TC.biz||'#7a5cc4', restroom:TC.restroom||'#2E90D6', stage:TC.stage||'#0f766e', seating:TC.seating||'#a3b8cc', lounge:TC.lounge||'#a3d977' };
-    const FIXLABEL={ stage:'STAGE', seating:L('객석 · 휴게공간','SEATING · LOUNGE'), biz:'', common:L('공용 공간','Common area'), organizer:L('주최측 운영','Organizer'), restroom:L('화장실','Restroom'), lounge:L('휴게공간','Lounge') };
+    const FIXLABEL={ stage:'STAGE', seating:L('객석 · 휴게공간','SEATING · LOUNGE'), biz:'', common:L('공용 공간','Common area'), organizer:L('주최측 운영','Organizer'), restroom:L('화장실','Restroom'), lounge:L('휴게공간','Lounge'), ...(Lay.typeLabels||{}) };
+    const FIXFONT=Lay.typeFonts||{}; // 푸드트럭·포토부스처럼 좁은 칸은 글자를 줄여 넘치지 않게 한다
     const cw=100/Lay.cols, rh=100/Lay.rows;
     const entries=Object.keys(Lay.cells).map(k=>{ const p=k.split('_'); return { r:+p[0], c:+p[1], cell:Lay.cells[k] }; }).filter(e=>e.cell);
     const fixBox={};
@@ -1837,20 +1838,21 @@ class Component extends DCLogic {
     const zcnt={};
     const floorCells=sells.map(e=>{
       const pre=ZPRE[e.cell.z]||'B'; zcnt[pre]=(zcnt[pre]||0)+1;
-      const bid=pre+'-'+String(zcnt[pre]).padStart(2,'0');
+      // 번호는 칸 순서로 계산한다. 다만 발주가 끝난 뒤 칸이 늘면 뒷번호가 통째로 밀리므로, 배치 데이터에 번호(cell.id)가 박혀 있으면 그것을 그대로 쓴다(2026-11-09 부산일보 W-30·31).
+      const bid=e.cell.id||(pre+'-'+String(zcnt[pre]).padStart(2,'0'));
       const isTaken=!!taken[bid];
       const zc=(zmap[e.cell.z]&&zmap[e.cell.z].color)||'#cdd8e4';
       const xoff=0; // 독립부스도 본 배치도와 같은 열에 맞춘다
       const zk=e.cell.z;
       const owner=boothOwner[bid];
-      return { onClick:()=>openZone(zk), title:bid+(owner?' · '+owner:(isTaken?' · '+L('신청 완료','Taken'):'')), num:String(zcnt[pre]),
+      return { onClick:()=>openZone(zk), title:bid+(owner?' · '+owner:(isTaken?' · '+L('신청 완료','Taken'):'')), num:String(bid).split('-').pop().replace(/^0+/,''),
         style:"position:absolute;left:"+((e.c+xoff)*cw)+"%;top:"+(e.r*rh)+"%;width:"+cw+"%;height:"+rh+"%;box-sizing:border-box;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:'Pretendard',sans-serif;"+(isTaken
           ?"border:1px solid #fff;background:#33475c;color:#fff;cursor:pointer;"
           :"border:1px solid rgba(255,255,255,0.8);background:"+zc+(zk==='z5'?';opacity:0.55':'')+";color:rgba(255,255,255,0.85);cursor:pointer;") };
     });
     const floorFixtures=Object.keys(fixBox).map(t=>{ const b=fixBox[t];
       return { label:(FIXLABEL[t]===undefined?t:FIXLABEL[t]),
-        style:"position:absolute;left:"+(b.c0*cw)+"%;top:"+(b.r0*rh)+"%;width:"+((b.c1-b.c0+1)*cw)+"%;height:"+((b.r1-b.r0+1)*rh)+"%;box-sizing:border-box;background:"+(TYPEC[t]||'#cbd5e1')+";color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0.08em;border-radius:4px;font-family:'Pretendard',sans-serif;" }; });
+        style:"position:absolute;left:"+(b.c0*cw)+"%;top:"+(b.r0*rh)+"%;width:"+((b.c1-b.c0+1)*cw)+"%;height:"+((b.r1-b.r0+1)*rh)+"%;box-sizing:border-box;background:"+(TYPEC[t]||'#cbd5e1')+";color:#fff;display:flex;align-items:center;justify-content:center;font-size:"+(FIXFONT[t]||12)+"px;font-weight:800;letter-spacing:0.08em;border-radius:4px;white-space:pre-line;text-align:center;line-height:1.1;padding:0 2px;font-family:'Pretendard',sans-serif;" }; });
     const floorDoors=Object.keys(Lay.doors||{}).map(k=>{ const col=+k.slice(1);
       return { label:L('출입구','ENTRANCE'),
         style:"position:absolute;left:"+(col*cw)+"%;bottom:-3px;width:"+(cw*2)+"%;display:flex;flex-direction:column;align-items:center;z-index:3;font-family:'Pretendard',sans-serif;",

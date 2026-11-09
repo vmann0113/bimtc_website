@@ -756,7 +756,7 @@ class Component extends DCLogic {
     const solid={}; all.forEach(e=>{ if(e.cell.t!=='aisle'&&e.cell.t!=='clear') solid[e.r+'_'+e.c]=1; });
     const sells=all.filter(e=>e.cell.t==='sell').sort((a,b)=>(a.c-b.c)||(b.r-a.r));
     const ZPRE={z1:'M',z2:'W',z3:'G',z4:'P',z5:'S'}; const zc={}; const map={};
-    sells.forEach(e=>{ const pre=ZPRE[e.cell.z]||'B'; zc[pre]=(zc[pre]||0)+1; map[pre+'-'+String(zc[pre]).padStart(2,'0')]={r:e.r,c:e.c}; });
+    sells.forEach(e=>{ const pre=ZPRE[e.cell.z]||'B'; zc[pre]=(zc[pre]||0)+1; map[e.cell.id||(pre+'-'+String(zc[pre]).padStart(2,'0'))]={r:e.r,c:e.c}; });
     return { map, solid };
   }
   // 선택된 부스들이 하나로 이어져 있는지: 변을 맞댄 이웃(번호 연속) 또는 통로 1칸을 사이에 둔 맞은편 허용
@@ -994,7 +994,8 @@ class Component extends DCLogic {
     const zmap={}; Lay.zones.forEach(z=>zmap[z.key]=z);
     const TC=Lay.typeColors||{};
     const TYPEC={ common:TC.common||'#E0A23C', organizer:TC.organizer||'#64748b', biz:TC.biz||'#7a5cc4', restroom:TC.restroom||'#2E90D6', stage:TC.stage||'#0f766e', seating:TC.seating||'#a3b8cc', lounge:TC.lounge||'#a3d977' };
-    const FIXLABEL={ stage:'STAGE', seating:L('객석 · 휴게공간','SEATING · LOUNGE'), biz:'', common:L('공용 공간','Common area'), organizer:L('주최측 운영','Organizer'), restroom:L('화장실','Restroom'), lounge:L('휴게공간','Lounge') };
+    const FIXLABEL={ stage:'STAGE', seating:L('객석 · 휴게공간','SEATING · LOUNGE'), biz:'', common:L('공용 공간','Common area'), organizer:L('주최측 운영','Organizer'), restroom:L('화장실','Restroom'), lounge:L('휴게공간','Lounge'), ...(Lay.typeLabels||{}) };
+    const FIXFONT=Lay.typeFonts||{};
     const rowLabel=(i)=>{ var s=''; i=i+1; while(i>0){ var m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; };
     const cw=100/Lay.cols, rh=100/Lay.rows;
     const planCells=[]; const fixBox={}; const idZone={};
@@ -1008,7 +1009,8 @@ class Component extends DCLogic {
     sells.forEach(e=>{
       const pre=ZPRE[e.cell.z]||'B';
       zcnt[pre]=(zcnt[pre]||0)+1;
-      const id=pre+'-'+String(zcnt[pre]).padStart(2,'0');
+      // 번호는 칸 순서로 계산한다. 다만 발주가 끝난 뒤 칸이 늘면 뒷번호가 통째로 밀리므로, 배치 데이터에 번호(cell.id)가 박혀 있으면 그것을 그대로 쓴다(2026-11-09 부산일보 W-30·31).
+      const id=e.cell.id||(pre+'-'+String(zcnt[pre]).padStart(2,'0'));
       idZone[id]=(zmap[e.cell.z]&&zmap[e.cell.z].name)||'';
       const zc=(zmap[e.cell.z]&&zmap[e.cell.z].color)||'#cdd8e4';
       const taken=!!this.state.taken[id], sel=this.state.selected.includes(id);
@@ -1022,12 +1024,12 @@ class Component extends DCLogic {
       if(taken){ st+="background:#c7cfd9;color:#f2f5f9;cursor:not-allowed;"; }
       else if(sel){ st+="background:#FF6B5A;color:#fff;cursor:pointer;z-index:2;box-shadow:0 2px 8px rgba(224,57,43,0.5);"; }
       else { st+="background:"+zc+";color:"+(isLight(zc)?'#3d6479':'#fff')+";cursor:pointer;"; }
-      planCells.push({ id, label:String(zcnt[pre]), style:st, onClick:()=>this.toggleBooth(id, taken) });
+      planCells.push({ id, label:String(id).split('-').pop().replace(/^0+/,''), style:st, onClick:()=>this.toggleBooth(id, taken) });
     });
     const planFixtures=Object.keys(fixBox).map(t=>{
       const b=fixBox[t];
       return { label:(FIXLABEL[t]===undefined?t:FIXLABEL[t]),
-        style:"position:absolute;left:"+(b.c0*cw)+"%;top:"+(b.r0*rh)+"%;width:"+((b.c1-b.c0+1)*cw)+"%;height:"+((b.r1-b.r0+1)*rh)+"%;box-sizing:border-box;background:"+(TYPEC[t]||'#cbd5e1')+";color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0.08em;border-radius:4px;font-family:'Pretendard',sans-serif;" };
+        style:"position:absolute;left:"+(b.c0*cw)+"%;top:"+(b.r0*rh)+"%;width:"+((b.c1-b.c0+1)*cw)+"%;height:"+((b.r1-b.r0+1)*rh)+"%;box-sizing:border-box;background:"+(TYPEC[t]||'#cbd5e1')+";color:#fff;display:flex;align-items:center;justify-content:center;font-size:"+(FIXFONT[t]||12)+"px;font-weight:800;letter-spacing:0.08em;border-radius:4px;white-space:pre-line;text-align:center;line-height:1.1;padding:0 2px;font-family:'Pretendard',sans-serif;" };
     });
     const planDoors=Object.keys(Lay.doors||{}).map(k=>{
       const col=+k.slice(1);
