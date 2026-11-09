@@ -459,6 +459,14 @@
         </div>
         <div style="width:1px;align-self:stretch;background:rgba(255,255,255,0.1);"></div>
         <div style="text-align:center;">
+          <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);letter-spacing:0.14em;color:#6b8aa6;margin-bottom:20px;">{{ t.spons_spon }}</div>
+          <div style="display:flex;justify-content:center;align-items:center;">
+            <!-- 어두운 남색 바탕이라 흰색 버전을 쓴다 (원본은 '협찬사 로고_해수랑' 폴더) -->
+            <img src="uploads/logo_spon_haesurang.png" alt="스파 해수랑" style="height:26px;width:auto;object-fit:contain;opacity:0.92;" />
+          </div>
+        </div>
+        <div style="width:1px;align-self:stretch;background:rgba(255,255,255,0.1);"></div>
+        <div style="text-align:center;">
           <div style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);letter-spacing:0.14em;color:#6b8aa6;margin-bottom:14px;">{{ t.spons_cert }}</div>
           <div style="display:inline-flex;justify-content:center;align-items:center;background:#fff;border-radius:10px;padding:8px 14px;">
             <img src="uploads/akei_approved.png" alt="{{ t.cert_label }}" style="height:40px;width:auto;display:block;" />
@@ -1940,7 +1948,7 @@ class Component extends DCLogic {
       eb_strip_cta:L('부스 신청하기 →','Apply now →'),
       ft_quick:L('바로가기','Quick Links'), ft_info:L('이용안내','Information'), ft_support:L('고객지원','Support'),
       ft_lib:L('자료실 다운로드','Downloads'), ft_stay:L('숙박·관광 안내','Stay & Tour'), ft_contact:L('문의하기','Contact'), ft_faq:L('자주 묻는 질문','FAQ'),
-      go:L('바로가기 →','Go →'), spons_host:L('주최','HOSTS'), spons_org:L('주관','ORGANIZER'), spons_cert:L('인증','CERTIFIED BY'), cert_label:L('한국전시산업진흥회 인증전시회','AKEI Approved Exhibition'),
+      go:L('바로가기 →','Go →'), spons_host:L('주최','HOSTS'), spons_org:L('주관','ORGANIZER'), spons_spon:L('협찬','SPONSOR'), spons_cert:L('인증','CERTIFIED BY'), cert_label:L('한국전시산업진흥회 인증전시회','AKEI Approved Exhibition'),
       ft_office:L('2026 부산국제의료관광컨벤션 사무국','2026 BIMTC Secretariat'), ft_addr:L('부산광역시 동구 중앙대로 365, 3층','3F, 365 Jungang-daero, Dong-gu, Busan'),
       ft_floormap:L('플로어맵·부스배치도','Floor Map · Booths'),
       ft_legal:L('개인정보처리방침 · 이메일무단수집거부 · 사이트맵','Privacy Policy · No Email Collection · Sitemap'),
