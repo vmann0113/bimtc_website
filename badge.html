@@ -3,21 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>출입증 발급 · BIMTC 2026</title>
+<title>현장 데스크 · BIMTC 2026</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#16294F">
 <link rel="icon" type="image/png" href="uploads/favicon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <!--
-  목걸이 비표(출입증) 발급 데스크 (badge.html → /badge)
-  · 관리자(is_admin) 계정으로 로그인. 라벨 프린터 XP-DT427B, 라벨 100×70mm.
-  · 데이터: public.badges / badge_events (SQL: ../badges.sql). 명단 불러오기는 RPC badge_sync().
-  · 출력 기록은 RPC badge_mark_printed() 로만 남긴다. 인터넷이 끊기면 기록을 이 PC에 모아 두었다가 다시 연결되면 올린다.
-  · 라벨 QR = HTTPS://BIMTC.BUSAN.COM/B/코드 (대문자 — QR이 작아져 감열 라벨에서 잘 읽힘)
+  현장 데스크 (badge.html → /badge) — 사무국 직원 전용
+  · 한 화면에서: ① 사전등록 참관객 QR 확인(→ 팔찌) ② 목걸이 비표 라벨 출력(XP-DT427B, 100×70mm)
+  · 로그인: 사무국 관리자(is_admin) 계정
+  · 데이터
+      비표      public.badges / badge_events (SQL ../badges.sql), RPC badge_sync · badge_mark_printed · badge_set_issued
+      참관객    visitor_registrations(읽기만) + visitor_passes(개인 QR 토큰) + visitor_checkins(입장 기록), RPC visitor_checkin
+  · 사전등록자 QR 내용 = HTTPS://BIMTC.BUSAN.COM/V/토큰 (개인 화면 v.html)
+  · 라벨에는 QR을 넣지 않는다(11/10 사용자). 유형별 내용:
+      참가기업 = 국문 부스명 + 영문 부스명 / 바이어·VIP·주최·프레스·통역 = 이름 + 직함 + 소속 / 스탭 = STAFF 진행요원
+  · 인터넷이 끊기면 이 PC에 저장된 명단으로 계속 쓰고, 기록은 모아 두었다가 다시 연결되면 올린다.
 -->
 <script src="bimtc-config.js"></script>
 <script src="bimtc-supabase.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <style>
   *{box-sizing:border-box}
   body{margin:0;background:#EEF1F6;color:#0F2440;font-family:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;font-size:14px;word-break:keep-all}
@@ -30,25 +35,25 @@
   .pill{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:4px 10px;font-size:12.5px;font-weight:700;background:#16324d}
   .dot{width:8px;height:8px;border-radius:50%;background:#2ecc71}
   .pill.off{background:#7a1f2b}.pill.off .dot{background:#ff6b6b}
-  .btn{border:1px solid #c9d4df;background:#fff;color:#0F2440;border-radius:8px;padding:8px 13px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
+  .btn{border:1px solid #c9d4df;background:#fff;color:#0F2440;border-radius:8px;padding:8px 13px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;text-decoration:none;display:inline-block}
   .btn:disabled{opacity:.45;cursor:default}
   .btn.dark{background:#16294F;border-color:#16294F;color:#fff}
   .btn.go{background:#11A37B;border-color:#11A37B;color:#fff}
-  .btn.warn{background:#fff4e5;border-color:#f0b35a;color:#8a4b00}
   .btn.red{background:#fff;border-color:#e3a3ad;color:#B4233C}
   .btn.ghost{background:transparent;color:#cfe0f2;border-color:#3b5470}
   .btn.big{font-size:18px;padding:14px 22px;border-radius:10px}
-  .tabs{display:flex;gap:4px;padding:0 18px;background:#0A2236}
-  .tab{background:transparent;color:#9fb4c7;border:0;padding:10px 16px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent}
+  .tabs{display:flex;gap:2px;padding:0 12px;background:#0A2236;overflow-x:auto}
+  .tab{background:transparent;color:#9fb4c7;border:0;padding:11px 15px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-size:14px}
   .tab.on{color:#fff;border-bottom-color:#4fb0ff}
+  .tab.help{margin-left:auto;color:#ffd479}
   .main{padding:16px 18px 40px;max-width:1500px;margin:0 auto}
   .desk{display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:16px;align-items:start}
   @media (max-width:1100px){.desk{grid-template-columns:1fr}}
   .card{background:#fff;border-radius:12px;padding:14px 16px}
   .search{display:flex;gap:8px}
   .search input{flex:1;font-size:20px;padding:12px 14px;border:2px solid #16294F;border-radius:10px;outline:none}
-  .hint{color:#6b7f95;font-size:12.5px;margin-top:6px}
-  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .hint{color:#6b7f95;font-size:12.5px;margin-top:6px;line-height:1.55}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
   .chip{border:1px solid #c9d4df;background:#fff;border-radius:20px;padding:5px 11px;cursor:pointer;font-size:12.5px;font-weight:600}
   .chip.on{background:#16294F;color:#fff;border-color:#16294F}
   .list{margin-top:12px;display:flex;flex-direction:column;gap:6px}
@@ -60,66 +65,87 @@
   .row .nm{flex:1;min-width:0}
   .row .nm b{font-size:15px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .row .nm span{color:#6b7f95;font-size:12.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .st{flex:none;font-size:12px;font-weight:700;border-radius:6px;padding:3px 8px}
+  .st{flex:none;font-size:12px;font-weight:700;border-radius:6px;padding:3px 8px;white-space:nowrap}
   .st.no{background:#F1F4F8;color:#6b7f95}.st.pr{background:#fff4e5;color:#8a4b00}.st.ok{background:#e6f6f0;color:#0b7a5a}.st.vd{background:#fde8eb;color:#B4233C}
   .slots{display:flex;gap:4px;flex:none}
   .slots i{width:12px;height:12px;border-radius:3px;background:#dfe5ec;display:block}
   .slots i.p{background:#f0b35a}.slots i.k{background:#11A37B}
-  .empty{padding:30px;text-align:center;color:#6b7f95}
+  .empty{padding:30px;text-align:center;color:#6b7f95;line-height:1.6}
   .side{position:sticky;top:110px}
   .side h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
-  .f{display:grid;grid-template-columns:70px 1fr;gap:6px 8px;align-items:center;margin-bottom:10px}
+  .f{display:grid;grid-template-columns:84px 1fr;gap:6px 8px;align-items:center;margin-bottom:10px}
   .f label{font-size:12.5px;color:#4b5d72}
   .f input,.f select,.f textarea{border:1px solid #c9d4df;border-radius:8px;padding:8px 10px;width:100%}
   .f input.big{font-size:18px;font-weight:700}
   .pvwrap{background:#E9ECEF;border-radius:10px;padding:14px;display:flex;justify-content:center;margin:10px 0}
-  .pvwrap .lbl{transform:scale(1.05);transform-origin:top center;box-shadow:0 0 0 1px #ADB5BD,0 4px 14px rgba(0,0,0,.12);margin-bottom:4mm}
+  .pvwrap .lbl{box-shadow:0 0 0 1px #ADB5BD,0 4px 14px rgba(0,0,0,.12)}
   .acts{display:flex;gap:8px;flex-wrap:wrap}
   .acts .btn.big{flex:1}
   .info{font-size:12.5px;color:#4b5d72;line-height:1.6;background:#F6F8FB;border-radius:8px;padding:8px 10px;margin-top:10px}
-  .info b{color:#0F2440}
   .alert{background:#fff4e5;border:1px solid #f0b35a;color:#6b3a00;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13px;line-height:1.55}
   .alert.red{background:#fde8eb;border-color:#e3a3ad;color:#8a1426}
   .grp{border:1px solid #e3e8ef;border-radius:10px;padding:10px;margin-top:10px}
-  .grp .gr{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed #e3e8ef;font-size:13px}
-  .grp .gr:last-child{border-bottom:0}
+  .grp .gr{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed #e3e8ef;font-size:13px;cursor:pointer}
+  .grp .gr:last-of-type{border-bottom:0}
   .grp .gr .n{width:22px;color:#6b7f95}
-  .grp .gr .w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .grp .gr .w{flex:1;min-width:0}
   .grp .gr.cur{font-weight:800}
+  /* 참관객 입장 확인 결과 */
+  .vres{border-radius:14px;padding:22px 22px;color:#fff;text-align:center}
+  .vres .ic{font-size:54px;line-height:1;font-weight:900}
+  .vres h3{font-size:26px;margin:10px 0 6px}
+  .vres .who{font-size:22px;font-weight:800;margin-top:12px}
+  .vres .sub{font-size:15px;opacity:.9;margin-top:4px}
+  .vres.ok{background:#11A37B}.vres.again{background:#D9822B}.vres.no{background:#B4233C}
+  .vbadge{background:#7B8794}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
   .stats .s{background:#fff;border-radius:12px;padding:14px 16px}
   .stats .s b{display:block;font-size:24px}
   .stats .s span{color:#6b7f95;font-size:12.5px}
   table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
-  th,td{padding:8px 10px;border-bottom:1px solid #eef1f5;text-align:left;font-size:13px}
+  th,td{padding:8px 10px;border-bottom:1px solid #eef1f5;text-align:left;font-size:13px;vertical-align:middle}
   th{background:#F6F8FB;color:#4b5d72;font-size:12.5px;white-space:nowrap}
   td.c,th.c{text-align:center}
   .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
   .tools input,.tools select{border:1px solid #c9d4df;border-radius:8px;padding:8px 10px}
+  .h2{font-size:17px;margin:0 0 6px}
   .gate{max-width:380px;margin:60px auto;background:#fff;border-radius:14px;padding:26px}
   .gate h1{font-size:19px;margin:0 0 4px}
   .gate label{display:block;font-size:12.5px;color:#4b5d72;margin:12px 0 4px}
   .gate input{width:100%;border:1px solid #c9d4df;border-radius:8px;padding:10px}
   .gate .btn{width:100%;margin-top:16px;padding:11px}
   .err{color:#B4233C;margin-top:10px;font-size:13px}
-  .modal{position:fixed;inset:0;background:rgba(10,20,35,.55);display:flex;align-items:center;justify-content:center;z-index:90;padding:20px}
-  .modal .box{background:#fff;border-radius:14px;padding:20px 22px;width:min(560px,100%);max-height:90vh;overflow:auto}
-  .modal h3{margin:0 0 10px;font-size:17px}
-  .modal textarea{width:100%;min-height:180px;border:1px solid #c9d4df;border-radius:8px;padding:10px;font-size:13px}
-  .modal .acts{margin-top:14px;justify-content:flex-end}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0A2236;color:#fff;padding:12px 20px;border-radius:10px;font-weight:700;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0A2236;color:#fff;padding:12px 20px;border-radius:10px;font-weight:700;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw}
   .toast.bad{background:#B4233C}
+  /* 즉석 출력 */
+  .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0 14px}
+  .tbtn{border:2px solid #e3e8ef;background:#fff;border-radius:12px;padding:14px 8px;cursor:pointer;font-weight:800;font-size:15px;color:#0F2440}
+  .tbtn small{display:block;font-weight:600;color:#6b7f95;font-size:12px;margin-top:3px}
+  .tbtn.on{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset;background:#fafcff}
+  .tbtn i{display:block;height:6px;border-radius:3px;background:var(--c);margin:0 auto 8px;width:60%}
+  /* 가이드 */
+  .guide{max-width:980px;margin:0 auto}
+  .guide nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+  .guide nav a{background:#fff;border:1px solid #c9d4df;border-radius:20px;padding:6px 12px;color:#16294F;text-decoration:none;font-weight:700;font-size:13px}
+  .guide section{background:#fff;border-radius:12px;padding:18px 22px;margin-bottom:12px;line-height:1.7;font-size:14.5px}
+  .guide h3{margin:0 0 8px;font-size:18px;color:#16294F}
+  .guide ol,.guide ul{margin:6px 0;padding-left:22px}
+  .guide li{margin:3px 0}
+  .guide .k{display:inline-block;background:#16294F;color:#fff;border-radius:6px;padding:0 7px;font-size:13px;font-weight:700}
+  .guide .tip{background:#fff8e6;border-left:4px solid #f0b35a;padding:8px 12px;border-radius:6px;margin:8px 0}
+  .guide table td,.guide table th{font-size:13.5px;border:1px solid #eef1f5}
 
-  /* ===== 라벨 100×70mm (화면 미리보기와 인쇄가 같은 규칙) ===== */
-  .lbl{width:100mm;height:70mm;background:#fff;color:#000;position:relative;overflow:hidden;font-family:'Pretendard','Malgun Gothic',sans-serif}
-  .lbl .ln{position:absolute;left:4mm;right:4mm;text-align:center;white-space:nowrap;line-height:1.15}
-  .lbl .l1{top:7mm;font-size:12.5mm;font-weight:800;letter-spacing:.4mm}
-  .lbl .l2{top:24.5mm;font-size:5.6mm;font-weight:700}
-  .lbl .l3{top:32.5mm;font-size:4mm;font-weight:500;color:#222}
-  .lbl.org .l1{top:6mm;font-size:9mm;white-space:normal;line-height:1.18;max-height:23mm;display:flex;align-items:center;justify-content:center}
-  .lbl.org .l2{top:30mm;font-size:4.4mm;font-weight:600}
-  .lbl .qr{position:absolute;left:50%;bottom:6mm;width:17mm;height:17mm;transform:translateX(-50%)}
-  .lbl .cd{position:absolute;left:0;right:0;bottom:2mm;text-align:center;font-size:2.4mm;font-weight:700;color:#333;letter-spacing:.3mm}
+  /* ===== 라벨 100×70mm (미리보기와 인쇄가 같은 규칙) ===== */
+  .lbl{width:100mm;height:70mm;background:#fff;color:#000;position:relative;overflow:hidden;font-family:'Pretendard','Malgun Gothic',sans-serif;flex:none}
+  .lbl .bx{position:absolute;left:5mm;right:5mm;top:5mm;bottom:5mm;display:flex;flex-direction:column;justify-content:center;gap:1.8mm;text-align:center}
+  .lbl .t{width:100%;overflow:hidden;line-height:1.2;word-break:keep-all;flex:none}
+  .lbl .nm{font-size:13mm;font-weight:800;white-space:normal;max-height:2.3em;line-height:1.12;letter-spacing:.2mm}
+  .lbl .ti{font-size:5.4mm;font-weight:600;white-space:nowrap}
+  .lbl .og{font-size:6mm;font-weight:700;white-space:normal;max-height:2.4em}
+  .lbl .ko{font-size:11.5mm;font-weight:800;white-space:normal;max-height:2.4em}
+  .lbl .en{font-size:5mm;font-weight:600;white-space:normal;max-height:2.4em;margin-top:1mm}
+  .lbl .sf{font-size:20mm;font-weight:900;letter-spacing:1.5mm;white-space:nowrap}
+  .lbl .sk{font-size:10mm;font-weight:800;letter-spacing:2mm;white-space:nowrap}
   #printArea{display:none}
   @page{size:100mm 70mm;margin:0}
   @media print{
@@ -132,21 +158,24 @@
 </style>
 </head>
 <body>
-<div class="top"><div class="in"><h1>2026 BIMTC 출입증 발급</h1>
+<div class="top"><div class="in"><h1>2026 BIMTC 현장 데스크</h1>
   <div class="r" id="topRight" hidden>
     <span class="pill" id="net"><span class="dot"></span><span id="netT">연결됨</span></span>
     <span class="pill" id="qPill" hidden>미전송 <b id="qN">0</b>건</span>
     <label style="display:flex;gap:6px;align-items:center">자리 <select id="desk" class="btn" style="padding:5px 8px"></select></label>
     <span id="who"></span>
     <button class="btn ghost" id="testBtn">시험 출력</button>
-    <a class="btn ghost" href="admin.html" style="text-decoration:none">관리자 콘솔</a>
+    <a class="btn ghost" href="admin.html">관리자 콘솔</a>
     <button class="btn ghost" id="logout">로그아웃</button>
   </div>
 </div>
 <div class="tabs" id="tabs" hidden>
-  <button class="tab on" data-t="desk">발급 데스크</button>
-  <button class="tab" data-t="bulk">미리 출력·명단</button>
-  <button class="tab" data-t="stat">현황·엑셀</button>
+  <button class="tab on" data-t="desk">입장 확인 · 비표</button>
+  <button class="tab" data-t="quick">즉석 출력</button>
+  <button class="tab" data-t="import">명단 올리기</button>
+  <button class="tab" data-t="bulk">미리 출력</button>
+  <button class="tab" data-t="stat">현황 · 엑셀</button>
+  <button class="tab help" data-t="guide">❓ 사용 안내</button>
 </div></div>
 <div class="main" id="view"><div class="empty">불러오는 중…</div></div>
 <div id="printArea"></div>
@@ -155,20 +184,24 @@
 (function () {
   'use strict';
   var DB = window.BimtcDB, sb = null, ME = null;
-  var ROWS = [], SEL = null, TAB = 'desk';
-  var F = { q: '', t: '', s: '' };          // 데스크 검색·유형·상태
-  var B = { t: 'EXHIBITOR', s: 'np', q: '', pick: {} }; // 미리 출력 탭
+  var ROWS = [], VIS = [], SEL = null, VSEL = null, VRES = null, TAB = 'desk';
+  var F = { q: '', t: '', s: '' };
+  var B = { t: 'EXHIBITOR', s: 'np', q: '', pick: {} };
+  var QK = { t: 'BUYER' };
+  var IM = { t: 'BUYER', rows: null, head: null, map: null, file: '' };
   var view = document.getElementById('view');
-  var LS_CACHE = 'bimtc_badge_cache_v1', LS_Q = 'bimtc_badge_queue_v1', LS_DESK = 'bimtc_badge_desk';
+  var LS_CACHE = 'bimtc_badge_cache_v2', LS_VCACHE = 'bimtc_visitor_cache_v1', LS_Q = 'bimtc_badge_queue_v1', LS_DESK = 'bimtc_badge_desk';
   var ONLINE = true;
+  var SITE = 'https://bimtc.busan.com';
 
   var TYPES = [
-    { k: 'EXHIBITOR', ko: '참가기업', c: '#1E9E78' },
-    { k: 'BUYER', ko: '바이어', c: '#E5603B' },
-    { k: 'VIP', ko: 'VIP', c: '#B8892E' },
-    { k: 'ORGANIZER', ko: '주최·사무국', c: '#22335F' },
-    { k: 'STAFF', ko: '스탭', c: '#2A2E36' },
-    { k: 'INTERPRETER', ko: '통역', c: '#2F6FD0' }
+    { k: 'EXHIBITOR', ko: '참가기업', c: '#1E9E78', d: '국문·영문 부스명' },
+    { k: 'BUYER', ko: '바이어', c: '#E5603B', d: '이름·직함·소속' },
+    { k: 'VIP', ko: 'VIP', c: '#B8892E', d: '이름·직함·소속' },
+    { k: 'STAFF', ko: '스탭', c: '#2A2E36', d: 'STAFF 진행요원' },
+    { k: 'PRESS', ko: '프레스', c: '#6B4FA0', d: '이름·직함·소속(매체)' },
+    { k: 'ORGANIZER', ko: '주최측', c: '#22335F', d: '이름·직함·소속' },
+    { k: 'INTERPRETER', ko: '통역', c: '#2F6FD0', d: '이름·직함·소속' }
   ];
   var TY = {}; TYPES.forEach(function (t) { TY[t.k] = t; });
   var COLS = 'id,code,type,name,org,org_en,title,country,grp,booth,source,source_ref,slot,note,void,print_count,first_printed_at,last_printed_at,issued_at,last_desk,created_at,updated_at';
@@ -177,15 +210,31 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function p2(n) { return String(n).padStart(2, '0'); }
   function dt(s) { if (!s) return ''; var d = new Date(s); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()); }
+  function hm(s) { if (!s) return ''; var d = new Date(s); return p2(d.getHours()) + ':' + p2(d.getMinutes()); }
+  function full(s) { if (!s) return ''; var d = new Date(s); return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()); }
+  function today() { var d = new Date(); return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); }
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function uuid() { return (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); })); }
   function tempCode() { var a = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', c = 'T'; for (var i = 0; i < 6; i++) c += a[Math.floor(Math.random() * 32)]; return c; }
-  function toast(msg, bad) { var t = document.createElement('div'); t.className = 'toast' + (bad ? ' bad' : ''); t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, bad ? 4200 : 2200); }
+  function toast(msg, bad) { var t = document.createElement('div'); t.className = 'toast' + (bad ? ' bad' : ''); t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, bad ? 4200 : 2400); }
   function desk() { return document.getElementById('desk').value || '데스크'; }
-  function norm(s) { return String(s || '').toLowerCase().replace(/[\s()㈜\-·.,]/g, '').replace(/주식회사|\(주\)|\(사\)/g, ''); }
+  function norm(s) { return String(s || '').toLowerCase().replace(/주식회사|\(주\)|㈜|\(사\)|\(재\)/g, '').replace(/[\s()\-·.,'"]/g, ''); }
+  function digits(s) { return String(s || '').replace(/\D/g, ''); }
+  function tail4(p) { var d = digits(p); return d.slice(-4); }
 
-  // 바코드 스캐너가 한글 입력 상태에서 찍히면 'HTTPS://...' 가 'ㅗㅅㅅㅔㄴ' 처럼 들어온다 → 영문 자판으로 되돌린다.
+  // 삑 소리(스캐너 결과를 화면을 안 봐도 알 수 있게)
+  var AC = null;
+  function beep(kind) {
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      var seq = kind === 'ok' ? [[880, .12]] : kind === 'again' ? [[660, .12], [660, .12]] : [[220, .35]];
+      var t = AC.currentTime;
+      seq.forEach(function (s) { var o = AC.createOscillator(), g = AC.createGain(); o.frequency.value = s[0]; o.type = 'sine'; g.gain.value = .25; o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + s[1]); t += s[1] + .06; });
+    } catch (e) {}
+  }
+
+  // 스캐너가 한글 입력 상태로 찍으면 'HTTPS://' 가 'ㅗㅅㅅㅔㄴ://' 처럼 들어온다 → 영문 자판으로 되돌린다.
   var CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ', JUNG = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ', JONG = ' ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ';
   var KEY = { 'ㅂ': 'q', 'ㅈ': 'w', 'ㄷ': 'e', 'ㄱ': 'r', 'ㅅ': 't', 'ㅛ': 'y', 'ㅕ': 'u', 'ㅑ': 'i', 'ㅐ': 'o', 'ㅔ': 'p', 'ㅁ': 'a', 'ㄴ': 's', 'ㅇ': 'd', 'ㄹ': 'f', 'ㅎ': 'g', 'ㅗ': 'h', 'ㅓ': 'j', 'ㅏ': 'k', 'ㅣ': 'l', 'ㅋ': 'z', 'ㅌ': 'x', 'ㅊ': 'c', 'ㅍ': 'v', 'ㅠ': 'b', 'ㅜ': 'n', 'ㅡ': 'm', 'ㅃ': 'Q', 'ㅉ': 'W', 'ㄸ': 'E', 'ㄲ': 'R', 'ㅆ': 'T', 'ㅒ': 'O', 'ㅖ': 'P',
     'ㅘ': 'hk', 'ㅙ': 'ho', 'ㅚ': 'hl', 'ㅝ': 'nj', 'ㅞ': 'np', 'ㅟ': 'nl', 'ㅢ': 'ml', 'ㄳ': 'rt', 'ㄵ': 'sw', 'ㄶ': 'sg', 'ㄺ': 'fr', 'ㄻ': 'fa', 'ㄼ': 'fq', 'ㄽ': 'ft', 'ㄾ': 'fx', 'ㄿ': 'fv', 'ㅀ': 'fg', 'ㅄ': 'qt' };
@@ -200,56 +249,60 @@
     }
     return out;
   }
-  // 입력에서 출입증 코드를 뽑는다(QR 주소·코드만·한글로 찍힌 것 모두)
-  function codeFrom(s) {
+  // 스캔한 값에서 { kind:'v'|'b', code } 를 뽑는다
+  function scanFrom(s) {
     s = String(s || '').trim(); if (!s) return null;
-    var t = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(s) ? hangulToKeys(s) : s;
-    var m = t.match(/\/b\/([0-9a-z]{7})/i) || t.match(/^\s*([bt][0-9a-z]{6})\s*$/i);
-    return m ? m[1].toUpperCase() : null;
+    var t = /[ㄱ-ㅎㅏ-ㅣ]/.test(s) || (/[가-힣]/.test(s) && /[:\/]/.test(s)) ? hangulToKeys(s) : s;
+    var m = t.match(/\/v\/([0-9a-z]{8})\b/i); if (m) return { kind: 'v', code: m[1].toUpperCase() };
+    m = t.match(/\/b\/([0-9a-z]{7})\b/i); if (m) return { kind: 'b', code: m[1].toUpperCase() };
+    m = t.match(/^\s*([bt][0-9a-z]{6})\s*$/i); if (m) return { kind: 'b', code: m[1].toUpperCase() };
+    return null;
   }
 
   // ---------- 라벨 ----------
-  function qrSvg(text) {
-    if (!window.qrcode) return '<svg class="qr" viewBox="0 0 10 10"></svg>';
-    var q = window.qrcode(0, 'M'); q.addData(text, 'Alphanumeric'); q.make();
-    var n = q.getModuleCount(), m = 2, r = '';
-    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) if (q.isDark(y, x)) r += 'M' + (x + m) + ' ' + (y + m) + 'h1v1h-1z';
-    return '<svg class="qr" viewBox="0 0 ' + (n + m * 2) + ' ' + (n + m * 2) + '" shape-rendering="crispEdges"><path d="' + r + '"/></svg>';
-  }
-  function qrText(code) { return 'HTTPS://BIMTC.BUSAN.COM/B/' + code; }
-  function labelLines(b) {
-    var sub = [];
-    if (b.type === 'BUYER') { if (b.title) sub.push(b.title); if (b.country) sub.push(String(b.country).toUpperCase()); }
-    else if (b.title) sub.push(b.title);
-    if (b.type === 'EXHIBITOR' || !b.name) {          // 참가기업 비표는 회사명만 찍는다(11/9 사용자 확인 — 부스 비표에 개인 이름 없음)
-      var l2 = b.org_en && b.org_en !== b.org ? b.org_en : '';
-      return { org: true, l1: b.org || '', l2: l2, l3: '' };
-    }
-    return { org: false, l1: b.name, l2: b.org || '', l3: sub.join(' · ') };
-  }
   function labelHtml(b) {
-    var L = labelLines(b);
-    return '<div class="lbl' + (L.org ? ' org' : '') + '">' +
-      '<div class="ln l1" data-fit>' + esc(L.l1) + '</div>' +
-      (L.l2 ? '<div class="ln l2" data-fit>' + esc(L.l2) + '</div>' : '') +
-      (L.l3 ? '<div class="ln l3" data-fit>' + esc(L.l3) + '</div>' : '') +
-      qrSvg(qrText(b.code)) + '<div class="cd">' + esc(b.code) + '</div></div>';
+    var h = '';
+    if (b.type === 'STAFF') {
+      h = '<div class="t sf" data-fit>STAFF</div><div class="t sk" data-fit>진행요원</div>';
+    } else if (b.type === 'EXHIBITOR') {
+      h = '<div class="t ko" data-fit>' + esc(b.org || '') + '</div>' + (b.org_en ? '<div class="t en" data-fit>' + esc(b.org_en) + '</div>' : '');
+    } else {
+      h = '<div class="t nm" data-fit>' + esc(b.name || '') + '</div>' +
+        (b.title ? '<div class="t ti" data-fit>' + esc(b.title) + '</div>' : '') +
+        (b.org ? '<div class="t og" data-fit>' + esc(b.org) + '</div>' : '');
+    }
+    return '<div class="lbl"><div class="bx">' + h + '</div></div>';
   }
-  // 넘치면 글자를 줄인다. 회사명 2줄 모드는 높이로, 나머지는 너비로 잰다.
+  // 넘치면 글자를 줄인다(줄바꿈 칸은 높이로, 한 줄 칸은 너비로). 다 줄여도 넘치면 data-over 표시.
   function fitAll(root) {
+    var over = 0;
     root.querySelectorAll('[data-fit]').forEach(function (el) {
-      var s = parseFloat(getComputedStyle(el).fontSize), wrap = getComputedStyle(el).whiteSpace !== 'nowrap', g = 0;
-      while (g++ < 80 && s > 7 && (wrap ? el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1 : el.scrollWidth > el.clientWidth + 1)) {
-        s -= 0.5; el.style.fontSize = s + 'px';
-      }
+      el.style.fontSize = '';
+      var s = parseFloat(getComputedStyle(el).fontSize), g = 0;
+      function bad() { return el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1; }
+      while (g++ < 120 && s > 8 && bad()) { s -= 0.5; el.style.fontSize = s + 'px'; }
+      if (bad()) { over++; el.setAttribute('data-over', '1'); } else el.removeAttribute('data-over');
     });
+    // 칸마다 맞춘 뒤에도 전체 높이가 넘치면(두 줄 이름 + 두 줄 소속 등) 큰 글자부터 조금씩 더 줄인다
+    root.querySelectorAll('.bx').forEach(function (bx) {
+      var big = bx.querySelector('.nm,.ko'), small = bx.querySelector('.og,.en'), g = 0;
+      while (g++ < 120 && bx.scrollHeight > bx.clientHeight + 1) {
+        var el = big && parseFloat(big.style.fontSize || getComputedStyle(big).fontSize) > 30 ? big : (small || big);
+        if (!el) break;
+        var s = parseFloat(el.style.fontSize || getComputedStyle(el).fontSize); if (s <= 8) break;
+        el.style.fontSize = (s - 0.5) + 'px';
+      }
+      if (bx.scrollHeight > bx.clientHeight + 1) over++;
+    });
+    return over;
   }
+  function previewInto(el, b) { el.innerHTML = labelHtml(b); return fitAll(el); }
 
-  // 인쇄: 라벨을 인쇄 영역에 넣고 window.print(). 크롬을 --kiosk-printing 으로 띄우면 인쇄 창 없이 바로 나간다.
+  // 인쇄: 라벨을 인쇄 영역에 넣고 window.print(). 바탕화면 바로가기(크롬 --kiosk-printing)로 열면 인쇄 창 없이 바로 나온다.
   function printLabels(list) {
     var pa = document.getElementById('printArea');
     pa.innerHTML = list.map(labelHtml).join('');
-    pa.style.display = 'block'; pa.style.position = 'fixed'; pa.style.left = '-200mm'; pa.style.top = '0';
+    pa.style.cssText = 'display:block;position:fixed;left:-300mm;top:0';
     return (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () {
       fitAll(pa);
       pa.removeAttribute('style');
@@ -264,59 +317,93 @@
   function runJob(j) {
     if (j.op === 'print') return sb.rpc('badge_mark_printed', { p_ids: j.ids, p_desk: j.desk, p_issue: j.issue });
     if (j.op === 'issue') return sb.rpc('badge_set_issued', { p_ids: j.ids, p_on: j.on, p_desk: j.desk });
-    if (j.op === 'insert') return sb.from('badges').insert(j.rows).select(COLS);
-    if (j.op === 'update') return sb.from('badges').update(j.patch).eq('id', j.id).select(COLS);
+    if (j.op === 'insert') return sb.from('badges').insert(j.rows);
+    if (j.op === 'update') return sb.from('badges').update(j.patch).eq('id', j.id);
     if (j.op === 'event') return sb.from('badge_events').insert(j.rows);
+    if (j.op === 'checkin') return sb.rpc('visitor_checkin', { p_token: j.token || null, p_reg: j.reg || null, p_desk: j.desk, p_method: j.method || 'qr' });
     return Promise.resolve({});
   }
-  // 한 번에 하나만 올린다(동시에 여러 번 부르면 같은 기록이 중복 전송된다)
   var FLUSHING = null;
   function flush() {
     if (FLUSHING) return FLUSHING;
     FLUSHING = flushStep().then(function () { FLUSHING = null; }, function () { FLUSHING = null; });
     return FLUSHING;
   }
+  function isNetErr(m) { return /fetch|network|Failed|Load failed|timeout/i.test(m || ''); }
   function flushStep() {
     var q = queue(); if (!q.length || !sb) return Promise.resolve();
-    var j = q[0];
-    return runJob(j).then(function (r) {
+    return runJob(q[0]).then(function (r) {
       if (r && r.error) {
-        if (/fetch|network|Failed/i.test(r.error.message || '')) { setOnline(false); return; }
-        // 서버가 거절한 기록(권한·중복 등)은 빼고 알린다. 다음 건 계속.
+        if (isNetErr(r.error.message)) { setOnline(false); return; }
         toast('기록 1건을 올리지 못했습니다: ' + r.error.message, true);
       }
       setOnline(true); q = queue(); q.shift(); setQueue(q); return flushStep();
     }, function () { setOnline(false); });
   }
-  function send(job) {               // 낙관적 반영은 호출하는 쪽이 한다
-    enqueue(job); return flush();
-  }
+  function send(job) { enqueue(job); return flush(); }
   function setOnline(on) {
     ONLINE = on; var n = document.getElementById('net');
     n.classList.toggle('off', !on); document.getElementById('netT').textContent = on ? '연결됨' : '끊김 · 이 PC에 저장 중';
   }
 
   // ---------- 불러오기 ----------
-  function load(silent) {
+  function loadBadges() {
     return sb.from('badges').select(COLS).order('type').order('grp').order('slot').range(0, 4999).then(function (r) {
       if (r.error) throw r.error;
-      ROWS = r.data || []; lsSet(LS_CACHE, { at: Date.now(), rows: ROWS }); setOnline(true);
-      // 대기열에 있는 로컬 변경을 다시 덮어 씌운다(아직 안 올라간 출력 표시가 사라지지 않게)
-      applyQueueLocally();
+      ROWS = r.data || []; lsSet(LS_CACHE, { at: Date.now(), rows: ROWS });
+    });
+  }
+  function fetchAll(table, cols) {
+    var out = [];
+    function page(from) {
+      return sb.from(table).select(cols).range(from, from + 999).then(function (r) {
+        if (r.error) throw r.error;
+        out = out.concat(r.data || []);
+        return (r.data || []).length === 1000 ? page(from + 1000) : out;
+      });
+    }
+    return page(0);
+  }
+  function loadVisitors() {
+    return Promise.all([
+      fetchAll('visitor_registrations', 'id,name,phone,email,org,visit_day,created_at'),
+      fetchAll('visitor_passes', 'reg_id,token'),
+      fetchAll('visitor_checkins', 'reg_id,day,at,desk')
+    ]).then(function (a) {
+      var tok = {}, chk = {};
+      a[1].forEach(function (p) { tok[p.reg_id] = p.token; });
+      a[2].forEach(function (c) { (chk[c.reg_id] = chk[c.reg_id] || []).push(c); });
+      VIS = a[0].map(function (v) {
+        return { id: v.id, name: v.name, phone: v.phone, tail: tail4(v.phone), email: v.email, org: v.org, visit_day: v.visit_day, created_at: v.created_at,
+          walkin: !v.email, token: tok[v.id] || null, checks: (chk[v.id] || []).sort(function (x, y) { return x.day < y.day ? -1 : 1; }) };
+      });
+      // 끊겼을 때 쓸 수 있게 이 PC에도 저장(전체 전화번호는 저장하지 않음)
+      lsSet(LS_VCACHE, { at: Date.now(), rows: VIS.map(function (v) { var c = Object.assign({}, v); delete c.phone; delete c.email; c.walkin = v.walkin; return c; }) });
+    });
+  }
+  function load(silent) {
+    return Promise.all([loadBadges(), loadVisitors()]).then(function () {
+      setOnline(true); applyQueueLocally();
       if (SEL) SEL = ROWS.find(function (x) { return x.id === SEL.id; }) || null;
+      if (VSEL) VSEL = VIS.find(function (x) { return x.id === VSEL.id; }) || null;
       render(silent);
     }).catch(function (e) {
       setOnline(false);
-      var c = lsGet(LS_CACHE, null);
-      if (c && !ROWS.length) { ROWS = c.rows || []; applyQueueLocally(); render(); toast('인터넷 연결이 안 돼 이 PC에 저장된 명단(' + dt(c.at) + ')으로 엽니다.', true); }
-      else if (!silent) render();
+      if (!ROWS.length) {
+        var c = lsGet(LS_CACHE, null), v = lsGet(LS_VCACHE, null);
+        if (c) ROWS = c.rows || []; if (v) VIS = v.rows || [];
+        applyQueueLocally(); render();
+        if (c || v) toast('인터넷 연결이 안 돼 이 PC에 저장된 명단으로 엽니다.', true);
+        else toast('명단을 불러오지 못했습니다: ' + (e && e.message || ''), true);
+      } else if (!silent) render();
     });
   }
   function applyQueueLocally() {
     queue().forEach(function (j) {
       if (j.op === 'insert') j.rows.forEach(function (row) { if (!ROWS.some(function (x) { return x.id === row.id; })) ROWS.push(Object.assign({ print_count: 0, void: false, slot: 1 }, row)); });
       if (j.op === 'update') { var b = ROWS.find(function (x) { return x.id === j.id; }); if (b) Object.assign(b, j.patch); }
-      if (j.op === 'print') j.ids.forEach(function (id) { var b = ROWS.find(function (x) { return x.id === id; }); if (b && !b._q) localPrinted(b, j.issue, j.desk, j.at); });
+      if (j.op === 'print') j.ids.forEach(function (id) { var b = ROWS.find(function (x) { return x.id === id; }); if (b && !(b.last_printed_at && b.last_printed_at >= j.at)) localPrinted(b, j.issue, j.desk, j.at); });
+      if (j.op === 'checkin') { var v = VIS.find(function (x) { return (j.reg && x.id === j.reg) || (j.token && x.token === j.token); }); if (v) localCheck(v, j.at, j.desk); }
     });
   }
   function localPrinted(b, issue, dk, at) {
@@ -324,50 +411,62 @@
     b.print_count = (b.print_count || 0) + 1; b.first_printed_at = b.first_printed_at || now; b.last_printed_at = now; b.last_desk = dk;
     if (issue && !b.issued_at) b.issued_at = now;
   }
+  function localCheck(v, at, dk) {
+    var d = today(); v.checks = v.checks || [];
+    if (!v.checks.some(function (c) { return c.day === d; })) v.checks.push({ day: d, at: at || new Date().toISOString(), desk: dk });
+  }
+  function todayCheck(v) { var d = today(); return (v.checks || []).find(function (c) { return c.day === d; }); }
 
-  // ---------- 동작 ----------
+  // ---------- 비표 동작 ----------
   function doPrint(list, issue) {
     list = list.filter(function (b) { return !b.void; });
     if (!list.length) return Promise.resolve();
     var again = list.filter(function (b) { return b.print_count > 0; });
     if (again.length) {
       var msg = again.length === 1
-        ? '이미 출력한 출입증입니다.\n\n' + (again[0].name || again[0].org) + '\n' + dt(again[0].last_printed_at) + ' · ' + (again[0].last_desk || '') + ' (' + again[0].print_count + '회)\n\n분실·훼손으로 다시 뽑습니까?'
+        ? '이미 출력한 비표입니다.\n\n' + (again[0].name || again[0].org || again[0].type) + '\n' + dt(again[0].last_printed_at) + ' · ' + (again[0].last_desk || '') + ' (' + again[0].print_count + '회)\n\n분실·훼손으로 다시 뽑습니까?'
         : '고른 ' + list.length + '장 중 ' + again.length + '장은 이미 출력한 것입니다.\n그래도 모두 다시 출력합니까?';
       if (!confirm(msg)) return Promise.resolve();
     }
     return printLabels(list).then(function () {
       var at = new Date().toISOString();
       list.forEach(function (b) { localPrinted(b, issue, desk(), at); });
-      render(true);
       return send({ op: 'print', ids: list.map(function (b) { return b.id; }), desk: desk(), issue: !!issue, at: at });
     });
   }
   function setIssued(list, on) {
     var now = new Date().toISOString();
     list.forEach(function (b) { b.issued_at = on ? (b.issued_at || now) : null; b.last_desk = desk(); });
-    render(true);
     return send({ op: 'issue', ids: list.map(function (b) { return b.id; }), on: on, desk: desk() });
   }
   function saveEdit(b, patch) {
     var changed = {}, any = false;
-    Object.keys(patch).forEach(function (k) { var v = (patch[k] === '' || patch[k] === undefined) ? null : patch[k]; if ((b[k] || null) !== v) { changed[k] = v; any = true; } });
-    if (!any) return Promise.resolve(false);
-    var before = {}; Object.keys(changed).forEach(function (k) { before[k] = b[k]; });
+    Object.keys(patch).forEach(function (k) { var v = (patch[k] === '' || patch[k] === undefined) ? null : patch[k]; if ((b[k] == null ? null : b[k]) !== v) { changed[k] = v; any = true; } });
+    if (!any) return false;
+    var before = {}; Object.keys(changed).forEach(function (k) { before[k] = b[k] == null ? null : b[k]; });
     Object.assign(b, changed);
     send({ op: 'update', id: b.id, patch: changed });
     send({ op: 'event', rows: [{ badge_id: b.id, kind: 'edit', desk: desk(), detail: { before: before, after: changed } }] });
-    return Promise.resolve(true);
+    return true;
   }
   function addBadges(rows, kind) {
-    rows.forEach(function (r) { r.id = uuid(); r.code = r.code || tempCode(); r.source = r.source || 'manual'; r.source_ref = r.source_ref || r.id; r.slot = r.slot || 1; r.grp = r.grp || ('manual:' + r.id); });
-    rows.forEach(function (r) { ROWS.push(Object.assign({ print_count: 0, void: false, created_at: new Date().toISOString() }, r)); });
+    var now = new Date().toISOString();
+    rows.forEach(function (r) { r.id = uuid(); r.code = tempCode(); r.source = r.source || 'manual'; r.source_ref = r.source_ref || r.id; r.slot = r.slot || 1; r.grp = r.grp || ('manual:' + r.id); });
+    rows.forEach(function (r) { ROWS.push(Object.assign({ print_count: 0, void: false, created_at: now }, r)); });
     send({ op: 'insert', rows: rows });
     send({ op: 'event', rows: rows.map(function (r) { return { badge_id: r.id, kind: kind || 'add', desk: desk(), detail: { name: r.name, org: r.org } }; }) });
-    return rows;
+    return rows.map(function (r) { return ROWS.find(function (y) { return y.id === r.id; }); });
   }
 
-  // ---------- 화면: 공통 ----------
+  // ---------- 참관객 동작 ----------
+  function checkin(v, method) {
+    var prev = todayCheck(v), at = new Date().toISOString();
+    VRES = { v: v, status: prev ? 'again' : 'ok', prev: prev };
+    if (!prev) { localCheck(v, at, desk()); send({ op: 'checkin', reg: v.id, token: v.token, desk: desk(), method: method || 'qr', at: at }); }
+    beep(VRES.status);
+  }
+
+  // ---------- 화면 공통 ----------
   function status(b) {
     if (b.void) return '<span class="st vd">무효</span>';
     if (b.issued_at) return '<span class="st ok">지급 ' + dt(b.issued_at) + '</span>';
@@ -375,239 +474,425 @@
     return '<span class="st no">미출력</span>';
   }
   function tbadge(t) { var x = TY[t] || { c: '#888', k: t }; return '<span class="tb" style="background:' + x.c + '">' + esc(x.k) + '</span>'; }
+  function vbadge(v) { return '<span class="tb vbadge">' + (v.walkin ? '현장등록' : '사전등록') + '</span>'; }
+  function dayKo(d) { return { D1: '13일(금)', D2: '14일(토)', both: '13·14일 모두' }[d] || d || ''; }
   function groupOf(b) { return ROWS.filter(function (x) { return x.grp === b.grp; }).sort(function (a, c) { return a.slot - c.slot; }); }
+  function badgeLine(b) { return b.type === 'STAFF' ? 'STAFF 진행요원' : b.type === 'EXHIBITOR' ? (b.org || '') : (b.name || '(이름 없음)'); }
   function render(silent) {
     document.querySelectorAll('.tab').forEach(function (t) { t.classList.toggle('on', t.dataset.t === TAB); });
-    if (TAB === 'desk') renderDesk(silent);
-    else if (TAB === 'bulk') renderBulk();
-    else renderStat();
+    ({ desk: renderDesk, quick: renderQuick, import: renderImport, bulk: renderBulk, stat: renderStat, guide: renderGuide }[TAB])(silent);
   }
 
-  // ---------- 발급 데스크 ----------
-  function matches(b, q) {
-    if (!q) return true;
-    var c = codeFrom(q); if (c) return b.code === c;
-    var n = norm(q);
-    var hay = norm([b.name, b.org, b.org_en, b.title, b.country, b.booth, b.code].join(' '));
-    return hay.indexOf(n) >= 0;
+  // ================= ① 입장 확인 · 비표 =================
+  function matchBadge(b, q) {
+    var n = norm(q); if (!n) return true;
+    return norm([b.name, b.org, b.org_en, b.title, b.booth, b.code, b.type === 'STAFF' ? 'staff 스탭 진행요원' : ''].join(' ')).indexOf(n) >= 0;
+  }
+  function matchVisitor(v, q) {
+    var n = norm(q), d = digits(q);
+    if (d.length >= 4 && /^[\d\-\s]+$/.test(q.trim())) return digits(v.phone || '').indexOf(d) >= 0 || v.tail === d.slice(-4);
+    return n && norm([v.name, v.org].join(' ')).indexOf(n) >= 0;
   }
   function deskList() {
-    var q = F.q.trim();
-    var list = ROWS.filter(function (b) {
-      if (F.t && b.type !== F.t) return false;
-      if (F.s === 'np' && (b.print_count || b.void)) return false;
-      if (F.s === 'ni' && (b.issued_at || b.void)) return false;
-      if (F.s === 'ok' && !b.issued_at) return false;
-      return matches(b, q);
-    });
-    // 참가기업은 회사 하나로 묶어서 보여준다
-    var seen = {}, out = [];
-    list.forEach(function (b) {
-      if (b.type === 'EXHIBITOR' && !codeFrom(q)) { if (seen[b.grp]) return; seen[b.grp] = 1; out.push({ g: true, b: b }); }
-      else out.push({ g: false, b: b });
-    });
+    var q = F.q.trim(), out = [];
+    if (F.t !== 'BADGE') {
+      if (q || F.t === 'VIS') VIS.filter(function (v) { return !q || matchVisitor(v, q); }).slice(0, F.t === 'VIS' ? 400 : 60).forEach(function (v) { out.push({ v: v }); });
+    }
+    if (F.t !== 'VIS') {
+      var seen = {};
+      ROWS.filter(function (b) {
+        if (F.t && F.t !== 'BADGE' && b.type !== F.t) return false;
+        if (F.s === 'np' && (b.print_count || b.void)) return false;
+        if (F.s === 'ni' && (b.issued_at || b.void)) return false;
+        if (F.s === 'ok' && !b.issued_at) return false;
+        return matchBadge(b, q);
+      }).forEach(function (b) {
+        if (b.type === 'EXHIBITOR') { if (seen[b.grp]) return; seen[b.grp] = 1; out.push({ g: true, b: b }); }
+        else out.push({ b: b });
+      });
+    }
     return out;
   }
   function renderDesk(silent) {
-    var listEl = document.getElementById('dList');
-    if (!listEl || !silent) {
+    if (!document.getElementById('dList') || !silent) {
       view.innerHTML = '<div class="desk"><div>' +
-        '<div class="card"><div class="search"><input id="q" placeholder="이름 · 회사명 · 부스번호 · QR 스캔" autocomplete="off" spellcheck="false"><button class="btn" id="qClr">지우기</button></div>' +
-        '<div class="hint">QR 스캐너로 찍으면 바로 그 출입증이 열립니다. Enter = 맨 위 결과 선택 · Esc = 지우기</div>' +
+        '<div class="card"><div class="search"><input id="q" placeholder="QR 스캔 · 이름 · 회사명 · 전화번호 뒷자리" autocomplete="off" spellcheck="false"><button class="btn" id="qClr">지우기</button></div>' +
+        '<div class="hint"><b>참관객</b>: 휴대폰 QR을 스캐너로 찍으면 바로 확인됩니다(삑 1번 = 확인, 삑삑 = 이미 들어옴, 낮은 삐― = 명단에 없음). QR이 없으면 이름이나 전화번호 뒷자리로 찾으세요.<br><b>비표</b>: 이름·회사명으로 찾아 오른쪽에서 출력합니다.</div>' +
         '<div class="chips" id="tChips"></div><div class="chips" id="sChips"></div></div>' +
         '<div class="list" id="dList"></div></div>' +
         '<div class="side" id="side"></div></div>';
       var qi = document.getElementById('q'); qi.value = F.q;
-      qi.oninput = function () { F.q = qi.value; drawList(); };
+      qi.oninput = function () { F.q = qi.value; if (!scanFrom(qi.value)) drawList(); };
       qi.onkeydown = function (e) {
         if (e.key === 'Escape') { qi.value = F.q = ''; drawList(); }
-        if (e.key === 'Enter') {
-          var c = codeFrom(qi.value);
-          if (c) { var b = ROWS.find(function (x) { return x.code === c; }); if (b) { SEL = b; F.q = ''; qi.value = ''; drawList(); drawSide(); } else toast('명단에 없는 코드입니다: ' + c, true); qi.select(); return; }
-          var first = deskList()[0]; if (first) { SEL = first.g ? (groupOf(first.b).find(function (x) { return !x.void && !x.issued_at; }) || first.b) : first.b; drawList(); drawSide(); }
+        if (e.key !== 'Enter') return;
+        var sc = scanFrom(qi.value);
+        if (sc && sc.kind === 'v') {
+          var v = VIS.find(function (x) { return x.token === sc.code; });
+          if (v) { VSEL = v; SEL = null; checkin(v, 'qr'); }
+          else { VSEL = null; SEL = null; VRES = { status: 'no', code: sc.code }; beep('no'); }
+          qi.value = F.q = ''; drawList(); drawSide(); return;
         }
+        if (sc && sc.kind === 'b') {
+          var b = ROWS.find(function (x) { return x.code === sc.code; });
+          if (b) { SEL = b; VSEL = null; VRES = null; } else toast('명단에 없는 코드입니다: ' + sc.code, true);
+          qi.value = F.q = ''; drawList(); drawSide(); return;
+        }
+        var first = deskList()[0];
+        if (first) pick(first);
       };
       document.getElementById('qClr').onclick = function () { qi.value = F.q = ''; drawList(); qi.focus(); };
       var tc = document.getElementById('tChips');
-      tc.innerHTML = '<button class="chip" data-v="">전체</button>' + TYPES.map(function (t) { return '<button class="chip" data-v="' + t.k + '">' + t.ko + '</button>'; }).join('');
+      tc.innerHTML = '<button class="chip" data-v="">전체</button><button class="chip" data-v="VIS">참관객(사전·현장등록)</button><button class="chip" data-v="BADGE">비표 전체</button>' +
+        TYPES.map(function (t) { return '<button class="chip" data-v="' + t.k + '">' + t.ko + '</button>'; }).join('');
       tc.onclick = function (e) { var v = e.target.dataset && e.target.dataset.v; if (v == null) return; F.t = v; drawList(); };
-      var sc = document.getElementById('sChips');
-      sc.innerHTML = [['', '상태 전체'], ['np', '미출력'], ['ni', '미지급'], ['ok', '지급 완료']].map(function (x) { return '<button class="chip" data-v="' + x[0] + '">' + x[1] + '</button>'; }).join('') +
-        '<span style="flex:1"></span><button class="btn" id="addOne">+ 새 출입증</button><button class="btn" id="freeLbl" title="명단 없이 이름만 넣어 출력(인터넷 끊겨도 됨)">임시 라벨</button>';
-      sc.onclick = function (e) { var v = e.target.dataset && e.target.dataset.v; if (v == null) return; F.s = v; drawList(); };
-      document.getElementById('addOne').onclick = function () { openAdd(); };
-      document.getElementById('freeLbl').onclick = function () { openAdd(true); };
+      var sc2 = document.getElementById('sChips');
+      sc2.innerHTML = '<span style="font-size:12px;color:#6b7f95">비표 상태</span>' + [['', '전체'], ['np', '미출력'], ['ni', '미지급'], ['ok', '지급 완료']].map(function (x) { return '<button class="chip" data-v="' + x[0] + '">' + x[1] + '</button>'; }).join('');
+      sc2.onclick = function (e) { var v = e.target.dataset && e.target.dataset.v; if (v == null) return; F.s = v; drawList(); };
       setTimeout(function () { qi.focus(); }, 0);
     }
+    drawList(); drawSide();
+  }
+  function pick(it) {
+    if (it.v) { VSEL = it.v; SEL = null; VRES = null; }
+    else if (it.g) { var g = groupOf(it.b); SEL = g.find(function (x) { return !x.void && !x.issued_at; }) || g[0]; VSEL = null; VRES = null; }
+    else { SEL = it.b; VSEL = null; VRES = null; }
     drawList(); drawSide();
   }
   function drawList() {
     document.querySelectorAll('#tChips .chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === F.t); });
     document.querySelectorAll('#sChips .chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === F.s); });
-    var L = deskList(), el = document.getElementById('dList'); if (!el) return;
-    if (!L.length) { el.innerHTML = '<div class="card empty">찾는 사람이 없습니다. 오른쪽 위 <b>+ 새 출입증</b>으로 바로 만들 수 있습니다.</div>'; return; }
-    var MAX = 120;
-    el.innerHTML = L.slice(0, MAX).map(function (it) {
+    var el = document.getElementById('dList'); if (!el) return;
+    var L = deskList();
+    if (!L.length) { el.innerHTML = '<div class="card empty">' + (F.q ? '찾는 사람이 없습니다.<br>참관객이면 <b>현장등록(QR 안내판)</b>으로 안내하고, 비표가 필요하면 <b>즉석 출력</b> 탭에서 바로 만드세요.' : '왼쪽 위 칸에 QR을 찍거나 이름을 넣으세요.') + '</div>'; return; }
+    var MAX = 150;
+    el.innerHTML = L.slice(0, MAX).map(function (it, i) {
+      if (it.v) {
+        var v = it.v, c = todayCheck(v);
+        return '<div class="row' + (VSEL && VSEL.id === v.id ? ' sel' : '') + '" data-i="' + i + '">' + vbadge(v) +
+          '<div class="nm"><b>' + esc(v.name) + '</b><span>' + esc([v.org, v.tail ? '☎ …' + v.tail : '', dayKo(v.visit_day)].filter(Boolean).join(' · ')) + '</span></div>' +
+          (c ? '<span class="st ok">입장 ' + hm(c.at) + '</span>' : '<span class="st no">미입장</span>') + '</div>';
+      }
       var b = it.b;
       if (it.g) {
         var g = groupOf(b).filter(function (x) { return !x.void; }), iss = g.filter(function (x) { return x.issued_at; }).length;
-        var cur = SEL && SEL.grp === b.grp;
-        return '<div class="row' + (cur ? ' sel' : '') + '" data-g="' + esc(b.grp) + '">' + tbadge(b.type) +
-          '<div class="nm"><b>' + esc(b.org) + '</b><span>' + esc(b.booth || '') + (b.org_en ? ' · ' + esc(b.org_en) : '') + '</span></div>' +
+        return '<div class="row' + (SEL && SEL.grp === b.grp ? ' sel' : '') + '" data-i="' + i + '">' + tbadge(b.type) +
+          '<div class="nm"><b>' + esc(b.org) + '</b><span>' + esc([b.booth, b.org_en].filter(Boolean).join(' · ')) + '</span></div>' +
           '<div class="slots">' + g.map(function (x) { return '<i class="' + (x.issued_at ? 'k' : x.print_count ? 'p' : '') + '"></i>'; }).join('') + '</div>' +
           '<span class="st ' + (iss >= g.length ? 'ok' : iss ? 'pr' : 'no') + '">' + iss + ' / ' + g.length + '장 지급</span></div>';
       }
-      return '<div class="row' + (b.void ? ' void' : '') + (SEL && SEL.id === b.id ? ' sel' : '') + '" data-id="' + b.id + '">' + tbadge(b.type) +
-        '<div class="nm"><b>' + esc(b.name || b.org || '(이름 없음)') + '</b><span>' + esc([b.name ? b.org : '', b.title, b.country, b.booth].filter(Boolean).join(' · ')) + '</span></div>' + status(b) + '</div>';
+      return '<div class="row' + (b.void ? ' void' : '') + (SEL && SEL.id === b.id ? ' sel' : '') + '" data-i="' + i + '">' + tbadge(b.type) +
+        '<div class="nm"><b>' + esc(badgeLine(b)) + '</b><span>' + esc(b.type === 'STAFF' ? (b.note || '') : [b.title, b.org].filter(Boolean).join(' · ')) + '</span></div>' + status(b) + '</div>';
     }).join('') + (L.length > MAX ? '<div class="empty">… ' + (L.length - MAX) + '건 더 있습니다. 검색어를 더 넣어 주세요.</div>' : '');
-    el.onclick = function (e) {
-      var r = e.target.closest('.row'); if (!r) return;
-      if (r.dataset.g) { var g = ROWS.filter(function (x) { return x.grp === r.dataset.g; }).sort(function (a, c) { return a.slot - c.slot; }); SEL = g.find(function (x) { return !x.void && !x.issued_at; }) || g[0]; }
-      else SEL = ROWS.find(function (x) { return x.id === r.dataset.id; });
-      drawList(); drawSide();
-    };
+    el.onclick = function (e) { var r = e.target.closest('.row'); if (!r) return; pick(L[+r.dataset.i]); };
   }
+  function refocus() { var q = document.getElementById('q'); if (q) { q.focus(); q.select(); } }
   function drawSide() {
     var s = document.getElementById('side'); if (!s) return;
-    if (!SEL) { s.innerHTML = '<div class="card"><div class="empty">왼쪽에서 사람을 고르거나 QR을 찍으세요.</div><div class="info">출력 버튼을 누르면 라벨이 바로 나오고 <b>지급 완료</b>로 기록됩니다. 미리 뽑아 둔 비표를 건넬 때는 <b>지급 처리</b>만 누릅니다.</div></div>'; return; }
-    var b = SEL, t = TY[b.type], isEx = b.type === 'EXHIBITOR';
-    var h = '<div class="card"><h2>' + tbadge(b.type) + '<span>' + esc(t ? t.ko : b.type) + '</span><span style="margin-left:auto;font-size:12px;color:#6b7f95">' + esc(b.code) + '</span></h2>';
-    if (b.void) h += '<div class="alert red">무효 처리된 출입증입니다. 출력할 수 없습니다.</div>';
+    if (VRES && (VRES.status === 'no' || VRES.v)) return drawVisitorResult(s);
+    if (VSEL) return drawVisitor(s);
+    if (!SEL) {
+      s.innerHTML = '<div class="card"><div class="empty">QR을 찍거나 왼쪽에서 사람을 고르세요.</div><div class="info">' +
+        '<b>참관객</b> → 초록 화면이 뜨면 <b>팔찌</b>를 채워 주세요.<br><b>비표</b> → [출력하고 지급]을 누르면 라벨이 나옵니다. 유형에 맞는 배경지 흰 칸에 붙여 주세요.<br>모르는 게 있으면 오른쪽 위 <b>❓ 사용 안내</b>.</div></div>';
+      return;
+    }
+    drawBadge(s);
+  }
+  function drawVisitorResult(s) {
+    var R = VRES, h;
+    if (R.status === 'no') {
+      h = '<div class="vres no"><div class="ic">✕</div><h3>명단에 없는 QR입니다</h3><div class="sub">이름이나 전화번호 뒷자리로 다시 찾아보세요.<br>없으면 현장등록(안내판 QR)으로 안내하세요.</div></div>';
+    } else {
+      var v = R.v, ok = R.status === 'ok';
+      h = '<div class="vres ' + (ok ? 'ok' : 'again') + '"><div class="ic">' + (ok ? '✓' : '!') + '</div>' +
+        '<h3>' + (ok ? (v.walkin ? '현장등록 확인' : '사전등록 확인') + ' — 팔찌 지급' : '오늘 이미 입장 확인됨') + '</h3>' +
+        '<div class="who">' + esc(v.name) + '</div><div class="sub">' + esc([v.org, dayKo(v.visit_day)].filter(Boolean).join(' · ')) + '</div>' +
+        (ok ? '' : '<div class="sub" style="margin-top:10px">' + hm(R.prev.at) + ' ' + esc(R.prev.desk || '') + '에서 확인했습니다.<br>팔찌를 이미 받았는지 확인하세요(재입장은 팔찌로).</div>') +
+        ((v.checks || []).length > 1 ? '<div class="sub" style="margin-top:6px">방문 기록: ' + v.checks.map(function (c) { return c.day.slice(5).replace('-', '/'); }).join(', ') + '</div>' : '') + '</div>';
+    }
+    s.innerHTML = '<div class="card">' + h + '<div class="info">다음 사람 QR을 바로 찍으면 됩니다.</div></div>';
+    refocus();
+  }
+  function drawVisitor(s) {
+    var v = VSEL, c = todayCheck(v);
+    s.innerHTML = '<div class="card"><h2>' + vbadge(v) + '<span>참관객</span></h2>' +
+      '<div style="font-size:22px;font-weight:800">' + esc(v.name) + '</div>' +
+      '<div class="info">' + esc(v.org || '소속 없음') + '<br>전화 …' + esc(v.tail || '----') + ' · 방문 예정 ' + esc(dayKo(v.visit_day) || '-') + '<br>등록 ' + dt(v.created_at) +
+      ((v.checks || []).length ? '<br>입장 기록: ' + v.checks.map(function (x) { return x.day.slice(5).replace('-', '/') + ' ' + hm(x.at); }).join(', ') : '') + '</div>' +
+      (c ? '<div class="alert">오늘 ' + hm(c.at) + ' ' + esc(c.desk || '') + '에서 이미 확인했습니다.</div>'
+        : '<div class="acts" style="margin-top:12px"><button class="btn go big" id="vIn">본인 확인 → 입장 처리(팔찌)</button></div>') +
+      '<div class="hint">QR 없이 이름으로 찾은 경우, 이름·전화 뒷자리를 본인에게 확인한 뒤 누르세요.</div></div>';
+    var b = document.getElementById('vIn');
+    if (b) b.onclick = function () { checkin(v, 'search'); drawList(); drawSide(); };
+  }
+  function drawBadge(s) {
+    var b = SEL, t = TY[b.type], isEx = b.type === 'EXHIBITOR', isStaff = b.type === 'STAFF';
+    var h = '<div class="card"><h2>' + tbadge(b.type) + '<span>' + esc(t ? t.ko : b.type) + ' 비표</span><span style="margin-left:auto;font-size:12px;color:#6b7f95">' + esc(srcLabel(b)) + '</span></h2>';
+    if (b.void) h += '<div class="alert red">무효 처리된 비표입니다. 출력할 수 없습니다.</div>';
     else if (b.issued_at) h += '<div class="alert">이미 지급했습니다 — <b>' + dt(b.issued_at) + '</b> · ' + esc(b.last_desk || '') + (b.print_count > 1 ? ' · 출력 ' + b.print_count + '회' : '') + '</div>';
     else if (b.print_count) h += '<div class="alert">미리 출력해 둔 비표가 있습니다(' + dt(b.last_printed_at) + '). 찾아서 건네고 <b>지급 처리</b>를 누르세요.</div>';
-    h += '<div class="f">' +
-      (isEx ? '' : '<label>이름</label><input id="eName" class="big" value="' + esc(b.name || '') + '">') +
-      '<label>' + (isEx ? '회사명' : '소속') + '</label><input id="eOrg"' + (isEx ? ' class="big"' : '') + ' value="' + esc(b.org || '') + '">' +
-      (isEx ? '' : '<label>직함</label><input id="eTitle" value="' + esc(b.title || '') + '">') +
-      (b.type === 'BUYER' ? '<label>국가</label><input id="eCountry" value="' + esc(b.country || '') + '">' : '') +
-      (isEx ? '<label>영문 회사</label><input id="eOrgEn" value="' + esc(b.org_en || '') + '">' : '') +
-      '<label>유형</label><select id="eType">' + TYPES.map(function (x) { return '<option value="' + x.k + '"' + (x.k === b.type ? ' selected' : '') + '>' + x.k + ' · ' + x.ko + '</option>'; }).join('') + '</select>' +
-      '<label>메모</label><input id="eNote" value="' + esc(b.note || '') + '">' +
-      '</div>';
-    h += '<div class="pvwrap" id="pv"></div>';
+    h += '<div class="f">';
+    if (isEx) h += '<label>국문 부스명</label><input id="eOrg" class="big" value="' + esc(b.org || '') + '"><label>영문 부스명</label><input id="eOrgEn" value="' + esc(b.org_en || '') + '"><label>부스번호</label><input id="eBooth" value="' + esc(b.booth || '') + '">';
+    else if (!isStaff) h += '<label>이름</label><input id="eName" class="big" value="' + esc(b.name || '') + '"><label>직함</label><input id="eTitle" value="' + esc(b.title || '') + '"><label>소속</label><input id="eOrg" value="' + esc(b.org || '') + '">';
+    h += '<label>유형</label><select id="eType">' + TYPES.map(function (x) { return '<option value="' + x.k + '"' + (x.k === b.type ? ' selected' : '') + '>' + x.ko + ' (' + x.k + ')</option>'; }).join('') + '</select>' +
+      '<label>메모</label><input id="eNote" value="' + esc(b.note || '') + '"></div>';
+    h += '<div class="pvwrap" id="pv"></div><div id="pvWarn"></div>';
     h += '<div class="acts">' +
       (b.void ? '' : '<button class="btn go big" id="aPrint">' + (b.print_count ? '다시 출력' : '출력하고 지급') + '</button>') +
-      (b.void ? '' : (b.issued_at ? '<button class="btn" id="aUnIss">지급 취소</button>' : '<button class="btn dark" id="aIss">지급 처리</button>')) +
-      '</div>';
+      (b.void ? '' : (b.issued_at ? '<button class="btn" id="aUnIss">지급 취소</button>' : '<button class="btn dark" id="aIss">지급 처리만</button>')) + '</div>';
     if (isEx) {
-      var g = groupOf(b);
-      var left = g.filter(function (x) { return !x.void && !x.issued_at; });
-      h += '<div class="grp"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b style="flex:1">' + esc(b.org) + ' · ' + g.filter(function (x) { return !x.void; }).length + '장</b>' +
-        (left.length ? '<button class="btn go" id="gPrint">남은 ' + left.length + '장 출력</button>' : '') + '<button class="btn" id="gAdd">+1장</button></div>' +
-        g.map(function (x) { return '<div class="gr' + (x.id === b.id ? ' cur' : '') + '" data-id="' + x.id + '" style="cursor:pointer"><span class="n">' + x.slot + '</span><span class="w">' + x.slot + '번째 비표' + (x.note ? ' · ' + esc(x.note) : '') + '</span>' + status(x) + '</div>'; }).join('') +
-        '<div class="hint">회사명 라벨이라 4장이 모두 같습니다. 회사 담당자가 오면 받아 갈 장수만큼 출력·지급하세요.</div></div>';
+      var g = groupOf(b), left = g.filter(function (x) { return !x.void && !x.issued_at; });
+      h += '<div class="grp"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b style="flex:1">이 부스 비표 ' + g.filter(function (x) { return !x.void; }).length + '장</b>' +
+        (left.length ? '<button class="btn go" id="gPrint">남은 ' + left.length + '장 모두 출력</button>' : '') + '<button class="btn" id="gAdd">+1장 추가</button></div>' +
+        g.map(function (x) { return '<div class="gr' + (x.id === b.id ? ' cur' : '') + '" data-id="' + x.id + '"><span class="n">' + x.slot + '</span><span class="w">' + x.slot + '번째' + (x.note ? ' · ' + esc(x.note) : '') + '</span>' + status(x) + '</div>'; }).join('') +
+        '<div class="hint">한 부스 4장은 모두 같은 라벨입니다. 부스명을 고치면 아직 안 뽑은 장에도 같이 반영됩니다.</div></div>';
     }
-    h += '<div class="info">' + (b.first_printed_at ? '처음 출력 ' + dt(b.first_printed_at) + ' · ' : '') + '출처 ' + esc(srcLabel(b)) +
-      '<br><button class="btn red" id="aVoid" style="margin-top:6px;padding:4px 10px;font-size:12px">' + (b.void ? '무효 해제' : '무효 처리(잘못 만든 출입증)') + '</button></div></div>';
+    h += '<div class="info">' + (b.first_printed_at ? '처음 출력 ' + dt(b.first_printed_at) + ' · ' : '') + '코드 ' + esc(b.code) +
+      '<br><button class="btn red" id="aVoid" style="margin-top:6px;padding:4px 10px;font-size:12px">' + (b.void ? '무효 해제' : '무효 처리(잘못 만든 비표)') + '</button></div></div>';
     s.innerHTML = h;
-    var pv = document.getElementById('pv');
+    function val(id) { var el = document.getElementById(id); if (!el) return undefined; var v = el.value.trim(); return v || null; }
     function cur() {
-      return Object.assign({}, b, {
-        name: document.getElementById('eName') ? val('eName') : b.name, org: val('eOrg'),
-        title: document.getElementById('eTitle') ? val('eTitle') : b.title,
-        country: document.getElementById('eCountry') ? val('eCountry') : b.country,
-        org_en: document.getElementById('eOrgEn') ? val('eOrgEn') : b.org_en
-      });
+      var c = Object.assign({}, b);
+      ['name:eName', 'title:eTitle', 'org:eOrg', 'org_en:eOrgEn', 'booth:eBooth'].forEach(function (p) { var k = p.split(':'); var v = val(k[1]); if (v !== undefined) c[k[0]] = v; });
+      c.type = document.getElementById('eType').value; return c;
     }
-    function val(id) { var v = document.getElementById(id).value.trim(); return v || null; }
-    function preview() { pv.innerHTML = labelHtml(cur()); fitAll(pv); }
+    function preview() {
+      var o = previewInto(document.getElementById('pv'), cur());
+      document.getElementById('pvWarn').innerHTML = o ? '<div class="alert red">글자가 너무 길어 라벨에 다 들어가지 않습니다. 줄여 써 주세요.</div>' : '';
+    }
     preview();
-    ['eName', 'eOrg', 'eTitle', 'eCountry', 'eOrgEn'].forEach(function (id) { var el = document.getElementById(id); if (el) el.oninput = preview; });
+    ['eName', 'eTitle', 'eOrg', 'eOrgEn', 'eBooth'].forEach(function (id) { var el = document.getElementById(id); if (el) { el.oninput = preview; el.onchange = function () { commit(); drawList(); }; el.onkeydown = function (e) { if (e.key === 'Enter' && document.getElementById('aPrint')) document.getElementById('aPrint').click(); }; } });
+    document.getElementById('eNote').onchange = function () { commit(); };
     function commit() {
-      var c = cur();
-      var patch = { name: c.name, org: c.org, title: c.title, type: document.getElementById('eType').value, note: val('eNote') };
-      if (document.getElementById('eCountry')) patch.country = c.country;
-      if (document.getElementById('eOrgEn')) patch.org_en = c.org_en;
-      return saveEdit(b, patch);
+      var c = cur(), patch = { type: c.type, note: val('eNote') };
+      ['name', 'title', 'org', 'org_en', 'booth'].forEach(function (k) { if (c[k] !== b[k] && (c[k] || b[k])) patch[k] = c[k]; });
+      saveEdit(b, patch);
+      if (isEx && (patch.org !== undefined || patch.org_en !== undefined || patch.booth !== undefined)) {
+        // 같은 부스의 아직 안 뽑은 장에도 같이
+        groupOf(b).forEach(function (x) { if (x.id !== b.id && !x.print_count && !x.void) saveEdit(x, { org: b.org, org_en: b.org_en, booth: b.booth }); });
+      }
     }
-    ['eName', 'eOrg', 'eTitle', 'eCountry', 'eOrgEn', 'eNote'].forEach(function (id) { var el = document.getElementById(id); if (el) { el.onchange = function () { commit(); drawList(); }; el.onkeydown = function (e) { if (e.key === 'Enter' && document.getElementById('aPrint')) document.getElementById('aPrint').click(); }; } });
-    document.getElementById('eType').onchange = function () { commit(); render(); };
-    var ap = document.getElementById('aPrint'); if (ap) ap.onclick = function () { commit(); doPrint([b], true).then(function () { drawSide(); refocus(); }); };
-    var ai = document.getElementById('aIss'); if (ai) ai.onclick = function () { commit(); setIssued([b], true); drawSide(); refocus(); toast('지급 처리했습니다.'); };
-    var au = document.getElementById('aUnIss'); if (au) au.onclick = function () { if (confirm('지급 기록을 지웁니다(출력 기록은 남음).')) { setIssued([b], false); drawSide(); } };
+    document.getElementById('eType').onchange = function () { commit(); drawList(); drawSide(); };
+    var ap = document.getElementById('aPrint'); if (ap) ap.onclick = function () { commit(); doPrint([b], true).then(function () { drawList(); drawSide(); refocus(); }); };
+    var ai = document.getElementById('aIss'); if (ai) ai.onclick = function () { commit(); setIssued([b], true); drawList(); drawSide(); refocus(); toast('지급 처리했습니다.'); };
+    var au = document.getElementById('aUnIss'); if (au) au.onclick = function () { if (confirm('지급 기록을 지웁니다(출력 기록은 남음).')) { setIssued([b], false); drawList(); drawSide(); } };
     document.getElementById('aVoid').onclick = function () {
-      if (!b.void && !confirm('이 출입증을 무효로 합니다. 명단에는 남고 출력은 막힙니다.')) return;
+      if (!b.void && !confirm('이 비표를 무효로 합니다. 명단에는 남고 출력은 막힙니다.')) return;
       saveEdit(b, { void: !b.void }); drawList(); drawSide();
     };
-    var gp = document.getElementById('gPrint'); if (gp) gp.onclick = function () { commit(); var left = groupOf(b).filter(function (x) { return !x.void && !x.issued_at; }); doPrint(left, true).then(function () { drawSide(); refocus(); }); };
+    var gp = document.getElementById('gPrint'); if (gp) gp.onclick = function () { commit(); var left = groupOf(b).filter(function (x) { return !x.void && !x.issued_at; }); doPrint(left, true).then(function () { drawList(); drawSide(); refocus(); }); };
     var ga = document.getElementById('gAdd'); if (ga) ga.onclick = function () {
       var g = groupOf(b), live = g.filter(function (x) { return !x.void; }).length;
-      if (live >= 4 && !confirm('기본 4장을 넘습니다(지금 ' + live + '장).\n관리자 확인을 받았으면 [확인]을 누르세요. 추가 발급 기록이 남습니다.')) return;
+      if (live >= 4 && !confirm('기본 4장을 넘습니다(지금 ' + live + '장).\n팀장 확인을 받았으면 [확인]을 누르세요. 추가 발급 기록이 남습니다.')) return;
       var mx = g.reduce(function (m, x) { return Math.max(m, x.slot); }, 0);
-      var r = addBadges([{ type: 'EXHIBITOR', org: b.org, org_en: b.org_en, booth: b.booth, grp: b.grp, source: b.source, source_ref: b.source_ref, slot: mx + 1, note: '추가 발급(' + desk() + ')' }], 'extra')[0];
-      SEL = ROWS.find(function (x) { return x.id === r.id; }); drawList(); drawSide();
+      SEL = addBadges([{ type: 'EXHIBITOR', org: b.org, org_en: b.org_en, booth: b.booth, grp: b.grp, source: b.source, source_ref: b.source_ref, slot: mx + 1, note: '추가 발급(' + desk() + ')' }], 'extra')[0];
+      drawList(); drawSide();
     };
     s.querySelectorAll('.gr').forEach(function (r) { r.onclick = function () { SEL = ROWS.find(function (x) { return x.id === r.dataset.id; }); drawList(); drawSide(); }; });
   }
-  function refocus() { var q = document.getElementById('q'); if (q) { q.focus(); q.select(); } }
-  function srcLabel(b) { return { booth: '부스 신청', tenant: '공동관 입주사', sign: '상호간판 명단', buyer: '바이어 회원', rsvp: '개막식 회신', manual: '직접 입력' }[b.source] || b.source; }
+  function srcLabel(b) { return { booth: '부스 신청', tenant: '공동관 입주사', sign: '상호간판 명단', buyer: '바이어 회원', rsvp: '개막식 회신', manual: '직접 입력', import: '엑셀 명단' }[b.source] || b.source; }
 
-  // ---------- 새 출입증 / 임시 라벨 / 여러 명 붙여넣기 ----------
-  function openAdd(free) {
-    var m = document.createElement('div'); m.className = 'modal';
-    m.innerHTML = '<div class="box"><h3>' + (free ? '임시 라벨 (인터넷이 끊겨도 출력됨)' : '새 출입증') + '</h3>' +
-      '<div class="f"><label>유형</label><select id="nType">' + TYPES.map(function (x) { return '<option value="' + x.k + '"' + (x.k === (F.t || 'STAFF') ? ' selected' : '') + '>' + x.k + ' · ' + x.ko + '</option>'; }).join('') + '</select>' +
-      '<label>이름</label><input id="nName" class="big"><label>소속</label><input id="nOrg"><label>직함</label><input id="nTitle"><label>국가</label><input id="nCountry" placeholder="바이어만"></div>' +
-      '<div class="info">' + (free ? '출력과 함께 명단에도 추가됩니다. 끊겨 있으면 이 PC에 모아 두었다가 연결되면 올립니다.' : '명단에 추가한 뒤 바로 출력할 수 있습니다.') + '</div>' +
-      '<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">여러 명 한꺼번에 붙여넣기</summary>' +
-      '<p class="hint">엑셀에서 <b>이름 · 소속 · 직함</b> 세 칸을 복사해 붙여넣으세요(한 줄에 한 명). 위에서 고른 유형으로 들어갑니다.</p><textarea id="nBulk" placeholder="홍길동&#9;부산일보&#9;사업국장"></textarea></details>' +
-      '<div class="acts"><button class="btn" id="nCancel">닫기</button><button class="btn dark" id="nSave">' + (free ? '' : '명단에 추가') + (free ? '' : '') + '</button><button class="btn go" id="nPrint">추가하고 출력</button></div></div>';
-    document.body.appendChild(m);
-    if (free) document.getElementById('nSave').hidden = true;
-    document.getElementById('nName').focus();
-    function close() { m.remove(); refocus(); }
-    document.getElementById('nCancel').onclick = close;
-    m.onclick = function (e) { if (e.target === m) close(); };
-    function collect() {
-      var type = document.getElementById('nType').value, rows = [];
-      var bulk = document.getElementById('nBulk').value.trim();
-      if (bulk) bulk.split(/\r?\n/).forEach(function (ln) { var c = ln.split('\t'); if (!c[0] || !c[0].trim()) return; rows.push({ type: type, name: c[0].trim(), org: (c[1] || '').trim() || null, title: (c[2] || '').trim() || null }); });
-      var nm = document.getElementById('nName').value.trim(), og = document.getElementById('nOrg').value.trim();
-      if (nm || og) rows.unshift({ type: type, name: nm || null, org: og || null, title: document.getElementById('nTitle').value.trim() || null, country: document.getElementById('nCountry').value.trim() || null });
-      return rows;
+  // ================= ② 즉석 출력 =================
+  function renderQuick() {
+    var t = QK.t;
+    var h = '<div class="desk"><div class="card"><div class="h2">즉석 출력 — 현장에서 갑자기 요청받았을 때</div><div class="hint">유형을 고르고 내용을 넣은 뒤 <b>출력</b>을 누르면 라벨이 바로 나오고 명단에도 남습니다. 인터넷이 끊겨도 출력됩니다.</div>' +
+      '<div class="tgrid">' + TYPES.map(function (x) { return '<button class="tbtn' + (x.k === t ? ' on' : '') + '" style="--c:' + x.c + '" data-k="' + x.k + '"><i></i>' + x.ko + '<small>' + x.k + '</small></button>'; }).join('') + '</div><div class="f" id="qf">';
+    if (t === 'EXHIBITOR') h += '<label>국문 부스명</label><input id="q1" class="big"><label>영문 부스명</label><input id="q2"><label>부스번호</label><input id="q3" placeholder="예: M-12"><label>장수</label><input id="qn" type="number" min="1" max="20" value="1">';
+    else if (t === 'STAFF') h += '<label>장수</label><input id="qn" class="big" type="number" min="1" max="50" value="1"><label>메모</label><input id="q4" placeholder="예: 운영요원 홍길동 (라벨에는 안 찍힘)">';
+    else h += '<label>이름</label><input id="q1" class="big"><label>직함</label><input id="q2"><label>소속' + (t === 'PRESS' ? '(매체)' : '') + '</label><input id="q3">';
+    h += '</div><div class="acts"><button class="btn go big" id="qPrint">출력</button><button class="btn" id="qSave">명단에만 추가</button></div>' +
+      '<div class="hint" style="margin-top:10px">참가기업이 이미 명단에 있는 부스라면 여기 말고 <b>입장 확인·비표</b> 탭에서 부스명을 찾아 <b>+1장 추가</b>로 뽑아 주세요(장수가 부스별로 기록됩니다).</div></div>' +
+      '<div class="card"><b>미리보기</b><div class="pvwrap" id="qpv"></div><div id="qWarn"></div></div></div>';
+    view.innerHTML = h;
+    view.querySelectorAll('.tbtn').forEach(function (b) { b.onclick = function () { QK.t = b.dataset.k; renderQuick(); }; });
+    function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+    function rec() {
+      if (t === 'EXHIBITOR') return { type: t, org: v('q1') || null, org_en: v('q2') || null, booth: v('q3') || null };
+      if (t === 'STAFF') return { type: t, note: v('q4') || null };
+      return { type: t, name: v('q1') || null, title: v('q2') || null, org: v('q3') || null };
     }
-    document.getElementById('nSave').onclick = function () { var r = collect(); if (!r.length) return toast('이름이나 소속을 넣어 주세요.', true); addBadges(r); close(); toast(r.length + '명을 명단에 추가했습니다.'); render(); };
-    document.getElementById('nPrint').onclick = function () {
-      var r = collect(); if (!r.length) return toast('이름이나 소속을 넣어 주세요.', true);
-      if (r.length > 1 && !confirm(r.length + '장을 바로 출력합니다.')) return;
-      addBadges(r); close();
-      var made = r.map(function (x) { return ROWS.find(function (y) { return y.id === x.id; }); });
-      SEL = made[0]; doPrint(made, true).then(function () { render(); });
+    function pv() { var o = previewInto(document.getElementById('qpv'), rec()); document.getElementById('qWarn').innerHTML = o ? '<div class="alert red">글자가 너무 길어 다 들어가지 않습니다. 줄여 써 주세요.</div>' : ''; }
+    view.querySelectorAll('#qf input').forEach(function (i) { i.oninput = pv; i.onkeydown = function (e) { if (e.key === 'Enter') document.getElementById('qPrint').click(); }; });
+    pv();
+    var first = document.getElementById('q1') || document.getElementById('qn'); if (first) first.focus();
+    function make() {
+      var r = rec();
+      if (t === 'EXHIBITOR' && !r.org) { toast('국문 부스명을 넣어 주세요.', true); return null; }
+      if (t !== 'EXHIBITOR' && t !== 'STAFF' && !r.name) { toast('이름을 넣어 주세요.', true); return null; }
+      var n = Math.max(1, Math.min(50, parseInt(v('qn') || '1', 10) || 1));
+      var grp = t === 'EXHIBITOR' ? 'manual:' + uuid() : null, rows = [];
+      for (var i = 0; i < n; i++) rows.push(Object.assign({}, r, grp ? { grp: grp, slot: i + 1, source_ref: grp } : {}));
+      return addBadges(rows, 'quick');
+    }
+    document.getElementById('qPrint').onclick = function () {
+      var made = make(); if (!made) return;
+      doPrint(made, true).then(function () { toast(made.length + '장 출력했습니다.'); renderQuick(); });
     };
+    document.getElementById('qSave').onclick = function () { var made = make(); if (!made) return; toast('명단에 추가했습니다. 미리 출력 탭에서 뽑을 수 있습니다.'); renderQuick(); };
   }
 
-  // ---------- 미리 출력·명단 ----------
+  // ================= ③ 명단 올리기 (엑셀) =================
+  var SYN = {
+    name: ['이름', '성명', '성함', '참석자', 'name', 'fullname', 'passportname', '영문명'],
+    title: ['직함', '직위', '직책', '직급', 'title', 'position', 'jobtitle'],
+    org: ['소속', '회사', '회사명', '기관', '기관명', '업체', '업체명', '단체', '매체', '매체명', 'company', 'organization', 'org', 'affiliation'],
+    ko: ['국문', '부스명', '국문부스명', '상호', '한글', '국문명', '참가기업', '기업명'],
+    en: ['영문', '영문부스명', '영문명칭', 'english', 'englishname', '영문상호'],
+    booth: ['부스', '부스번호', 'booth', 'boothno'],
+    n: ['장수', '수량', '매수', 'qty', 'count']
+  };
+  function fieldsFor(t) {
+    if (t === 'EXHIBITOR') return [['ko', '국문 부스명', 1], ['en', '영문 부스명', 0], ['booth', '부스번호', 0], ['n', '장수(비우면 4)', 0]];
+    if (t === 'STAFF') return [['name', '이름(라벨엔 안 찍힘)', 0], ['n', '장수(비우면 1)', 0]];
+    return [['name', '이름', 1], ['title', '직함', 0], ['org', t === 'PRESS' ? '소속(매체)' : '소속', 0]];
+  }
+  function guessMap(head, t) {
+    var map = {};
+    fieldsFor(t).forEach(function (f) {
+      var syn = SYN[f[0]], hit = -1;
+      head.forEach(function (h, i) { var n = norm(h); if (hit < 0 && syn.some(function (s) { return n === norm(s); })) hit = i; });
+      if (hit < 0) head.forEach(function (h, i) { var n = norm(h); if (hit < 0 && n && syn.some(function (s) { return n.indexOf(norm(s)) >= 0; })) hit = i; });
+      map[f[0]] = hit;
+    });
+    if (t === 'EXHIBITOR' && map.ko < 0) map.ko = map.org !== undefined ? map.org : -1;
+    return map;
+  }
+  function parseGrid(grid) {
+    grid = grid.map(function (r) { return r.map(function (c) { return c == null ? '' : String(c).trim(); }); }).filter(function (r) { return r.some(Boolean); });
+    if (!grid.length) return null;
+    // 머리글 줄 찾기: 위 10줄 중 알려진 머리글이 가장 많은 줄
+    var all = [].concat.apply([], Object.keys(SYN).map(function (k) { return SYN[k]; })).map(norm), best = -1, bestN = 0;
+    grid.slice(0, 10).forEach(function (r, i) { var n = r.filter(function (c) { return all.indexOf(norm(c)) >= 0; }).length; if (n > bestN) { bestN = n; best = i; } });
+    var head, body;
+    if (best >= 0) { head = grid[best]; body = grid.slice(best + 1); }
+    else { head = grid[0].map(function (_, i) { return (i + 1) + '번째 칸'; }); body = grid; }
+    var w = Math.max.apply(null, [head.length].concat(body.map(function (r) { return r.length; })));
+    while (head.length < w) head.push((head.length + 1) + '번째 칸');
+    return { head: head, rows: body };
+  }
+  function renderImport() {
+    var t = IM.t;
+    var h = '<div class="card" style="margin-bottom:12px"><div class="h2">명단 올리기 — 가지고 있는 엑셀 명단을 그대로</div>' +
+      '<div class="hint">① 유형 고르기 → ② 엑셀 파일 고르기(또는 엑셀에서 복사해 붙여넣기) → ③ 칸 맞는지 확인 → ④ <b>명단에 추가</b>. 이미 있는 사람(같은 이름+소속)은 자동으로 빼 둡니다.</div>' +
+      '<div class="tgrid">' + TYPES.map(function (x) { return '<button class="tbtn' + (x.k === t ? ' on' : '') + '" style="--c:' + x.c + '" data-k="' + x.k + '"><i></i>' + x.ko + '<small>' + x.d + '</small></button>'; }).join('') + '</div>' +
+      '<div class="tools"><input type="file" id="imFile" accept=".xlsx,.xls,.csv"><span style="color:#6b7f95">또는</span><button class="btn" id="imPasteBtn">붙여넣기 칸 열기</button>' + (IM.file ? '<span class="st ok">' + esc(IM.file) + '</span>' : '') + '</div>' +
+      '<textarea id="imPaste" hidden style="width:100%;min-height:140px;border:1px solid #c9d4df;border-radius:8px;padding:10px" placeholder="엑셀에서 머리글 줄(이름·직함·소속 등)까지 같이 복사해 여기에 붙여넣으세요"></textarea></div>';
+    if (IM.rows) {
+      var F2 = fieldsFor(t), map = IM.map;
+      var opts = function (k) { return '<select data-k="' + k + '"><option value="-1">(없음)</option>' + IM.head.map(function (hd, i) { return '<option value="' + i + '"' + (map[k] === i ? ' selected' : '') + '>' + esc(hd || (i + 1) + '번째 칸') + '</option>'; }).join('') + '</select>'; };
+      var recs = buildImport();
+      var add = recs.filter(function (r) { return r.ok && !r.dup; });
+      h += '<div class="card" style="margin-bottom:12px"><b>③ 칸 맞추기</b> <span class="hint">엑셀의 어느 칸이 무엇인지 확인하세요. 틀리면 바꾸면 됩니다.</span><div class="tools" style="margin-top:8px">' +
+        F2.map(function (f) { return '<label style="display:flex;gap:6px;align-items:center;font-weight:700">' + f[1] + (f[2] ? '<span style="color:#B4233C">*</span>' : '') + ' ' + opts(f[0]) + '</label>'; }).join('') + '</div></div>' +
+        '<div class="tools"><b style="flex:1">미리보기 — 추가 ' + add.reduce(function (a, r) { return a + r.n; }, 0) + '장 · 이미 있음 ' + recs.filter(function (r) { return r.dup; }).length + '명 · 빈 줄 ' + recs.filter(function (r) { return !r.ok; }).length + '</b>' +
+        '<button class="btn" id="imCancel">취소</button><button class="btn dark" id="imAdd"' + (add.length ? '' : ' disabled') + '>명단에 추가</button><button class="btn go" id="imAddPrint"' + (add.length ? '' : ' disabled') + '>추가하고 바로 출력</button></div>' +
+        '<table><thead><tr><th class="c">#</th><th>라벨에 찍힐 내용</th><th class="c">장수</th><th>상태</th></tr></thead><tbody>' +
+        recs.slice(0, 500).map(function (r, i) {
+          return '<tr' + (!r.ok || r.dup ? ' style="opacity:.5"' : '') + '><td class="c">' + (i + 1) + '</td><td>' + esc(r.preview) + '</td><td class="c">' + r.n + '</td><td>' +
+            (!r.ok ? '<span class="st vd">' + esc(r.why) + '</span>' : r.dup ? '<span class="st pr">이미 명단에 있음 — 빼 둠</span>' : '<span class="st ok">추가</span>') + '</td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    view.innerHTML = h;
+    view.querySelectorAll('.tbtn').forEach(function (b) { b.onclick = function () { IM.t = b.dataset.k; if (IM.head) IM.map = guessMap(IM.head, IM.t); renderImport(); }; });
+    document.getElementById('imFile').onchange = function (e) {
+      var f = e.target.files[0]; if (!f) return;
+      if (!window.XLSX) return toast('엑셀 읽기 도구를 아직 못 불러왔습니다. 잠시 뒤 다시 하거나 붙여넣기를 쓰세요.', true);
+      var rd = new FileReader();
+      rd.onload = function () {
+        try {
+          var wb = XLSX.read(new Uint8Array(rd.result), { type: 'array' });
+          var ws = wb.Sheets[wb.SheetNames[0]];
+          var g = parseGrid(XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' }));
+          if (!g) return toast('파일에 내용이 없습니다.', true);
+          IM.head = g.head; IM.rows = g.rows; IM.map = guessMap(g.head, IM.t); IM.file = f.name + (wb.SheetNames.length > 1 ? ' (첫 시트 「' + wb.SheetNames[0] + '」)' : '');
+          renderImport();
+        } catch (er) { toast('파일을 읽지 못했습니다: ' + er.message, true); }
+      };
+      rd.readAsArrayBuffer(f);
+    };
+    var pb = document.getElementById('imPasteBtn'), pa = document.getElementById('imPaste');
+    pb.onclick = function () { pa.hidden = false; pa.focus(); };
+    pa.onpaste = function () { setTimeout(function () {
+      var g = parseGrid(pa.value.split(/\r?\n/).map(function (l) { return l.split('\t'); }));
+      if (!g) return; IM.head = g.head; IM.rows = g.rows; IM.map = guessMap(g.head, IM.t); IM.file = '붙여넣은 ' + g.rows.length + '줄'; renderImport();
+    }, 30); };
+    view.querySelectorAll('select[data-k]').forEach(function (s) { s.onchange = function () { IM.map[s.dataset.k] = +s.value; renderImport(); }; });
+    var c = document.getElementById('imCancel'); if (c) c.onclick = function () { IM.rows = IM.head = IM.map = null; IM.file = ''; renderImport(); };
+    function doAdd(andPrint) {
+      var recs = buildImport().filter(function (r) { return r.ok && !r.dup; }), rows = [];
+      recs.forEach(function (r) {
+        if (IM.t === 'EXHIBITOR') { var g = 'import:' + uuid(); for (var i = 0; i < r.n; i++) rows.push({ type: 'EXHIBITOR', org: r.rec.org, org_en: r.rec.org_en, booth: r.rec.booth, grp: g, slot: i + 1, source: 'import', source_ref: g }); }
+        else for (var j = 0; j < r.n; j++) rows.push(Object.assign({ source: 'import' }, r.rec));
+      });
+      if (!rows.length) return;
+      if (!confirm(rows.length + '장을 명단에 추가' + (andPrint ? '하고 바로 출력' : '') + '합니다.')) return;
+      var made = addBadges(rows, 'import');
+      IM.rows = IM.head = IM.map = null; IM.file = '';
+      if (andPrint) doPrint(made, false).then(function () { toast(made.length + '장 추가·출력했습니다(미지급 상태).'); renderImport(); });
+      else { toast(made.length + '장을 명단에 추가했습니다.'); renderImport(); }
+    }
+    var a1 = document.getElementById('imAdd'); if (a1) a1.onclick = function () { doAdd(false); };
+    var a2 = document.getElementById('imAddPrint'); if (a2) a2.onclick = function () { doAdd(true); };
+  }
+  function buildImport() {
+    var t = IM.t, m = IM.map, seen = {};
+    function cell(r, k) { return m[k] >= 0 ? String(r[m[k]] || '').trim() : ''; }
+    var have = {};
+    ROWS.forEach(function (b) { if (b.void || b.type !== t) return; have[t === 'EXHIBITOR' ? norm(b.org) : norm(b.name) + '|' + norm(b.org)] = 1; });
+    return IM.rows.map(function (r) {
+      var rec, key, prev, n;
+      if (t === 'EXHIBITOR') {
+        rec = { type: t, org: cell(r, 'ko') || null, org_en: cell(r, 'en') || null, booth: cell(r, 'booth') || null };
+        n = parseInt(cell(r, 'n'), 10) || 4; key = norm(rec.org); prev = (rec.org || '') + (rec.org_en ? ' / ' + rec.org_en : '');
+        if (!rec.org) return { ok: false, why: '부스명 없음', n: 0, preview: r.filter(Boolean).join(' · ') };
+      } else if (t === 'STAFF') {
+        var nm = cell(r, 'name'); n = parseInt(cell(r, 'n'), 10) || 1;
+        rec = { type: t, note: nm || null }; key = null; prev = 'STAFF 진행요원' + (nm ? ' (' + nm + ')' : '');
+        if (!nm && !cell(r, 'n')) return { ok: false, why: '빈 줄', n: 0, preview: r.filter(Boolean).join(' · ') };
+      } else {
+        rec = { type: t, name: cell(r, 'name') || null, title: cell(r, 'title') || null, org: cell(r, 'org') || null }; n = 1;
+        key = norm(rec.name) + '|' + norm(rec.org); prev = [rec.name, rec.title, rec.org].filter(Boolean).join(' · ');
+        if (!rec.name) return { ok: false, why: '이름 없음', n: 0, preview: r.filter(Boolean).join(' · ') };
+      }
+      n = Math.max(1, Math.min(20, n));
+      var dup = key && (have[key] || seen[key]); if (key) seen[key] = 1;
+      return { ok: true, dup: !!dup, rec: rec, n: n, preview: prev };
+    });
+  }
+
+  // ================= ④ 미리 출력 =================
   function bulkList() {
     return ROWS.filter(function (b) {
       if (B.t && b.type !== B.t) return false;
       if (b.void) return B.s === 'all';
       if (B.s === 'np' && b.print_count) return false;
       if (B.s === 'p' && !b.print_count) return false;
-      return matches(b, B.q);
+      return matchBadge(b, B.q);
     });
   }
   function renderBulk() {
-    var L = bulkList();
-    var picked = L.filter(function (b) { return B.pick[b.id]; });
-    view.innerHTML = '<div class="card" style="margin-bottom:12px"><b>행사 전날 미리 출력</b><div class="hint">유형을 고르고 [고른 것 출력]을 누르면 한 번에 뽑습니다. 미리 출력한 것은 <b>미지급</b>으로 남고, 데스크에서 건넬 때 지급 처리합니다. ' +
-      '라벨이 한 장씩 비뚤어지면 50장 정도씩 나눠 뽑으세요.</div></div>' +
-      '<div class="tools"><select id="bT"><option value="">전체 유형</option>' + TYPES.map(function (t) { return '<option value="' + t.k + '"' + (B.t === t.k ? ' selected' : '') + '>' + t.k + ' · ' + t.ko + '</option>'; }).join('') + '</select>' +
+    var L = bulkList(), picked = L.filter(function (b) { return B.pick[b.id]; });
+    view.innerHTML = '<div class="card" style="margin-bottom:12px"><div class="h2">미리 출력 — 행사 전날 한꺼번에</div><div class="hint">유형을 고르고 [보이는 것 모두 고르기] → [출력]. 미리 뽑은 비표는 <b>미지급</b>으로 남고, 당일 건넬 때 <b>입장 확인·비표</b> 탭에서 찾아 [지급 처리만]을 누릅니다. ' +
+      '한 번에 <b>50장 정도씩</b> 나눠 뽑고, 롤을 바꾸면 프린터 FEED 버튼으로 용지 맞춤을 다시 하세요.</div></div>' +
+      '<div class="tools"><select id="bT"><option value="">전체 유형</option>' + TYPES.map(function (t) { return '<option value="' + t.k + '"' + (B.t === t.k ? ' selected' : '') + '>' + t.ko + ' (' + t.k + ')</option>'; }).join('') + '</select>' +
       '<select id="bS"><option value="np"' + (B.s === 'np' ? ' selected' : '') + '>미출력만</option><option value="p"' + (B.s === 'p' ? ' selected' : '') + '>출력한 것</option><option value=""' + (B.s === '' ? ' selected' : '') + '>전부(무효 제외)</option><option value="all"' + (B.s === 'all' ? ' selected' : '') + '>무효 포함</option></select>' +
       '<input id="bQ" placeholder="검색" value="' + esc(B.q) + '">' +
-      '<button class="btn" id="bAll">보이는 것 모두 고르기</button><button class="btn" id="bNone">고르기 해제</button>' +
-      '<span style="flex:1"></span><button class="btn" id="bSync" title="새로 승인된 부스·바이어·개막식 회신을 명단에 더합니다. 이미 있는 출입증은 건드리지 않습니다.">명단 새로 불러오기</button>' +
+      '<button class="btn" id="bAll">보이는 것 모두 고르기</button><button class="btn" id="b50">위에서 50장만</button><button class="btn" id="bNone">해제</button>' +
+      '<span style="flex:1"></span><button class="btn" id="bSync" title="홈페이지에서 새로 승인된 부스·바이어·개막식 회신을 더합니다. 이미 있는 비표는 건드리지 않습니다.">홈페이지 명단 새로 불러오기</button>' +
       '<button class="btn go" id="bPrint"' + (picked.length ? '' : ' disabled') + '>고른 ' + picked.length + '장 출력</button></div>' +
-      '<table><thead><tr><th class="c"><input type="checkbox" id="bChk"></th><th>유형</th><th>이름</th><th>소속</th><th>직함·국가</th><th>부스</th><th class="c">#</th><th>상태</th><th>코드</th></tr></thead><tbody>' +
+      '<table><thead><tr><th class="c"><input type="checkbox" id="bChk"></th><th>유형</th><th>라벨 내용</th><th>부스</th><th class="c">#</th><th>상태</th><th>출처</th></tr></thead><tbody>' +
       L.map(function (b) {
-        return '<tr' + (b.void ? ' style="opacity:.45"' : '') + '><td class="c"><input type="checkbox" data-id="' + b.id + '"' + (B.pick[b.id] ? ' checked' : '') + (b.void ? ' disabled' : '') + '></td><td>' + tbadge(b.type) + '</td><td><b>' + esc(b.name || '') + '</b></td><td>' + esc(b.org || '') + '</td><td>' + esc([b.title, b.country].filter(Boolean).join(' · ')) + '</td><td>' + esc(b.booth || '') + '</td><td class="c">' + (b.type === 'EXHIBITOR' ? b.slot : '') + '</td><td>' + status(b) + '</td><td style="font-family:monospace">' + esc(b.code) + '</td></tr>';
-      }).join('') + (L.length ? '' : '<tr><td colspan="9" class="empty">해당하는 출입증이 없습니다.</td></tr>') + '</tbody></table>';
-    document.getElementById('bT').onchange = function (e) { B.t = e.target.value; renderBulk(); };
-    document.getElementById('bS').onchange = function (e) { B.s = e.target.value; renderBulk(); };
+        var txt = b.type === 'EXHIBITOR' ? [b.org, b.org_en].filter(Boolean).join(' / ') : b.type === 'STAFF' ? 'STAFF 진행요원' + (b.note ? ' (' + b.note + ')' : '') : [b.name, b.title, b.org].filter(Boolean).join(' · ');
+        return '<tr' + (b.void ? ' style="opacity:.45"' : '') + '><td class="c"><input type="checkbox" data-id="' + b.id + '"' + (B.pick[b.id] ? ' checked' : '') + (b.void ? ' disabled' : '') + '></td><td>' + tbadge(b.type) + '</td><td>' + esc(txt) + '</td><td>' + esc(b.booth || '') + '</td><td class="c">' + (b.type === 'EXHIBITOR' ? b.slot : '') + '</td><td>' + status(b) + '</td><td style="color:#6b7f95;font-size:12px">' + esc(srcLabel(b)) + '</td></tr>';
+      }).join('') + (L.length ? '' : '<tr><td colspan="7" class="empty">해당하는 비표가 없습니다.</td></tr>') + '</tbody></table>';
+    document.getElementById('bT').onchange = function (e) { B.t = e.target.value; B.pick = {}; renderBulk(); };
+    document.getElementById('bS').onchange = function (e) { B.s = e.target.value; B.pick = {}; renderBulk(); };
     var bq = document.getElementById('bQ'); bq.oninput = function () { B.q = bq.value; clearTimeout(bq._t); bq._t = setTimeout(function () { renderBulk(); var n = document.getElementById('bQ'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
     document.getElementById('bAll').onclick = function () { L.forEach(function (b) { if (!b.void) B.pick[b.id] = 1; }); renderBulk(); };
+    document.getElementById('b50').onclick = function () { B.pick = {}; L.filter(function (b) { return !b.void; }).slice(0, 50).forEach(function (b) { B.pick[b.id] = 1; }); renderBulk(); };
     document.getElementById('bNone').onclick = function () { B.pick = {}; renderBulk(); };
     document.getElementById('bChk').onchange = function (e) { L.forEach(function (b) { if (!b.void) { if (e.target.checked) B.pick[b.id] = 1; else delete B.pick[b.id]; } }); renderBulk(); };
-    view.querySelectorAll('tbody input[type=checkbox]').forEach(function (c) { c.onchange = function () { if (c.checked) B.pick[c.dataset.id] = 1; else delete B.pick[c.dataset.id]; var n = Object.keys(B.pick).length; var bp = document.getElementById('bPrint'); bp.disabled = !n; bp.textContent = '고른 ' + L.filter(function (b) { return B.pick[b.id]; }).length + '장 출력'; }; });
+    view.querySelectorAll('tbody input[type=checkbox]').forEach(function (c) { c.onchange = function () { if (c.checked) B.pick[c.dataset.id] = 1; else delete B.pick[c.dataset.id]; var n = L.filter(function (b) { return B.pick[b.id]; }).length; var bp = document.getElementById('bPrint'); bp.disabled = !n; bp.textContent = '고른 ' + n + '장 출력'; }; });
     document.getElementById('bPrint').onclick = function () {
       var list = L.filter(function (b) { return B.pick[b.id] && !b.void; });
       if (!list.length) return;
@@ -618,55 +903,164 @@
       if (!ONLINE) return toast('인터넷이 연결돼야 합니다.', true);
       sb.rpc('badge_sync').then(function (r) {
         if (r.error) return toast('불러오기 실패: ' + r.error.message, true);
-        var d = r.data || {}; toast('새로 더한 것 — 참가기업 ' + (d.exhibitor || 0) + ' · 바이어 ' + (d.buyer || 0) + ' · VIP ' + (d.vip || 0));
+        var d = r.data || {}; toast('새로 더한 것 — 참가기업 ' + (d.exhibitor || 0) + '장 · 바이어 ' + (d.buyer || 0) + ' · VIP ' + (d.vip || 0));
         load();
       });
     };
   }
 
-  // ---------- 현황·엑셀 ----------
+  // ================= ⑤ 현황 · 엑셀 =================
   function renderStat() {
     var live = ROWS.filter(function (b) { return !b.void; });
-    var tot = { n: live.length, p: live.filter(function (b) { return b.print_count; }).length, i: live.filter(function (b) { return b.issued_at; }).length };
-    var day = function (s, d) { return s && new Date(s).getDate() === d; };
-    var h = '<div class="stats"><div class="s"><b>' + tot.n + '</b><span>전체 출입증</span></div><div class="s"><b>' + tot.p + '</b><span>출력</span></div><div class="s"><b style="color:#11A37B">' + tot.i + '</b><span>지급 완료</span></div><div class="s"><b>' + (tot.n - tot.i) + '</b><span>남은 것</span></div>' +
-      '<div class="s"><b>' + live.filter(function (b) { return day(b.issued_at, 12); }).length + ' / ' + live.filter(function (b) { return day(b.issued_at, 13); }).length + ' / ' + live.filter(function (b) { return day(b.issued_at, 14); }).length + '</b><span>지급일 11/12 · 13 · 14</span></div></div>';
-    h += '<div class="tools"><b style="flex:1">유형별</b><button class="btn dark" id="csv">엑셀(CSV) 받기</button></div>';
+    var dayN = function (d) { return VIS.filter(function (v) { return (v.checks || []).some(function (c) { return c.day === d; }); }).length; };
+    var pre = VIS.filter(function (v) { return !v.walkin; }), wk = VIS.filter(function (v) { return v.walkin; });
+    var h = '<div class="h2">참관객</div><div class="stats">' +
+      '<div class="s"><b>' + pre.length + '</b><span>사전등록</span></div><div class="s"><b>' + wk.length + '</b><span>현장등록</span></div>' +
+      '<div class="s"><b style="color:#11A37B">' + dayN('2026-11-13') + '</b><span>입장 확인 11/13(금)</span></div><div class="s"><b style="color:#11A37B">' + dayN('2026-11-14') + '</b><span>입장 확인 11/14(토)</span></div>' +
+      '<div class="s"><b>' + VIS.filter(function (v) { return (v.checks || []).length > 1; }).length + '</b><span>이틀 다 온 사람</span></div>' +
+      '<div class="s"><b>' + dayN(today()) + '</b><span>오늘 입장 확인</span></div></div>' +
+      '<div class="tools"><button class="btn dark" id="csvSend">알림톡 발송용 명단(엑셀)</button><button class="btn" id="csvVis">참관객 입장 기록(엑셀)</button>' +
+      '<span class="hint">발송용 명단 = 이름 · 휴대폰 · 방문일 · 개인 QR 링크 (같은 번호는 한 줄). 대행사 업로드 양식에 맞게 칸을 옮겨 쓰세요.</span></div>';
+    h += '<div class="h2" style="margin-top:18px">비표</div><div class="stats"><div class="s"><b>' + live.length + '</b><span>전체 비표</span></div><div class="s"><b>' + live.filter(function (b) { return b.print_count; }).length + '</b><span>출력</span></div><div class="s"><b style="color:#11A37B">' + live.filter(function (b) { return b.issued_at; }).length + '</b><span>지급 완료</span></div><div class="s"><b>' + live.filter(function (b) { return !b.issued_at; }).length + '</b><span>남은 것</span></div></div>';
+    h += '<div class="tools"><b style="flex:1">유형별</b><button class="btn dark" id="csv">비표 명단·지급 기록(엑셀)</button></div>';
     h += '<table><thead><tr><th>유형</th><th class="c">전체</th><th class="c">출력</th><th class="c">지급</th><th class="c">남음</th><th class="c">재출력</th><th class="c">무효</th></tr></thead><tbody>' +
       TYPES.map(function (t) {
         var all = ROWS.filter(function (b) { return b.type === t.k; }), l = all.filter(function (b) { return !b.void; });
         return '<tr><td>' + tbadge(t.k) + ' ' + t.ko + '</td><td class="c">' + l.length + '</td><td class="c">' + l.filter(function (b) { return b.print_count; }).length + '</td><td class="c"><b>' + l.filter(function (b) { return b.issued_at; }).length + '</b></td><td class="c">' + l.filter(function (b) { return !b.issued_at; }).length + '</td><td class="c">' + l.filter(function (b) { return b.print_count > 1; }).length + '</td><td class="c">' + (all.length - l.length) + '</td></tr>';
       }).join('') + '</tbody></table>';
-    // 참가기업 회사별 미지급
     var ex = {}; ROWS.filter(function (b) { return b.type === 'EXHIBITOR' && !b.void; }).forEach(function (b) { var g = ex[b.grp] || (ex[b.grp] = { org: b.org, booth: b.booth, n: 0, i: 0 }); g.n++; if (b.issued_at) g.i++; });
     var gs = Object.keys(ex).map(function (k) { return ex[k]; }).sort(function (a, c) { return (a.i / a.n) - (c.i / c.n) || String(a.booth).localeCompare(String(c.booth)); });
-    h += '<div class="tools" style="margin-top:18px"><b>참가기업별 지급 (덜 받아 간 곳부터)</b></div><table><thead><tr><th>부스</th><th>회사</th><th class="c">지급 / 전체</th></tr></thead><tbody>' +
+    h += '<div class="tools" style="margin-top:18px"><b>참가기업별 지급 (덜 받아 간 곳부터)</b></div><table><thead><tr><th>부스</th><th>부스명</th><th class="c">지급 / 전체</th></tr></thead><tbody>' +
       gs.map(function (g) { return '<tr><td>' + esc(g.booth || '') + '</td><td>' + esc(g.org) + '</td><td class="c"><span class="st ' + (g.i >= g.n ? 'ok' : g.i ? 'pr' : 'no') + '">' + g.i + ' / ' + g.n + '</span></td></tr>'; }).join('') + '</tbody></table>';
     view.innerHTML = h;
-    document.getElementById('csv').onclick = exportCsv;
+    document.getElementById('csv').onclick = exportBadges;
+    document.getElementById('csvVis').onclick = exportVisitors;
+    document.getElementById('csvSend').onclick = exportSendList;
   }
-  function exportCsv() {
-    var head = ['코드', '유형', '이름', '소속', '영문 소속', '직함', '국가', '부스', '번호', '출처', '상태', '출력 횟수', '처음 출력', '마지막 출력', '지급 시각', '데스크', '메모'];
-    var lines = [head].concat(ROWS.map(function (b) {
-      return [b.code, b.type, b.name, b.org, b.org_en, b.title, b.country, b.booth, b.type === 'EXHIBITOR' ? b.slot : '', srcLabel(b),
-        b.void ? '무효' : b.issued_at ? '지급' : b.print_count ? '출력·미지급' : '미출력', b.print_count || 0,
-        full(b.first_printed_at), full(b.last_printed_at), full(b.issued_at), b.last_desk, b.note];
-    }));
-    function full(s) { if (!s) return ''; var d = new Date(s); return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()); }
-    var csv = '﻿' + lines.map(function (r) { return r.map(function (v) { v = v == null ? '' : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(','); }).join('\r\n');
+  function csvDownload(name, lines) {
+    var csv = '﻿' + lines.map(function (r) { return r.map(function (v) { v = v == null ? '' : String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(','); }).join('\r\n');
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    var d = new Date(); a.download = 'BIMTC2026_출입증_' + (d.getMonth() + 1) + p2(d.getDate()) + '_' + p2(d.getHours()) + p2(d.getMinutes()) + '.csv'; a.click();
+    var d = new Date(); a.download = name + '_' + (d.getMonth() + 1) + p2(d.getDate()) + '_' + p2(d.getHours()) + p2(d.getMinutes()) + '.csv'; a.click();
+  }
+  function exportBadges() {
+    csvDownload('BIMTC2026_비표', [['유형', '이름', '직함', '소속/국문 부스명', '영문 부스명', '부스', '번호', '출처', '상태', '출력 횟수', '처음 출력', '마지막 출력', '지급 시각', '데스크', '메모', '코드']].concat(ROWS.map(function (b) {
+      return [(TY[b.type] || {}).ko || b.type, b.name, b.title, b.org, b.org_en, b.booth, b.type === 'EXHIBITOR' ? b.slot : '', srcLabel(b),
+        b.void ? '무효' : b.issued_at ? '지급' : b.print_count ? '출력·미지급' : '미출력', b.print_count || 0, full(b.first_printed_at), full(b.last_printed_at), full(b.issued_at), b.last_desk, b.note, b.code];
+    })));
+  }
+  function exportVisitors() {
+    csvDownload('BIMTC2026_참관객_입장', [['구분', '이름', '소속', '전화 뒷자리', '방문 예정', '11/13 입장', '11/14 입장', '등록 시각']].concat(VIS.map(function (v) {
+      var c = function (d) { var x = (v.checks || []).find(function (y) { return y.day === d; }); return x ? hm(x.at) : ''; };
+      return [v.walkin ? '현장등록' : '사전등록', v.name, v.org, v.tail, dayKo(v.visit_day), c('2026-11-13'), c('2026-11-14'), full(v.created_at)];
+    })));
+  }
+  function exportSendList() {
+    if (!ONLINE || !VIS.some(function (v) { return v.phone; })) return toast('인터넷이 연결된 상태에서 받아 주세요(전화번호는 이 PC에 저장하지 않습니다).', true);
+    var byPhone = {}, out = [];
+    VIS.filter(function (v) { return !v.walkin && v.token && digits(v.phone).length >= 9; })
+      .sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; })
+      .forEach(function (v) { var k = digits(v.phone); if (byPhone[k]) return; byPhone[k] = 1; out.push(v); });
+    csvDownload('BIMTC2026_알림톡_발송명단', [['이름', '휴대폰', '방문일', '개인QR링크', '소속']].concat(out.map(function (v) {
+      var d = digits(v.phone), ph = d.length === 11 ? d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7) : v.phone;
+      return [v.name, ph, dayKo(v.visit_day), SITE + '/v/' + v.token, v.org];
+    })));
+    toast(out.length + '명 발송 명단을 받았습니다(같은 번호 중복 제외).');
+  }
+
+  // ================= ⑥ 사용 안내 =================
+  function renderGuide() {
+    var sw = '<span style="display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;background:';
+    view.innerHTML = '<div class="guide">' +
+      '<nav>' + [['g0', '처음 켤 때'], ['g1', '참관객 QR 확인'], ['g2', '비표 찾아서 출력'], ['g3', '즉석 출력'], ['g4', '엑셀 명단 올리기'], ['g5', '미리 출력'], ['g6', '참가기업 4장'], ['g7', '다시 출력·잘못 뽑음'], ['g8', '프린터 문제'], ['g9', '인터넷 끊김'], ['g10', '하루 끝']].map(function (x) { return '<a href="#' + x[0] + '">' + x[1] + '</a>'; }).join('') + '</nav>' +
+
+      '<section id="g0"><h3>0. 처음 켤 때</h3><ol>' +
+      '<li>바탕화면의 <b>「BIMTC 출입증 발급」</b> 아이콘으로 엽니다. <b>이 아이콘으로 열어야 인쇄 창 없이 라벨이 바로 나옵니다.</b> (일반 크롬으로 열면 매번 인쇄 창이 뜹니다 → 8번 참고)</li>' +
+      '<li>사무국 관리자 계정으로 로그인합니다.</li>' +
+      '<li>오른쪽 위 <b>자리</b>를 내 자리(데스크1, 데스크2 …)로 고릅니다. 누가 어디서 처리했는지 기록됩니다.</li>' +
+      '<li>오른쪽 위 <b>[시험 출력]</b>을 한 번 눌러 라벨이 바르게 나오는지 봅니다.</li>' +
+      '<li>오른쪽 위 <b>연결됨</b>(초록)이 보이면 정상입니다. 빨간 <b>끊김</b>이면 9번.</li></ol></section>' +
+
+      '<section id="g1"><h3>1. 참관객 — QR 확인하고 팔찌 주기</h3><ol>' +
+      '<li><b>입장 확인·비표</b> 탭 맨 위 검색칸에 커서가 있는 상태로, 참관객 휴대폰의 QR(알림톡으로 받은 화면)을 스캐너로 찍습니다.</li>' +
+      '<li>오른쪽 결과를 봅니다.<table style="margin:6px 0"><tr><td>' + sw + '#11A37B"></span> 초록 ✓ <b>사전등록 확인</b> (삑 1번)</td><td>팔찌를 채워 줍니다.</td></tr>' +
+      '<tr><td>' + sw + '#D9822B"></span> 주황 ! <b>오늘 이미 입장 확인됨</b> (삑삑)</td><td>이미 팔찌를 받은 사람입니다. 팔찌를 차고 있는지 확인하세요. 잃어버렸으면 팀장 판단.</td></tr>' +
+      '<tr><td>' + sw + '#B4233C"></span> 빨강 ✕ <b>명단에 없는 QR</b> (낮은 삐―)</td><td>이름·전화번호 뒷자리로 다시 찾아보고, 없으면 현장등록 안내판 QR로 등록하게 합니다.</td></tr></table></li>' +
+      '<li><b>QR이 없는 사람</b>: 검색칸에 이름이나 <b>전화번호 뒷자리 4개</b>를 넣고 Enter → 왼쪽 목록에서 고름 → 본인 확인 후 <b>[입장 처리(팔찌)]</b>.</li>' +
+      '<li><b>현장등록한 사람</b>: 등록 완료 화면을 보여 주면 팔찌를 줍니다. 이름으로 찾아 [입장 처리]까지 누르면 집계에 들어갑니다(‘현장등록’ 표시).</li>' +
+      '<li>둘째 날 다시 온 사람도 똑같이 찍으면 그날 입장으로 기록됩니다.</li></ol>' +
+      '<div class="tip">스캐너로 찍었는데 검색칸에 한글이 이상하게 들어가도 괜찮습니다. 화면이 알아서 바꿔 읽습니다. 아무 반응이 없으면 검색칸을 한 번 클릭하고 다시 찍으세요.</div></section>' +
+
+      '<section id="g2"><h3>2. 비표 — 찾아서 출력</h3><ol>' +
+      '<li>검색칸에 <b>이름이나 회사·부스명</b>을 넣습니다. 위 칩으로 유형(참가기업·바이어·VIP …)만 볼 수도 있습니다.</li>' +
+      '<li>왼쪽 목록에서 고르면 오른쪽에 <b>라벨 미리보기</b>가 나옵니다. 오타가 있으면 그 자리에서 고칩니다(고친 내용은 저장됨).</li>' +
+      '<li><b>[출력하고 지급]</b> → 라벨이 나오면 <b>유형에 맞는 배경지</b>의 흰 칸에 붙여 건넵니다.</li>' +
+      '<li><b>미리 뽑아 둔 비표</b>를 건넬 때는 출력하지 말고 <b>[지급 처리만]</b>을 누릅니다.</li></ol>' +
+      '<table><tr><th>유형</th><th>라벨에 찍히는 것</th><th>배경지</th></tr>' +
+      TYPES.map(function (t) { return '<tr><td>' + tbadge(t.k) + ' ' + t.ko + '</td><td>' + t.d + '</td><td>' + t.k + ' 배경지</td></tr>'; }).join('') + '</table></section>' +
+
+      '<section id="g3"><h3>3. 즉석 출력 — 현장에서 갑자기 요청</h3><ol>' +
+      '<li><b>즉석 출력</b> 탭 → 유형 버튼을 고릅니다.</li>' +
+      '<li>내용을 넣습니다. <b>스탭</b>은 장수만 넣으면 「STAFF 진행요원」이 찍힙니다. <b>프레스</b>는 소속칸에 매체명.</li>' +
+      '<li>오른쪽 미리보기를 확인하고 <b>[출력]</b>. 명단에도 자동으로 남습니다.</li></ol>' +
+      '<div class="tip">이미 명단에 있는 사람인지 먼저 1번 탭에서 찾아보세요. 있으면 그걸 출력해야 중복 기록이 안 생깁니다.<br>참가기업 추가 1장은 즉석 출력이 아니라 해당 부스를 찾아 <b>[+1장 추가]</b>로 합니다.</div></section>' +
+
+      '<section id="g4"><h3>4. 엑셀 명단 올리기</h3><ol>' +
+      '<li><b>명단 올리기</b> 탭 → 유형(바이어·VIP·스탭·프레스·주최측 …)을 고릅니다. 유형마다 따로 올립니다.</li>' +
+      '<li><b>[파일 선택]</b>으로 엑셀(.xlsx)을 고릅니다. 첫 번째 시트를 읽습니다. 또는 엑셀에서 <b>머리글 줄까지</b> 복사해 붙여넣기 칸에 붙여넣습니다.</li>' +
+      '<li><b>칸 맞추기</b>에서 이름·직함·소속이 엑셀의 맞는 칸으로 잡혔는지 확인합니다. 틀리면 골라서 바꿉니다.</li>' +
+      '<li>미리보기에서 <b>‘이미 명단에 있음’</b>은 자동으로 빠집니다(같은 이름+소속). 확인 후 <b>[명단에 추가]</b> 또는 <b>[추가하고 바로 출력]</b>.</li></ol>' +
+      '<div class="tip">참가기업 엑셀은 국문 부스명·영문 부스명(·장수) 칸이 있으면 됩니다. 장수를 비우면 4장. 단, 참가기업은 홈페이지 신청 명단에서 <b>이미 4장씩 들어와 있으니</b> 새 부스만 올리세요.<br>잘못 올렸으면 그 비표를 찾아 <b>[무효 처리]</b> 하면 됩니다.</div></section>' +
+
+      '<section id="g5"><h3>5. 미리 출력 — 전날 한꺼번에</h3><ol>' +
+      '<li><b>미리 출력</b> 탭 → 유형 고르기 → ‘미출력만’.</li>' +
+      '<li><b>[위에서 50장만]</b> → <b>[출력]</b>. 50장씩 끊어 뽑고, 나온 라벨을 순서대로 배경지에 붙입니다.</li>' +
+      '<li>미리 뽑은 비표는 ‘출력됨·미지급’으로 남습니다. 당일 건넬 때 1번 탭에서 찾아 <b>[지급 처리만]</b>.</li>' +
+      '<li>홈페이지에서 새로 승인된 부스·바이어가 있으면 <b>[홈페이지 명단 새로 불러오기]</b>. 이미 있는 건 안 바뀝니다.</li></ol></section>' +
+
+      '<section id="g6"><h3>6. 참가기업 — 부스당 4장</h3><ul>' +
+      '<li>부스명으로 찾으면 한 줄로 묶여 <b>□□□□</b>(4칸)과 ‘지급 2/4장’이 보입니다. 주황 = 출력됨, 초록 = 지급.</li>' +
+      '<li>4장을 한꺼번에: 오른쪽 <b>[남은 n장 모두 출력]</b>. 나눠 받아 가면 받은 만큼만 한 장씩.</li>' +
+      '<li>5장째를 요청하면 <b>팀장 확인</b> 후 <b>[+1장 추가]</b>. 기록이 남습니다.</li>' +
+      '<li>라벨에는 <b>국문 부스명 + 영문 부스명</b>만 찍힙니다(개인 이름 없음).</li></ul></section>' +
+
+      '<section id="g7"><h3>7. 다시 출력 · 잘못 뽑았을 때</h3><ul>' +
+      '<li><b>잃어버림·훼손</b>: 찾아서 <b>[다시 출력]</b>. “이미 출력한 비표입니다(언제·어디서·몇 번)” 창이 뜨면 확인 후 [확인].</li>' +
+      '<li><b>오타로 잘못 뽑음</b>: 오른쪽에서 글자를 고친 뒤 [다시 출력]. 잘못 나온 라벨은 버립니다.</li>' +
+      '<li><b>아예 잘못 만든 비표</b>(중복 등): <b>[무효 처리]</b>. 지워지진 않고 출력만 막힙니다.</li>' +
+      '<li><b>지급 처리를 잘못 누름</b>: [지급 취소].</li></ul></section>' +
+
+      '<section id="g8"><h3>8. 프린터 문제</h3><table><tr><th>증상</th><th>해결</th></tr>' +
+      '<tr><td>인쇄 창이 뜬다</td><td>바탕화면 아이콘이 아니라 일반 크롬으로 연 것. 그대로 쓰려면: 대상 <b>Xprinter XP-DT427B</b>, 설정 더보기 → 용지 <b>BIMTC 100x70</b>, 여백 <b>없음</b>, 배율 <b>기본값</b>, 머리글·바닥글 끔 → 인쇄.</td></tr>' +
+      '<tr><td>한 장이 두 라벨에 걸쳐 찍힘 / 빈 라벨이 끼어 나옴</td><td>프린터 <b>FEED 버튼을 길게</b> 눌러 LED가 바뀌면 떼기 → 라벨이 몇 장 나가고 멈추면 맞춤 완료. 롤을 바꿀 때마다 한 번씩.</td></tr>' +
+      '<tr><td>흰 라벨만 나옴</td><td>롤을 뒤집어 끼운 것. 긁으면 검게 되는 면이 위로.</td></tr>' +
+      '<tr><td>LED 빨강, 안 나옴</td><td>라벨 다 씀 / 덮개 덜 닫힘. 덮개를 ‘딸깍’ 닫고 FEED 한 번.</td></tr>' +
+      '<tr><td>아무 반응 없음</td><td>USB·전원 확인 → 프린터 껐다 켜기 → 화면 새로고침(F5).</td></tr>' +
+      '<tr><td>글자가 흐림</td><td>팀장에게: 프린터 설정의 농도(Darkness)를 2~3 올림.</td></tr>' +
+      '<tr><td>라벨 위치가 배경지 흰 칸과 안 맞음</td><td>라벨은 흰 칸 가운데에 맞춰 손으로 붙입니다(사방 2mm 여유).</td></tr></table></section>' +
+
+      '<section id="g9"><h3>9. 인터넷이 끊겼을 때</h3><ul>' +
+      '<li>오른쪽 위가 빨간 <b>끊김</b>으로 바뀌어도 <b>그대로 계속 쓰면 됩니다.</b> QR 확인·출력 모두 이 PC에 저장된 명단으로 동작합니다.</li>' +
+      '<li>그동안의 기록은 <b>미전송 n건</b>으로 쌓였다가, 연결되면 자동으로 올라갑니다. <b>미전송이 남아 있을 때 창을 닫거나 로그아웃하지 마세요.</b></li>' +
+      '<li>휴대폰 핫스팟에 노트북을 연결하면 바로 복구됩니다.</li>' +
+      '<li>여러 데스크가 동시에 쓰면 20초마다 서로의 기록이 반영됩니다. 끊긴 동안엔 다른 자리에서 처리한 건 안 보일 수 있습니다.</li></ul></section>' +
+
+      '<section id="g10"><h3>10. 하루 끝</h3><ol>' +
+      '<li>오른쪽 위 <b>미전송 0건</b>(안 보이면 0건)인지 확인.</li>' +
+      '<li><b>현황·엑셀</b> 탭 → [참관객 입장 기록], [비표 명단·지급 기록]을 받아 공유 폴더에 저장.</li>' +
+      '<li>라벨 남은 양 확인, 다음 날 예비 롤 준비.</li></ol>' +
+      '<div class="tip">모르는 상황이면 기록을 지우지 말고 메모칸에 적어 두고 팀장에게 물어보세요. 이 화면에서 한 일은 모두 기록이 남습니다.</div></section>' +
+      '</div>';
   }
 
   // ---------- 시험 출력 ----------
   function testPrint() {
-    printLabels([{ code: 'B2TEST0', type: 'BUYER', name: 'NGUYEN VAN AN', org: 'Saigon Medical Travel', title: 'Director', country: 'Vietnam' }]);
+    printLabels([{ type: 'BUYER', name: 'NGUYEN VAN AN', title: 'Director', org: 'Saigon Medical Travel Co., Ltd.' }]);
   }
 
   // ---------- 로그인·시작 ----------
   function renderLogin(msg) {
     document.getElementById('topRight').hidden = true; document.getElementById('tabs').hidden = true;
-    view.innerHTML = '<div class="gate"><h1>출입증 발급</h1><p style="color:#8295ab;margin:4px 0 6px">사무국 관리자 계정으로 로그인하세요.</p>' +
+    view.innerHTML = '<div class="gate"><h1>현장 데스크</h1><p style="color:#8295ab;margin:4px 0 6px">사무국 관리자 계정으로 로그인하세요.</p>' +
       '<label>이메일</label><input id="liE" type="email" autocomplete="username"><label>비밀번호</label><input id="liP" type="password" autocomplete="current-password">' +
       (msg ? '<div class="err">' + esc(msg) + '</div>' : '') + '<button class="btn dark" id="liB">로그인</button></div>';
     function go() {
@@ -685,29 +1079,27 @@
       if (!u.is_admin) return renderLogin('이 계정은 관리자 권한이 없습니다.');
       ME = u; start();
     }).catch(function () {
-      // 인터넷이 없을 때: 저장된 명단이 있으면 그걸로 연다(출력·기록은 대기열로)
-      var c = lsGet(LS_CACHE, null);
-      if (c) { ROWS = c.rows || []; ME = { name: '오프라인' }; start(true); }
+      var c = lsGet(LS_CACHE, null), v = lsGet(LS_VCACHE, null);
+      if (c || v) { ROWS = c ? c.rows : []; VIS = v ? v.rows : []; ME = { name: '오프라인' }; start(true); }
       else view.innerHTML = '<div class="empty">인터넷에 연결되지 않았고 이 PC에 저장된 명단도 없습니다.</div>';
     });
   }
+  var started = false;
   function start(offline) {
     document.getElementById('who').textContent = ME.name || ME.email || '';
     document.getElementById('topRight').hidden = false; document.getElementById('tabs').hidden = false;
     var dsel = document.getElementById('desk');
-    dsel.innerHTML = ['데스크1', '데스크2', '데스크3', '데스크4', '사무국'].map(function (d) { return '<option>' + d + '</option>'; }).join('');
+    dsel.innerHTML = ['데스크1', '데스크2', '데스크3', '데스크4', '데스크5', '사무국'].map(function (d) { return '<option>' + d + '</option>'; }).join('');
     dsel.value = lsGet(LS_DESK, '데스크1'); dsel.onchange = function () { lsSet(LS_DESK, dsel.value); };
     setQueue(queue());
     document.querySelectorAll('.tab').forEach(function (t) { t.onclick = function () { TAB = t.dataset.t; render(); }; });
     document.getElementById('testBtn').onclick = testPrint;
-    var code = codeFrom(new URLSearchParams(location.search).get('code') || '');
-    var go = function () { if (code) { SEL = ROWS.find(function (x) { return x.code === code; }) || null; } render(); };
-    if (offline) { setOnline(false); go(); }
-    else load().then(go);
-    // 다른 데스크가 한 일을 20초마다 반영(입력 중이면 미룬다), 대기열은 10초마다 다시 시도
+    if (offline) { setOnline(false); applyQueueLocally(); render(); }
+    else load();
+    if (started) return; started = true;
     setInterval(function () {
       var a = document.activeElement, typing = a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.id !== 'q';
-      if (!typing && !document.querySelector('.modal') && sb) flush().then(function () { if (!queue().length) load(true); });
+      if (!typing && sb && (TAB === 'desk' || TAB === 'stat')) flush().then(function () { if (!queue().length) load(true); });
     }, 20000);
     setInterval(function () { if (queue().length && sb) flush(); }, 10000);
     window.addEventListener('online', function () { if (sb) flush(); });

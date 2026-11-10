@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BIMTC 2026 입장 QR</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="/uploads/favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!--
+  사전등록자 개인 입장 QR (v.html ← /v/토큰 · /V/토큰, vercel.json rewrite)
+  · 알림톡 버튼 링크로 들어온다. 공개 RPC visitor_pass_get(토큰) — 이름은 가려서 돌려준다.
+  · QR 내용 = HTTPS://BIMTC.BUSAN.COM/V/토큰 (대문자 → QR이 작고 촘촘하지 않음). 현장 데스크(/badge)가 이 값을 읽는다.
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#16294F;color:#fff;font-family:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;display:flex;justify-content:center;padding:22px 16px 30px}
+  .c{width:100%;max-width:400px;text-align:center}
+  .top{font-size:13px;letter-spacing:2px;color:#9fc1ea;font-weight:700}
+  h1{font-size:22px;margin:6px 0 2px}
+  .when{color:#c9d6e6;font-size:14px;line-height:1.5}
+  .card{background:#fff;color:#0F2440;border-radius:18px;padding:22px 20px 18px;margin-top:18px}
+  .card .nm{font-size:22px;font-weight:800}
+  .card .day{display:inline-block;margin-top:6px;background:#EAF2FF;color:#16294F;font-weight:700;border-radius:20px;padding:4px 12px;font-size:13px}
+  #qr{margin:16px auto 6px;width:240px;height:240px}
+  #qr svg{width:100%;height:100%}
+  .code{font-size:13px;color:#6b7f95;letter-spacing:2px}
+  .how{font-size:14px;line-height:1.6;color:#33475b;margin-top:12px;background:#F4F7FB;border-radius:10px;padding:10px 12px}
+  .en{color:#9fb4c7;font-size:12.5px;line-height:1.55;margin-top:16px}
+  .err{background:#fff;color:#8a1426;border-radius:14px;padding:20px;margin-top:18px;line-height:1.6}
+  a{color:#fff}
+</style>
+</head>
+<body>
+<div class="c">
+  <div class="top">BIMTC 2026</div>
+  <h1>입장 QR · Entry Pass</h1>
+  <div class="when">2026.11.13(금) – 14(토) 10:00–17:00<br>BEXCO 제1전시장 3A홀</div>
+  <div id="box"><div class="card">불러오는 중…</div></div>
+  <div class="en">Show this QR at the registration desk to receive your entry wristband.<br>화면 밝기를 높이면 더 빨리 읽힙니다.</div>
+  <p style="margin-top:18px"><a href="https://bimtc.busan.com/">행사 홈페이지</a></p>
+</div>
+<script>
+(function () {
+  var URL_ = 'https://xkomxbskwvtofpglback.supabase.co';
+  var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrb214YnNrd3Z0b2ZwZ2xiYWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjIxNzYsImV4cCI6MjEwMDAzODE3Nn0.YVBpieLDFP4AyeapuiRmjrDyZYdAHfiudnUdRPG65mo';
+  var box = document.getElementById('box');
+  var m = location.pathname.match(/\/v\/([0-9a-z]{8})/i);
+  var tok = (m ? m[1] : (new URLSearchParams(location.search).get('t') || '')).toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 8);
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fail(msg) { box.innerHTML = '<div class="err">' + msg + '<br><br>사전등록 확인은 현장 등록 데스크에서 이름으로도 할 수 있습니다.</div>'; }
+  if (tok.length !== 8) return fail('QR 주소가 올바르지 않습니다.');
+  function qrSvg(text) {
+    var q = qrcode(0, 'M'); q.addData(text, 'Alphanumeric'); q.make();
+    var n = q.getModuleCount(), p = 3, d = '';
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) if (q.isDark(y, x)) d += 'M' + (x + p) + ' ' + (y + p) + 'h1v1h-1z';
+    return '<svg viewBox="0 0 ' + (n + p * 2) + ' ' + (n + p * 2) + '" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="' + d + '"/></svg>';
+  }
+  fetch(URL_ + '/rest/v1/rpc/visitor_pass_get', {
+    method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_token: tok })
+  }).then(function (r) { return r.json(); }).then(function (d) {
+    if (!d || !d.token) return fail('등록 정보를 찾지 못했습니다.');
+    var day = { D1: '11/13(금) 방문', D2: '11/14(토) 방문', both: '11/13·14 이틀 방문' }[d.visit_day] || '';
+    box.innerHTML = '<div class="card"><div class="nm">' + esc(d.name) + ' 님</div>' + (day ? '<span class="day">' + day + '</span>' : '') +
+      '<div id="qr">' + qrSvg('HTTPS://BIMTC.BUSAN.COM/V/' + d.token) + '</div><div class="code">' + esc(d.token) + '</div>' +
+      '<div class="how">등록 데스크에서 이 화면을 보여 주세요.<br>QR 확인 후 <b>입장 팔찌</b>를 드립니다.</div></div>';
+  }).catch(function () { fail('인터넷 연결을 확인해 주세요.'); });
+})();
+</script>
+</body>
+</html>

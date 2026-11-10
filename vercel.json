@@ -11,6 +11,8 @@
     { "source": "/main", "destination": "/main.dc.html" },
     { "source": "/i/:code", "destination": "/i" },
     { "source": "/b/:code", "destination": "/b" },
-    { "source": "/B/:code", "destination": "/b" }
+    { "source": "/B/:code", "destination": "/b" },
+    { "source": "/v/:code", "destination": "/v" },
+    { "source": "/V/:code", "destination": "/v" }
   ]
 }
