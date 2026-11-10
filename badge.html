@@ -920,7 +920,7 @@
   function renderBulk() {
     var L = bulkList(), picked = L.filter(function (b) { return B.pick[b.id]; });
     view.innerHTML = '<div class="card" style="margin-bottom:12px"><div class="h2">미리 출력 — 행사 전날 한꺼번에</div><div class="hint">유형을 고르고 [보이는 것 모두 고르기] → [출력]. 미리 뽑은 비표는 <b>미지급</b>으로 남고, 당일 건넬 때 <b>입장 확인·비표</b> 탭에서 찾아 [지급 처리만]을 누릅니다. ' +
-      '한 번에 <b>50장 정도씩</b> 나눠 뽑고, 롤을 바꾸면 프린터 FEED 버튼으로 용지 맞춤을 다시 하세요.</div></div>' +
+      '한 번에 <b>50장 정도씩</b> 나눠 뽑고, 롤을 바꾸면 프린터 <b>노란 버튼</b>을 한 번 눌러 주세요.</div></div>' +
       '<div class="tools"><select id="bT"><option value="">전체 유형</option>' + TYPES.map(function (t) { return '<option value="' + t.k + '"' + (B.t === t.k ? ' selected' : '') + '>' + t.ko + ' (' + t.k + ')</option>'; }).join('') + '</select>' +
       '<select id="bS"><option value="np"' + (B.s === 'np' ? ' selected' : '') + '>미출력만</option><option value="p"' + (B.s === 'p' ? ' selected' : '') + '>출력한 것</option><option value=""' + (B.s === '' ? ' selected' : '') + '>전부(무효 제외)</option><option value="all"' + (B.s === 'all' ? ' selected' : '') + '>무효 포함</option></select>' +
       '<input id="bQ" placeholder="검색" value="' + esc(B.q) + '">' +
@@ -1026,7 +1026,7 @@
         '뚜껑을 ' + q('딸깍') + ' 소리 나게 꾹 닫아요.',
         '프린터 전원을 켜요.',
         'USB 줄을 컴퓨터에 꽂아요.',
-        '프린터의 ' + q('FEED') + ' 버튼을 꾹 누르고 있다가, 불빛이 바뀌면 손을 떼요.<br><small>라벨이 몇 장 나오고 멈추면 OK. (라벨 길이를 프린터가 배우는 거예요)</small>'],
+        '프린터의 <b>노란 버튼</b>을 한 번 ' + q('딸깍') + ' 눌러요.<br><small>라벨이 나오고 멈추면 OK.</small>'],
       ok: '프린터에 불이 들어왔나요?',
       help: '불이 <b>빨간색</b>이면 → 뚜껑이 덜 닫힌 거예요. 다시 꾹 닫아요.<br>종이가 없으면 → 라벨 종이를 다시 넣어요.' },
     { t: '프린터 프로그램을 받아요', d: [
@@ -1086,7 +1086,7 @@
       ok: '라벨이 나왔나요?',
       help: '<b>인쇄 창이 뜬다</b> → 아이콘으로 안 들어온 거예요. 창을 닫고 바탕화면 아이콘으로 다시(8번).<br>' +
         '<b>「시험 출력」을 눌러도 프린터가 가만히 있다</b> → 4번, 5번을 다시 해요.<br>' +
-        '<b>라벨이 두 장에 걸쳐 나온다</b> → 프린터 ' + q('FEED') + ' 버튼을 3초 꾹 눌렀다 떼요.<br>' +
+        '<b>라벨이 두 장에 걸쳐 나온다</b> → 프린터 <b>노란 버튼</b>을 한 번 눌러요.<br>' +
         '<b>아무것도 안 나온다</b> → USB·전원을 확인하고, 프린터를 껐다 켜요.' }
   ];
   var wzAt = -1;   // -1 = 첫 질문
@@ -1225,9 +1225,9 @@
       '<table><tr><th>증상</th><th>해결</th></tr>' +
       '<tr><td>인쇄 창도 안 뜨는데 프린터가 가만히 있다</td><td>Xprinter가 기본 프린터로 안 정해진 것. 「★ 처음 시작하기」 4·5단계: 「Windows에서 기본 프린터 관리」 끔 → Xprinter <b>기본값으로 설정</b>.</td></tr>' +
       '<tr><td>인쇄 창이 뜬다</td><td>바탕화면 아이콘이 아니라 일반 크롬으로 연 것. 그대로 쓰려면: 대상 <b>Xprinter XP-DT427B</b>, 설정 더보기 → 용지 <b>BIMTC 100x70</b>, 여백 <b>없음</b>, 배율 <b>기본값</b>, 머리글·바닥글 끔 → 인쇄.</td></tr>' +
-      '<tr><td>한 장이 두 라벨에 걸쳐 찍힘 / 빈 라벨이 끼어 나옴</td><td>프린터 <b>FEED 버튼을 길게</b> 눌러 LED가 바뀌면 떼기 → 라벨이 몇 장 나가고 멈추면 맞춤 완료. 롤을 바꿀 때마다 한 번씩.</td></tr>' +
+      '<tr><td>한 장이 두 라벨에 걸쳐 찍힘 / 빈 라벨이 끼어 나옴</td><td>프린터 <b>노란 버튼</b>을 한 번 딸깍 → 라벨이 나오고 멈추면 맞춤 완료. 롤을 바꿀 때마다 한 번씩.</td></tr>' +
       '<tr><td>흰 라벨만 나옴</td><td>롤을 뒤집어 끼운 것. 긁으면 검게 되는 면이 위로.</td></tr>' +
-      '<tr><td>LED 빨강, 안 나옴</td><td>라벨 다 씀 / 덮개 덜 닫힘. 덮개를 ‘딸깍’ 닫고 FEED 한 번.</td></tr>' +
+      '<tr><td>LED 빨강, 안 나옴</td><td>라벨 다 씀 / 덮개 덜 닫힘. 덮개를 ‘딸깍’ 닫고 노란 버튼 한 번.</td></tr>' +
       '<tr><td>아무 반응 없음</td><td>USB·전원 확인 → 프린터 껐다 켜기 → 화면 새로고침(F5).</td></tr>' +
       '<tr><td>글자가 흐림</td><td>팀장에게: 프린터 설정의 농도(Darkness)를 2~3 올림.</td></tr>' +
       '<tr><td>라벨 위치가 배경지 흰 칸과 안 맞음</td><td>라벨은 흰 칸 가운데에 맞춰 손으로 붙입니다(사방 2mm 여유).</td></tr></table></section>' +
