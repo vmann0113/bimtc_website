@@ -375,6 +375,16 @@
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#0d8f6b;font-weight:700;margin-bottom:5px;">입금완료</div><div style="font-size:19px;font-weight:800;color:#0d8f6b;">{{ bcPaid }}</div></div>
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#7a5cc4;font-weight:700;margin-bottom:5px;">계산서 발행 대기</div><div style="font-size:19px;font-weight:800;color:#7a5cc4;">{{ bcTaxWait }}</div></div>
         </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px;">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#8295ab;font-weight:600;margin-bottom:5px;">순수 부스 참가비</div><div style="font-size:19px;font-weight:800;color:#0F2440;">{{ bmBooth }}</div></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#8295ab;font-weight:600;margin-bottom:5px;">부가서비스</div><div style="font-size:19px;font-weight:800;color:#0B5FA5;">{{ bmAddon }}</div></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#8295ab;font-weight:600;margin-bottom:5px;">비품 렌탈</div><div style="font-size:19px;font-weight:800;color:#7a5cc4;">{{ bmRental }}</div></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#8295ab;font-weight:600;margin-bottom:5px;">할인</div><div style="font-size:19px;font-weight:800;color:#C8803A;">− {{ bmDisc }}</div></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 18px;"><div style="font-size:12.5px;color:#0d8f6b;font-weight:700;margin-bottom:5px;">공급가 합계</div><div style="font-size:19px;font-weight:800;color:#0d8f6b;">{{ bmSub }}</div></div>
+        </div>
+        <sc-if value="{{ bmAdj }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FDF4EC;border:1px solid #F0D9AE;color:#A4631F;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;line-height:1.6;">{{ bmAdjLabel }}</div>
+        </sc-if>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
           <sc-for list="{{ boothFilters }}" as="bft" hint-placeholder-count="5"><span onClick="{{ bft.onClick }}" style="{{ bft.style }}">{{ bft.label }}</span></sc-for>
           <span style="flex:1;"></span>
@@ -1169,7 +1179,7 @@ class Component extends DCLogic {
     let closed={}; try{ closed=await window.BimtcDB.getClosedSlots(); }catch(e){}
     let bizOpen=false; try{ bizOpen=await window.BimtcDB.bizMatchingOpen(); }catch(e){}
     let eb=null; try{ eb=await window.BimtcDB.getEarlyBird(); }catch(e){}
-    try{ const pr=await window.BimtcDB.getPricing(); this._rentals=(pr&&pr.rentals)||{}; window.BIMTC_RENTALS=this._rentals; }catch(e){ this._rentals={}; }   // 비품 품목명 표시용(인보이스 포함)
+    try{ const pr=await window.BimtcDB.getPricing(); this._rentals=(pr&&pr.rentals)||{}; this._pricing=pr||{}; window.BIMTC_RENTALS=this._rentals; }catch(e){ this._rentals={}; this._pricing={}; }   // 비품 품목명 표시용(인보이스 포함)
     // 오픈 전 잠금값(전부 끄기, 오픈 시각 이전 저장) → 자동 모드로 해석 (공개 사이트와 동일 규칙)
     if(eb){ try{ const C=window.BIMTC_CONFIG; const keys=Object.keys(eb); const allOff=keys.length>0&&keys.every(k=>eb[k]==='off'); const ts=window.__bimtcEbOvTs?new Date(window.__bimtcEbOvTs).getTime():0; if(C&&C.isLaunched&&C.isLaunched()&&allOff&&ts&&ts<new Date(C.launchAt).getTime()) eb={phase1:'auto',phase2:'auto'}; }catch(e){} }
     try{ const lay=await window.BimtcDB.getLayout(); if(lay&&lay.zones) this.setState({layoutMap:lay}); }catch(e){}
@@ -1365,6 +1375,26 @@ class Component extends DCLogic {
     if(!list.filter(has).length){ this.flash('신청된 비품이 없습니다'); return; }
     if(!window.BimtcInvoice.openRentalOrder(list)) this.flash('팝업이 차단되었습니다 — 브라우저에서 팝업을 허용해 주세요');
   }
+  ADDON_NAME = { elec_1p:'전기 단상 220V', elec_3p220:'전기 삼상 220V', elec_3p380:'전기 삼상 380V',
+    elec_24h:'24시간 전기', tel:'전화선', water:'급·배수', air:'압축공기', lan:'LAN(인터넷)' };
+  // 부스 신청 금액 나누기. DB에는 합계(subtotal·vat·total)만 있어서 단가표로 되살린다.
+  // 사무국이 합계를 손으로 고친 건은 gap 에 차이가 남는다 — 그 건은 화면에 그대로 알려 준다.
+  boothMoney(b){
+    const P=this._pricing||{}, AP=P.addons||{}, UP=P.unitPrice||{};
+    const unit = (b.booth_type==='space') ? Number(UP.space||0) : Number(UP.package||0);
+    const cnt = (b.booth_ids||[]).length;
+    const booth = unit*cnt;
+    let addon=0; const addonLines=[];
+    Object.keys(b.addons||{}).forEach(k=>{
+      const v=(b.addons||{})[k]; const q=(v===true)?1:(Number(v)||0);
+      if(q<=0) return;
+      addon += Number(AP[k]||0)*q;
+      addonLines.push((this.ADDON_NAME[k]||k)+(q>1?(' ×'+q):''));
+    });
+    const rental=Number(b.rental_total||0), disc=Number(b.discount||0), sub=Number(b.subtotal||0);
+    const calc = booth - disc + addon + rental;
+    return { unit, cnt, booth, addon, addonLines, rental, disc, calc, sub, gap: sub-calc };
+  }
   boothDetail(b){
     const won=(v)=>((v||0).toLocaleString())+'원';
     const ap=b.applicant||{};
@@ -1376,18 +1406,18 @@ class Component extends DCLogic {
     Object.keys(label).forEach(k=>{ if(ap[k]) rows.push({k:label[k], v:String(ap[k])}); });
     rows.push({k:'담당자', v:(b.contact||'-')+(b.phone?' · '+b.phone:'')});
     rows.push({k:'이메일', v:b.email||'-'});
-    const ad=b.addons||{}; const adTxt=Object.keys(ad).filter(k=>ad[k]).map(k=>k+(ad[k]===true?'':' ×'+ad[k])).join(', ');
-    rows.push({k:'부가서비스', v:adTxt||'없음'});
+    const M=this.boothMoney(b);
+    rows.push({k:'부스 참가비', v: won(M.booth)+(M.cnt?('  ('+(b.booth_type==='space'?'독립부스':'조립부스')+' '+M.cnt+'칸 × '+won(M.unit)+')'):'')});
+    rows.push({k:'부가서비스', v: M.addon ? (won(M.addon)+(M.addonLines.length?('  ('+M.addonLines.join(', ')+')'):'')) : '없음'});
     const rmap=this._rentals||{}, rsel=b.rentals||{};
     const rlist=Object.keys(rsel).filter(k=>Number(rsel[k])>0)
       .map(k=>((rmap[k]&&rmap[k].n)||k)+' ×'+rsel[k]);
-    if(rlist.length) rows.push({k:'비품 렌탈', v:rlist.join(', ')});
-    if(b.rental_total) rows.push({k:'비품 합계', v:won(b.rental_total)});
+    rows.push({k:'비품 렌탈', v: M.rental ? (won(M.rental)+(rlist.length?('  ('+rlist.join(', ')+')'):'')) : '없음'});
     rows.push({k:'팸투어', v:b.fam_tour?'신청':'미신청'});
     if(b.returning_company) rows.push({k:'재참가(작년)', v:b.returning_company});
     if(b.early_bird) rows.push({k:'얼리버드', v:b.early_bird==='phase1'?'1차 (20%)':'2차 (10%)'});
     if(b.discount) rows.push({k:'할인 금액', v:'− '+won(b.discount)+(b.returning_company?' (재참가 10% 포함)':'')});
-    rows.push({k:'공급가', v:won(b.subtotal)});
+    rows.push({k:'공급가', v:won(b.subtotal)+(M.gap ? ('   ※ 항목 합계 '+won(M.calc)+' 보다 '+(M.gap>0?'+':'−')+won(Math.abs(M.gap))+' — 사무국이 조정한 금액입니다') : '')});
     rows.push({k:'부가세', v:won(b.vat)});
     rows.push({k:'합계', v:won(b.total)});
     rows.push({k:'입금 상태', v:b.paid?('입금완료'+(b.paid_at?' ('+String(b.paid_at).slice(0,10)+')':'')):'입금 전'});
@@ -1831,6 +1861,10 @@ class Component extends DCLogic {
     };
     const bfv=this.state.boothFilter||'all';
     const bFiltered=booths.filter(b=> bfv==='all'?true : bfv==='submitted'?b.status==='submitted' : bfv==='awaiting'?(b.status==='approved'&&!b.paid) : bfv==='paid'?!!b.paid : bfv==='taxwait'?(!!b.paid&&!b.tax_invoice) : bfv==='rejected'?b.status==='rejected' : true);
+    // 지금 보고 있는 필터 기준 금액 합계 (반려 건도 필터에 들어 있으면 같이 센다)
+    const bMoney=bFiltered.reduce((a,b)=>{ const m=this.boothMoney(b);
+      a.booth+=m.booth; a.addon+=m.addon; a.rental+=m.rental; a.disc+=m.disc; a.sub+=m.sub;
+      if(m.gap) a.adj+=1; return a; }, {booth:0,addon:0,rental:0,disc:0,sub:0,adj:0});
     const boothsView=bFiltered.map(b=>({ id:b.id, company:b.company||'(기업명)', contact:b.contact||'', email:b.email||'',
       type:b.booth_type==='space'?'독립부스':'조립부스', count:(b.booth_ids||[]).length, ids:(b.booth_ids||[]).join(', ')||'-',
       total:won(b.total), date:this.short(b.created_at), status:b.status,
@@ -1873,7 +1907,7 @@ class Component extends DCLogic {
       const rmap=this._rentals||{};
       const head=['신청일','상태','입금여부','입금일','계산서발행','계산서발행일','기업명','영문상호','대표자','사업자번호','업태','종목','주소','홈페이지',
         '담당자','담당부서','연락처','이메일','전화','팩스','전시품목','부스타입','부스수','부스위치','재참가','얼리버드',
-        '부가서비스','비품','비품합계','할인','공급가','부가세','최종금액','팸투어'];
+        '부스참가비','부가서비스','부가서비스금액','비품','비품합계','할인','공급가','조정차액','부가세','최종금액','팸투어'];
       const rows=[head].concat(bFiltered.map(b=>{
         const ap=b.applicant||{};
         const st=b.paid?'입금완료':(b.status==='approved'?'승인':(b.status==='rejected'?'반려':'접수'));
@@ -1883,9 +1917,11 @@ class Component extends DCLogic {
           b.contact||'', ap.dept||'', b.phone||'', b.email||'', ap.tel||'', ap.fax||'', ap.items||'',
           b.booth_type==='space'?'독립부스':'조립부스', (b.booth_ids||[]).length, (b.booth_ids||[]).join(' '),
           b.returning_company||'', b.early_bird==='phase1'?'1차':(b.early_bird==='phase2'?'2차':''),
-          pairs(b.addons,k=>ADDON_LABEL[k]||k),
+          this.boothMoney(b).booth,
+          pairs(b.addons,k=>ADDON_LABEL[k]||k), this.boothMoney(b).addon,
           pairs(b.rentals,k=>(rmap[k]&&rmap[k].n)||k),
-          Number(b.rental_total||0), Number(b.discount||0), Number(b.subtotal||0), Number(b.vat||0), Number(b.total||0),
+          Number(b.rental_total||0), Number(b.discount||0), Number(b.subtotal||0), this.boothMoney(b).gap,
+          Number(b.vat||0), Number(b.total||0),
           b.fam_tour?'Y':'N' ];
       }));
       csvSave(rows,'BIMTC_부스신청_'+(FILTER_LABEL[bfv]||bfv)+'_'+today10()+'.csv');
@@ -2327,6 +2363,9 @@ class Component extends DCLogic {
       bizBtnLabel:this.state.bizBusy?'처리 중…':(this.state.bizOpen?'매칭 마감하기':'지금 매칭 오픈하기'),
       bizBtnStyle:'border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;font-family:inherit;white-space:nowrap;cursor:'+(this.state.bizBusy?'default':'pointer')+';border:none;'+(this.state.bizOpen?'background:#fff;color:#c0392b;border:1.5px solid #f0c8c2;':'background:#0B5FA5;color:#fff;'),
       toggleBiz:()=>this.toggleBizOpen(),
+      bmBooth:won(bMoney.booth), bmAddon:won(bMoney.addon), bmRental:won(bMoney.rental),
+      bmDisc:won(bMoney.disc), bmSub:won(bMoney.sub),
+      bmAdj:bMoney.adj>0, bmAdjLabel:'사무국이 금액을 조정한 신청 '+bMoney.adj+'건이 들어 있어, 항목 합계와 공급가가 다를 수 있습니다',
       isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',isOblead:v==='oblead',isPsign:v==='psign',
       isMou:v==='mou', mouSlotCells, mouAdminRows, hasMouRows, noMouRows:!hasMouRows,
       mouAcceptedN:String(mouAcceptedN), mouPendingN:String(mouPendingN), mouFreeN:String(mouFreeN),
