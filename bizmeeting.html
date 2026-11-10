@@ -737,8 +737,7 @@ class Component extends DCLogic {
   mouErr(m){ return this.state.lang==='en' ? (this.MOUERR[m] || m) : m; }
   mouSlotLabel(i){
     if(i==null) return this.L('시간 미지정','Time not set');
-    const r = (i < this.MOU_R2) ? 1 : 2;
-    return this.L('11.13 '+this.MOU_SLOTS[i]+' ('+r+'차)', 'Nov 13 '+this.MOU_SLOTS[i]+' (round '+r+')');
+    return this.L('11.13 '+this.MOU_SLOTS[i], 'Nov 13 '+this.MOU_SLOTS[i]);
   }
 
   async componentDidMount(){
@@ -1087,9 +1086,9 @@ class Component extends DCLogic {
         textStyle: b ? 'color:#0d8f6b;font-weight:700;' : 'color:#9aa9bd;font-weight:600;' };
     };
     const mouRounds = [
-      { title:this.L('1차 · 13:00 ~ 13:50','Round 1 · 13:00-13:50'), note:this.L('5분씩 10건','10 slots, 5 min each'),
+      { title:this.L('13:00 ~ 13:50','13:00-13:50'), note:this.L('5분씩 10건','10 slots, 5 min each'),
         cells: Array.from({length:this.MOU_R2}, (x,i)=>mouCell(i)) },
-      { title:this.L('2차 · 15:30 ~ 15:55','Round 2 · 15:30-15:55'), note:this.L('5분씩 5건','5 slots, 5 min each'),
+      { title:this.L('15:30 ~ 15:55','15:30-15:55'), note:this.L('5분씩 5건','5 slots, 5 min each'),
         cells: Array.from({length:this.MOU_SLOTS.length-this.MOU_R2}, (x,i)=>mouCell(this.MOU_R2+i)) },
     ];
     const mouFree = this.MOU_SLOTS.length - mouBoardRows.length;
@@ -1115,7 +1114,7 @@ class Component extends DCLogic {
       if(taken){ style+="background:#eef1f6;color:#adb8c6;border:1px solid #e1e8f0;cursor:not-allowed;"; }
       else if(sel){ style+="background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;cursor:pointer;"; }
       else { style+="background:#fff;color:#33485e;border:1px solid #d3deea;cursor:pointer;"; }
-      return { label:(i<this.MOU_R2?'① ':'② ')+time, style, onClick:()=> taken?null:this.setState({mouSlot:i}) };
+      return { label:time, style, onClick:()=> taken?null:this.setState({mouSlot:i}) };
     });
     const pkTabBase="flex:1;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;";
     const u = this.state.user;
