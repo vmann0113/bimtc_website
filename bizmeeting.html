@@ -562,7 +562,17 @@ class Component extends DCLogic {
   MATCH_OPEN_AT = '2026-11-01T00:00:00+09:00'; // 2차 얼리버드 마감(10/31) 이후 오픈
   state = {
     matchClosed: false,  // 오픈 여부를 확인하기 전에는 안내창을 띄우지 않는다 (확인 실패 시 componentDidMount 에서 닫힘 처리)
-    lang: (function(){ try{ return localStorage.getItem('bimtc_lang')==='en' ? 'en' : 'ko'; }catch(e){ return 'ko'; } })(),
+    lang: (function(){
+      try{
+        // 주소에 ?lang=en 이 있으면 그걸 따르고 기억해 둔다 (바이어에게 보내는 링크용).
+        var q=(location.search||'').match(/[?&]lang=(ko|en)/);
+        if(q){ try{ localStorage.setItem('bimtc_lang', q[1]); }catch(e){} return q[1]; }
+        var s=localStorage.getItem('bimtc_lang');
+        if(s==='en'||s==='ko') return s;
+        // 고른 적이 없으면 브라우저 언어로 정한다 — 해외 바이어가 한국어 화면을 마주하지 않게.
+        return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ko')===0 ? 'ko' : 'en';
+      }catch(e){ return 'ko'; }
+    })(),
     view: 'guide',
     applyStep: 1,
     role: 'exhibitor',
