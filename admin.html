@@ -1370,6 +1370,7 @@ class Component extends DCLogic {
       // 별도 화면(같은 관리자 로그인으로 열림)
       {k:'rsvp',label:'개막식 초청 회신 ↗',href:'rsvp-admin.html'},
       {k:'invite',label:'초청바이어 정보 ↗',href:'invite-admin.html'},
+      {k:'badge',label:'출입증 발급 ↗',href:'badge.html'},
     ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>{ if(n.href){ window.location.href=n.href; return; } this.setState({view:n.k}); if(n.k==='prospect') setTimeout(()=>this.pollProspects(),60); }}));
 
 

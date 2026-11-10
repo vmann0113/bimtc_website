@@ -9,6 +9,8 @@
   ],
   "rewrites": [
     { "source": "/main", "destination": "/main.dc.html" },
-    { "source": "/i/:code", "destination": "/i" }
+    { "source": "/i/:code", "destination": "/i" },
+    { "source": "/b/:code", "destination": "/b" },
+    { "source": "/B/:code", "destination": "/b" }
   ]
 }

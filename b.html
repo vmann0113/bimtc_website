@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIMTC 2026 출입증</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16294F">
+<link rel="icon" type="image/png" href="/uploads/favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!--
+  출입증 QR 이 여는 화면 (b.html ← /b/코드 · /B/코드, vercel.json rewrite)
+  · 일반 휴대폰: 공식 출입증 안내만 보여 준다(개인정보 없음).
+  · 사무국 관리자로 로그인된 기기: 발급 화면(/badge?code=)으로 넘긴다.
+  · 비즈미팅 상담 체크(참가기업이 바이어 비표를 찍는 기능)는 이 화면에 붙일 예정.
+-->
+<script src="/bimtc-config.js"></script>
+<script src="/bimtc-supabase.js"></script>
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#16294F;color:#fff;font-family:'Pretendard',-apple-system,'Malgun Gothic',sans-serif;text-align:center;padding:24px;box-sizing:border-box}
+  .c{max-width:380px}
+  h1{font-size:22px;margin:0 0 8px}
+  p{color:#c9d6e6;line-height:1.6;margin:0 0 6px;font-size:15px}
+  code{display:inline-block;margin-top:14px;background:rgba(255,255,255,.12);padding:6px 14px;border-radius:8px;font-size:18px;letter-spacing:2px}
+  a{display:inline-block;margin-top:22px;background:#fff;color:#16294F;font-weight:700;text-decoration:none;padding:12px 20px;border-radius:10px}
+</style>
+</head>
+<body>
+<div class="c">
+  <h1>2026 BIMTC 공식 출입증</h1>
+  <p>Busan International Medical Tourism Convention</p>
+  <p>2026.11.13(금) – 14(토) · BEXCO 제1전시장 3A홀</p>
+  <code id="cd"></code><br>
+  <a href="https://bimtc.busan.com/">행사 홈페이지</a>
+</div>
+<script>
+(function () {
+  var m = location.pathname.match(/\/b\/([0-9a-z]{7})/i) || [null, new URLSearchParams(location.search).get('code') || ''];
+  var code = String(m[1] || '').toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 7);
+  document.getElementById('cd').textContent = code || '-';
+  if (!code || !window.BimtcDB) return;
+  window.BimtcDB.ready().then(function () { return window.BimtcDB.currentUser(); }).then(function (u) {
+    if (u && u.is_admin) location.replace('/badge?code=' + encodeURIComponent(code));
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>
