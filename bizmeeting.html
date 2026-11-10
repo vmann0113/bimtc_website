@@ -399,7 +399,7 @@
                 <sc-for list="{{ rd.cells }}" as="c" hint-placeholder-count="5">
                   <div style="{{ c.style }}border-radius:10px;padding:10px 12px;">
                     <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:800;color:#0F2440;">{{ c.time }}</div>
-                    <div style="{{ c.textStyle }}font-size:clamp(12px,calc(16.13px - 0.35vw),14px);margin-top:3px;line-height:1.45;">{{ c.pair }}</div>
+                    <div style="{{ c.textStyle }}font-size:clamp(12px,calc(16.13px - 0.35vw),14px);margin-top:3px;line-height:1.45;word-break:break-word;overflow-wrap:anywhere;">{{ c.pair }}</div>
                   </div>
                 </sc-for>
               </div>
@@ -415,14 +415,14 @@
               <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px;">
                 <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;">
                   <div>
-                    <div style="font-size:16px;font-weight:800;color:#0F2440;">{{ r.name }}</div>
-                    <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ r.meta }}</div>
+                    <div style="font-size:16px;font-weight:800;color:#0F2440;word-break:break-word;overflow-wrap:anywhere;">{{ r.name }}</div>
+                    <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;word-break:break-word;overflow-wrap:anywhere;">{{ r.meta }}</div>
                     <sc-if value="{{ r.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#33485e;font-weight:600;margin-top:2px;">{{ t.k058 }} {{ r.person }}</div></sc-if>
                   </div>
                   <span style="{{ r.statusStyle }}font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:800;font-family:'Pretendard',sans-serif;border-radius:999px;padding:5px 11px;white-space:nowrap;">{{ r.statusLabel }}</span>
                 </div>
                 <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">{{ t.k125 }}</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div>
-                <sc-if value="{{ r.msg }}" hint-placeholder-val="{{ '' }}"><p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;margin:4px 0 10px;line-height:1.6;">{{ r.msg }}</p></sc-if>
+                <sc-if value="{{ r.msg }}" hint-placeholder-val="{{ '' }}"><p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;margin:4px 0 10px;line-height:1.6;word-break:break-word;overflow-wrap:anywhere;">{{ r.msg }}</p></sc-if>
                 <sc-if value="{{ r.isPending }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex;gap:8px;">
                     <button onClick="{{ r.accept }}" style="flex:1;background:#11A37B;color:#fff;border:none;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k126 }}</button>
@@ -441,14 +441,14 @@
               <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px;">
                 <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;">
                   <div>
-                    <div style="font-size:16px;font-weight:800;color:#0F2440;">{{ r.name }}</div>
-                    <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ r.meta }}</div>
+                    <div style="font-size:16px;font-weight:800;color:#0F2440;word-break:break-word;overflow-wrap:anywhere;">{{ r.name }}</div>
+                    <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;word-break:break-word;overflow-wrap:anywhere;">{{ r.meta }}</div>
                     <sc-if value="{{ r.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#33485e;font-weight:600;margin-top:2px;">{{ t.k058 }} {{ r.person }}</div></sc-if>
                   </div>
                   <span style="{{ r.statusStyle }}font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:800;font-family:'Pretendard',sans-serif;border-radius:999px;padding:5px 11px;white-space:nowrap;">{{ r.statusLabel }}</span>
                 </div>
                 <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">{{ t.k125 }}</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div>
-                <sc-if value="{{ r.msg }}" hint-placeholder-val="{{ '' }}"><p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;margin:4px 0 10px;line-height:1.6;">{{ r.msg }}</p></sc-if>
+                <sc-if value="{{ r.msg }}" hint-placeholder-val="{{ '' }}"><p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;margin:4px 0 10px;line-height:1.6;word-break:break-word;overflow-wrap:anywhere;">{{ r.msg }}</p></sc-if>
                 <sc-if value="{{ r.isPending }}" hint-placeholder-val="{{ true }}">
                   <button onClick="{{ r.cancel }}" style="background:#fff;color:#8295ab;border:1px solid #e1e8f0;padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k132 }}</button>
                 </sc-if>
@@ -573,12 +573,15 @@
           <span onClick="{{ closeMouPicker }}" style="font-size:22px;color:#9aa9bd;cursor:pointer;line-height:1;">×</span>
         </div>
         <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin:8px 0 18px;line-height:1.6;">{{ t.k122 }}</p>
+        <sc-if value="{{ mouNoFree }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FDF4EC;border:1px solid #F0D9AE;color:#A4631F;border-radius:10px;padding:11px 14px;margin:0 0 14px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.6;">{{ t.k134 }}</div>
+        </sc-if>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:8px;max-height:260px;overflow-y:auto;margin-bottom:16px;">
           <sc-for list="{{ mouPickerSlots }}" as="s" hint-placeholder-count="15">
             <button onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</button>
           </sc-for>
         </div>
-        <input value="{{ mouMsg }}" onInput="{{ setMouMsg }}" placeholder="{{ t.k131 }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;margin-bottom:20px;" />
+        <input value="{{ mouMsg }}" onInput="{{ setMouMsg }}" maxLength="300" placeholder="{{ t.k131 }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;margin-bottom:20px;" />
         <div style="display:flex;gap:10px;justify-content:flex-end;">
           <button onClick="{{ closeMouPicker }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k075 }}</button>
           <button onClick="{{ confirmMou }}" style="{{ mouConfirmStyle }}">{{ mouConfirmLabel }}</button>
@@ -724,6 +727,7 @@ class Component extends DCLogic {
     '체결식 시간을 선택해 주세요':'Please choose a signing time',
     '이미 확정된 시간입니다. 다른 시간을 골라 주세요.':'That time is already taken. Please pick another one.',
     '이미 신청해 둔 상대입니다':'You already have a request waiting with this partner',
+    '협약 내용은 300자 안으로 적어주세요':'Please keep the note under 300 characters',
     '신청을 찾을 수 없습니다':'This request was not found',
     '권한이 없습니다':'You are not allowed to do this',
     '이미 처리된 신청입니다':'This request has already been handled',
@@ -1215,6 +1219,7 @@ class Component extends DCLogic {
         k131:L('어떤 내용의 협약인지 한 줄로 적어주세요 (선택)','One line on what the MOU is about (optional)'),
         k132:L('신청 취소','Cancel request'),
         k133:L('MOU 체결식은 11월 13일(금) 메인무대에서 두 번 진행됩니다.','The MOU signing ceremony runs twice on Friday, 13 November, on the main stage.'),
+        k134:L('남은 칸이 없습니다. 15건이 모두 찼습니다 — 사무국으로 문의해 주세요.','All 15 slots are taken. Please contact the secretariat.'),
         k058:L('담당자','Contact'),
         k059:L('✓ 요청함','✓ Requested'),
         k060:L('날짜·시간 선택 후 요청','Choose a time and request'),
@@ -1280,6 +1285,7 @@ class Component extends DCLogic {
       mouRounds, mouIn, mouOut,
       hasMouIn:mouIn.length>0, hasMouOut:mouOut.length>0, noMou:(mouIn.length+mouOut.length)===0,
       mouFreeLabel:this.L('남은 칸 '+mouFree+'개 / 전체 15개','Open slots: '+mouFree+' of 15'),
+      mouNoFree:mouFree===0,
       mouPickerOpen:this.state.mouPickId!=null, mouPickName:this.state.mouPickName,
       mouPickerSlots, mouMsg:this.state.mouMsg, setMouMsg:this.set('mouMsg'),
       closeMouPicker:()=>this.closeMouPicker(), confirmMou:()=>this.confirmMou(),

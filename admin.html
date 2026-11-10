@@ -732,7 +732,7 @@
             <sc-for list="{{ mouSlotCells }}" as="c" hint-placeholder-count="15">
               <div style="{{ c.style }}border-radius:10px;padding:10px 12px;">
                 <div style="font-size:13px;font-weight:800;color:#0F2440;">{{ c.time }}</div>
-                <div style="{{ c.textStyle }}font-size:12.5px;margin-top:3px;line-height:1.45;">{{ c.pair }}</div>
+                <div style="{{ c.textStyle }}font-size:12.5px;margin-top:3px;line-height:1.45;word-break:break-word;overflow-wrap:anywhere;">{{ c.pair }}</div>
               </div>
             </sc-for>
           </div>
@@ -742,12 +742,12 @@
             <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
               <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
                 <div style="width:38px;height:38px;border-radius:10px;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ m.aIni }}</div>
-                <div><div style="font-size:14.5px;font-weight:700;">{{ m.a }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ m.aType }} · 신청 {{ m.when }}</div></div>
+                <div><div style="font-size:14.5px;font-weight:700;word-break:break-word;overflow-wrap:anywhere;">{{ m.a }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;word-break:break-word;overflow-wrap:anywhere;">{{ m.aType }} · 신청 {{ m.when }}</div></div>
               </div>
               <div style="font-family:'Pretendard',sans-serif;color:#c2cdda;font-size:18px;">→</div>
               <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
                 <div style="width:38px;height:38px;border-radius:10px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ m.bIni }}</div>
-                <div><div style="font-size:14.5px;font-weight:700;">{{ m.b }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ m.bType }}</div></div>
+                <div><div style="font-size:14.5px;font-weight:700;word-break:break-word;overflow-wrap:anywhere;">{{ m.b }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;word-break:break-word;overflow-wrap:anywhere;">{{ m.bType }}</div></div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0;">
                 <span style="{{ m.statusStyle }}font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;padding:5px 11px;border-radius:999px;">{{ m.statusLabel }}</span>
@@ -758,7 +758,7 @@
                 </sc-if>
               </div>
               <sc-if value="{{ m.msg }}" hint-placeholder-val="{{ '' }}">
-                <div style="flex-basis:100%;font-size:13.5px;color:#33485e;background:#F7F9FC;border-radius:9px;padding:10px 13px;line-height:1.6;">{{ m.msg }}</div>
+                <div style="flex-basis:100%;font-size:13.5px;color:#33485e;background:#F7F9FC;border-radius:9px;padding:10px 13px;line-height:1.6;word-break:break-word;overflow-wrap:anywhere;">{{ m.msg }}</div>
               </sc-if>
             </div>
           </sc-for>
