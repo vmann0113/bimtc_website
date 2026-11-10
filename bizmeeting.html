@@ -306,7 +306,12 @@
             <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:24px;display:flex;flex-direction:column;">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
                 <div style="width:46px;height:46px;border-radius:12px;background:{{ p.avBg }};color:{{ p.avColor }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">{{ p.initial }}</div>
-                <span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;padding:4px 10px;border-radius:999px;background:{{ p.tagBg }};color:{{ p.tagColor }};">{{ p.type }}</span>
+                <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+                  <sc-if value="{{ p.isInvited }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:800;font-family:'Pretendard',sans-serif;padding:4px 10px;border-radius:999px;background:#FFF4E0;color:#A96A00;border:1px solid #F0D9AE;">{{ t.k110 }}</span>
+                  </sc-if>
+                  <span style="font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:700;font-family:'Pretendard',sans-serif;padding:4px 10px;border-radius:999px;background:{{ p.tagBg }};color:{{ p.tagColor }};">{{ p.type }}</span>
+                </div>
               </div>
               <h3 style="font-size:16.5px;font-weight:800;margin:0 0 4px;color:#0F2440;">{{ p.name }}</h3>
               <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:14px;">{{ p.meta }}</div>
@@ -319,6 +324,14 @@
                 </sc-for>
               </div>
               <div style="margin-top:auto;">
+                <sc-if value="{{ p.hasDoc }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:6px;margin-bottom:8px;">
+                    <a href="{{ p.docUrl }}" target="_blank" rel="noopener" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#F1F5FA;border:1px solid #d8e0ea;color:#0B5FA5;text-decoration:none;padding:10px;border-radius:10px;font-size:13.5px;font-weight:700;font-family:'Pretendard',sans-serif;">{{ t.k111 }}</a>
+                    <sc-if value="{{ p.hasCat }}" hint-placeholder-val="{{ false }}">
+                      <a href="{{ p.catUrl }}" target="_blank" rel="noopener" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#F1F5FA;border:1px solid #d8e0ea;color:#5E7289;text-decoration:none;padding:10px;border-radius:10px;font-size:13.5px;font-weight:700;font-family:'Pretendard',sans-serif;">{{ t.k112 }}</a>
+                    </sc-if>
+                  </div>
+                </sc-if>
                 <sc-if value="{{ p.requested }}" hint-placeholder-val="{{ false }}">
                   <button disabled style="width:100%;background:#E7F6F0;color:#0d8f6b;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:700;font-family:'Pretendard',sans-serif;">{{ t.k059 }}</button>
                 </sc-if>
@@ -472,6 +485,80 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  // 사무국 초청바이어 (초청바이어 1109 엑셀 38줄 → 홈페이지 계정 35개).
+  // 파트너 찾기에서 맨 위로 올리고 「초청바이어」 표시를 붙인다. 숨기는 것은 없다.
+  INVITED = {
+    '3d2e520f-ad8f-4ce0-903c-a4d8e7a36800':1,  // 1 Doctors Hunter
+    '3bab0fd8-6e96-4ed5-9fbd-054713dd90bb':1,  // 2 Vernal Kazakhstan
+    '9df36342-1a02-48ba-a552-768a12b81a73':1,  // 3 Molan
+    'd759dd6b-1196-4762-a294-2907499266f2':1,  // 4 LLC Life Tour KG
+    '05d3cb75-f7b3-4683-9613-25ce3f6de2e1':1,  // 5 Engel Maral Besud
+    'e605785d-3619-4833-95dc-01e3c7e0e25f':1,  // 6 Vernal
+    '876a4640-839d-4ed0-9832-4bc1d9b529a1':1,  // 7 Rainbow Bridge
+    '93516ad4-b184-4560-b92d-f4fbb18d7468':1,  // 8 Dalain Khukh Mori
+    '6ac5a27d-8be7-4b99-9163-a6c5a2f96445':1,  // 9 Satsuki
+    '8d9d7a46-2ac7-4975-bb9c-33c15e269874':1,  // 10 Suzhou Quancheng (회사명으로 맞춤)
+    'b54423be-f66c-45f9-8372-efa245cc84a7':1,  // 11 Korea Vision
+    '4e89e3e8-cbaa-4b52-aa76-c5ec6f39410b':1,  // 12·13 Birgatour
+    '66305420-530a-4574-b49c-fd6f356e58f4':1,  // 14 Dr.Nature
+    '431502a9-2965-48a0-ba71-0e0af35b4d1c':1,  // 15 ATK tour
+    'ba5b0427-da19-4ca4-9e7d-b5ba89e4e62b':1,  // 16 Classik Tour
+    '63039e11-d3d0-4872-b350-94928c661852':1,  // 17 Buryat Ombol
+    'de0aab11-9f7f-4457-ad9f-f6f8ff1c29d7':1,  // 18 Diamond Azushka
+    '8afb8046-9b05-46fb-944d-e22ea926bfd4':1,  // 19 Diamond Azushka
+    '47cc70a5-7a18-43d8-aa28-a68023bd0169':1,  // 20 Diamond Azushka
+    'ab618092-600b-4751-898f-be92338b4b5b':1,  // 21 City Council of Manila
+    '96f06107-7ec5-4c12-85a3-ebea7d49bd4c':1,  // 22 IP Maksimova
+    '95505e38-9d55-42ae-aaea-79b062930359':1,  // 23 Doctor Pusan
+    '80dfdf22-a158-4991-be40-73da3c23f321':1,  // 24·26 Healthy life wings
+    'bcdfe36a-2a8d-4d7a-8936-983c2a5f1390':1,  // 25 Healthy life wings
+    '7ebbc958-a6b8-4560-997c-155c68d5ed12':1,  // 27 Tam Anh General Hospital
+    'facc7137-ebe2-4042-9d0f-302b08aa9428':1,  // 28 Hliee Beauty & Success
+    '8f62655c-3187-47e1-ac19-ae98d88ec52c':1,  // 29 Kasih Ibu Hospital
+    'f1f14b4d-4b50-4af4-af1c-f4a1befe57fe':1,  // 30 Puri Asia
+    'fbfad2e6-eb29-4568-b9bb-c25a3a08145e':1,  // 31·32 Shanghai Hanerting
+    '05463511-45d9-4534-8622-b30517aae1ef':1,  // 33 上海薏欣
+    '63bc30f5-4d9a-4b68-b842-675c47924d68':1,  // 34 上海薏欣
+    '0a3c8211-03ef-4f4d-a3b8-3c02899c7bd8':1,  // 35 KONGANIN
+    '026e18ff-1552-4c1e-836f-4fbadcbdb567':1,  // 36 Qingdao Qingtong
+    'd10cae62-84c4-405c-934d-1fe0ee1b23e3':1,  // 37 Qingdao Honghai
+    'ea4abb23-4b2c-4dba-ad06-71890061ef2c':1,  // 38 Qingdao Baoer
+  };
+  // 바이어가 낸 소개서·회사자료 (uploads/buyer/). 사무국이 받은 PDF 를 웹용으로 줄여 둔 것이다.
+  // 아직 안 낸 곳은 여기에 없고, 화면에도 단추가 안 뜬다.
+  BUYERDOC = {
+    '3d2e520f-ad8f-4ce0-903c-a4d8e7a36800':{doc:'b01_doctors_hunter.pdf'},  // 1 Doctors Hunter
+    '3bab0fd8-6e96-4ed5-9fbd-054713dd90bb':{doc:'b02_vernal_kazakhstan.pdf'},  // 2 Vernal Kazakhstan
+    '9df36342-1a02-48ba-a552-768a12b81a73':{doc:'b03_molan.pdf'},  // 3 Molan
+    'd759dd6b-1196-4762-a294-2907499266f2':{doc:'b04_life_tour_kg.pdf',cat:'c04_life_tour_kg.pdf'},  // 4 LLC Life Tour KG
+    '05d3cb75-f7b3-4683-9613-25ce3f6de2e1':{doc:'b05_engel_maral_besud.pdf'},  // 5 Engel Maral Besud
+    'e605785d-3619-4833-95dc-01e3c7e0e25f':{doc:'b06_vernal.pdf',cat:'c06_vernal.pdf'},  // 6 Vernal
+    '93516ad4-b184-4560-b92d-f4fbb18d7468':{doc:'b08_dalain_khukh_mori.pdf'},  // 8 Dalain Khukh Mori
+    '6ac5a27d-8be7-4b99-9163-a6c5a2f96445':{doc:'b09_satsuki.pdf',cat:'c09_satsuki.pdf'},  // 9 Satsuki
+    '8d9d7a46-2ac7-4975-bb9c-33c15e269874':{doc:'b10_suzhou_quancheng.pdf'},  // 10 Suzhou Quancheng (회사명으로 맞춤)
+    'b54423be-f66c-45f9-8372-efa245cc84a7':{doc:'b11_korea_vision.pdf',cat:'c11_korea_vision.pdf'},  // 11 Korea Vision
+    '4e89e3e8-cbaa-4b52-aa76-c5ec6f39410b':{doc:'b12_birgatour.pdf',cat:'c12_birgatour.pdf'},  // 12·13 Birgatour
+    '66305420-530a-4574-b49c-fd6f356e58f4':{doc:'b14_dr_nature.pdf',cat:'c14_dr_nature.pdf'},  // 14 Dr.Nature
+    '431502a9-2965-48a0-ba71-0e0af35b4d1c':{doc:'b15_atk_tour.pdf'},  // 15 ATK tour
+    'ba5b0427-da19-4ca4-9e7d-b5ba89e4e62b':{doc:'b16_classik_tour.pdf'},  // 16 Classik Tour
+    '63039e11-d3d0-4872-b350-94928c661852':{doc:'b17_buryat_ombol.pdf'},  // 17 Buryat Ombol
+    'de0aab11-9f7f-4457-ad9f-f6f8ff1c29d7':{doc:'b18_diamond_azushka.pdf'},  // 18 Diamond Azushka
+    '8afb8046-9b05-46fb-944d-e22ea926bfd4':{doc:'b18_diamond_azushka.pdf'},  // 19 Diamond Azushka
+    '47cc70a5-7a18-43d8-aa28-a68023bd0169':{doc:'b18_diamond_azushka.pdf'},  // 20 Diamond Azushka
+    'ab618092-600b-4751-898f-be92338b4b5b':{doc:'b21_city_council_manila.pdf'},  // 21 City Council of Manila
+    '96f06107-7ec5-4c12-85a3-ebea7d49bd4c':{doc:'b22_doctor_pusan_m.pdf',cat:'c22_doctor_pusan_m.pdf'},  // 22 IP Maksimova
+    '95505e38-9d55-42ae-aaea-79b062930359':{doc:'b23_doctor_pusan_o.pdf'},  // 23 Doctor Pusan
+    '8f62655c-3187-47e1-ac19-ae98d88ec52c':{doc:'b29_kasih_ibu.pdf'},  // 29 Kasih Ibu Hospital
+    'fbfad2e6-eb29-4568-b9bb-c25a3a08145e':{doc:'b31_shanghai_hanerting.pdf'},  // 31·32 Shanghai Hanerting
+    '05463511-45d9-4534-8622-b30517aae1ef':{doc:'b33_shanghai_yixin.pdf'},  // 33 上海薏欣
+    '63bc30f5-4d9a-4b68-b842-675c47924d68':{doc:'b33_shanghai_yixin.pdf'},  // 34 上海薏欣
+    '0a3c8211-03ef-4f4d-a3b8-3c02899c7bd8':{doc:'b35_konganin.pdf'},  // 35 KONGANIN
+    'd10cae62-84c4-405c-934d-1fe0ee1b23e3':{doc:'b37_qingdao_honghai.pdf'},  // 37 Qingdao Honghai
+    'ea4abb23-4b2c-4dba-ad06-71890061ef2c':{doc:'b38_qingdao_baoer.pdf'},  // 38 Qingdao Baoer
+  };
+  isInvited(id){ return !!this.INVITED[id]; }
+  buyerDoc(id){ return this.BUYERDOC[id] || null; }
+
   MATCH_OPEN_AT = '2026-11-01T00:00:00+09:00'; // 2차 얼리버드 마감(10/31) 이후 오픈
   state = {
     matchClosed: false,  // 오픈 여부를 확인하기 전에는 안내창을 띄우지 않는다 (확인 실패 시 componentDidMount 에서 닫힘 처리)
@@ -536,7 +623,8 @@ class Component extends DCLogic {
     const requestedIds = new Set(sent.filter(r=>r.status!=='declined').map(r=>r.to_profile));
     const partnersMapped = partners.map(p=>({ id:p.id, name:p.name||this.L('(이름 미입력)','(no name)'), type:this.typeLabel(p.type), ptype:p.type, attendMode:p.attend_mode||'onsite',
       person:this.personName(p), job:p.job_title||'',
-      country:p.country||'', org:((p.category||p.industry||'')+'').trim(), tags:(p.interests||[]).map(c=>this.fieldLabel(c)), status: requestedIds.has(p.id)?'requested':'none' }));
+      country:p.country||'', org:((p.category||p.industry||'')+'').trim(), tags:(p.interests||[]).map(c=>this.fieldLabel(c)), status: requestedIds.has(p.id)?'requested':'none',
+      invited:this.isInvited(p.id), docs:this.buyerDoc(p.id) }));
     const requestsMapped = inbox.map(r=>({ id:r.id, from_profile:r.from_profile, name:(r.from&&r.from.name)||this.L('요청자','Requester'), type:this.typeLabel(r.from&&r.from.type), ptype:(r.from&&r.from.type)||'',
       person:this.personName(r.from),
       country:(r.from&&r.from.country)||'', org:(((r.from&&(r.from.category||r.from.industry))||'')+'').trim(), msg:r.message||'', status:r.status,
@@ -746,10 +834,16 @@ class Component extends DCLogic {
     ];
 
     const slotLabelOf=(d,si)=> (si==null||d==null) ? this.L('시간 미지정','Time not set') : (this.dayLabel(d)+' '+this.SLOTS[si]);
-    const partnersView = this.state.partners.map(p=>({
+    // 사무국이 초청한 바이어를 맨 위에 모은다. 나머지(홈페이지로 모집한 온라인 바이어)는 그 아래.
+    const partnersSorted = this.state.partners.slice().sort((a,b)=>
+      (b.invited?1:0)-(a.invited?1:0) || String(a.name||'').localeCompare(String(b.name||'')));
+    const partnersView = partnersSorted.map(p=>({
       ...p, requested:p.status==='requested', notRequested:p.status!=='requested',
       onlineOnly:(p.attendMode||'onsite')==='online',
       onsiteBuyer:p.ptype==='buyer' && (p.attendMode||'onsite')!=='online',
+      isInvited:!!p.invited,
+      hasDoc:!!(p.docs&&p.docs.doc), docUrl:(p.docs&&p.docs.doc)?('uploads/buyer/'+p.docs.doc):'',
+      hasCat:!!(p.docs&&p.docs.cat), catUrl:(p.docs&&p.docs.cat)?('uploads/buyer/'+p.docs.cat):'',
       meta:[(p.country||'').trim(), (p.org||'').trim()].filter(Boolean).join(' · '),
       initial:this.initialOf(p.name), ...this.avatarColors(p.ptype==='buyer'), openPicker:()=>this.openPicker(p)
     }));
@@ -877,9 +971,12 @@ class Component extends DCLogic {
         k053:L('파트너 찾기','Find partners'),
         k054:L('내 미팅 일정 보기','View my meetings'),
         k055:L('이전','Back'),
-        k056:L('매칭된 참가기업·바이어에게 1:1 미팅을 요청하세요.','Send a 1:1 meeting request to an exhibitor or buyer.'),
+        k056:L('매칭된 참가기업·바이어에게 1:1 미팅을 요청하세요. 사무국이 초청한 바이어가 맨 위에 있고, 소개서를 낸 곳은 [소개서 보기]로 회사 정보를 확인하실 수 있습니다.','Send a 1:1 meeting request to an exhibitor or buyer. Buyers invited by the secretariat are listed first; where a profile was submitted you can open it with [View profile].'),
         k057:L('온라인 참가 · 화상 미팅','Online participant · video meeting'),
         k057b:L('현장 방문 · 부스 상담','On-site · meet at your booth'),
+        k110:L('초청바이어','Invited buyer'),
+        k111:L('소개서 보기','View profile'),
+        k112:L('회사 자료','Catalog'),
         k058:L('담당자','Contact'),
         k059:L('✓ 요청함','✓ Requested'),
         k060:L('날짜·시간 선택 후 요청','Choose a time and request'),
