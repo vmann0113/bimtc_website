@@ -145,6 +145,35 @@
   .guide .cmd{display:flex;gap:8px;align-items:flex-start;margin-top:6px}
   .guide .cmd code{flex:1;min-width:0;display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-family:Consolas,monospace;font-size:12px;background:#f4f7fb;border:1px solid #d6dfea;border-radius:6px;padding:6px 8px;word-break:break-all;user-select:all}
   .setup-only{max-width:980px;margin:0 auto}
+  .wz{font-size:19px;line-height:1.6}
+  .wz-h{font-size:15px;color:#6b7f95;font-weight:700}
+  .wz-bar{height:10px;background:#e6ecf3;border-radius:6px;margin:6px 0 14px;overflow:hidden}
+  .wz-bar i{display:block;height:100%;background:#11A37B}
+  .wz h2{font-size:26px;color:#16294F;margin:6px 0 14px;line-height:1.35;display:flex;gap:12px;align-items:center}
+  .wz-n{flex:none;width:46px;height:46px;border-radius:50%;background:#16294F;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:23px}
+  .guide .wz-do{padding-left:32px}
+  .guide .wz-do li{margin:10px 0;padding-left:4px}
+  .wz-do li::marker{font-weight:800;color:#16294F}
+  .guide .q{background:#eef3fa;border:1px solid #c9d6e6;border-radius:6px;padding:0 6px;color:#16294F;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .bigbtn{display:inline-block;font:inherit;font-size:19px;font-weight:800;padding:14px 22px;border-radius:12px;border:0;background:#11A37B;color:#fff !important;cursor:pointer;text-decoration:none;margin:6px 0;line-height:1.3}
+  .bigbtn.ghost{background:#fff;color:#16294F !important;border:2px solid #c9d6e6}
+  .bigbtn.warn{background:#fff3e6;color:#B45309 !important;border:2px solid #f0b35a}
+  .wz-pick{display:flex;flex-direction:column;gap:12px;max-width:600px;margin-top:10px}
+  .wz-pick .bigbtn{text-align:left;font-size:21px;padding:18px 22px}
+  .wz-nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .wz-nav .bigbtn:last-child{margin-left:auto}
+  .wz-ok{margin-top:16px;font-size:21px;font-weight:800;color:#16294F;background:#eafaf4;border-radius:10px;padding:10px 14px}
+  .wz-help{margin-top:12px;background:#fff8e6;border-left:5px solid #f0b35a;padding:12px 16px;border-radius:8px;font-size:18px}
+  .wz-s{color:#6b7f95;font-size:16px}
+  .guide small{font-size:15px;color:#6b7f95}
+  .wz-cmd{display:block;margin-top:6px;font-family:Consolas,monospace;font-size:12px;color:#6b7f95;background:#f4f7fb;border:1px solid #d6dfea;border-radius:6px;padding:6px 8px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-all;user-select:all}
+  .guide #gD{border:2px solid #11A37B}
+  .dc{border-top:1px solid #eef1f5;padding:14px 0}
+  .guide .dc h3{font-size:20px}
+  .dc .wz-do{font-size:17px}
+  .qr3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .qr3 p{margin:4px 0;font-size:16px;line-height:1.5}
+  @media (max-width:700px){ .qr3{grid-template-columns:1fr} .wz h2{font-size:22px} .wz-nav .bigbtn{flex:1} .wz-nav .bigbtn:last-child{margin-left:0} }
   @media (max-width:700px){ .guide .two img.shot{max-width:100%} }
 
   /* ===== 라벨 100×70mm (미리보기와 인쇄가 같은 규칙) ===== */
@@ -986,80 +1015,155 @@
   }
 
   // ================= ⑥ 사용 안내 =================
-  // 처음 시작하기(따라하기) — 로그인 전에도 볼 수 있다: 로그인 화면 링크 또는 /badge#setup
+  // 처음 시작하기 — 한 화면에 한 단계(따라하기). 로그인 전에도 볼 수 있다: 로그인 화면 링크 또는 /badge#setup
+  // 말은 쉽게: 한 줄에 행동 하나, 화면에 보이는 버튼 이름 그대로.
   var SHORTCUT_CMD = '"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%LOCALAPPDATA%\\BIMTC-Badge-Chrome" --kiosk-printing --no-first-run --no-default-browser-check --app=https://bimtc.busan.com/badge';
   function shot(f, alt) { return '<img class="shot" src="/uploads/badge-guide/' + f + '" alt="' + alt + '" loading="lazy">'; }
-  function setupHtml() {
-    return '<section id="gS"><h3>★ 처음 시작하기 — 순서대로 따라 하세요</h3>' +
-      '<div class="tip"><b>사무실 출입증 PC</b>(바탕화면에 「BIMTC 출입증 발급」 아이콘이 있는 PC)는 이미 다 해 두었습니다 → <b>6단계</b>부터.<br>' +
-      '<b>다른 노트북·현장 PC</b>는 1단계부터. 전부 20분 정도 걸립니다.</div>' +
-
-      '<div class="st"><b class="n">1</b><div><h4>프린터 연결</h4><ol>' +
-      '<li>라벨 롤을 끼웁니다. <b>손톱으로 긁으면 검게 되는 면이 위</b>.</li>' +
-      '<li>덮개를 ‘딸깍’ 닫고 → 전원 켜기 → USB를 PC에 꽂기.</li>' +
-      '<li><b>FEED 버튼을 길게</b> 누르다가 불빛이 바뀌면 손을 뗍니다. 라벨이 몇 장 나가고 멈추면 간격 맞춤 끝.</li></ol></div></div>' +
-
-      '<div class="st"><b class="n">2</b><div><h4>드라이버 받기</h4><ol>' +
-      '<li><a class="btn dark" style="display:inline-block;padding:6px 12px;color:#fff;text-decoration:none" href="https://www.xprintertech.com/download/xp-dt427b" target="_blank" rel="noopener">Xprinter XP-DT427B 공식 드라이버 페이지 열기 ↗</a></li>' +
-      '<li>아래 빨간 칸 <b>Driver-Windows</b> 줄의 <b>Download</b>를 누릅니다(약 85MB). 아래쪽 쿠키 안내 창은 아무 버튼이나 눌러 닫아도 됩니다.</li></ol>' +
-      shot('s1_driver.png', '드라이버 다운로드 페이지') + '</div></div>' +
-
-      '<div class="st"><b class="n">3</b><div><h4>드라이버 설치</h4><ol>' +
-      '<li>받은 zip 파일을 오른쪽 클릭 → <b>압축 풀기</b>.</li>' +
-      '<li>풀린 폴더 안의 설치 파일(Setup, 또는 .exe)을 실행 → 모델 <b>XP-DT427B</b>, 포트 <b>USB</b>를 고르고 끝까지 <b>다음/설치</b>.</li>' +
-      '<li>설치 화면이 영어로 나와도 괜찮습니다. 모르면 기본값 그대로 진행하세요.</li></ol></div></div>' +
-
-      '<div class="st"><b class="n">4</b><div><h4>윈도우 프린터 설정</h4><ol>' +
-      '<li>시작 → <b>설정</b> → <b>Bluetooth 및 장치</b> → <b>프린터 및 스캐너</b>.</li>' +
-      '<li>아래로 내려 <b>「Windows에서 내 기본 프린터를 관리할 수 있도록 허용」을 끔</b>. <span style="color:#B4233C">켜 두면 복합기로 한 번 인쇄한 뒤 라벨이 복합기로 나갑니다.</span></li>' +
-      '<li>목록에서 <b>Xprinter XP-DT427B</b>를 누릅니다.</li></ol>' +
-      shot('s2_printers.png', '프린터 및 스캐너 설정') + '</div></div>' +
-
-      '<div class="st"><b class="n">5</b><div><h4>기본 프린터 + 라벨 용지</h4><ol>' +
-      '<li><b>기본값으로 설정</b>을 누릅니다 → 「프린터 상태: <b>기본값</b>」이 되면 OK.</li>' +
-      '<li><b>인쇄 기본 설정</b>을 누릅니다.</li></ol>' + shot('s3_xprinter.png', 'Xprinter 설정 화면') +
-      '<ol start="3"><li><b>페이지 설정</b> 탭 → <b>용지 이름</b>에 <b>BIMTC 100x70</b>이 있으면 고르고 <b>확인</b>.</li>' +
-      '<li>없으면 <b>새 용지(W)...</b> → 이름 <b>BIMTC 100x70</b>, 유형 <b>다이컷 라벨</b>, 너비 <b>100</b> mm, 높이 <b>70</b> mm → 확인 → 목록에서 고르고 <b>확인</b>.</li></ol>' +
-      '<div class="two">' + shot('s4_prefs.png', '인쇄 기본 설정 - 용지') + shot('s5_stock.png', '용지 편집 - 100x70') + '</div></div></div>' +
-
-      '<div class="st"><b class="n">6</b><div><h4>바탕화면 아이콘 만들기 <small style="color:#6b7f95">(아이콘이 이미 있으면 건너뛰기)</small></h4><ol>' +
-      '<li>바탕화면 빈 곳 오른쪽 클릭 → <b>새로 만들기</b> → <b>바로 가기</b>.</li>' +
-      '<li>아래 <b>[복사]</b>를 누르고, 「항목 위치 입력」 칸에 <b>Ctrl+V</b>로 붙여넣기 → <b>다음</b>.' +
-      '<div class="cmd"><code id="scCmd">' + esc(SHORTCUT_CMD) + '</code><button class="btn" id="scCopy" type="button">복사</button></div></li>' +
-      '<li>이름에 <b>BIMTC 출입증 발급</b> → <b>마침</b>.</li></ol>' + shot('s6_shortcut.png', '바로 가기 만들기') +
-      '<div class="tip">크롬이 다른 곳에 깔린 PC면 「찾을 수 없음」이 뜹니다 → 팀장에게.</div></div></div>' +
-
-      '<div class="st"><b class="n">7</b><div><h4>아이콘으로 열고 로그인</h4><ol>' +
-      '<li>바탕화면 <b>「BIMTC 출입증 발급」</b>을 더블클릭. <b>꼭 이 아이콘으로</b> 엽니다(일반 크롬으로 열면 매번 인쇄 창이 뜸).</li>' +
-      '<li>사무국 관리자 이메일·비밀번호로 <b>로그인</b>.</li></ol>' + shot('s7_login.png', '로그인 화면') + '</div></div>' +
-
-      '<div class="st"><b class="n">8</b><div><h4>자리 고르고 시험 출력</h4><ol>' +
-      '<li>오른쪽 위 <b>자리</b>에서 내 자리(데스크1, 2 …)를 고릅니다.</li>' +
-      '<li><b>[시험 출력]</b> → 라벨 한 장(NGUYEN VAN AN)이 <b>인쇄 창 없이 바로</b> 나오면 준비 끝.</li>' +
-      '<li><b>연결됨</b>(초록)이 보이면 정상.</li></ol>' + shot('s8_top.png', '자리 선택과 시험 출력') +
-      '<div class="tip">인쇄 창이 뜬다 → 아이콘으로 안 연 것(7단계). 복합기에서 A4가 나온다 → 4·5단계(기본 프린터). 라벨이 두 장에 걸쳐 찍힌다 → 1단계 FEED 길게.</div></div></div>' +
-
-      '<div class="st"><b class="n">9</b><div><h4>QR 리더기 확인</h4><ol>' +
-      '<li>리더기를 USB로 꽂습니다(설치할 것 없음).</li>' +
-      '<li><b>입장 확인·비표</b> 탭 검색칸을 한 번 클릭 → 참관객 QR을 찍어 결과 카드가 뜨는지 봅니다.</li></ol></div></div>' +
-      '</section>';
+  function q(s) { return '<b class="q">' + s + '</b>'; }   // 화면에 보이는 글자(버튼 이름 등)
+  var WZ = [
+    { t: '프린터를 켜요', d: [
+        '하얀 라벨 종이를 프린터 안에 넣어요.<br><small>손톱으로 긁으면 까맣게 되는 쪽이 <b>위</b>로 가게요.</small>',
+        '뚜껑을 ' + q('딸깍') + ' 소리 나게 꾹 닫아요.',
+        '프린터 전원을 켜요.',
+        'USB 줄을 컴퓨터에 꽂아요.',
+        '프린터의 ' + q('FEED') + ' 버튼을 꾹 누르고 있다가, 불빛이 바뀌면 손을 떼요.<br><small>라벨이 몇 장 나오고 멈추면 OK. (라벨 길이를 프린터가 배우는 거예요)</small>'],
+      ok: '프린터에 불이 들어왔나요?',
+      help: '불이 <b>빨간색</b>이면 → 뚜껑이 덜 닫힌 거예요. 다시 꾹 닫아요.<br>종이가 없으면 → 라벨 종이를 다시 넣어요.' },
+    { t: '프린터 프로그램을 받아요', d: [
+        '아래 파란 버튼을 눌러요.<br><a class="bigbtn" href="https://www.xprintertech.com/download/xp-dt427b" target="_blank" rel="noopener">프로그램 받는 곳 열기 ↗</a>',
+        '새 창이 열리면, <b>빨간 네모</b> 안의 파란 ' + q('Download') + ' 를 눌러요.',
+        '다 받아질 때까지 기다려요. <small>(조금 걸려요)</small>'],
+      img: ['s1_driver.png'],
+      ok: '파일이 다 받아졌나요?',
+      help: '아래쪽에 ' + q('COOKIES') + ' 창이 가리면 → ' + q('allow all') + ' 을 눌러 닫아요.<br>영어 화면이라도 괜찮아요. 빨간 네모만 찾으면 돼요.' },
+    { t: '프로그램을 설치해요', d: [
+        '받은 파일에 마우스 <b>오른쪽</b> 버튼 → ' + q('모두 압축 풀기') + ' → ' + q('압축 풀기') + '.',
+        '열린 폴더에서 이름에 ' + q('Setup') + ' 이나 ' + q('Install') + ' 이 들어간 파일을 두 번 눌러요.',
+        q('Next') + ' (다음)를 계속 눌러요. 마지막에 ' + q('Finish') + ' (마침).',
+        '프린터 이름을 고르라고 나오면 ' + q('XP-DT427B') + ' 를 골라요.'],
+      ok: '설치가 끝났나요?',
+      help: '「이 앱이 디바이스를 변경하도록 허용하시겠어요?」가 나오면 → ' + q('예') + '.<br>잘 모르겠으면 → 여기서 멈추고 팀장님께 물어봐요.' },
+    { t: '컴퓨터가 프린터를 마음대로 못 바꾸게 해요', d: [
+        '키보드 왼쪽 아래 ' + q('⊞ 윈도우 키') + ' 를 눌러요.',
+        q('프린터') + ' 라고 쳐요 → ' + q('프린터 및 스캐너') + ' 를 눌러요.',
+        '아래로 내려요. ' + q('Windows에서 내 기본 프린터를 관리할 수 있도록 허용') + ' 옆 스위치를 눌러 ' + q('끔') + ' 으로 만들어요. <small>(아래 사진 아래쪽 빨간 네모)</small>',
+        '위에 있는 ' + q('Xprinter XP-DT427B') + ' 를 눌러요. <small>(사진 위쪽 빨간 네모)</small>'],
+      img: ['s2_printers.png'],
+      ok: '스위치가 「끔」이 됐나요?',
+      help: '이걸 안 끄면, 큰 복사기로 한 번 뽑은 뒤부터 라벨이 <b>복사기로</b> 나가요. 꼭 꺼요!' },
+    { t: '이 프린터를 기본으로 정해요', d: [
+        q('기본값으로 설정') + ' 을 눌러요.',
+        '이름 아래에 ' + q('프린터 상태: 기본값') + ' 이 보이면 성공!'],
+      img: ['s3_xprinter.png'],
+      ok: '「기본값」이 보이나요?',
+      help: q('기본값으로 설정') + ' 버튼이 안 보이면 → 이미 기본이라서 그래요. 다음으로!' },
+    { t: '라벨 크기를 맞춰요', d: [
+        '같은 화면에서 ' + q('인쇄 기본 설정') + ' 을 눌러요.',
+        '맨 위 ' + q('이름') + ' 칸에 ' + q('BIMTC 100x70') + ' 이 있으면 → 고르고 ' + q('확인') + '. 끝!',
+        '없으면 → ' + q('새 용지') + ' → 이름 <b>BIMTC 100x70</b>, 너비 <b>100</b>, 높이 <b>70</b> 쓰고 ' + q('확인') + ' → 그걸 고르고 ' + q('확인') + '.'],
+      img: ['s4_prefs.png', 's5_stock.png'],
+      ok: '「BIMTC 100x70」을 골랐나요?',
+      help: '숫자는 <b>너비 100, 높이 70</b> 두 개만 바꾸면 돼요. 나머지는 그대로 둬요.' },
+    { t: '바탕화면에 출입증 아이콘을 만들어요', d: [
+        '아래 큰 버튼을 눌러요.<br><button class="bigbtn" id="scCopy" type="button">복사하기</button><code id="scCmd" class="wz-cmd">' + esc(SHORTCUT_CMD) + '</code>',
+        '바탕화면 빈 곳에 마우스 <b>오른쪽</b> 버튼 → ' + q('새로 만들기') + ' → ' + q('바로 가기') + '.',
+        '칸을 한 번 누르고 ' + q('Ctrl') + ' 을 누른 채 ' + q('V') + ' → ' + q('다음') + '.',
+        '이름에 <b>BIMTC 출입증 발급</b> 쓰고 → ' + q('마침') + '.'],
+      img: ['s6_shortcut.png'],
+      ok: '바탕화면에 아이콘이 생겼나요?',
+      help: '「찾을 수 없습니다」가 나오면 → 이 컴퓨터에 크롬이 없거나 다른 곳에 있어요. 팀장님께.<br>「복사하기」가 안 되면 → 회색 글자를 마우스로 전부 긁어서 ' + q('Ctrl') + '+' + q('C') + '.' },
+    { t: '아이콘을 눌러 들어가요', d: [
+        '바탕화면 ' + q('BIMTC 출입증 발급') + ' 을 두 번 눌러요.<br><small>인터넷 창(크롬) 말고 <b>꼭 이 아이콘</b>으로 들어가요.</small>',
+        '이메일, 비밀번호를 쓰고 ' + q('로그인') + '.'],
+      img: ['s7_login.png'],
+      ok: '로그인이 됐나요?',
+      help: '비밀번호를 모르면 → 팀장님께 물어봐요.' },
+    { t: '시험으로 한 장 뽑아요', d: [
+        '오른쪽 위 ' + q('자리') + ' 에서 내 자리를 골라요. <small>(데스크1, 데스크2 …)</small>',
+        q('시험 출력') + ' 을 눌러요.',
+        '라벨이 한 장 나오면 <b>끝!</b> 이제 일할 준비가 됐어요.'],
+      img: ['s8_top.png'],
+      ok: '라벨이 나왔나요?',
+      help: '<b>인쇄 창이 뜬다</b> → 아이콘으로 안 들어온 거예요. 창을 닫고 바탕화면 아이콘으로 다시(8번).<br>' +
+        '<b>큰 복사기에서 종이가 나온다</b> → 4번, 5번을 다시 해요.<br>' +
+        '<b>라벨이 두 장에 걸쳐 나온다</b> → 프린터 ' + q('FEED') + ' 버튼을 3초 꾹 눌렀다 떼요.<br>' +
+        '<b>아무것도 안 나온다</b> → USB·전원을 확인하고, 프린터를 껐다 켜요.' }
+  ];
+  var wzAt = -1;   // -1 = 첫 질문
+  function wizardHtml() {
+    if (wzAt < 0) return '<div class="wz"><div class="wz-h">처음 시작하기</div>' +
+      '<h2>이 컴퓨터 바탕화면에<br>「BIMTC 출입증 발급」 아이콘이 있나요?</h2>' +
+      '<div class="wz-pick"><button class="bigbtn" data-go="7">네, 있어요</button><button class="bigbtn ghost" data-go="0">아니요 / 처음 쓰는 컴퓨터예요</button></div>' +
+      '<p class="wz-s">사무실 출입증 컴퓨터는 아이콘이 이미 있어요.</p></div>';
+    var s = WZ[wzAt], n = WZ.length;
+    return '<div class="wz"><div class="wz-h">처음 시작하기 · <b>' + (wzAt + 1) + '</b> / ' + n + '</div>' +
+      '<div class="wz-bar"><i style="width:' + Math.round((wzAt + 1) / n * 100) + '%"></i></div>' +
+      '<h2><span class="wz-n">' + (wzAt + 1) + '</span>' + s.t + '</h2>' +
+      '<ol class="wz-do">' + s.d.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' +
+      (s.img ? '<div class="wz-img">' + s.img.map(function (f) { return shot(f, s.t); }).join('') + '</div>' : '') +
+      '<div class="wz-ok">' + s.ok + '</div>' +
+      '<div class="wz-nav"><button class="bigbtn ghost" data-go="' + (wzAt - 1) + '">◀ 이전</button>' +
+      '<button class="bigbtn warn" data-help="1">안 돼요</button>' +
+      (wzAt < n - 1 ? '<button class="bigbtn" data-go="' + (wzAt + 1) + '">네, 다음 ▶</button>' : '<button class="bigbtn" data-go="done">끝! ✓</button>') + '</div>' +
+      '<div class="wz-help" hidden>' + s.help + '</div></div>';
   }
-  function bindSetup() {
-    var b = document.getElementById('scCopy'); if (!b) return;
-    b.onclick = function () {
-      var done = function () { b.textContent = '복사됨 ✓'; setTimeout(function () { b.textContent = '복사'; }, 1500); };
-      if (navigator.clipboard) navigator.clipboard.writeText(SHORTCUT_CMD).then(done, function () { selCmd(); });
-      else selCmd();
-      function selCmd() { var r = document.createRange(); r.selectNodeContents(document.getElementById('scCmd')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); done(); } catch (e) {} }
+  function bindWizard(box, onDone) {
+    box.innerHTML = wizardHtml();
+    box.querySelectorAll('[data-go]').forEach(function (b) {
+      b.onclick = function () {
+        var g = b.getAttribute('data-go');
+        if (g === 'done') { wzAt = -1; return onDone ? onDone() : bindWizard(box, onDone); }
+        wzAt = Math.max(-1, Math.min(WZ.length - 1, parseInt(g, 10))); bindWizard(box, onDone);
+        box.scrollIntoView({ block: 'start' });
+      };
+    });
+    var h = box.querySelector('[data-help]'); if (h) h.onclick = function () { var x = box.querySelector('.wz-help'); x.hidden = !x.hidden; };
+    var c = box.querySelector('#scCopy'); if (c) c.onclick = function () {
+      var done = function () { c.textContent = '복사됐어요 ✓'; setTimeout(function () { c.textContent = '복사하기'; }, 2000); };
+      function sel() { var r = document.createRange(); r.selectNodeContents(document.getElementById('scCmd')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); done(); } catch (e) {} }
+      if (navigator.clipboard) navigator.clipboard.writeText(SHORTCUT_CMD).then(done, sel); else sel();
     };
+  }
+  // 매일 하는 일 — 사진 카드 (사용 안내 탭 맨 위)
+  function dailyHtml() {
+    var card = function (t, steps, img) { return '<div class="dc"><h3>' + t + '</h3><ol class="wz-do">' + steps.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' + (img || '') + '</div>'; };
+    return '<section id="gD"><h3 style="font-size:22px">매일 이렇게 해요</h3>' +
+      card('① 아침에 켜기', [
+        '바탕화면 ' + q('BIMTC 출입증 발급') + ' 을 두 번 눌러요.',
+        '로그인해요.',
+        '오른쪽 위 ' + q('자리') + ' 를 고르고 ' + q('시험 출력') + ' 한 장.'], shot('s8_top.png', '자리와 시험 출력')) +
+      card('② 손님이 휴대폰 QR을 보여줘요', [
+        '맨 위 큰 칸을 한 번 눌러요.',
+        '리더기로 휴대폰 QR을 찍어요.',
+        '오른쪽 색깔을 봐요 ↓'],
+        '<div class="qr3"><div>' + shot('d_green.png', '초록') + '<p><b style="color:#11A37B">초록</b> → 팔찌를 채워 줘요.</p></div>' +
+        '<div>' + shot('d_orange.png', '주황') + '<p><b style="color:#D9822B">주황</b> → 오늘 이미 받은 사람이에요. 팔찌를 찼는지 봐요.</p></div>' +
+        '<div>' + shot('d_red.png', '빨강') + '<p><b style="color:#B4233C">빨강</b> → 이름이나 전화번호 뒤 4자리로 찾아봐요. 없으면 현장등록 QR 안내판으로.</p></div></div>') +
+      card('③ 비표(목걸이)를 달라고 해요', [
+        '맨 위 큰 칸에 <b>이름</b>이나 <b>회사 이름</b>을 써요.',
+        '아래 목록에서 그 사람을 눌러요.',
+        '오른쪽 초록 ' + q('출력하고 지급') + ' 을 눌러요.',
+        '나온 라벨을 <b>같은 색 배경지</b> 흰 칸에 붙여서 줘요.'], shot('d_badge.png', '비표 출력')) +
+      card('④ 명단에 없는 사람 (기자, 스탭 등)', [
+        '위쪽 ' + q('즉석 출력') + ' 을 눌러요.',
+        '종류를 눌러요. <small>(기자 = 프레스, 진행요원 = 스탭)</small>',
+        '이름·직함·소속을 써요. <small>스탭은 장수만.</small>',
+        '초록 ' + q('출력') + ' 을 눌러요.'], shot('d_quick.png', '즉석 출력')) +
+      card('⑤ 엑셀 명단을 받았어요', [
+        '위쪽 ' + q('명단 올리기') + ' 를 눌러요.',
+        '종류를 눌러요. (바이어, VIP …)',
+        q('파일 선택') + ' 으로 엑셀 파일을 골라요.',
+        '아래 표가 맞으면 ' + q('추가하고 바로 출력') + '.'], shot('d_import.png', '명단 올리기')) +
+      '<div class="tip" style="font-size:16px">모르는 게 생기면 → 이 페이지 아래 「자세한 설명」을 보거나 팀장님께 물어봐요.</div></section>';
   }
   function renderGuide() {
     var sw = '<span style="display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;background:';
-    setTimeout(bindSetup, 0);
+    setTimeout(function () { bindWizard(document.getElementById('wzBox')); }, 0);
     view.innerHTML = '<div class="guide">' +
-      '<nav>' + [['gS', '★ 처음 시작하기'], ['g0', '처음 켤 때'], ['g1', '참관객 QR 확인'], ['g2', '비표 찾아서 출력'], ['g3', '즉석 출력'], ['g4', '엑셀 명단 올리기'], ['g5', '미리 출력'], ['g6', '참가기업 4장'], ['g7', '다시 출력·잘못 뽑음'], ['g8', '프린터 문제'], ['g9', '인터넷 끊김'], ['g10', '하루 끝']].map(function (x) { return '<a href="#' + x[0] + '">' + x[1] + '</a>'; }).join('') + '</nav>' +
+      '<nav>' + [['gS', '★ 처음 시작하기'], ['gD', '★ 매일 이렇게 해요'], ['g0', '처음 켤 때'], ['g1', '참관객 QR 확인'], ['g2', '비표 찾아서 출력'], ['g3', '즉석 출력'], ['g4', '엑셀 명단 올리기'], ['g5', '미리 출력'], ['g6', '참가기업 4장'], ['g7', '다시 출력·잘못 뽑음'], ['g8', '프린터 문제'], ['g9', '인터넷 끊김'], ['g10', '하루 끝']].map(function (x) { return '<a href="#' + x[0] + '">' + x[1] + '</a>'; }).join('') + '</nav>' +
 
-      setupHtml() +
+      '<section id="gS"><div id="wzBox"></div></section>' + dailyHtml() +
+      '<h3 id="gX" style="margin:26px 0 10px;font-size:20px;color:#16294F">자세한 설명</h3>' +
       '<section id="g0"><h3>0. 처음 켤 때 (매일 아침)</h3><ol>' +
       '<li>바탕화면의 <b>「BIMTC 출입증 발급」</b> 아이콘으로 엽니다. <b>이 아이콘으로 열어야 인쇄 창 없이 라벨이 바로 나옵니다.</b> (일반 크롬으로 열면 매번 인쇄 창이 뜹니다 → 8번 참고)<br>다른 컴퓨터라 아이콘·프린터가 없으면 → <a href="#gS">맨 위 「★ 처음 시작하기」</a></li>' +
       '<li>사무국 관리자 계정으로 로그인합니다.</li>' +
@@ -1153,7 +1257,7 @@
     view.innerHTML = '<div class="gate"><h1>현장 데스크</h1><p style="color:#8295ab;margin:4px 0 6px">사무국 관리자 계정으로 로그인하세요.</p>' +
       '<label>이메일</label><input id="liE" type="email" autocomplete="username"><label>비밀번호</label><input id="liP" type="password" autocomplete="current-password">' +
       (msg ? '<div class="err">' + esc(msg) + '</div>' : '') + '<button class="btn dark" id="liB">로그인</button>' +
-      '<p style="margin:14px 0 0;text-align:center"><a href="#setup" id="liSetup" style="color:#16294F;font-weight:700">처음 쓰는 PC인가요? 프린터 설치부터 따라하기 →</a></p></div>';
+      '<p style="margin:14px 0 0;text-align:center"><a href="#setup" id="liSetup" style="color:#16294F;font-weight:700">처음 쓰는 컴퓨터예요 → 프린터 연결부터 따라하기</a></p></div>';
     document.getElementById('liSetup').onclick = function (e) { e.preventDefault(); renderSetupOnly(); };
     function go() {
       var b = document.getElementById('liB'); b.disabled = true; b.textContent = '로그인 중…';
@@ -1168,9 +1272,10 @@
   // 로그인 전에 보는 「처음 시작하기」 (주소 /badge#setup 으로도 바로 열림)
   function renderSetupOnly() {
     document.getElementById('topRight').hidden = true; document.getElementById('tabs').hidden = true;
-    view.innerHTML = '<div class="guide setup-only"><p><a href="#" id="soBack" style="color:#16294F;font-weight:700">← 로그인 화면으로</a></p>' + setupHtml() + '</div>';
-    document.getElementById('soBack').onclick = function (e) { e.preventDefault(); history.replaceState(null, '', location.pathname); boot(); };
-    bindSetup(); window.scrollTo(0, 0);
+    view.innerHTML = '<div class="guide setup-only"><p><a href="#" id="soBack" style="color:#16294F;font-weight:700;font-size:17px">← 로그인 화면으로</a></p><section id="gS"><div id="wzBox"></div></section></div>';
+    var back = function () { history.replaceState(null, '', location.pathname); boot(); };
+    document.getElementById('soBack').onclick = function (e) { e.preventDefault(); back(); };
+    wzAt = -1; bindWizard(document.getElementById('wzBox'), back); window.scrollTo(0, 0);
   }
   function boot() {
     if (location.hash === '#setup' && !ME) return renderSetupOnly();
