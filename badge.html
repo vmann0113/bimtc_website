@@ -974,7 +974,7 @@
       '<nav>' + [['g0', '처음 켤 때'], ['g1', '참관객 QR 확인'], ['g2', '비표 찾아서 출력'], ['g3', '즉석 출력'], ['g4', '엑셀 명단 올리기'], ['g5', '미리 출력'], ['g6', '참가기업 4장'], ['g7', '다시 출력·잘못 뽑음'], ['g8', '프린터 문제'], ['g9', '인터넷 끊김'], ['g10', '하루 끝']].map(function (x) { return '<a href="#' + x[0] + '">' + x[1] + '</a>'; }).join('') + '</nav>' +
 
       '<section id="g0"><h3>0. 처음 켤 때</h3><ol>' +
-      '<li>바탕화면의 <b>「BIMTC 출입증 발급」</b> 아이콘으로 엽니다. <b>이 아이콘으로 열어야 인쇄 창 없이 라벨이 바로 나옵니다.</b> (일반 크롬으로 열면 매번 인쇄 창이 뜹니다 → 8번 참고)</li>' +
+      '<li>바탕화면의 <b>「BIMTC 출입증 발급」</b> 아이콘으로 엽니다. <b>이 아이콘으로 열어야 인쇄 창 없이 라벨이 바로 나옵니다.</b> (일반 크롬으로 열면 매번 인쇄 창이 뜹니다 → 8번 참고)<br>다른 컴퓨터라 아이콘·프린터가 없으면 → <a href="#g8">8번 맨 위 「드라이버 설치」</a></li>' +
       '<li>사무국 관리자 계정으로 로그인합니다.</li>' +
       '<li>오른쪽 위 <b>자리</b>를 내 자리(데스크1, 데스크2 …)로 고릅니다. 누가 어디서 처리했는지 기록됩니다.</li>' +
       '<li>오른쪽 위 <b>[시험 출력]</b>을 한 번 눌러 라벨이 바르게 나오는지 봅니다.</li>' +
@@ -1029,7 +1029,16 @@
       '<li><b>아예 잘못 만든 비표</b>(중복 등): <b>[무효 처리]</b>. 지워지진 않고 출력만 막힙니다.</li>' +
       '<li><b>지급 처리를 잘못 누름</b>: [지급 취소].</li></ul></section>' +
 
-      '<section id="g8"><h3>8. 프린터 문제</h3><table><tr><th>증상</th><th>해결</th></tr>' +
+      '<section id="g8"><h3>8. 프린터 문제</h3>' +
+      '<div class="tip" style="margin-bottom:10px"><b>다른 컴퓨터에 프린터를 처음 연결할 때 (드라이버 설치)</b><ol style="margin:6px 0 0">' +
+      '<li>드라이버 받기 → <a href="https://www.xprintertech.com/download/xp-dt427b" target="_blank" rel="noopener"><b>Xprinter XP-DT427B 공식 드라이버 페이지</b></a> 에서 <b>Driver-Windows</b> 를 눌러 zip 을 받습니다.</li>' +
+      '<li>zip 압축을 풀고 안의 설치 파일을 실행 → 모델 <b>XP-DT427B</b>, 포트 <b>USB</b> 를 골라 설치합니다. (프린터를 USB로 꽂고 전원을 켠 상태에서)</li>' +
+      '<li>윈도우 <b>설정 → 블루투스 및 장치 → 프린터 및 스캐너</b> → <b>Xprinter XP-DT427B</b> → <b>기본값으로 설정</b>. (「Windows에서 기본 프린터 관리」는 끔)</li>' +
+      '<li>같은 화면 <b>인쇄 기본 설정</b> → 용지(Stock) <b>새로 만들기</b>: 이름 <b>BIMTC 100x70</b>, 너비 <b>100mm</b>, 높이 <b>70mm</b> → 선택하고 확인.</li>' +
+      '<li>바탕화면 아이콘 만들기: 바탕화면 오른쪽 클릭 → 새로 만들기 → 바로 가기 → 아래 줄을 그대로 붙여넣기 → 이름 「BIMTC 출입증 발급」.' +
+      '<div style="font-family:Consolas,monospace;font-size:12px;background:#fff;border:1px solid #d6dfea;border-radius:6px;padding:6px 8px;margin-top:4px;word-break:break-all;user-select:all">"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%LOCALAPPDATA%\\BIMTC-Badge-Chrome" --kiosk-printing --no-first-run --no-default-browser-check --app=https://bimtc.busan.com/badge</div></li>' +
+      '<li>그 아이콘으로 열고 로그인 → <b>[시험 출력]</b> 으로 확인.</li></ol></div>' +
+      '<table><tr><th>증상</th><th>해결</th></tr>' +
       '<tr><td>인쇄 창이 뜬다</td><td>바탕화면 아이콘이 아니라 일반 크롬으로 연 것. 그대로 쓰려면: 대상 <b>Xprinter XP-DT427B</b>, 설정 더보기 → 용지 <b>BIMTC 100x70</b>, 여백 <b>없음</b>, 배율 <b>기본값</b>, 머리글·바닥글 끔 → 인쇄.</td></tr>' +
       '<tr><td>한 장이 두 라벨에 걸쳐 찍힘 / 빈 라벨이 끼어 나옴</td><td>프린터 <b>FEED 버튼을 길게</b> 눌러 LED가 바뀌면 떼기 → 라벨이 몇 장 나가고 멈추면 맞춤 완료. 롤을 바꿀 때마다 한 번씩.</td></tr>' +
       '<tr><td>흰 라벨만 나옴</td><td>롤을 뒤집어 끼운 것. 긁으면 검게 되는 면이 위로.</td></tr>' +
