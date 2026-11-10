@@ -1046,7 +1046,7 @@ class Component extends DCLogic {
       z5:L('독립부스 전용 구역 · 위치·수량은 사무국 전화 협의로 배정','Space-only booth area — assigned by phone'),
     };
     const planZones=Lay.zones.map(z=>({ name:z.name, color:z.color, desc:ZDESC[z.key]||'', pre:(ZPRE[z.key]?ZPRE[z.key]+'-##':''), preFg:isLight(z.color)?'#3d6479':'#fff' }));
-    planZones.push({ name:L('비즈니스존','Business Zone'), color:TYPEC.biz, pre:'',
+    planZones.push({ name:L('비즈니스 라운지','Business Lounge'), color:TYPEC.biz, pre:'',
       desc:L('바이어 미팅은 자체 부스 내 진행이 원칙이나, 일정 중복·공간 부족 등 특별한 사정 시 이용할 수 있는 공용 미팅라운지 공간','Shared meeting lounge available when booth meetings overlap or space runs short') });
     const planBoxStyle="position:relative;width:100%;aspect-ratio:"+Lay.cols+" / "+Lay.rows+";background:#fff;border:2px solid #b7c4d4;border-radius:8px;";
 

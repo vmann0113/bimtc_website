@@ -1441,8 +1441,10 @@
 class Component extends DCLogic {
   // 현장 상호간판 표기 (1107-3 상호간판.pdf + 2026-11-09 사무국 수정본).
   // 신청서에 적힌 상호는 세금계산서·입금 확인에 쓰이므로 그대로 두고, 화면에 뜨는 이름만 간판과 맞춘다.
-  // 부스번호(정렬했을 때 첫 번호)로 찾는다. 독립부스 S-01~16 은 상호간판을 쓰지 않아 목록에 없다.
+  // 부스번호(정렬했을 때 첫 번호)로 찾는다. 독립부스 S-01~16 은 상호간판을 쓰지 않아
+  // 원래 목록에 없었으나, 사무국이 표기를 고친 S-07 은 예외로 넣었다.
   SIGNNAME = {
+      'S-07':['부산광역시 서구','Seo-gu, Busan'],   // 부산서구 (2026-11-10 사무국 지시) · S-07~12
       'M-01':['자연안에 한의원','Nature Korean Medicine Clinic'],   // 자연안에한의원
       'M-02':['(주)클라우드호스피탈','CloudHospital'],
       'M-04':['주식회사 담하','DAMHA'],
@@ -1486,7 +1488,7 @@ class Component extends DCLogic {
       'W-21':['(주)에스피메드','SPMED Co., Ltd.'],
       'W-22':['예이린 사회적협동조합','YEIRIN Social Cooperative'],
       'W-23':['홍법사(싱잉볼치유의소리)','Hongbeopsa Temple(singingbowl)'],
-      'W-24':['부산 동구청','BUSAN DONGGU METROPOLITAN CITY'],
+      'W-24':['부산광역시 동구','Dong-gu, Busan'],   // 부산 동구청 (2026-11-10 사무국 지시 — 간판 영문 BUSAN DONGGU METROPOLITAN CITY 대신)
       'W-25':['월드스파','Worldspa'],   // 주식회사 월드스파
       'W-26':['주식회사 유유위','UUW'],
       'W-27':['대구광역시 중구','JUNG-GU, Daegu Metropolitan City'],
@@ -1987,7 +1989,7 @@ class Component extends DCLogic {
         arrowDeg:open?180:0, onClick:()=>openZone(z.key),
         cardStyle:"background:#fff;border:1px solid "+(open?'#0B5FA5':'#e6ebf2')+";border-radius:14px;padding:15px 17px;cursor:pointer;transition:border-color .15s;" };
     });
-    floorZones.push({ name:L('비즈니스존','Business Zone'), color:TYPEC.biz,
+    floorZones.push({ name:L('비즈니스 라운지','Business Lounge'), color:TYPEC.biz,
       desc:L('바이어 미팅은 자체 부스 내 진행이 원칙이나, 일정 중복·공간 부족 등 특별한 사정 시 이용할 수 있는 공용 미팅라운지 공간','Shared meeting lounge for overlapping schedules'),
       countLabel:'', open:false, hasCompanies:false, noCompanies:false, companies:[], arrowDeg:0, onClick:()=>{},
       cardStyle:"background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:15px 17px;" });
