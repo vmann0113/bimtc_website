@@ -756,6 +756,9 @@
                   <button onClick="{{ m.accept }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">확정</button>
                   <button onClick="{{ m.decline }}" style="background:#fff;color:#8295ab;border:1px solid #e1e8f0;padding:9px 16px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">거절</button>
                 </sc-if>
+                <sc-if value="{{ m.notPending }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ m.reopen }}" style="background:#fff;color:#A4631F;border:1px solid #F0D9AE;padding:9px 16px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">대기로 되돌리기</button>
+                </sc-if>
               </div>
               <sc-if value="{{ m.msg }}" hint-placeholder-val="{{ '' }}">
                 <div style="flex-basis:100%;font-size:13.5px;color:#33485e;background:#F7F9FC;border-radius:9px;padding:10px 13px;line-height:1.6;word-break:break-word;overflow-wrap:anywhere;">{{ m.msg }}</div>
@@ -1133,6 +1136,12 @@ class Component extends DCLogic {
     if(!res || res.ok===false){ this.flash('처리 실패: '+((res&&res.error)||'')); return; }
     await this.reload();
     this.flash(accept ? 'MOU 체결을 확정했습니다' : 'MOU 신청을 거절했습니다');
+  }
+  async mouAdminReopen(id){
+    const res = await window.BimtcDB.adminMouReopen(id);
+    if(!res || res.ok===false){ this.flash('되돌리기 실패: '+((res&&res.error)||'')); return; }
+    await this.reload();
+    this.flash('대기 상태로 되돌렸습니다');
   }
   async mouAdminSlot(id, v){
     const slot = (v==='' || v==null) ? null : Number(v);
@@ -1689,6 +1698,7 @@ class Component extends DCLogic {
       statusStyle: r.status==='accepted' ? 'color:#0d8f6b;background:#E7F6F0;'
                  : (r.status==='declined' ? 'color:#8295ab;background:#F4F6F9;' : 'color:#A96A00;background:#FFF4E0;'),
       accept:()=>this.mouAdminRespond(r.id,true), decline:()=>this.mouAdminRespond(r.id,false),
+      reopen:()=>this.mouAdminReopen(r.id),
       setSlot:(e)=>this.mouAdminSlot(r.id, e.target.value)
     }));
     const mouAcceptedN=mouAll.filter(r=>r.status==='accepted').length;

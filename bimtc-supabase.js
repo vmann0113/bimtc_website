@@ -583,6 +583,12 @@
       var r = await sb.from('mou_requests').select('*').order('created_at', { ascending: false });
       return r.data || [];
     },
+    async adminMouReopen(id) {
+      var sb = await ready();
+      var r = await sb.rpc('admin_mou_reopen', { p_id: id });
+      if (r.error) return { ok: false, error: r.error.message };
+      return r.data || { ok: false, error: 'unknown' };
+    },
     async adminMouSetSlot(id, slot) {
       var sb = await ready();
       var r = await sb.rpc('admin_mou_set_slot', { p_id: id, p_slot: (slot == null ? null : slot) });
