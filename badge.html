@@ -134,6 +134,18 @@
   .guide .k{display:inline-block;background:#16294F;color:#fff;border-radius:6px;padding:0 7px;font-size:13px;font-weight:700}
   .guide .tip{background:#fff8e6;border-left:4px solid #f0b35a;padding:8px 12px;border-radius:6px;margin:8px 0}
   .guide table td,.guide table th{font-size:13.5px;border:1px solid #eef1f5}
+  .guide #gS{border:2px solid #16294F}
+  .guide .st{display:flex;gap:14px;padding:14px 0;border-top:1px solid #eef1f5}
+  .guide .st .n{flex:none;width:34px;height:34px;border-radius:50%;background:#16294F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
+  .guide .st > div{flex:1;min-width:0}
+  .guide h4{margin:4px 0 4px;font-size:16px;color:#16294F}
+  .guide img.shot{display:block;max-width:100%;height:auto;border:1px solid #d6dfea;border-radius:8px;margin:8px 0}
+  .guide .two{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+  .guide .two img.shot{max-width:calc(50% - 5px)}
+  .guide .cmd{display:flex;gap:8px;align-items:flex-start;margin-top:6px}
+  .guide .cmd code{flex:1;min-width:0;display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-family:Consolas,monospace;font-size:12px;background:#f4f7fb;border:1px solid #d6dfea;border-radius:6px;padding:6px 8px;word-break:break-all;user-select:all}
+  .setup-only{max-width:980px;margin:0 auto}
+  @media (max-width:700px){ .guide .two img.shot{max-width:100%} }
 
   /* ===== 라벨 100×70mm (미리보기와 인쇄가 같은 규칙) ===== */
   .lbl{width:100mm;height:70mm;background:#fff;color:#000;position:relative;overflow:hidden;font-family:'Pretendard','Malgun Gothic',sans-serif;flex:none}
@@ -974,13 +986,82 @@
   }
 
   // ================= ⑥ 사용 안내 =================
+  // 처음 시작하기(따라하기) — 로그인 전에도 볼 수 있다: 로그인 화면 링크 또는 /badge#setup
+  var SHORTCUT_CMD = '"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%LOCALAPPDATA%\\BIMTC-Badge-Chrome" --kiosk-printing --no-first-run --no-default-browser-check --app=https://bimtc.busan.com/badge';
+  function shot(f, alt) { return '<img class="shot" src="/uploads/badge-guide/' + f + '" alt="' + alt + '" loading="lazy">'; }
+  function setupHtml() {
+    return '<section id="gS"><h3>★ 처음 시작하기 — 순서대로 따라 하세요</h3>' +
+      '<div class="tip"><b>사무실 출입증 PC</b>(바탕화면에 「BIMTC 출입증 발급」 아이콘이 있는 PC)는 이미 다 해 두었습니다 → <b>6단계</b>부터.<br>' +
+      '<b>다른 노트북·현장 PC</b>는 1단계부터. 전부 20분 정도 걸립니다.</div>' +
+
+      '<div class="st"><b class="n">1</b><div><h4>프린터 연결</h4><ol>' +
+      '<li>라벨 롤을 끼웁니다. <b>손톱으로 긁으면 검게 되는 면이 위</b>.</li>' +
+      '<li>덮개를 ‘딸깍’ 닫고 → 전원 켜기 → USB를 PC에 꽂기.</li>' +
+      '<li><b>FEED 버튼을 길게</b> 누르다가 불빛이 바뀌면 손을 뗍니다. 라벨이 몇 장 나가고 멈추면 간격 맞춤 끝.</li></ol></div></div>' +
+
+      '<div class="st"><b class="n">2</b><div><h4>드라이버 받기</h4><ol>' +
+      '<li><a class="btn dark" style="display:inline-block;padding:6px 12px;color:#fff;text-decoration:none" href="https://www.xprintertech.com/download/xp-dt427b" target="_blank" rel="noopener">Xprinter XP-DT427B 공식 드라이버 페이지 열기 ↗</a></li>' +
+      '<li>아래 빨간 칸 <b>Driver-Windows</b> 줄의 <b>Download</b>를 누릅니다(약 85MB). 아래쪽 쿠키 안내 창은 아무 버튼이나 눌러 닫아도 됩니다.</li></ol>' +
+      shot('s1_driver.png', '드라이버 다운로드 페이지') + '</div></div>' +
+
+      '<div class="st"><b class="n">3</b><div><h4>드라이버 설치</h4><ol>' +
+      '<li>받은 zip 파일을 오른쪽 클릭 → <b>압축 풀기</b>.</li>' +
+      '<li>풀린 폴더 안의 설치 파일(Setup, 또는 .exe)을 실행 → 모델 <b>XP-DT427B</b>, 포트 <b>USB</b>를 고르고 끝까지 <b>다음/설치</b>.</li>' +
+      '<li>설치 화면이 영어로 나와도 괜찮습니다. 모르면 기본값 그대로 진행하세요.</li></ol></div></div>' +
+
+      '<div class="st"><b class="n">4</b><div><h4>윈도우 프린터 설정</h4><ol>' +
+      '<li>시작 → <b>설정</b> → <b>Bluetooth 및 장치</b> → <b>프린터 및 스캐너</b>.</li>' +
+      '<li>아래로 내려 <b>「Windows에서 내 기본 프린터를 관리할 수 있도록 허용」을 끔</b>. <span style="color:#B4233C">켜 두면 복합기로 한 번 인쇄한 뒤 라벨이 복합기로 나갑니다.</span></li>' +
+      '<li>목록에서 <b>Xprinter XP-DT427B</b>를 누릅니다.</li></ol>' +
+      shot('s2_printers.png', '프린터 및 스캐너 설정') + '</div></div>' +
+
+      '<div class="st"><b class="n">5</b><div><h4>기본 프린터 + 라벨 용지</h4><ol>' +
+      '<li><b>기본값으로 설정</b>을 누릅니다 → 「프린터 상태: <b>기본값</b>」이 되면 OK.</li>' +
+      '<li><b>인쇄 기본 설정</b>을 누릅니다.</li></ol>' + shot('s3_xprinter.png', 'Xprinter 설정 화면') +
+      '<ol start="3"><li><b>페이지 설정</b> 탭 → <b>용지 이름</b>에 <b>BIMTC 100x70</b>이 있으면 고르고 <b>확인</b>.</li>' +
+      '<li>없으면 <b>새 용지(W)...</b> → 이름 <b>BIMTC 100x70</b>, 유형 <b>다이컷 라벨</b>, 너비 <b>100</b> mm, 높이 <b>70</b> mm → 확인 → 목록에서 고르고 <b>확인</b>.</li></ol>' +
+      '<div class="two">' + shot('s4_prefs.png', '인쇄 기본 설정 - 용지') + shot('s5_stock.png', '용지 편집 - 100x70') + '</div></div></div>' +
+
+      '<div class="st"><b class="n">6</b><div><h4>바탕화면 아이콘 만들기 <small style="color:#6b7f95">(아이콘이 이미 있으면 건너뛰기)</small></h4><ol>' +
+      '<li>바탕화면 빈 곳 오른쪽 클릭 → <b>새로 만들기</b> → <b>바로 가기</b>.</li>' +
+      '<li>아래 <b>[복사]</b>를 누르고, 「항목 위치 입력」 칸에 <b>Ctrl+V</b>로 붙여넣기 → <b>다음</b>.' +
+      '<div class="cmd"><code id="scCmd">' + esc(SHORTCUT_CMD) + '</code><button class="btn" id="scCopy" type="button">복사</button></div></li>' +
+      '<li>이름에 <b>BIMTC 출입증 발급</b> → <b>마침</b>.</li></ol>' + shot('s6_shortcut.png', '바로 가기 만들기') +
+      '<div class="tip">크롬이 다른 곳에 깔린 PC면 「찾을 수 없음」이 뜹니다 → 팀장에게.</div></div></div>' +
+
+      '<div class="st"><b class="n">7</b><div><h4>아이콘으로 열고 로그인</h4><ol>' +
+      '<li>바탕화면 <b>「BIMTC 출입증 발급」</b>을 더블클릭. <b>꼭 이 아이콘으로</b> 엽니다(일반 크롬으로 열면 매번 인쇄 창이 뜸).</li>' +
+      '<li>사무국 관리자 이메일·비밀번호로 <b>로그인</b>.</li></ol>' + shot('s7_login.png', '로그인 화면') + '</div></div>' +
+
+      '<div class="st"><b class="n">8</b><div><h4>자리 고르고 시험 출력</h4><ol>' +
+      '<li>오른쪽 위 <b>자리</b>에서 내 자리(데스크1, 2 …)를 고릅니다.</li>' +
+      '<li><b>[시험 출력]</b> → 라벨 한 장(NGUYEN VAN AN)이 <b>인쇄 창 없이 바로</b> 나오면 준비 끝.</li>' +
+      '<li><b>연결됨</b>(초록)이 보이면 정상.</li></ol>' + shot('s8_top.png', '자리 선택과 시험 출력') +
+      '<div class="tip">인쇄 창이 뜬다 → 아이콘으로 안 연 것(7단계). 복합기에서 A4가 나온다 → 4·5단계(기본 프린터). 라벨이 두 장에 걸쳐 찍힌다 → 1단계 FEED 길게.</div></div></div>' +
+
+      '<div class="st"><b class="n">9</b><div><h4>QR 리더기 확인</h4><ol>' +
+      '<li>리더기를 USB로 꽂습니다(설치할 것 없음).</li>' +
+      '<li><b>입장 확인·비표</b> 탭 검색칸을 한 번 클릭 → 참관객 QR을 찍어 결과 카드가 뜨는지 봅니다.</li></ol></div></div>' +
+      '</section>';
+  }
+  function bindSetup() {
+    var b = document.getElementById('scCopy'); if (!b) return;
+    b.onclick = function () {
+      var done = function () { b.textContent = '복사됨 ✓'; setTimeout(function () { b.textContent = '복사'; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(SHORTCUT_CMD).then(done, function () { selCmd(); });
+      else selCmd();
+      function selCmd() { var r = document.createRange(); r.selectNodeContents(document.getElementById('scCmd')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); done(); } catch (e) {} }
+    };
+  }
   function renderGuide() {
     var sw = '<span style="display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;background:';
+    setTimeout(bindSetup, 0);
     view.innerHTML = '<div class="guide">' +
-      '<nav>' + [['g0', '처음 켤 때'], ['g1', '참관객 QR 확인'], ['g2', '비표 찾아서 출력'], ['g3', '즉석 출력'], ['g4', '엑셀 명단 올리기'], ['g5', '미리 출력'], ['g6', '참가기업 4장'], ['g7', '다시 출력·잘못 뽑음'], ['g8', '프린터 문제'], ['g9', '인터넷 끊김'], ['g10', '하루 끝']].map(function (x) { return '<a href="#' + x[0] + '">' + x[1] + '</a>'; }).join('') + '</nav>' +
+      '<nav>' + [['gS', '★ 처음 시작하기'], ['g0', '처음 켤 때'], ['g1', '참관객 QR 확인'], ['g2', '비표 찾아서 출력'], ['g3', '즉석 출력'], ['g4', '엑셀 명단 올리기'], ['g5', '미리 출력'], ['g6', '참가기업 4장'], ['g7', '다시 출력·잘못 뽑음'], ['g8', '프린터 문제'], ['g9', '인터넷 끊김'], ['g10', '하루 끝']].map(function (x) { return '<a href="#' + x[0] + '">' + x[1] + '</a>'; }).join('') + '</nav>' +
 
-      '<section id="g0"><h3>0. 처음 켤 때</h3><ol>' +
-      '<li>바탕화면의 <b>「BIMTC 출입증 발급」</b> 아이콘으로 엽니다. <b>이 아이콘으로 열어야 인쇄 창 없이 라벨이 바로 나옵니다.</b> (일반 크롬으로 열면 매번 인쇄 창이 뜹니다 → 8번 참고)<br>다른 컴퓨터라 아이콘·프린터가 없으면 → <a href="#g8">8번 맨 위 「드라이버 설치」</a></li>' +
+      setupHtml() +
+      '<section id="g0"><h3>0. 처음 켤 때 (매일 아침)</h3><ol>' +
+      '<li>바탕화면의 <b>「BIMTC 출입증 발급」</b> 아이콘으로 엽니다. <b>이 아이콘으로 열어야 인쇄 창 없이 라벨이 바로 나옵니다.</b> (일반 크롬으로 열면 매번 인쇄 창이 뜹니다 → 8번 참고)<br>다른 컴퓨터라 아이콘·프린터가 없으면 → <a href="#gS">맨 위 「★ 처음 시작하기」</a></li>' +
       '<li>사무국 관리자 계정으로 로그인합니다.</li>' +
       '<li>오른쪽 위 <b>자리</b>를 내 자리(데스크1, 데스크2 …)로 고릅니다. 누가 어디서 처리했는지 기록됩니다.</li>' +
       '<li>오른쪽 위 <b>[시험 출력]</b>을 한 번 눌러 라벨이 바르게 나오는지 봅니다.</li>' +
@@ -1036,15 +1117,9 @@
       '<li><b>지급 처리를 잘못 누름</b>: [지급 취소].</li></ul></section>' +
 
       '<section id="g8"><h3>8. 프린터 문제</h3>' +
-      '<div class="tip" style="margin-bottom:10px"><b>다른 컴퓨터에 프린터를 처음 연결할 때 (드라이버 설치)</b><ol style="margin:6px 0 0">' +
-      '<li>드라이버 받기 → <a href="https://www.xprintertech.com/download/xp-dt427b" target="_blank" rel="noopener"><b>Xprinter XP-DT427B 공식 드라이버 페이지</b></a> 에서 <b>Driver-Windows</b> 를 눌러 zip 을 받습니다.</li>' +
-      '<li>zip 압축을 풀고 안의 설치 파일을 실행 → 모델 <b>XP-DT427B</b>, 포트 <b>USB</b> 를 골라 설치합니다. (프린터를 USB로 꽂고 전원을 켠 상태에서)</li>' +
-      '<li>윈도우 <b>설정 → 블루투스 및 장치 → 프린터 및 스캐너</b> → <b>Xprinter XP-DT427B</b> → <b>기본값으로 설정</b>. (「Windows에서 기본 프린터 관리」는 끔)</li>' +
-      '<li>같은 화면 <b>인쇄 기본 설정</b> → 용지(Stock) <b>새로 만들기</b>: 이름 <b>BIMTC 100x70</b>, 너비 <b>100mm</b>, 높이 <b>70mm</b> → 선택하고 확인.</li>' +
-      '<li>바탕화면 아이콘 만들기: 바탕화면 오른쪽 클릭 → 새로 만들기 → 바로 가기 → 아래 줄을 그대로 붙여넣기 → 이름 「BIMTC 출입증 발급」.' +
-      '<div style="font-family:Consolas,monospace;font-size:12px;background:#fff;border:1px solid #d6dfea;border-radius:6px;padding:6px 8px;margin-top:4px;word-break:break-all;user-select:all">"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%LOCALAPPDATA%\\BIMTC-Badge-Chrome" --kiosk-printing --no-first-run --no-default-browser-check --app=https://bimtc.busan.com/badge</div></li>' +
-      '<li>그 아이콘으로 열고 로그인 → <b>[시험 출력]</b> 으로 확인.</li></ol></div>' +
+      '<div class="tip" style="margin-bottom:10px">다른 컴퓨터에 프린터를 처음 연결하거나(드라이버 설치), 라벨이 복합기로 나가면 → <a href="#gS"><b>맨 위 「★ 처음 시작하기」</b></a> 사진 따라하기.</div>' +
       '<table><tr><th>증상</th><th>해결</th></tr>' +
+      '<tr><td>라벨이 아니라 복합기에서 A4가 나온다</td><td>기본 프린터가 바뀐 것. 「★ 처음 시작하기」 4·5단계: 「Windows에서 기본 프린터 관리」 끔 → Xprinter <b>기본값으로 설정</b>.</td></tr>' +
       '<tr><td>인쇄 창이 뜬다</td><td>바탕화면 아이콘이 아니라 일반 크롬으로 연 것. 그대로 쓰려면: 대상 <b>Xprinter XP-DT427B</b>, 설정 더보기 → 용지 <b>BIMTC 100x70</b>, 여백 <b>없음</b>, 배율 <b>기본값</b>, 머리글·바닥글 끔 → 인쇄.</td></tr>' +
       '<tr><td>한 장이 두 라벨에 걸쳐 찍힘 / 빈 라벨이 끼어 나옴</td><td>프린터 <b>FEED 버튼을 길게</b> 눌러 LED가 바뀌면 떼기 → 라벨이 몇 장 나가고 멈추면 맞춤 완료. 롤을 바꿀 때마다 한 번씩.</td></tr>' +
       '<tr><td>흰 라벨만 나옴</td><td>롤을 뒤집어 끼운 것. 긁으면 검게 되는 면이 위로.</td></tr>' +
@@ -1077,7 +1152,9 @@
     document.getElementById('topRight').hidden = true; document.getElementById('tabs').hidden = true;
     view.innerHTML = '<div class="gate"><h1>현장 데스크</h1><p style="color:#8295ab;margin:4px 0 6px">사무국 관리자 계정으로 로그인하세요.</p>' +
       '<label>이메일</label><input id="liE" type="email" autocomplete="username"><label>비밀번호</label><input id="liP" type="password" autocomplete="current-password">' +
-      (msg ? '<div class="err">' + esc(msg) + '</div>' : '') + '<button class="btn dark" id="liB">로그인</button></div>';
+      (msg ? '<div class="err">' + esc(msg) + '</div>' : '') + '<button class="btn dark" id="liB">로그인</button>' +
+      '<p style="margin:14px 0 0;text-align:center"><a href="#setup" id="liSetup" style="color:#16294F;font-weight:700">처음 쓰는 PC인가요? 프린터 설치부터 따라하기 →</a></p></div>';
+    document.getElementById('liSetup').onclick = function (e) { e.preventDefault(); renderSetupOnly(); };
     function go() {
       var b = document.getElementById('liB'); b.disabled = true; b.textContent = '로그인 중…';
       DB.login(document.getElementById('liE').value.trim(), document.getElementById('liP').value).then(function (r) {
@@ -1088,7 +1165,15 @@
     document.getElementById('liB').onclick = go;
     document.getElementById('liP').onkeydown = function (e) { if (e.key === 'Enter') go(); };
   }
+  // 로그인 전에 보는 「처음 시작하기」 (주소 /badge#setup 으로도 바로 열림)
+  function renderSetupOnly() {
+    document.getElementById('topRight').hidden = true; document.getElementById('tabs').hidden = true;
+    view.innerHTML = '<div class="guide setup-only"><p><a href="#" id="soBack" style="color:#16294F;font-weight:700">← 로그인 화면으로</a></p>' + setupHtml() + '</div>';
+    document.getElementById('soBack').onclick = function (e) { e.preventDefault(); history.replaceState(null, '', location.pathname); boot(); };
+    bindSetup(); window.scrollTo(0, 0);
+  }
   function boot() {
+    if (location.hash === '#setup' && !ME) return renderSetupOnly();
     DB.ready().then(function (c) { sb = c; return DB.currentUser(); }).then(function (u) {
       if (!u) return renderLogin();
       if (!u.is_admin) return renderLogin('이 계정은 관리자 권한이 없습니다.');
