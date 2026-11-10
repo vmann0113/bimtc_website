@@ -556,6 +556,7 @@
               <span style="flex:1.2;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ r.field }}</span>
               <span style="width:90px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ r.day }}</span>
               <span style="width:120px;font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ r.at }}</span>
+              <button onClick="{{ r.del }}" title="이 등록을 삭제합니다 (두 번 확인)" style="background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
             </div>
           </sc-for>
         </div>
@@ -721,6 +722,7 @@
                 <span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 11px;border-radius:999px;">적합도 {{ m.score }}</span><sc-if value="{{ m.interpreter }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;color:#7a5cc4;background:#F3EEFB;border:1px solid #ddd0f0;padding:5px 11px;border-radius:999px;margin-left:6px;">통역 요청</span></sc-if>
                 <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}"><span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;color:#0d8f6b;">✓ 매칭됨</span></sc-if>
                 <sc-if value="{{ m.notDone }}" hint-placeholder-val="{{ true }}"><button onClick="{{ m.match }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">매칭 확정</button></sc-if>
+                <button onClick="{{ m.del }}" title="이 요청을 삭제합니다 (두 번 확인)" style="background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
               </div>
             </div>
           </sc-for>
@@ -769,6 +771,7 @@
                 <sc-if value="{{ m.notPending }}" hint-placeholder-val="{{ false }}">
                   <button onClick="{{ m.reopen }}" style="background:#fff;color:#A4631F;border:1px solid #F0D9AE;padding:9px 16px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">대기로 되돌리기</button>
                 </sc-if>
+                <button onClick="{{ m.del }}" title="이 MOU 신청을 삭제합니다 (두 번 확인)" style="background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
               </div>
               <sc-if value="{{ m.msg }}" hint-placeholder-val="{{ '' }}">
                 <div style="flex-basis:100%;font-size:13.5px;color:#33485e;background:#F7F9FC;border-radius:9px;padding:10px 13px;line-height:1.6;word-break:break-word;overflow-wrap:anywhere;">{{ m.msg }}</div>
@@ -809,6 +812,7 @@
                 </div>
                 <span style="{{ m.modeStyle }}">{{ m.modeLabel }}</span>
                 <span style="font-size:13px;font-weight:700;color:#33485e;background:#F7F9FC;border:1px solid #e6ebf2;padding:6px 12px;border-radius:8px;white-space:nowrap;">{{ m.place }}</span>
+                <button onClick="{{ m.del }}" title="이 확정 미팅을 삭제합니다 (두 번 확인)" style="background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
                 <sc-if value="{{ m.interp }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#7a5cc4;background:#F3EEFB;border:1px solid #ddd0f0;padding:5px 10px;border-radius:999px;white-space:nowrap;">통역 요청</span></sc-if>
                 <span onClick="{{ m.toggleMode }}" style="font-size:12px;color:#8295ab;cursor:pointer;text-decoration:underline;white-space:nowrap;">{{ m.toggleLabel }}</span>
               </div>
@@ -869,6 +873,7 @@
                 <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ q.org }}</span>
                 <span style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;">{{ q.email }}</span>
                 <span style="margin-left:auto;font-family:'Pretendard',sans-serif;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ q.date }}</span>
+                <button onClick="{{ q.del }}" title="이 문의를 삭제합니다 (두 번 확인)" style="background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
               </div>
               <div style="background:#F7F9FC;border-radius:12px;padding:16px 18px;font-size:14.5px;line-height:1.7;color:#33485e;white-space:pre-wrap;margin-bottom:14px;">{{ q.message }}</div>
               <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
@@ -906,6 +911,7 @@
                 <a href="{{ n.mailHref }}" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:9px 15px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Pretendard',sans-serif;">메일 열기</a>
                 <a href="{{ n.smsHref }}" style="background:#fff;color:#0d6b4f;border:1px solid #bcd9cc;text-decoration:none;padding:9px 15px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Pretendard',sans-serif;">문자 열기</a>
                 <button onClick="{{ n.markSent }}" style="background:#fff;color:#5E7289;border:1px solid #dde5ee;padding:9px 15px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">발송 완료 처리</button>
+                <button onClick="{{ n.del }}" title="이 알림을 삭제합니다 (두 번 확인)" style="background:#fff;color:#c0392b;border:1px solid #f0cfc9;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">삭제</button>
               </div>
             </div>
           </sc-for>
@@ -1375,6 +1381,18 @@ class Component extends DCLogic {
     if(!list.filter(has).length){ this.flash('신청된 비품이 없습니다'); return; }
     if(!window.BimtcInvoice.openRentalOrder(list)) this.flash('팝업이 차단되었습니다 — 브라우저에서 팝업을 허용해 주세요');
   }
+  // 삭제는 반드시 두 번 묻는다. 지운 내용은 보관함(admin_deleted_rows)에 남는다.
+  askDelete(what, detail){
+    if(!window.confirm(what+'\n'+(detail?(detail+'\n'):'')+'\n이 내용을 삭제할까요?')) return false;
+    return window.confirm('한 번 더 확인합니다.\n\n'+what+'\n\n관리자 화면에서 사라집니다.\n(지운 내용은 보관함에 남아 되살릴 수 있습니다)\n\n정말 삭제할까요?');
+  }
+  async deleteRow(table, id, what, detail){
+    if(!this.askDelete(what, detail)) return;
+    const r = await window.BimtcDB.adminDeleteRow(table, id);
+    if(!r || r.ok!==true){ this.flash('삭제 실패: '+((r&&r.error)||'알 수 없는 오류')); return; }
+    await this.reload();
+    this.flash('삭제했습니다 · 보관함에 남아 있습니다');
+  }
   ADDON_NAME = { elec_1p:'전기 단상 220V', elec_3p220:'전기 삼상 220V', elec_3p380:'전기 삼상 380V',
     elec_24h:'24시간 전기', tel:'전화선', water:'급·배수', air:'압축공기', lan:'LAN(인터넷)' };
   // 부스 신청 금액 나누기. DB에는 합계(subtotal·vat·total)만 있어서 단가표로 되살린다.
@@ -1519,8 +1537,8 @@ class Component extends DCLogic {
     };
     const psDelete=async(id)=>{
       const x=psAll.find(y=>y.id===id); if(!x) return;
-      if(!confirm(psName(x.program)+' · '+(x.name||'')+' ('+(x.phone||'')+') 신청을 지울까요?\n되돌릴 수 없습니다. 취소하신 분은 지우지 말고 상태를 [취소]로 바꿔 주세요.')) return;
-      const r=await window.BimtcDB.deleteProgramSignup(id);
+      if(!this.askDelete('부대행사 사전신청 · '+psName(x.program)+' · '+(x.name||''), (x.phone||'')+'  ※ 취소하신 분은 지우지 말고 상태를 [취소]로 바꾸세요')) return;
+      const r=await window.BimtcDB.adminDeleteRow('program_signups', id);
       if(!r.ok){ this.setState({toast:'삭제 실패: '+r.error}); return; }
       this.setState({ psRows:psAll.filter(y=>y.id!==id) });
       this.flash('삭제했습니다');
@@ -1607,8 +1625,8 @@ class Component extends DCLogic {
     };
     const obDelete=async(id)=>{
       const x=obAll.find(y=>y.id===id); if(!x) return;
-      if(!confirm((x.company||'')+' ('+(x.email||'')+') 신청을 삭제할까요? 되돌릴 수 없습니다.')) return;
-      const r=await window.BimtcDB.deleteOnlineBuyerLead(id);
+      if(!this.askDelete('온라인 바이어 신청 · '+(x.company||''), x.email||'')) return;
+      const r=await window.BimtcDB.adminDeleteRow('online_buyer_leads', id);
       if(!r.ok){ this.setState({toast:'삭제 실패: '+r.error}); return; }
       this.setState({ obLeads:obAll.filter(y=>y.id!==id) });
       this.flash('삭제했습니다');
@@ -1663,6 +1681,7 @@ class Component extends DCLogic {
     const inqView=inquiries.filter(q=> iTab==='all' ? true : iTab==='open' ? !q.answer : !!q.answer).map(q=>{
       const answered=!!q.answer;
       return { id:q.id, name:q.name||'(이름 없음)', org:q.org||'', email:q.email||'', category:q.category||'일반 문의',
+        del:()=>this.deleteRow('inquiries', q.id, '문의 · '+(q.name||'이름 없음'), [q.category,q.email].filter(Boolean).join(' · ')),
         message:q.message||'', date:this.shortTime(q.created_at),
         statusLabel: answered?'답변 완료':'미답변',
         statusStyle: 'font-size:13px;font-weight:700;padding:4px 11px;border-radius:999px;'+(answered?'color:#0d8f6b;background:#E7F6F0;':'color:#E0533C;background:#FBE9E5;'),
@@ -1694,7 +1713,8 @@ class Component extends DCLogic {
       const done=m.status==='accepted', declined=m.status==='declined';
       return { id:m.id, a:aName, b:bName, aField:m.message||'', bField: done?'수락됨':(declined?'거절됨':'대기 중'),
         score: declined?'—':'요청', aIni:this.ini(aName), bIni:this.ini(bName), done, notDone:!done && !declined,
-        interpreter:!!m.interpreter, match:()=>this.confirmMatch(m.id) };
+        interpreter:!!m.interpreter, match:()=>this.confirmMatch(m.id),
+        del:()=>this.deleteRow('match_requests', m.id, '비즈미팅 요청 · '+aName+' → '+bName, m.message||'') };
     });
 
     // ── MOU 체결 신청 ───────────────────────────────────────────────
@@ -1729,6 +1749,7 @@ class Component extends DCLogic {
                  : (r.status==='declined' ? 'color:#8295ab;background:#F4F6F9;' : 'color:#A96A00;background:#FFF4E0;'),
       accept:()=>this.mouAdminRespond(r.id,true), decline:()=>this.mouAdminRespond(r.id,false),
       reopen:()=>this.mouAdminReopen(r.id),
+      del:()=>this.deleteRow('mou_requests', r.id, 'MOU 신청 · '+mouName(r.from_profile)+' → '+mouName(r.to_profile), mouLbl(r.slot_idx)),
       setSlot:(e)=>this.mouAdminSlot(r.id, e.target.value)
     }));
     const mouAcceptedN=mouAll.filter(r=>r.status==='accepted').length;
@@ -1794,7 +1815,8 @@ class Component extends DCLogic {
             +(plat===k?'background:#0F2440;color:#fff;border:1px solid #0F2440;':'background:#fff;border:1px solid #dde5ee;color:#5e7289;') })),
         save:()=>saveMtg(r), toggleMode:()=>toggleMtgMode(r),
         toggleLabel: online?'현장(부스)으로 바꾸기':'온라인으로 바꾸기',
-        hasLink:!!(r.meet_url), savedLink:r.meet_url||'' };
+        hasLink:!!(r.meet_url), savedLink:r.meet_url||'',
+        del:()=>this.deleteRow('reservations', r.id, '확정 미팅 · '+(exh.name||r.host_name||'참가기업')+' ↔ '+(buyer?buyer.name:(r.guest_name||'바이어')), (this.SLOTS[r.slot_idx]||'')+' · '+(online?'온라인':'현장')) };
     });
     const mtgCount={ all:allResv.length, day:dayResv.length,
       online:dayResv.filter(r=>r.mode==='online').length,
@@ -1809,7 +1831,7 @@ class Component extends DCLogic {
       startEdit:()=>this.setState({editingId:c.id, editTag:c.tag||'안내', editTitle:c.title}),
       cancel:()=>this.setState({editingId:null}),
       save:()=>this.saveNotice(c.id),
-      del:async()=>{ if(typeof window!=='undefined'&&!window.confirm('이 공지를 삭제할까요?')) return; const ok=await window.BimtcDB.deleteNotice(c.id); await this.reload(); this.setState({editingId:null}); this.flash(ok?'공지를 삭제했습니다':'삭제 실패 (권한 확인)'); } }));
+      del:async()=>{ if(!this.askDelete('공지 · '+(c.title||''), c.tag||'')) return; const ok=((await window.BimtcDB.adminDeleteRow('notices', c.id))||{}).ok===true; await this.reload(); this.setState({editingId:null}); this.flash(ok?'공지를 삭제했습니다':'삭제 실패 (권한 확인)'); } }));
 
     const won=(n)=>(n||0).toLocaleString('ko-KR')+'원';
     const memberDef=[['all','전체'],['exhibitor','참가기업'],['buyer','바이어'],['buyer_online','온라인 바이어'],['visitor','방문객']];
@@ -2191,8 +2213,8 @@ class Component extends DCLogic {
     };
     const addSubmit=()=>((this.state.addMode==='edit') ? saveEdit() : addOne());
     const delProspect=async(id,name)=>{
-      if(!window.confirm(name+' 을(를) 명단에서 지울까요?\n(직접 추가한 기관만 삭제됩니다)')) return;
-      const r=await window.BimtcDB.deleteProspect(id);
+      if(!this.askDelete('부스 유치 후보 · '+name, '직접 추가한 기관만 지울 수 있습니다')) return;
+      const r=await window.BimtcDB.adminDeleteRow('booth_prospects', id);
       if(!r || r.ok===false){ this.flash('삭제 실패: '+((r&&r.error)||'')); return; }
       await this.reload();
       this.flash(name+' 을(를) 명단에서 지웠습니다');
@@ -2260,7 +2282,8 @@ class Component extends DCLogic {
     // 사전등록(홈 > 참관안내)은 이메일이 필수라 전부 들어 있고, 현장등록(walkin.html)은 안 받는다.
     // 그래서 이메일이 비면 현장 등록으로 본다. 사전등록에서 이메일을 선택으로 바꾸면 이 구분이 깨진다.
     const regKind=(r)=> (r.email && String(r.email).trim()) ? '사전' : '현장';
-    const regs=regsData.map(r=>({ name:r.name||'ooo', org:r.org||'개인', field:(r.interests||[]).join('·'),
+    const regs=regsData.map(r=>({ id:r.id, name:r.name||'ooo', org:r.org||'개인', field:(r.interests||[]).join('·'),
+      del:()=>this.deleteRow('visitor_registrations', r.id, '사전등록 · '+(r.name||'이름 없음'), [r.org,r.email,r.phone].filter(Boolean).join(' · ')),
       day: r.visit_day==='D1'?'11.13':r.visit_day==='D2'?'11.14':'양일', at:this.shortTime(r.created_at),
       kind: regKind(r),
       kindStyle: "display:inline-block;width:38px;text-align:center;padding:3px 0;border-radius:6px;font-size:12px;font-weight:800;"
@@ -2281,7 +2304,8 @@ class Component extends DCLogic {
           date:(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),
           mailHref:'mailto:'+encodeURIComponent(n.recipient_email||'')+'?subject='+encodeURIComponent(n.title||'')+'&body='+encodeURIComponent(n.body||''),
           smsHref:'sms:?&body='+encodeURIComponent((n.title||'')+' — '+(n.body||'')),
-          markSent:async()=>{ await window.BimtcDB.setNotificationStatus(n.id,'sent'); this.setState({notifications:(this.state.notifications||[]).map(x=>x.id===n.id?{...x,status:'sent'}:x)}); this.flash('발송 완료로 처리했습니다'); } };
+          markSent:async()=>{ await window.BimtcDB.setNotificationStatus(n.id,'sent'); this.setState({notifications:(this.state.notifications||[]).map(x=>x.id===n.id?{...x,status:'sent'}:x)}); this.flash('발송 완료로 처리했습니다'); },
+          del:()=>this.deleteRow('notification_queue', n.id, '알림 · '+(n.title||''), (n.recipient_name||'')+' <'+(n.recipient_email||'')+'>') };
       }),
       noNoti:(this.state.notifications||[]).filter(n=>n.status==='pending').length===0,
       hasSentNoti:(this.state.notifications||[]).some(n=>n.status==='sent'),

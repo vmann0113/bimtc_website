@@ -583,6 +583,20 @@
       var r = await sb.from('mou_requests').select('*').order('created_at', { ascending: false });
       return r.data || [];
     },
+    // 관리자 삭제 — 지우기 전에 보관함으로 옮긴다
+    async adminDeleteRow(table, id) {
+      var sb = await ready();
+      var r = await sb.rpc('admin_delete_row', { p_table: table, p_id: String(id) });
+      if (r.error) return { ok: false, error: r.error.message };
+      return r.data || { ok: false, error: 'unknown' };
+    },
+    async adminDeletedRows(table) {
+      var sb = await ready();
+      var q = sb.from('admin_deleted_rows').select('*').order('deleted_at', { ascending: false });
+      if (table) q = q.eq('table_name', table);
+      var r = await q;
+      return r.data || [];
+    },
     async adminMouReopen(id) {
       var sb = await ready();
       var r = await sb.rpc('admin_mou_reopen', { p_id: id });
