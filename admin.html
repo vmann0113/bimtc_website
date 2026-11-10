@@ -717,6 +717,57 @@
         </div>
       </sc-if>
 
+      <!-- MOU -->
+      <sc-if value="{{ isMou }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">MOU 체결 관리</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 18px;line-height:1.6;">11월 13일(금) 메인무대 협약 체결식입니다. <b>1차 13:00~13:50 (5분씩 10건)</b> · <b>2차 15:30~15:55 (5분씩 5건)</b>, 모두 15건이 한계입니다.<br>참가기업·바이어가 홈페이지에서 서로 신청하고, 상대가 수락하면 칸이 확정됩니다. 전화·현장에서 받은 건은 아래에서 사무국이 대신 확정하면 됩니다.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0d8f6b;">{{ mouAcceptedN }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">확정</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#E0A23C;">{{ mouPendingN }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">대기</span></div>
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0B5FA5;">{{ mouFreeN }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">남은 칸 (15개 중)</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px 20px;margin-bottom:22px;">
+          <div style="font-size:15px;font-weight:800;color:#0F2440;margin-bottom:12px;">체결식 타임테이블</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:8px;">
+            <sc-for list="{{ mouSlotCells }}" as="c" hint-placeholder-count="15">
+              <div style="{{ c.style }}border-radius:10px;padding:10px 12px;">
+                <div style="font-size:13px;font-weight:800;color:#0F2440;">{{ c.time }}</div>
+                <div style="{{ c.textStyle }}font-size:12.5px;margin-top:3px;line-height:1.45;">{{ c.pair }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ mouAdminRows }}" as="m" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:#EAF2FC;color:#0B5FA5;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ m.aIni }}</div>
+                <div><div style="font-size:14.5px;font-weight:700;">{{ m.a }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ m.aType }} · 신청 {{ m.when }}</div></div>
+              </div>
+              <div style="font-family:'Pretendard',sans-serif;color:#c2cdda;font-size:18px;">→</div>
+              <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:12px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:#E7F6F0;color:#0d8f6b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);flex-shrink:0;">{{ m.bIni }}</div>
+                <div><div style="font-size:14.5px;font-weight:700;">{{ m.b }}</div><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;">{{ m.bType }}</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0;">
+                <span style="{{ m.statusStyle }}font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;padding:5px 11px;border-radius:999px;">{{ m.statusLabel }}</span>
+                <select value="{{ m.slotVal }}" onChange="{{ m.setSlot }}" style="padding:8px 10px;border:1px solid #d8e0ea;border-radius:9px;font-size:13.5px;font-weight:700;font-family:'Pretendard',sans-serif;background:#fff;color:#0F2440;cursor:pointer;"><option value="">시간 미지정</option><option value="0">① 13:00</option><option value="1">① 13:05</option><option value="2">① 13:10</option><option value="3">① 13:15</option><option value="4">① 13:20</option><option value="5">① 13:25</option><option value="6">① 13:30</option><option value="7">① 13:35</option><option value="8">① 13:40</option><option value="9">① 13:45</option><option value="10">② 15:30</option><option value="11">② 15:35</option><option value="12">② 15:40</option><option value="13">② 15:45</option><option value="14">② 15:50</option></select>
+                <sc-if value="{{ m.isPending }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ m.accept }}" style="background:#0B5FA5;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">확정</button>
+                  <button onClick="{{ m.decline }}" style="background:#fff;color:#8295ab;border:1px solid #e1e8f0;padding:9px 16px;border-radius:9px;font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">거절</button>
+                </sc-if>
+              </div>
+              <sc-if value="{{ m.msg }}" hint-placeholder-val="{{ '' }}">
+                <div style="flex-basis:100%;font-size:13.5px;color:#33485e;background:#F7F9FC;border-radius:9px;padding:10px 13px;line-height:1.6;">{{ m.msg }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ noMouRows }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#F7F9FC;border:1px dashed #d3deea;border-radius:14px;padding:28px;text-align:center;font-size:14px;color:#5E7289;line-height:1.7;">아직 들어온 MOU 신청이 없습니다.<br>참가기업·바이어가 [비즈미팅 → MOU 체결]에서 신청하면 여기에 쌓입니다.</div>
+        </sc-if>
+      </sc-if>
+
       <!-- MEETINGS -->
       <sc-if value="{{ isLounge }}" hint-placeholder-val="{{ false }}">
         <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">미팅 현황</h1>
@@ -1076,8 +1127,23 @@ class Component extends DCLogic {
     }catch(e){}
     this._proBusy=false;
   }
+  // ── MOU 체결 신청 (11/13 협약 체결식) ──────────────────────────
+  async mouAdminRespond(id, accept){
+    const res = await window.BimtcDB.respondMouRequest(id, accept);
+    if(!res || res.ok===false){ this.flash('처리 실패: '+((res&&res.error)||'')); return; }
+    await this.reload();
+    this.flash(accept ? 'MOU 체결을 확정했습니다' : 'MOU 신청을 거절했습니다');
+  }
+  async mouAdminSlot(id, v){
+    const slot = (v==='' || v==null) ? null : Number(v);
+    const res = await window.BimtcDB.adminMouSetSlot(id, slot);
+    if(!res || res.ok===false){ this.flash('변경 실패: '+((res&&res.error)||'')); return; }
+    await this.reload();
+    this.flash('체결식 시간을 바꿨습니다');
+  }
+
   async reload(){
-    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects, obLeads, psRows, psCfg] = await Promise.all([
+    const [apps, regs, matches, notices, resvs, booths, members, inquiries, notifications, prospects, obLeads, psRows, psCfg, mouRows] = await Promise.all([
       window.BimtcDB.listApplications(), window.BimtcDB.listVisitors(),
       window.BimtcDB.listMatchRequests(), window.BimtcDB.listNotices(), window.BimtcDB.listReservations(),
       window.BimtcDB.listBoothApplications(), window.BimtcDB.listMembers(),
@@ -1086,7 +1152,8 @@ class Component extends DCLogic {
       window.BimtcDB.listProspects().catch(()=>[]),
       window.BimtcDB.listOnlineBuyerLeads().catch(()=>[]),
       window.BimtcDB.listProgramSignups().catch(()=>[]),
-      window.BimtcDB.programSignupConfig().catch(()=>({ open:false, programs:[] }))
+      window.BimtcDB.programSignupConfig().catch(()=>({ open:false, programs:[] })),
+      window.BimtcDB.adminListMou().catch(()=>[])
     ]);
     // 11.13(D1)·11.14(D2) 를 구분하지 않으면 한쪽 예약이 다른 날에도 잡힌 것처럼 보인다
     const reserved={}; resvs.forEach(r=>{ reserved[r.day+'-'+r.table_idx+'-'+r.slot_idx]=r.interpreter?2:1; });
@@ -1101,7 +1168,8 @@ class Component extends DCLogic {
     this.setState({ apps, regs, matches, notices, reserved, restricted: closed||{}, booths, members, inquiries: inquiries||[],
       notifications: notifications||[], prospects: prospects||[], obLeads: obLeads||[],
       psRows: psRows||[], psCfg: psCfg||{ open:false, programs:[] },
-      resvRows: resvs||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false, bizOpen });
+      resvRows: resvs||[], proSyncedAt:new Date().toISOString(), ebOverride: eb||{}, ebDirty:false, bizOpen,
+      mouRows: mouRows||[] });
   }
 
   // 비즈미팅 매칭 오픈/마감 (참가기업·바이어 화면이 이 값만 본다)
@@ -1353,6 +1421,7 @@ class Component extends DCLogic {
     const pendingApps=apps.filter(a=>a.status==='pending').length;
     const pendingBooths=booths.filter(b=>b.status==='submitted').length;
     const pendingMatch=matches.filter(m=>m.status!=='accepted' && m.status!=='declined').length;
+    const pendingMou=(this.state.mouRows||[]).filter(r=>r.status==='pending').length;
 
     const nav=[
       {k:'dash',label:'대시보드'},
@@ -1363,6 +1432,7 @@ class Component extends DCLogic {
       {k:'reg',label:'사전등록 명단'},
       {k:'psign',label:'부대행사 사전신청',badge:(this.state.psRows||[]).filter(x=>x.status==='received').length},
       {k:'match',label:'비즈미팅 매칭',badge:pendingMatch},
+      {k:'mou',label:'MOU 체결',badge:pendingMou},
       {k:'lounge',label:'미팅 현황'},
       {k:'inq',label:'문의 관리',badge:(this.state.inquiries||[]).filter(q=>!q.answer).length},
       {k:'noti',label:'알림함',badge:(this.state.notifications||[]).filter(n=>n.status==='pending').length},
@@ -1587,6 +1657,44 @@ class Component extends DCLogic {
         score: declined?'—':'요청', aIni:this.ini(aName), bIni:this.ini(bName), done, notDone:!done && !declined,
         interpreter:!!m.interpreter, match:()=>this.confirmMatch(m.id) };
     });
+
+    // ── MOU 체결 신청 ───────────────────────────────────────────────
+    // 칸 번호 0~14 는 DB(mou_requests.slot_idx) 와 같다. 0~9 = 1차(13:00~13:50), 10~14 = 2차(15:30~15:55).
+    const MOU_SLOTS=['13:00','13:05','13:10','13:15','13:20','13:25','13:30','13:35','13:40','13:45',
+                     '15:30','15:35','15:40','15:45','15:50'];
+    const mouAll=this.state.mouRows||[];
+    const mouProf={}; (this.state.members||[]).forEach(p=>{ mouProf[p.id]=p; });
+    const mouName=(id)=>{ const p=mouProf[id]; return (p&&p.name)||'(미상)'; };
+    const mouType=(id)=>{ const p=mouProf[id]; return (p&&p.type)||''; };
+    const mouLbl=(i)=> (i==null) ? '시간 미지정' : ((i<10?'① ':'② ')+MOU_SLOTS[i]);
+    const mouTakenBy={};
+    mouAll.filter(r=>r.status==='accepted' && r.slot_idx!=null).forEach(r=>{ mouTakenBy[r.slot_idx]=r; });
+    const mouSlotCells=MOU_SLOTS.map((t,i)=>{
+      const r=mouTakenBy[i];
+      const ex = r ? (mouType(r.from_profile)==='exhibitor' ? mouName(r.from_profile) : mouName(r.to_profile)) : '';
+      const by = r ? (mouType(r.from_profile)==='buyer'     ? mouName(r.from_profile) : mouName(r.to_profile)) : '';
+      return { time:(i<10?'① ':'② ')+t, pair: r ? (ex+'  ↔  '+by) : '비어 있음',
+        style: r ? 'background:#E7F6F0;border:1px solid #bfe7d8;' : 'background:#fff;border:1px dashed #d3deea;',
+        textStyle: r ? 'color:#0d8f6b;font-weight:700;' : 'color:#9aa9bd;font-weight:600;' };
+    });
+    const mouAdminRows=mouAll.map(r=>({
+      id:r.id, a:mouName(r.from_profile), b:mouName(r.to_profile),
+      aIni:this.ini(mouName(r.from_profile)), bIni:this.ini(mouName(r.to_profile)),
+      aType: mouType(r.from_profile)==='buyer' ? '바이어' : '참가기업',
+      bType: mouType(r.to_profile)==='buyer' ? '바이어' : '참가기업',
+      msg:r.message||'', when:(r.created_at||'').replace('T',' ').slice(0,16),
+      slotLabel:mouLbl(r.slot_idx), slotVal: r.slot_idx==null ? '' : String(r.slot_idx),
+      isPending:r.status==='pending', notPending:r.status!=='pending',
+      statusLabel: r.status==='accepted' ? '확정' : (r.status==='declined' ? '거절' : '대기'),
+      statusStyle: r.status==='accepted' ? 'color:#0d8f6b;background:#E7F6F0;'
+                 : (r.status==='declined' ? 'color:#8295ab;background:#F4F6F9;' : 'color:#A96A00;background:#FFF4E0;'),
+      accept:()=>this.mouAdminRespond(r.id,true), decline:()=>this.mouAdminRespond(r.id,false),
+      setSlot:(e)=>this.mouAdminSlot(r.id, e.target.value)
+    }));
+    const mouAcceptedN=mouAll.filter(r=>r.status==='accepted').length;
+    const mouPendingN=mouAll.filter(r=>r.status==='pending').length;
+    const mouFreeN=15-mouAcceptedN;
+    const hasMouRows=mouAdminRows.length>0;
 
     // lounge grid
     // ── 미팅 현황 (확정된 1:1 미팅) ──────────────────────────────────
@@ -2210,6 +2318,8 @@ class Component extends DCLogic {
       bizBtnStyle:'border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;font-family:inherit;white-space:nowrap;cursor:'+(this.state.bizBusy?'default':'pointer')+';border:none;'+(this.state.bizOpen?'background:#fff;color:#c0392b;border:1.5px solid #f0c8c2;':'background:#0B5FA5;color:#fff;'),
       toggleBiz:()=>this.toggleBizOpen(),
       isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',isOblead:v==='oblead',isPsign:v==='psign',
+      isMou:v==='mou', mouSlotCells, mouAdminRows, hasMouRows, noMouRows:!hasMouRows,
+      mouAcceptedN:String(mouAcceptedN), mouPendingN:String(mouPendingN), mouFreeN:String(mouFreeN),
       memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       pwModalOn:!!this.state.pwModal,
       pwWho:this.state.pwModal?((this.state.pwModal.name||'')+' ('+(this.state.pwModal.email||'')+')'):'',

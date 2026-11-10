@@ -338,6 +338,7 @@
                 <sc-if value="{{ p.notRequested }}" hint-placeholder-val="{{ true }}">
                   <button onClick="{{ p.openPicker }}" style="width:100%;background:#0B5FA5;color:#fff;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k060 }}</button>
                 </sc-if>
+                <button onClick="{{ p.openMou }}" style="width:100%;margin-top:8px;background:#fff;color:#16294F;border:1.5px solid #16294F;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k120 }}</button>
               </div>
             </div>
           </sc-for>
@@ -378,6 +379,90 @@
             </div>
           </sc-for>
         </div>
+      </sc-if>
+
+      <sc-if value="{{ showMou }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:22px;">
+          <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">{{ t.k121 }}</h2>
+          <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#5E7289;margin:0;line-height:1.6;">{{ t.k122 }}</p>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px;margin-bottom:20px;">
+          <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+            <span style="font-size:clamp(14.5px,calc(18.63px - 0.35vw),16.5px);font-weight:800;color:#0F2440;">{{ t.k123 }}</span>
+            <span style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5E7289;font-weight:700;">{{ mouFreeLabel }}</span>
+          </div>
+          <sc-for list="{{ mouRounds }}" as="rd" hint-placeholder-count="2">
+            <div style="margin-bottom:16px;">
+              <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:800;color:#0B5FA5;margin-bottom:8px;">{{ rd.title }} <span style="color:#8295ab;font-weight:600;">{{ rd.note }}</span></div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:8px;">
+                <sc-for list="{{ rd.cells }}" as="c" hint-placeholder-count="5">
+                  <div style="{{ c.style }}border-radius:10px;padding:10px 12px;">
+                    <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:800;color:#0F2440;">{{ c.time }}</div>
+                    <div style="{{ c.textStyle }}font-size:clamp(12px,calc(16.13px - 0.35vw),14px);margin-top:3px;line-height:1.45;">{{ c.pair }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:4px 0 0;line-height:1.6;">{{ t.k133 }}</p>
+        </div>
+
+        <sc-if value="{{ hasMouIn }}" hint-placeholder-val="{{ false }}">
+          <h3 style="font-size:clamp(16px,calc(20.13px - 0.35vw),18px);font-weight:800;margin:0 0 12px;color:#0F2440;">{{ t.k124 }}</h3>
+          <div style="display:grid;gap:12px;margin-bottom:22px;">
+            <sc-for list="{{ mouIn }}" as="r" hint-placeholder-count="2">
+              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px;">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;">
+                  <div>
+                    <div style="font-size:16px;font-weight:800;color:#0F2440;">{{ r.name }}</div>
+                    <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ r.meta }}</div>
+                    <sc-if value="{{ r.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#33485e;font-weight:600;margin-top:2px;">{{ t.k058 }} {{ r.person }}</div></sc-if>
+                  </div>
+                  <span style="{{ r.statusStyle }}font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:800;font-family:'Pretendard',sans-serif;border-radius:999px;padding:5px 11px;white-space:nowrap;">{{ r.statusLabel }}</span>
+                </div>
+                <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">{{ t.k125 }}</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div>
+                <sc-if value="{{ r.msg }}" hint-placeholder-val="{{ '' }}"><p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;margin:4px 0 10px;line-height:1.6;">{{ r.msg }}</p></sc-if>
+                <sc-if value="{{ r.isPending }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;gap:8px;">
+                    <button onClick="{{ r.accept }}" style="flex:1;background:#11A37B;color:#fff;border:none;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k126 }}</button>
+                    <button onClick="{{ r.decline }}" style="flex:1;background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k127 }}</button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ hasMouOut }}" hint-placeholder-val="{{ false }}">
+          <h3 style="font-size:clamp(16px,calc(20.13px - 0.35vw),18px);font-weight:800;margin:0 0 12px;color:#0F2440;">{{ t.k128 }}</h3>
+          <div style="display:grid;gap:12px;margin-bottom:22px;">
+            <sc-for list="{{ mouOut }}" as="r" hint-placeholder-count="2">
+              <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px;">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;">
+                  <div>
+                    <div style="font-size:16px;font-weight:800;color:#0F2440;">{{ r.name }}</div>
+                    <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ r.meta }}</div>
+                    <sc-if value="{{ r.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#33485e;font-weight:600;margin-top:2px;">{{ t.k058 }} {{ r.person }}</div></sc-if>
+                  </div>
+                  <span style="{{ r.statusStyle }}font-size:clamp(11.5px,calc(15.63px - 0.35vw),13.5px);font-weight:800;font-family:'Pretendard',sans-serif;border-radius:999px;padding:5px 11px;white-space:nowrap;">{{ r.statusLabel }}</span>
+                </div>
+                <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF2FC;border:1px solid #cfe0f2;border-radius:8px;padding:6px 12px;margin-bottom:8px;"><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#0B5FA5;font-weight:700;">{{ t.k125 }}</span><span style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#0F2440;font-weight:700;">{{ r.slotLabel }}</span></div>
+                <sc-if value="{{ r.msg }}" hint-placeholder-val="{{ '' }}"><p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;margin:4px 0 10px;line-height:1.6;">{{ r.msg }}</p></sc-if>
+                <sc-if value="{{ r.isPending }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ r.cancel }}" style="background:#fff;color:#8295ab;border:1px solid #e1e8f0;padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k132 }}</button>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ noMou }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#F7F9FC;border:1px dashed #d3deea;border-radius:14px;padding:26px;text-align:center;">
+            <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:#5E7289;margin:0 0 14px;line-height:1.7;">{{ t.k129 }}</p>
+            <button onClick="{{ goPartners }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k130 }}</button>
+          </div>
+        </sc-if>
       </sc-if>
 
       <sc-if value="{{ showMeetings }}" hint-placeholder-val="{{ false }}">
@@ -472,6 +557,31 @@
         <div style="display:flex;gap:10px;justify-content:flex-end;">
           <button onClick="{{ closePicker }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k075 }}</button>
           <button onClick="{{ confirmRequest }}" style="{{ confirmStyle }}">{{ confirmLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ mouPickerOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMouPicker }}" style="position:fixed;inset:0;z-index:70;background:rgba(15,36,64,0.5);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div onClick="{{ stop }}" style="width:100%;max-width:560px;background:#fff;border-radius:20px;padding:30px;box-shadow:0 30px 70px rgba(0,0,0,0.35);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
+          <div>
+            <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;margin-bottom:4px;">{{ t.k120 }}</div>
+            <h3 style="font-size:20px;font-weight:800;margin:0;color:#0F2440;">{{ mouPickName }}</h3>
+          </div>
+          <span onClick="{{ closeMouPicker }}" style="font-size:22px;color:#9aa9bd;cursor:pointer;line-height:1;">×</span>
+        </div>
+        <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin:8px 0 18px;line-height:1.6;">{{ t.k122 }}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:8px;max-height:260px;overflow-y:auto;margin-bottom:16px;">
+          <sc-for list="{{ mouPickerSlots }}" as="s" hint-placeholder-count="15">
+            <button onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</button>
+          </sc-for>
+        </div>
+        <input value="{{ mouMsg }}" onInput="{{ setMouMsg }}" placeholder="{{ t.k131 }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;margin-bottom:20px;" />
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button onClick="{{ closeMouPicker }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k075 }}</button>
+          <button onClick="{{ confirmMou }}" style="{{ mouConfirmStyle }}">{{ mouConfirmLabel }}</button>
         </div>
       </div>
     </div>
@@ -588,6 +698,7 @@ class Component extends DCLogic {
     pendingAssign: [],
     pickerId:null, pickerName:'', pickDay:'D1', pickSlot:null, pickerBusy:{}, requesting:false, pickInterp:false,
     pickerMode:'request', rescheduleId:null, sent:[],
+    mouBoard:[], mouReqs:[], mouPickId:null, mouPickName:'', mouSlot:null, mouMsg:'', mouBusy:false,
     apOrg:'', apContact:'', apEmail:'', apCountry:'', apPurpose:'', apFields:[], apDay:'any', apFam:null,
     submitting:false,
     toast: null,
@@ -600,6 +711,31 @@ class Component extends DCLogic {
   SLOT_END = 14;
   DAYLABEL = { D1:'11.13', D2:'11.14' };
   DAYLABEL_EN = { D1:'Nov 13', D2:'Nov 14' };
+
+  // MOU 체결식(11/13) — 한 건에 5분. ① 13:00 부터 50분(10칸), ② 15:30 부터 25분(5칸).
+  // 남는 시간은 무대 전환용이라 칸을 만들지 않는다. 칸 번호 0~14 는 DB(mou_requests.slot_idx) 와 같다.
+  MOU_SLOTS = ['13:00','13:05','13:10','13:15','13:20','13:25','13:30','13:35','13:40','13:45',
+               '15:30','15:35','15:40','15:45','15:50'];
+  MOU_R2 = 10;   // 이 번호부터 2회차
+  // 서버가 돌려주는 오류 문구는 한국어다. 영어 화면에서만 바꿔 보여 준다.
+  MOUERR = {
+    '로그인이 필요합니다':'You need to sign in first',
+    '참가기업과 바이어 사이에만 신청할 수 있습니다':'MOU requests can only be sent between an exhibitor and a buyer',
+    '체결식 시간을 선택해 주세요':'Please choose a signing time',
+    '이미 확정된 시간입니다. 다른 시간을 골라 주세요.':'That time is already taken. Please pick another one.',
+    '이미 신청해 둔 상대입니다':'You already have a request waiting with this partner',
+    '신청을 찾을 수 없습니다':'This request was not found',
+    '권한이 없습니다':'You are not allowed to do this',
+    '이미 처리된 신청입니다':'This request has already been handled',
+    '체결식 시간이 비어 있습니다. 사무국에 문의해 주세요.':'No signing time is set. Please contact the secretariat.',
+    '그 시간은 방금 다른 협약이 확정되었습니다. 사무국에 시간 변경을 요청해 주세요.':'That slot was just confirmed for another MOU. Please ask the secretariat for a different time.'
+  };
+  mouErr(m){ return this.state.lang==='en' ? (this.MOUERR[m] || m) : m; }
+  mouSlotLabel(i){
+    if(i==null) return this.L('시간 미지정','Time not set');
+    const r = (i < this.MOU_R2) ? 1 : 2;
+    return this.L('11.13 '+this.MOU_SLOTS[i]+' ('+r+'차)', 'Nov 13 '+this.MOU_SLOTS[i]+' (round '+r+')');
+  }
 
   async componentDidMount(){
     try{
@@ -625,9 +761,10 @@ class Component extends DCLogic {
   }
 
   async reload(){
-    const [partners, inbox, sent, resvs] = await Promise.all([
+    const [partners, inbox, sent, resvs, mouBoard, mouReqs] = await Promise.all([
       window.BimtcDB.listPartners(), window.BimtcDB.inboxRequests(),
-      window.BimtcDB.sentRequestsDetailed(), window.BimtcDB.listReservations()
+      window.BimtcDB.sentRequestsDetailed(), window.BimtcDB.listReservations(),
+      window.BimtcDB.mouBoard(), window.BimtcDB.myMouRequests()
     ]);
     const myId = this.state.user ? this.state.user.id : null;
     const requestedIds = new Set(sent.filter(r=>r.status!=='declined').map(r=>r.to_profile));
@@ -647,7 +784,8 @@ class Component extends DCLogic {
     resvs.forEach(r=>{ const mine = (r.owner_profile===myId || r.guest_profile===myId);
       const counterpart = r.owner_profile===myId ? (r.guest_name||r.partner_name||'') : (r.host_name||'');
       resMap[r.id]={ by: mine?'me':'other', partner:counterpart, id:r.id, day:r.day, slotIdx:r.slot_idx, place:r.place||'', mode:r.mode||'onsite', meetUrl:r.meet_url||'', platform:r.platform||'' }; });
-    this.setState({ partners:partnersMapped, requests:requestsMapped, sent:sentMapped, reservations:resMap });
+    this.setState({ partners:partnersMapped, requests:requestsMapped, sent:sentMapped, reservations:resMap,
+      mouBoard:mouBoard||[], mouReqs:mouReqs||[] });
   }
 
   // 바이어는 profiles.name 이 회사명이라 담당자 성명을 따로 조합한다 (admin.html 과 동일 규칙)
@@ -685,6 +823,36 @@ class Component extends DCLogic {
     this.setState({ pickerMode:'reschedule', rescheduleId:m.id, pickerId:'reschedule', pickerName:m.partner+this.L(' · 시간 변경',' · reschedule'), pickDay:m.dayKey, pickSlot:m.slotIdx, pickerBusy:{} });
   }
   closePicker(){ this.setState({ pickerId:null, pickSlot:null, pickerMode:'request', rescheduleId:null, pickInterp:false }); }
+
+  // ----- MOU 체결 신청 -----
+  openMouPicker(partner){ this.setState({ mouPickId:partner.id, mouPickName:partner.name, mouSlot:null, mouMsg:'' }); }
+  closeMouPicker(){ this.setState({ mouPickId:null, mouSlot:null, mouMsg:'' }); }
+  async confirmMou(){
+    if(this.state.mouSlot==null){ this.flash(this.L('체결식 시간을 선택해 주세요','Please choose a signing time')); return; }
+    if(this.state.mouBusy) return;
+    this.setState({ mouBusy:true });
+    const res = await window.BimtcDB.addMouRequest(this.state.mouPickId, this.state.mouSlot, this.state.mouMsg);
+    this.setState({ mouBusy:false });
+    if(!res.ok){ this.flash(this.mouErr(res.error)); return; }
+    const lbl = this.mouSlotLabel(this.state.mouSlot);
+    this.closeMouPicker();
+    await this.reload();
+    this.flash(this.L(lbl+' MOU 체결을 신청했습니다 · 상대가 수락하면 확정됩니다',
+                      'MOU requested for '+lbl+' - confirmed once the other party accepts'));
+  }
+  async respondMou(id, accept){
+    const res = await window.BimtcDB.respondMouRequest(id, accept);
+    if(!res.ok){ this.flash(this.mouErr(res.error)); return; }
+    await this.reload();
+    this.flash(accept ? this.L('MOU 체결을 수락했습니다','MOU request accepted')
+                      : this.L('MOU 신청을 거절했습니다','MOU request declined'));
+  }
+  async cancelMou(id){
+    const res = await window.BimtcDB.cancelMouRequest(id);
+    if(!res.ok){ this.flash(this.mouErr(res.error)); return; }
+    await this.reload();
+    this.flash(this.L('신청을 취소했습니다','Request cancelled'));
+  }
   selectSlot(si){ this.setState({ pickSlot:si }); }
   async confirmRequest(){
     if(this.state.pickSlot==null){ this.flash(this.L('시간대를 선택해 주세요','Please choose a time slot')); return; }
@@ -791,11 +959,14 @@ class Component extends DCLogic {
     const reservations = this.state.reservations;
     const myMeetingsCount = Object.keys(reservations).filter(k=> reservations[k].by==='me').length;
 
+    const mouReqs = this.state.mouReqs||[];
+    const mouPending = mouReqs.filter(r=>r.direction==='in' && r.status==='pending').length;
     const navItems = [
       { key:'guide', label:this.L('비즈미팅 안내','How it works') },
       { key:'apply', label:this.L('신청하기','Apply') },
       { key:'partners', label:this.L('파트너 찾기','Find partners') },
       { key:'requests', label:this.L('받은 요청','Requests'), badge:pendingCount },
+      { key:'mou', label:this.L('MOU 체결','MOU signing'), badge:mouPending },
       { key:'meetings', label:this.L('내 미팅 일정','My meetings'), badge:myMeetingsCount },
     ].map(n=>({ ...n, badge:n.badge||0, active:v===n.key, style:(v===n.key?navActive:navIdle), onClick:()=>this.setView(n.key) }));
 
@@ -855,7 +1026,8 @@ class Component extends DCLogic {
       hasDoc:!!(p.docs&&p.docs.doc), docUrl:(p.docs&&p.docs.doc)?('uploads/buyer/'+p.docs.doc):'',
       hasCat:!!(p.docs&&p.docs.cat), catUrl:(p.docs&&p.docs.cat)?('uploads/buyer/'+p.docs.cat):'',
       meta:[(p.country||'').trim(), (p.org||'').trim()].filter(Boolean).join(' · '),
-      initial:this.initialOf(p.name), ...this.avatarColors(p.ptype==='buyer'), openPicker:()=>this.openPicker(p)
+      initial:this.initialOf(p.name), ...this.avatarColors(p.ptype==='buyer'), openPicker:()=>this.openPicker(p),
+      openMou:()=>this.openMouPicker(p)
     }));
     const requestsView = this.state.requests.map(r=>({
       ...r, isPending:r.status==='pending', isAccepted:r.status==='accepted', isDeclined:r.status==='declined',
@@ -899,6 +1071,48 @@ class Component extends DCLogic {
       else { style+="background:#fff;color:#33485e;border:1px solid #d3deea;cursor:pointer;"; }
       return { label:time, style, onClick:()=> (lunch||busy)?null:this.selectSlot(si) };
     }).slice(0, this.SLOT_END);
+    // ----- MOU 체결식 타임테이블 -----
+    const mouBoardRows = this.state.mouBoard||[];
+    const mouTakenMap = {};
+    mouBoardRows.forEach(b=>{ mouTakenMap[b.slot_idx] = b; });
+    const mouCell = (i)=>{
+      const b = mouTakenMap[i];
+      return { time:this.MOU_SLOTS[i],
+        pair: b ? (b.exhibitor+'  ↔  '+b.buyer) : this.L('비어 있음','Open'),
+        style: b ? 'background:#E7F6F0;border:1px solid #bfe7d8;' : 'background:#fff;border:1px dashed #d3deea;',
+        textStyle: b ? 'color:#0d8f6b;font-weight:700;' : 'color:#9aa9bd;font-weight:600;' };
+    };
+    const mouRounds = [
+      { title:this.L('1차 · 13:00 ~ 13:50','Round 1 · 13:00-13:50'), note:this.L('5분씩 10건','10 slots, 5 min each'),
+        cells: Array.from({length:this.MOU_R2}, (x,i)=>mouCell(i)) },
+      { title:this.L('2차 · 15:30 ~ 15:55','Round 2 · 15:30-15:55'), note:this.L('5분씩 5건','5 slots, 5 min each'),
+        cells: Array.from({length:this.MOU_SLOTS.length-this.MOU_R2}, (x,i)=>mouCell(this.MOU_R2+i)) },
+    ];
+    const mouFree = this.MOU_SLOTS.length - mouBoardRows.length;
+    const mouMap = (r)=>({
+      id:r.id, name:r.other_name||this.L('상대','Partner'),
+      meta:[this.typeLabel(r.other_type), (r.other_country||'').trim()].filter(Boolean).join(' · '),
+      person:this.personName({ first_name:r.other_first_name, last_name:r.other_last_name }),
+      msg:r.message||'', slotLabel:this.mouSlotLabel(r.slot_idx),
+      isPending:r.status==='pending', isAccepted:r.status==='accepted', isDeclined:r.status==='declined',
+      statusLabel: r.status==='accepted' ? this.L('확정','Confirmed')
+                 : (r.status==='declined' ? this.L('거절됨','Declined') : this.L('상대 수락 대기','Waiting for reply')),
+      statusStyle: r.status==='accepted' ? 'background:#E7F6F0;color:#0d8f6b;'
+                 : (r.status==='declined' ? 'background:#F4F6F9;color:#8295ab;' : 'background:#FFF4E0;color:#A96A00;'),
+      initial:this.initialOf(r.other_name||'?'), ...this.avatarColors(r.other_type==='buyer'),
+      accept:()=>this.respondMou(r.id,true), decline:()=>this.respondMou(r.id,false), cancel:()=>this.cancelMou(r.id)
+    });
+    const mouIn  = mouReqs.filter(r=>r.direction==='in').map(mouMap);
+    const mouOut = mouReqs.filter(r=>r.direction==='out').map(mouMap);
+    const mouPickerSlots = this.MOU_SLOTS.map((time,i)=>{
+      const taken = !!mouTakenMap[i];
+      const sel = this.state.mouSlot===i;
+      let style="padding:10px 4px;border-radius:9px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;font-family:'Pretendard',sans-serif;";
+      if(taken){ style+="background:#eef1f6;color:#adb8c6;border:1px solid #e1e8f0;cursor:not-allowed;"; }
+      else if(sel){ style+="background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;cursor:pointer;"; }
+      else { style+="background:#fff;color:#33485e;border:1px solid #d3deea;cursor:pointer;"; }
+      return { label:(i<this.MOU_R2?'① ':'② ')+time, style, onClick:()=> taken?null:this.setState({mouSlot:i}) };
+    });
     const pkTabBase="flex:1;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;";
     const u = this.state.user;
 
@@ -987,6 +1201,20 @@ class Component extends DCLogic {
         k110:L('초청바이어','Invited buyer'),
         k111:L('소개서 보기','View profile'),
         k112:L('회사 자료','Catalog'),
+        k120:L('MOU 체결 신청','Request MOU signing'),
+        k121:L('MOU 체결','MOU signing'),
+        k122:L('11월 13일(금) 메인무대 협약 체결식에 함께 오를 상대를 신청합니다. 한 건에 5분이고, 상대가 수락하면 그 칸이 확정됩니다.','Request a partner to sign an MOU with you on the main stage on Friday, 13 November. Each signing takes 5 minutes and the slot is confirmed once the other party accepts.'),
+        k123:L('체결식 타임테이블','Signing timetable'),
+        k124:L('받은 MOU 신청','MOU requests received'),
+        k125:L('체결 시간','Signing time'),
+        k126:L('수락','Accept'),
+        k127:L('거절','Decline'),
+        k128:L('보낸 MOU 신청','MOU requests sent'),
+        k129:L('아직 주고받은 MOU 신청이 없습니다. [파트너 찾기]에서 상대를 골라 신청해 보세요.','No MOU requests yet. Pick a partner under [Find partners] to send one.'),
+        k130:L('파트너 찾기 →','Find partners →'),
+        k131:L('어떤 내용의 협약인지 한 줄로 적어주세요 (선택)','One line on what the MOU is about (optional)'),
+        k132:L('신청 취소','Cancel request'),
+        k133:L('MOU 체결식은 11월 13일(금) 메인무대에서 두 번 진행됩니다.','The MOU signing ceremony runs twice on Friday, 13 November, on the main stage.'),
         k058:L('담당자','Contact'),
         k059:L('✓ 요청함','✓ Requested'),
         k060:L('날짜·시간 선택 후 요청','Choose a time and request'),
@@ -1027,6 +1255,7 @@ class Component extends DCLogic {
       enStyle:"padding:7px 13px;font-size:13px;font-weight:800;cursor:pointer;"+(this.state.lang==='en'?'background:#0B5FA5;color:#fff;':'background:#fff;color:#8295ab;'),
       showGuide:v==='guide', showApply:v==='apply', showPartners:v==='partners',
       showRequests:v==='requests', showMeetings:v==='meetings',
+      showMou:v==='mou',
       dday:this.ddayLabel(), pickOnline:(this.state.pickMode==='online') && this.state.pickerMode!=='reschedule',
       goApply:()=>this.setView('apply'), goPartners:()=>this.setView('partners'), goBoard:()=>this.setView('meetings'),
       steps, facts, fieldChips,
@@ -1048,6 +1277,17 @@ class Component extends DCLogic {
       reviewRows,
 
       partnersView, requestsView,
+      mouRounds, mouIn, mouOut,
+      hasMouIn:mouIn.length>0, hasMouOut:mouOut.length>0, noMou:(mouIn.length+mouOut.length)===0,
+      mouFreeLabel:this.L('남은 칸 '+mouFree+'개 / 전체 15개','Open slots: '+mouFree+' of 15'),
+      mouPickerOpen:this.state.mouPickId!=null, mouPickName:this.state.mouPickName,
+      mouPickerSlots, mouMsg:this.state.mouMsg, setMouMsg:this.set('mouMsg'),
+      closeMouPicker:()=>this.closeMouPicker(), confirmMou:()=>this.confirmMou(),
+      mouConfirmLabel: this.state.mouBusy ? this.L('신청 중…','Sending...')
+        : (this.state.mouSlot!=null ? this.L(this.MOU_SLOTS[this.state.mouSlot]+' 신청','Request '+this.MOU_SLOTS[this.state.mouSlot])
+                                    : this.L('시간 선택','Choose a time')),
+      mouConfirmStyle: "padding:12px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;border:none;" + (this.state.mouSlot!=null?'background:#0B5FA5;color:#fff;':'background:#cdd6e2;color:#fff;'),
+      goMou:()=>this.setView('mou'),
 
 
       myMeetings, hasMeetings:myMeetings.length>0, noMeetings:myMeetings.length===0,

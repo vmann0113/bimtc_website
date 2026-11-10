@@ -547,6 +547,48 @@
       return rows.filter(function (x) { return x.direction === 'out'; });
     },
     async deleteRequest(id) { var sb = await ready(); var r = await sb.from('match_requests').delete().eq('id', id); return r.error ? { ok: false, error: r.error.message } : { ok: true }; },
+
+    // ---------- MOU 체결 신청 (11/13 협약 체결식 ① 13:00 · ② 15:30) ----------
+    // 비즈미팅과 테이블이 다르다. 5분 칸 번호 0~14 로만 주고받는다.
+    async mouBoard() {
+      var sb = await ready();
+      var r = await sb.rpc('mou_board');
+      return r.error ? [] : (r.data || []);
+    },
+    async myMouRequests() {
+      var sb = await ready();
+      var r = await sb.rpc('my_mou_requests');
+      return r.error ? [] : (r.data || []);
+    },
+    async addMouRequest(toProfile, slot, message) {
+      var sb = await ready();
+      var r = await sb.rpc('mou_request', { p_to: toProfile, p_slot: slot, p_message: message || null });
+      if (r.error) return { ok: false, error: r.error.message };
+      return r.data || { ok: false, error: 'unknown' };
+    },
+    async respondMouRequest(id, accept) {
+      var sb = await ready();
+      var r = await sb.rpc('mou_respond', { p_id: id, p_accept: !!accept });
+      if (r.error) return { ok: false, error: r.error.message };
+      return r.data || { ok: false, error: 'unknown' };
+    },
+    async cancelMouRequest(id) {
+      var sb = await ready();
+      var r = await sb.from('mou_requests').delete().eq('id', id);
+      return r.error ? { ok: false, error: r.error.message } : { ok: true };
+    },
+    // 사무국 화면용
+    async adminListMou() {
+      var sb = await ready();
+      var r = await sb.from('mou_requests').select('*').order('created_at', { ascending: false });
+      return r.data || [];
+    },
+    async adminMouSetSlot(id, slot) {
+      var sb = await ready();
+      var r = await sb.rpc('admin_mou_set_slot', { p_id: id, p_slot: (slot == null ? null : slot) });
+      if (r.error) return { ok: false, error: r.error.message };
+      return r.data || { ok: false, error: 'unknown' };
+    },
     // 사무국 대신 확정: 메일·전화로 양측 동의를 받고 누르면 상태 변경 + 예약 생성까지 한다.
     // 상태만 바꾸면 '미팅 현황'과 타임테이블이 비어 있게 되므로 서버 함수 한 번으로 묶는다.
     async adminAcceptRequest(id) {
