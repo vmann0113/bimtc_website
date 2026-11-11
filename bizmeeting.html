@@ -408,6 +408,31 @@
           <p style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin:4px 0 0;line-height:1.6;">{{ t.k133 }}</p>
         </div>
 
+        <sc-if value="{{ hasMouEx }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px;margin-bottom:20px;">
+            <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+              <span style="font-size:clamp(14.5px,calc(18.63px - 0.35vw),16.5px);font-weight:800;color:#0F2440;">{{ t.k135 }}</span>
+              <span style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5E7289;font-weight:700;">{{ mouExCount }}</span>
+            </div>
+            <p style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#5E7289;margin:0 0 12px;line-height:1.6;">{{ t.k136 }}</p>
+            <input value="{{ mouExQ }}" onInput="{{ setMouExQ }}" maxLength="60" placeholder="{{ t.k137 }}" style="width:100%;padding:11px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;margin-bottom:12px;" />
+            <div style="display:grid;gap:8px;max-height:360px;overflow-y:auto;">
+              <sc-for list="{{ mouExView }}" as="e" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #edf1f6;border-radius:10px;padding:10px 12px;">
+                  <div style="min-width:0;">
+                    <div style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);font-weight:800;color:#0F2440;word-break:break-word;overflow-wrap:anywhere;">{{ e.name }}</div>
+                    <sc-if value="{{ e.meta }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;word-break:break-word;overflow-wrap:anywhere;">{{ e.meta }}</div></sc-if>
+                  </div>
+                  <button onClick="{{ e.openMou }}" style="flex-shrink:0;background:#fff;color:#16294F;border:1.5px solid #16294F;padding:8px 14px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">{{ t.k120 }}</button>
+                </div>
+              </sc-for>
+              <sc-if value="{{ mouExEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;padding:10px 4px;">{{ t.k138 }}</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
         <sc-if value="{{ hasMouIn }}" hint-placeholder-val="{{ false }}">
           <h3 style="font-size:clamp(16px,calc(20.13px - 0.35vw),18px);font-weight:800;margin:0 0 12px;color:#0F2440;">{{ t.k124 }}</h3>
           <div style="display:grid;gap:12px;margin-bottom:22px;">
@@ -702,6 +727,7 @@ class Component extends DCLogic {
     pickerId:null, pickerName:'', pickDay:'D1', pickSlot:null, pickerBusy:{}, requesting:false, pickInterp:false,
     pickerMode:'request', rescheduleId:null, sent:[],
     mouBoard:[], mouReqs:[], mouPickId:null, mouPickName:'', mouSlot:null, mouMsg:'', mouBusy:false,
+    mouExList:[], mouExQ:'',
     apOrg:'', apContact:'', apEmail:'', apCountry:'', apPurpose:'', apFields:[], apDay:'any', apFam:null,
     submitting:false,
     toast: null,
@@ -724,6 +750,7 @@ class Component extends DCLogic {
   MOUERR = {
     '로그인이 필요합니다':'You need to sign in first',
     '참가기업과 바이어 사이에만 신청할 수 있습니다':'MOU requests can only be sent between an exhibitor and a buyer',
+    '참가기업·바이어 사이에만 신청할 수 있습니다':'MOU requests can only be sent to an approved exhibitor or a buyer',
     '체결식 시간을 선택해 주세요':'Please choose a signing time',
     '이미 확정된 시간입니다. 다른 시간을 골라 주세요.':'That time is already taken. Please pick another one.',
     '이미 신청해 둔 상대입니다':'You already have a request waiting with this partner',
@@ -764,10 +791,12 @@ class Component extends DCLogic {
   }
 
   async reload(){
-    const [partners, inbox, sent, resvs, mouBoard, mouReqs] = await Promise.all([
+    const [partners, inbox, sent, resvs, mouBoard, mouReqs, mouExList] = await Promise.all([
       window.BimtcDB.listPartners(), window.BimtcDB.inboxRequests(),
       window.BimtcDB.sentRequestsDetailed(), window.BimtcDB.listReservations(),
-      window.BimtcDB.mouBoard(), window.BimtcDB.myMouRequests()
+      window.BimtcDB.mouBoard(), window.BimtcDB.myMouRequests(),
+      // 참가기업끼리 MOU 상대 목록 (바이어는 빈 목록을 받는다)
+      (window.BimtcDB.mouExhibitorPartners ? window.BimtcDB.mouExhibitorPartners() : Promise.resolve([]))
     ]);
     const myId = this.state.user ? this.state.user.id : null;
     const requestedIds = new Set(sent.filter(r=>r.status!=='declined').map(r=>r.to_profile));
@@ -788,7 +817,7 @@ class Component extends DCLogic {
       const counterpart = r.owner_profile===myId ? (r.guest_name||r.partner_name||'') : (r.host_name||'');
       resMap[r.id]={ by: mine?'me':'other', partner:counterpart, id:r.id, day:r.day, slotIdx:r.slot_idx, place:r.place||'', mode:r.mode||'onsite', meetUrl:r.meet_url||'', platform:r.platform||'' }; });
     this.setState({ partners:partnersMapped, requests:requestsMapped, sent:sentMapped, reservations:resMap,
-      mouBoard:mouBoard||[], mouReqs:mouReqs||[] });
+      mouBoard:mouBoard||[], mouReqs:mouReqs||[], mouExList:mouExList||[] });
   }
 
   // 바이어는 profiles.name 이 회사명이라 담당자 성명을 따로 조합한다 (admin.html 과 동일 규칙)
@@ -1105,6 +1134,17 @@ class Component extends DCLogic {
       initial:this.initialOf(r.other_name||'?'), ...this.avatarColors(r.other_type==='buyer'),
       accept:()=>this.respondMou(r.id,true), decline:()=>this.respondMou(r.id,false), cancel:()=>this.cancelMou(r.id)
     });
+    // 참가기업끼리 MOU — 이름·분야로 걸러 보여 준다
+    const mouExQ = String(this.state.mouExQ||'').trim().toLowerCase();
+    const mouExAll = (this.state.mouExList||[]);
+    const mouExView = mouExAll.filter(p=>{
+      if(!mouExQ) return true;
+      return [p.name,p.category,p.industry,p.country].some(v=>String(v||'').toLowerCase().indexOf(mouExQ)>=0);
+    }).map(p=>({
+      id:p.id, name:p.name||this.L('(이름 미입력)','(no name)'),
+      meta:[(p.category||p.industry||'').trim(), (p.country||'').trim()].filter(Boolean).join(' · '),
+      openMou:()=>this.openMouPicker({ id:p.id, name:p.name||'' })
+    }));
     const mouIn  = mouReqs.filter(r=>r.direction==='in').map(mouMap);
     const mouOut = mouReqs.filter(r=>r.direction==='out').map(mouMap);
     const mouPickerSlots = this.MOU_SLOTS.map((time,i)=>{
@@ -1213,12 +1253,16 @@ class Component extends DCLogic {
         k126:L('수락','Accept'),
         k127:L('거절','Decline'),
         k128:L('보낸 MOU 신청','MOU requests sent'),
-        k129:L('아직 주고받은 MOU 신청이 없습니다. [파트너 찾기]에서 상대를 골라 신청해 보세요.','No MOU requests yet. Pick a partner under [Find partners] to send one.'),
+        k129:L('아직 주고받은 MOU 신청이 없습니다. [파트너 찾기]에서 바이어를, 위 [참가기업과 MOU]에서 참가기업을 골라 신청해 보세요.','No MOU requests yet. Pick a buyer under [Find partners], or an exhibitor under [MOU with another exhibitor] above.'),
         k130:L('파트너 찾기 →','Find partners →'),
         k131:L('어떤 내용의 협약인지 한 줄로 적어주세요 (선택)','One line on what the MOU is about (optional)'),
         k132:L('신청 취소','Cancel request'),
         k133:L('MOU 체결식은 11월 13일(금) 메인무대에서 두 번 진행됩니다.','The MOU signing ceremony runs twice on Friday, 13 November, on the main stage.'),
         k134:L('남은 칸이 없습니다. 15건이 모두 찼습니다 — 사무국으로 문의해 주세요.','All 15 slots are taken. Please contact the secretariat.'),
+        k135:L('참가기업과 MOU','MOU with another exhibitor'),
+        k136:L('바이어뿐 아니라 함께 참가하는 기업·기관과도 MOU를 신청할 수 있습니다.','You can also request an MOU with other exhibiting companies and organisations, not only buyers.'),
+        k137:L('기업·기관명으로 찾기','Search by company name'),
+        k138:L('찾는 이름이 없습니다.','No matching exhibitor.'),
         k058:L('담당자','Contact'),
         k059:L('✓ 요청함','✓ Requested'),
         k060:L('날짜·시간 선택 후 요청','Choose a time and request'),
@@ -1283,6 +1327,9 @@ class Component extends DCLogic {
       partnersView, requestsView,
       mouRounds, mouIn, mouOut,
       hasMouIn:mouIn.length>0, hasMouOut:mouOut.length>0, noMou:(mouIn.length+mouOut.length)===0,
+      hasMouEx:mouExAll.length>0, mouExView, mouExEmpty:mouExAll.length>0 && mouExView.length===0,
+      mouExQ:this.state.mouExQ, setMouExQ:this.set('mouExQ'),
+      mouExCount:this.L('승인된 참가기업 '+mouExAll.length+'곳','Approved exhibitors: '+mouExAll.length),
       mouFreeLabel:this.L('남은 칸 '+mouFree+'개 / 전체 15개','Open slots: '+mouFree+' of 15'),
       mouNoFree:mouFree===0,
       mouPickerOpen:this.state.mouPickId!=null, mouPickName:this.state.mouPickName,

@@ -560,6 +560,12 @@
       var r = await sb.rpc('my_mou_requests');
       return r.error ? [] : (r.data || []);
     },
+    // 참가기업끼리 MOU — 승인된 참가기업 목록 (참가기업·관리자만 받는다)
+    async mouExhibitorPartners() {
+      var sb = await ready();
+      var r = await sb.rpc('mou_exhibitor_partners');
+      return r.error ? [] : (r.data || []);
+    },
     async addMouRequest(toProfile, slot, message) {
       var sb = await ready();
       var r = await sb.rpc('mou_request', { p_to: toProfile, p_slot: slot, p_message: message || null });
