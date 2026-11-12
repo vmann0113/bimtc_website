@@ -739,7 +739,11 @@
           <div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:12px 18px;"><span style="font-size:20px;font-weight:700;color:#0B5FA5;">{{ mouFreeN }}</span><span style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;margin-left:7px;">남은 칸 (15개 중)</span></div>
         </div>
         <div style="background:#fff;border:1px solid #e6ebf2;border-radius:14px;padding:18px 20px;margin-bottom:22px;">
-          <div style="font-size:15px;font-weight:800;color:#0F2440;margin-bottom:12px;">체결식 타임테이블</div>
+          <div style="font-size:15px;font-weight:800;color:#0F2440;margin-bottom:6px;">체결식 타임테이블</div>
+          <div style="font-size:12.5px;color:#5E7289;margin-bottom:12px;line-height:1.55;">한 칸에 여러 건은 같은 기관이 여러 상대와 맺을 때만 됩니다. 다른 기관끼리 겹친 칸은 빨간색으로 보이니 아래 목록에서 시간을 옮겨 주세요.</div>
+          <sc-if value="{{ hasMouClash }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FDECEC;border:1px solid #f1b9b9;color:#B42318;border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:13px;font-weight:700;">다른 기관이 겹친 칸 {{ mouClashN }}개 — 시간 조정이 필요합니다</div>
+          </sc-if>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:8px;">
             <sc-for list="{{ mouSlotCells }}" as="c" hint-placeholder-count="15">
               <div style="{{ c.style }}border-radius:10px;padding:10px 12px;">
@@ -1726,15 +1730,30 @@ class Component extends DCLogic {
     const mouName=(id)=>{ const p=mouProf[id]; return (p&&p.name)||'(미상)'; };
     const mouType=(id)=>{ const p=mouProf[id]; return (p&&p.type)||''; };
     const mouLbl=(i)=> (i==null) ? '시간 미지정' : MOU_SLOTS[i];
-    const mouTakenBy={};
-    mouAll.filter(r=>r.status==='accepted' && r.slot_idx!=null).forEach(r=>{ mouTakenBy[r.slot_idx]=r; });
+    // 한 칸에 여러 건 가능 — 단, 모두 같은 기관 하나를 끼고 있어야 한다 (DB 규칙 mou_slot_ok 와 같음)
+    const mouSlotRows={};
+    mouAll.filter(r=>(r.status==='accepted'||r.status==='pending') && r.slot_idx!=null)
+      .forEach(r=>{ (mouSlotRows[r.slot_idx]=mouSlotRows[r.slot_idx]||[]).push(r); });
+    const mouPairTxt=(r)=>{
+      const fb=mouType(r.from_profile)==='buyer', tb=mouType(r.to_profile)==='buyer';
+      return (fb&&!tb) ? (mouName(r.to_profile)+'  ↔  '+mouName(r.from_profile)) : (mouName(r.from_profile)+'  ↔  '+mouName(r.to_profile));
+    };
+    const mouClash=(rows)=> rows.length>1 && ![rows[0].from_profile, rows[0].to_profile]
+      .some(c=>rows.every(r=>r.from_profile===c||r.to_profile===c));
+    let mouClashN=0;
     const mouSlotCells=MOU_SLOTS.map((t,i)=>{
-      const r=mouTakenBy[i];
-      const ex = r ? (mouType(r.from_profile)==='exhibitor' ? mouName(r.from_profile) : mouName(r.to_profile)) : '';
-      const by = r ? (mouType(r.from_profile)==='buyer'     ? mouName(r.from_profile) : mouName(r.to_profile)) : '';
-      return { time:t, pair: r ? (ex+'  ↔  '+by) : '비어 있음',
-        style: r ? 'background:#E7F6F0;border:1px solid #bfe7d8;' : 'background:#fff;border:1px dashed #d3deea;',
-        textStyle: r ? 'color:#0d8f6b;font-weight:700;' : 'color:#9aa9bd;font-weight:600;' };
+      const rows=(mouSlotRows[i]||[]).slice().sort((x,y)=>(x.status==='accepted'?0:1)-(y.status==='accepted'?0:1));
+      const acc=rows.filter(r=>r.status==='accepted');
+      const clash=mouClash(rows); if(clash) mouClashN++;
+      const lines=rows.map(r=>(r.status==='accepted'?'[확정] ':'[대기] ')+mouPairTxt(r));
+      if(clash) lines.unshift('⚠ 다른 기관이 겹침 — 시간 조정 필요');
+      return { time:t, pair: rows.length ? lines.join(String.fromCharCode(10)) : '비어 있음',
+        style: clash ? 'background:#FDECEC;border:1px solid #f1b9b9;'
+             : (acc.length ? 'background:#E7F6F0;border:1px solid #bfe7d8;'
+             : (rows.length ? 'background:#FFF8EB;border:1px solid #f1dcb0;' : 'background:#fff;border:1px dashed #d3deea;')),
+        textStyle: clash ? 'color:#B42318;font-weight:700;white-space:pre-line;'
+             : (acc.length ? 'color:#0d8f6b;font-weight:700;white-space:pre-line;'
+             : (rows.length ? 'color:#A96A00;font-weight:700;white-space:pre-line;' : 'color:#9aa9bd;font-weight:600;')) };
     });
     const mouAdminRows=mouAll.map(r=>({
       id:r.id, a:mouName(r.from_profile), b:mouName(r.to_profile),
@@ -1754,7 +1773,7 @@ class Component extends DCLogic {
     }));
     const mouAcceptedN=mouAll.filter(r=>r.status==='accepted').length;
     const mouPendingN=mouAll.filter(r=>r.status==='pending').length;
-    const mouFreeN=15-mouAcceptedN;
+    const mouFreeN=15-Object.keys(mouSlotRows).length;
     const hasMouRows=mouAdminRows.length>0;
 
     // lounge grid
@@ -2391,7 +2410,7 @@ class Component extends DCLogic {
       bmDisc:won(bMoney.disc), bmSub:won(bMoney.sub),
       bmAdj:bMoney.adj>0, bmAdjLabel:'사무국이 금액을 조정한 신청 '+bMoney.adj+'건이 들어 있어, 항목 합계와 공급가가 다를 수 있습니다',
       isDash:v==='dash',isProspect:v==='prospect',isApps:v==='apps',isReg:v==='reg',isMatch:v==='match',isLounge:v==='lounge',isCms:v==='cms',isBooths:v==='booths',isMembers:v==='members',isOblead:v==='oblead',isPsign:v==='psign',
-      isMou:v==='mou', mouSlotCells, mouAdminRows, hasMouRows, noMouRows:!hasMouRows,
+      isMou:v==='mou', mouSlotCells, mouClashN, hasMouClash:mouClashN>0, mouAdminRows, hasMouRows, noMouRows:!hasMouRows,
       mouAcceptedN:String(mouAcceptedN), mouPendingN:String(mouPendingN), mouFreeN:String(mouFreeN),
       memberTabs, membersView, noMembers:membersView.length===0, exportMembers,
       pwModalOn:!!this.state.pwModal,

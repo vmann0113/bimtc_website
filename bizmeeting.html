@@ -759,7 +759,9 @@ class Component extends DCLogic {
     '권한이 없습니다':'You are not allowed to do this',
     '이미 처리된 신청입니다':'This request has already been handled',
     '체결식 시간이 비어 있습니다. 사무국에 문의해 주세요.':'No signing time is set. Please contact the secretariat.',
-    '그 시간은 방금 다른 협약이 확정되었습니다. 사무국에 시간 변경을 요청해 주세요.':'That slot was just confirmed for another MOU. Please ask the secretariat for a different time.'
+    '그 시간은 방금 다른 협약이 확정되었습니다. 사무국에 시간 변경을 요청해 주세요.':'That slot was just confirmed for another MOU. Please ask the secretariat for a different time.',
+    '그 시간에는 다른 기관의 협약이 이미 확정되어 있습니다. 다른 시간을 골라 주세요.':'Another organisation has already confirmed an MOU in that slot. Please pick another time.',
+    '그 시간에는 다른 기관의 협약이 신청되어 있습니다. 다른 시간을 골라 주세요.':'Another organisation has already requested that slot. Please pick another time.'
   };
   mouErr(m){ return this.state.lang==='en' ? (this.MOUERR[m] || m) : m; }
   mouSlotLabel(i){
@@ -1105,14 +1107,21 @@ class Component extends DCLogic {
     }).slice(0, this.SLOT_END);
     // ----- MOU 체결식 타임테이블 -----
     const mouBoardRows = this.state.mouBoard||[];
-    const mouTakenMap = {};
-    mouBoardRows.forEach(b=>{ mouTakenMap[b.slot_idx] = b; });
+    // 한 칸에 여러 건이 올 수 있다(같은 기관이 여러 상대와 체결할 때만). 대기 건도 칸을 차지한다.
+    const mouSlotRows = {};
+    mouBoardRows.forEach(b=>{ (mouSlotRows[b.slot_idx] = mouSlotRows[b.slot_idx] || []).push(b); });
     const mouCell = (i)=>{
-      const b = mouTakenMap[i];
+      const rows = mouSlotRows[i] || [];
+      const acc = rows.filter(b=>b.status!=='pending');
+      const pend = rows.length - acc.length;
+      const lines = acc.map(b=>(b.exhibitor||'')+'  ↔  '+(b.buyer||''));
+      if(pend) lines.push(this.L('신청 대기 '+pend+'건','Pending requests: '+pend));
       return { time:this.MOU_SLOTS[i],
-        pair: b ? (b.exhibitor+'  ↔  '+b.buyer) : this.L('비어 있음','Open'),
-        style: b ? 'background:#E7F6F0;border:1px solid #bfe7d8;' : 'background:#fff;border:1px dashed #d3deea;',
-        textStyle: b ? 'color:#0d8f6b;font-weight:700;' : 'color:#9aa9bd;font-weight:600;' };
+        pair: rows.length ? lines.join(String.fromCharCode(10)) : this.L('비어 있음','Open'),
+        style: acc.length ? 'background:#E7F6F0;border:1px solid #bfe7d8;'
+             : (pend ? 'background:#FFF8EB;border:1px solid #f1dcb0;' : 'background:#fff;border:1px dashed #d3deea;'),
+        textStyle: acc.length ? 'color:#0d8f6b;font-weight:700;white-space:pre-line;'
+             : (pend ? 'color:#A96A00;font-weight:700;white-space:pre-line;' : 'color:#9aa9bd;font-weight:600;') };
     };
     const mouRounds = [
       { title:this.L('13:00 ~ 13:50','13:00-13:50'), note:this.L('5분씩 10건','10 slots, 5 min each'),
@@ -1120,7 +1129,7 @@ class Component extends DCLogic {
       { title:this.L('15:30 ~ 15:55','15:30-15:55'), note:this.L('5분씩 5건','5 slots, 5 min each'),
         cells: Array.from({length:this.MOU_SLOTS.length-this.MOU_R2}, (x,i)=>mouCell(this.MOU_R2+i)) },
     ];
-    const mouFree = this.MOU_SLOTS.length - mouBoardRows.length;
+    const mouFree = this.MOU_SLOTS.length - Object.keys(mouSlotRows).length;
     const mouMap = (r)=>({
       id:r.id, name:r.other_name||this.L('상대','Partner'),
       meta:[this.typeLabel(r.other_type), (r.other_country||'').trim()].filter(Boolean).join(' · '),
@@ -1147,17 +1156,21 @@ class Component extends DCLogic {
     }));
     const mouIn  = mouReqs.filter(r=>r.direction==='in').map(mouMap);
     const mouOut = mouReqs.filter(r=>r.direction==='out').map(mouMap);
+    const u = this.state.user;
     const mouPickerSlots = this.MOU_SLOTS.map((time,i)=>{
-      const taken = !!mouTakenMap[i];
+      // 그 칸의 모든 건이 나 또는 고른 상대를 끼고 있으면 같이 쓸 수 있다 (서버 규칙과 같음)
+      const rows = mouSlotRows[i] || [];
+      const me = u ? u.id : null, other = this.state.mouPickId;
+      const shareOk = (c)=> !!c && rows.every(b=>b.from_id===c || b.to_id===c);
+      const taken = rows.length>0 && !(shareOk(me) || shareOk(other));
       const sel = this.state.mouSlot===i;
       let style="padding:10px 4px;border-radius:9px;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);font-weight:700;font-family:'Pretendard',sans-serif;";
       if(taken){ style+="background:#eef1f6;color:#adb8c6;border:1px solid #e1e8f0;cursor:not-allowed;"; }
       else if(sel){ style+="background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;cursor:pointer;"; }
       else { style+="background:#fff;color:#33485e;border:1px solid #d3deea;cursor:pointer;"; }
-      return { label:time, style, onClick:()=> taken?null:this.setState({mouSlot:i}) };
+      return { label:time, style, taken, onClick:()=> taken?null:this.setState({mouSlot:i}) };
     });
     const pkTabBase="flex:1;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;";
-    const u = this.state.user;
 
     return {
       matchClosed:mc.matchClosed, mcTitle:mc.mcTitle, mcBody:mc.mcBody, mcBodyEn:mc.mcBodyEn, mcHome:mc.mcHome,
@@ -1331,7 +1344,7 @@ class Component extends DCLogic {
       mouExQ:this.state.mouExQ, setMouExQ:this.set('mouExQ'),
       mouExCount:this.L('승인된 참가기업 '+mouExAll.length+'곳','Approved exhibitors: '+mouExAll.length),
       mouFreeLabel:this.L('남은 칸 '+mouFree+'개 / 전체 15개','Open slots: '+mouFree+' of 15'),
-      mouNoFree:mouFree===0,
+      mouNoFree:mouPickerSlots.every(x=>x.taken),
       mouPickerOpen:this.state.mouPickId!=null, mouPickName:this.state.mouPickName,
       mouPickerSlots, mouMsg:this.state.mouMsg, setMouMsg:this.set('mouMsg'),
       closeMouPicker:()=>this.closeMouPicker(), confirmMou:()=>this.confirmMou(),
