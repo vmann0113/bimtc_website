@@ -300,6 +300,11 @@
         <div style="margin-bottom:22px;">
           <h2 style="font-size:clamp(22px,2.89vw,26px);font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;">{{ t.k053 }}</h2>
           <p style="font-size:14.5px;color:#5E7289;margin:0;">{{ t.k056 }}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
+            <sc-for list="{{ partnerSortChips }}" as="c" hint-placeholder-count="3">
+              <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:16px;">
           <sc-for list="{{ partnersView }}" as="p" hint-placeholder-count="6">
@@ -725,6 +730,7 @@ class Component extends DCLogic {
     notAllowed: false,
     boothPending: false,
     partners: [],
+    partnerSort: 'new',  // 파트너 찾기 정렬: new(등록 최신순) · old(등록 과거순) · name(이름순)
     requests: [],
     reservations: {},
     pendingAssign: [],
@@ -1072,9 +1078,21 @@ class Component extends DCLogic {
     ];
 
     const slotLabelOf=(d,si)=> (si==null||d==null) ? this.L('시간 미지정','Time not set') : (this.dayLabel(d)+' '+this.SLOTS[si]);
-    // 사무국이 초청한 바이어를 맨 위에 모은다. 나머지(홈페이지로 모집한 온라인 바이어)는 그 아래.
-    const partnersSorted = this.state.partners.slice().sort((a,b)=>
-      (b.invited?1:0)-(a.invited?1:0) || String(a.name||'').localeCompare(String(b.name||'')));
+    // 정렬: 등록 최신순(기본) · 등록 과거순 · 이름순. 등록 시각이 없는 곳은 시간순에서 맨 뒤로 보낸다.
+    const pSort = this.state.partnerSort||'new';
+    const regMs = (x)=> x.regAt ? new Date(x.regAt).getTime() : null;
+    const byName = (a,b)=> String(a.name||'').localeCompare(String(b.name||''));
+    const partnersSorted = this.state.partners.slice().sort((a,b)=>{
+      if(pSort==='name') return byName(a,b);
+      const ta=regMs(a), tb=regMs(b);
+      if(ta==null && tb==null) return byName(a,b);
+      if(ta==null) return 1; if(tb==null) return -1;
+      return (pSort==='old' ? ta-tb : tb-ta) || byName(a,b);
+    });
+    const partnerSortChips = [['new',this.L('등록 최신순','Newest first')],['old',this.L('등록 과거순','Oldest first')],['name',this.L('이름순','By name')]].map(([k,l])=>({
+      label:l, onClick:()=>this.setState({partnerSort:k}),
+      style:"cursor:pointer;padding:8px 15px;border-radius:999px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);font-weight:700;font-family:'Pretendard',sans-serif;white-space:nowrap;"+(pSort===k?'background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;':'background:#fff;color:#5e7289;border:1px solid #d8e0ea;')
+    }));
     const partnersView = partnersSorted.map(p=>({
       ...p, requested:p.status==='requested', notRequested:p.status!=='requested',
       onlineOnly:(p.attendMode||'onsite')==='online',
@@ -1282,7 +1300,7 @@ class Component extends DCLogic {
         k053:L('파트너 찾기','Find partners'),
         k054:L('내 미팅 일정 보기','View my meetings'),
         k055:L('이전','Back'),
-        k056:L('매칭된 참가기업·바이어에게 1:1 미팅을 요청하세요. 사무국이 초청한 바이어가 맨 위에 있고, 소개서를 낸 곳은 [소개서 보기]로 회사 정보를 확인하실 수 있습니다.','Send a 1:1 meeting request to an exhibitor or buyer. Buyers invited by the secretariat are listed first; where a profile was submitted you can open it with [View profile].'),
+        k056:L('매칭된 참가기업·바이어에게 1:1 미팅을 요청하세요. 등록 최신순·과거순·이름순으로 정렬할 수 있고, 소개서를 낸 곳은 [소개서 보기]로 회사 정보를 확인하실 수 있습니다.','Send a 1:1 meeting request to an exhibitor or buyer. Sort by newest, oldest or name; where a profile was submitted you can open it with [View profile].'),
         k057:L('온라인 참가 · 화상 미팅','Online participant · video meeting'),
         k057b:L('현장 방문 · 부스 상담','On-site · meet at your booth'),
         k110:L('초청바이어','Invited buyer'),
@@ -1369,7 +1387,7 @@ class Component extends DCLogic {
       roleBuStyle: roleBase + (!exA?'background:#0B5FA5;color:#fff;border:1.5px solid #0B5FA5;':'background:#fff;color:#5E7289;border:1.5px solid #d8e0ea;'),
       reviewRows,
 
-      partnersView, requestsView,
+      partnersView, partnerSortChips, requestsView,
       mouRounds, mouIn, mouOut,
       hasMouIn:mouIn.length>0, hasMouOut:mouOut.length>0, noMou:(mouIn.length+mouOut.length)===0,
       hasMouEx:mouExAll.length>0, mouExView, mouExEmpty:mouExAll.length>0 && mouExView.length===0,
