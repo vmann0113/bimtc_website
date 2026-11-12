@@ -572,6 +572,13 @@
       if (r.error) return { ok: false, error: r.error.message };
       return r.data || { ok: false, error: 'unknown' };
     },
+    // 받은 신청을 다른 시간으로 바꿔 수락
+    async acceptMouAt(id, slot) {
+      var sb = await ready();
+      var r = await sb.rpc('mou_accept_at', { p_id: id, p_slot: slot });
+      if (r.error) return { ok: false, error: r.error.message };
+      return r.data || { ok: false, error: 'unknown' };
+    },
     async respondMouRequest(id, accept) {
       var sb = await ready();
       var r = await sb.rpc('mou_respond', { p_id: id, p_accept: !!accept });

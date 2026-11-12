@@ -451,6 +451,7 @@
                 <sc-if value="{{ r.isPending }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex;gap:8px;">
                     <button onClick="{{ r.accept }}" style="flex:1;background:#11A37B;color:#fff;border:none;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k126 }}</button>
+                    <button onClick="{{ r.reslot }}" style="flex:1;background:#fff;color:#0B5FA5;border:1.5px solid #0B5FA5;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k139 }}</button>
                     <button onClick="{{ r.decline }}" style="flex:1;background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k127 }}</button>
                   </div>
                 </sc-if>
@@ -592,12 +593,12 @@
       <div onClick="{{ stop }}" style="width:100%;max-width:560px;background:#fff;border-radius:20px;padding:30px;box-shadow:0 30px 70px rgba(0,0,0,0.35);">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
           <div>
-            <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;margin-bottom:4px;">{{ t.k120 }}</div>
+            <div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#8295ab;font-weight:600;margin-bottom:4px;">{{ mouPickTitle }}</div>
             <h3 style="font-size:20px;font-weight:800;margin:0;color:#0F2440;">{{ mouPickName }}</h3>
           </div>
           <span onClick="{{ closeMouPicker }}" style="font-size:22px;color:#9aa9bd;cursor:pointer;line-height:1;">×</span>
         </div>
-        <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin:8px 0 18px;line-height:1.6;">{{ t.k122 }}</p>
+        <p style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin:8px 0 18px;line-height:1.6;">{{ mouPickDesc }}</p>
         <sc-if value="{{ mouNoFree }}" hint-placeholder-val="{{ false }}">
           <div style="background:#FDF4EC;border:1px solid #F0D9AE;color:#A4631F;border-radius:10px;padding:11px 14px;margin:0 0 14px;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);line-height:1.6;">{{ t.k134 }}</div>
         </sc-if>
@@ -606,7 +607,9 @@
             <button onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</button>
           </sc-for>
         </div>
-        <input value="{{ mouMsg }}" onInput="{{ setMouMsg }}" maxLength="300" placeholder="{{ t.k131 }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;margin-bottom:20px;" />
+        <sc-if value="{{ mouPickIsRequest }}" hint-placeholder-val="{{ true }}">
+          <input value="{{ mouMsg }}" onInput="{{ setMouMsg }}" maxLength="300" placeholder="{{ t.k131 }}" style="width:100%;padding:12px 14px;border:1px solid #d8e0ea;border-radius:10px;font-size:clamp(14px,calc(19.2px - 0.35vw),16px);color:#0F2440;outline:none;margin-bottom:20px;" />
+        </sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end;">
           <button onClick="{{ closeMouPicker }}" style="background:#fff;color:#5E7289;border:1px solid #d8e0ea;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.k075 }}</button>
           <button onClick="{{ confirmMou }}" style="{{ mouConfirmStyle }}">{{ mouConfirmLabel }}</button>
@@ -859,11 +862,24 @@ class Component extends DCLogic {
   closePicker(){ this.setState({ pickerId:null, pickSlot:null, pickerMode:'request', rescheduleId:null, pickInterp:false }); }
 
   // ----- MOU 체결 신청 -----
-  openMouPicker(partner){ this.setState({ mouPickId:partner.id, mouPickName:partner.name, mouSlot:null, mouMsg:'' }); }
-  closeMouPicker(){ this.setState({ mouPickId:null, mouSlot:null, mouMsg:'' }); }
+  openMouPicker(partner){ this.setState({ mouPickId:partner.id, mouPickName:partner.name, mouSlot:null, mouMsg:'', mouAcceptId:null }); }
+  // 받은 신청을 다른 시간으로 바꿔 수락할 때 같은 선택 창을 쓴다
+  openMouReslot(r){ this.setState({ mouPickId:r.other_id, mouPickName:r.other_name||'', mouSlot:null, mouMsg:'', mouAcceptId:r.id }); }
+  closeMouPicker(){ this.setState({ mouPickId:null, mouSlot:null, mouMsg:'', mouAcceptId:null }); }
   async confirmMou(){
     if(this.state.mouSlot==null){ this.flash(this.L('체결식 시간을 선택해 주세요','Please choose a signing time')); return; }
     if(this.state.mouBusy) return;
+    if(this.state.mouAcceptId){
+      this.setState({ mouBusy:true });
+      const r2 = await window.BimtcDB.acceptMouAt(this.state.mouAcceptId, this.state.mouSlot);
+      this.setState({ mouBusy:false });
+      if(!r2.ok){ this.flash(this.mouErr(r2.error)); return; }
+      const lbl2 = this.mouSlotLabel(this.state.mouSlot);
+      this.closeMouPicker();
+      await this.reload();
+      this.flash(this.L(lbl2+'(으)로 시간을 바꿔 MOU 체결을 수락했습니다','MOU accepted at '+lbl2));
+      return;
+    }
     this.setState({ mouBusy:true });
     const res = await window.BimtcDB.addMouRequest(this.state.mouPickId, this.state.mouSlot, this.state.mouMsg);
     this.setState({ mouBusy:false });
@@ -1141,7 +1157,8 @@ class Component extends DCLogic {
       statusStyle: r.status==='accepted' ? 'background:#E7F6F0;color:#0d8f6b;'
                  : (r.status==='declined' ? 'background:#F4F6F9;color:#8295ab;' : 'background:#FFF4E0;color:#A96A00;'),
       initial:this.initialOf(r.other_name||'?'), ...this.avatarColors(r.other_type==='buyer'),
-      accept:()=>this.respondMou(r.id,true), decline:()=>this.respondMou(r.id,false), cancel:()=>this.cancelMou(r.id)
+      accept:()=>this.respondMou(r.id,true), decline:()=>this.respondMou(r.id,false), cancel:()=>this.cancelMou(r.id),
+      reslot:()=>this.openMouReslot(r)
     });
     // 참가기업끼리 MOU — 이름·분야로 걸러 보여 준다
     const mouExQ = String(this.state.mouExQ||'').trim().toLowerCase();
@@ -1159,8 +1176,9 @@ class Component extends DCLogic {
     const u = this.state.user;
     const mouPickerSlots = this.MOU_SLOTS.map((time,i)=>{
       // 그 칸의 모든 건이 나 또는 고른 상대를 끼고 있으면 같이 쓸 수 있다 (서버 규칙과 같음)
-      const rows = mouSlotRows[i] || [];
       const me = u ? u.id : null, other = this.state.mouPickId;
+      // 시간 바꿔 수락이면 그 신청 자신은 빼고 본다
+      const rows = (mouSlotRows[i] || []).filter(b=> !(this.state.mouAcceptId && b.status==='pending' && b.from_id===other && b.to_id===me));
       const shareOk = (c)=> !!c && rows.every(b=>b.from_id===c || b.to_id===c);
       const taken = rows.length>0 && !(shareOk(me) || shareOk(other));
       const sel = this.state.mouSlot===i;
@@ -1276,6 +1294,7 @@ class Component extends DCLogic {
         k136:L('바이어뿐 아니라 함께 참가하는 기업·기관과도 MOU를 신청할 수 있습니다.','You can also request an MOU with other exhibiting companies and organisations, not only buyers.'),
         k137:L('기업·기관명으로 찾기','Search by company name'),
         k138:L('찾는 이름이 없습니다.','No matching exhibitor.'),
+        k139:L('시간 바꿔 수락','Accept at other time'),
         k058:L('담당자','Contact'),
         k059:L('✓ 요청함','✓ Requested'),
         k060:L('날짜·시간 선택 후 요청','Choose a time and request'),
@@ -1348,9 +1367,16 @@ class Component extends DCLogic {
       mouPickerOpen:this.state.mouPickId!=null, mouPickName:this.state.mouPickName,
       mouPickerSlots, mouMsg:this.state.mouMsg, setMouMsg:this.set('mouMsg'),
       closeMouPicker:()=>this.closeMouPicker(), confirmMou:()=>this.confirmMou(),
-      mouConfirmLabel: this.state.mouBusy ? this.L('신청 중…','Sending...')
-        : (this.state.mouSlot!=null ? this.L(this.MOU_SLOTS[this.state.mouSlot]+' 신청','Request '+this.MOU_SLOTS[this.state.mouSlot])
-                                    : this.L('시간 선택','Choose a time')),
+      mouPickIsRequest: !this.state.mouAcceptId,
+      mouPickTitle: this.state.mouAcceptId ? this.L('시간 바꿔 수락','Accept at another time') : this.L('MOU 체결 신청','Request MOU signing'),
+      mouPickDesc: this.state.mouAcceptId
+        ? this.L('원하는 체결 시간을 고르면 그 시간으로 바뀌면서 바로 확정됩니다. 다른 기관이 쓰는 칸은 고를 수 없습니다.','Pick the time you prefer. The request moves to that slot and is confirmed right away. Slots used by other organisations cannot be chosen.')
+        : this.L('11월 13일(금) 메인무대 협약 체결식에 함께 오를 상대를 신청합니다. 한 건에 5분이고, 상대가 수락하면 그 칸이 확정됩니다.','Request a partner to sign an MOU with you on the main stage on Friday, 13 November. Each signing takes 5 minutes and the slot is confirmed once the other party accepts.'),
+      mouConfirmLabel: this.state.mouBusy ? this.L('처리 중…','Sending...')
+        : (this.state.mouSlot!=null
+            ? (this.state.mouAcceptId ? this.L(this.MOU_SLOTS[this.state.mouSlot]+' 수락','Accept '+this.MOU_SLOTS[this.state.mouSlot])
+                                      : this.L(this.MOU_SLOTS[this.state.mouSlot]+' 신청','Request '+this.MOU_SLOTS[this.state.mouSlot]))
+            : this.L('시간 선택','Choose a time')),
       mouConfirmStyle: "padding:12px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;border:none;" + (this.state.mouSlot!=null?'background:#0B5FA5;color:#fff;':'background:#cdd6e2;color:#fff;'),
       goMou:()=>this.setView('mou'),
 
