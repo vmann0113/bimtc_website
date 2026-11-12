@@ -504,7 +504,7 @@
             <span style="flex:1;min-width:0;">이메일</span>
             <span style="width:130px;flex-shrink:0;">연락처</span>
             <span style="width:80px;flex-shrink:0;">국가</span>
-            <span style="width:74px;flex-shrink:0;">가입일</span>
+            <span style="width:112px;flex-shrink:0;">가입일시</span>
             <span style="width:104px;flex-shrink:0;text-align:right;">비즈미팅</span>
             <span style="width:172px;flex-shrink:0;text-align:right;position:sticky;right:0;background:#F7F9FC;padding-left:12px;box-shadow:-10px 0 10px -6px rgba(16,40,70,0.10);">관리</span>
           </div>
@@ -518,7 +518,7 @@
               <span style="flex:1;min-width:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.email }}</span>
               <span style="width:130px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;">{{ m.phone }}</span>
               <span style="width:80px;flex-shrink:0;font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#5e7289;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ m.country }}</span>
-              <span style="width:74px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);color:#8295ab;">{{ m.date }}</span>
+              <span style="width:112px;flex-shrink:0;font-size:clamp(12.5px,calc(16.63px - 0.35vw),14.5px);white-space:nowrap;color:{{ m.dateColor }};font-weight:{{ m.dateWeight }};">{{ m.date }}</span>
               <span style="width:104px;flex-shrink:0;text-align:right;">
                 <sc-if value="{{ m.canGrant }}" hint-placeholder-val="{{ false }}"><button onClick="{{ m.grant }}" style="background:#fff;color:#0B5FA5;border:1.5px solid #b9d3ea;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;white-space:nowrap;">매칭 권한 부여</button></sc-if>
                 <sc-if value="{{ m.hasMatch }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#0d8f6b;background:#E7F6F0;padding:5px 10px;border-radius:999px;white-space:nowrap;">매칭 가능</span></sc-if>
@@ -1883,7 +1883,8 @@ class Component extends DCLogic {
       const has=!!grantedIds[p.id];
       return { name:p.name||'-', person:personName(p)||'-', dept:p.dept||'-', email:p.email||'-', phone:p.phone||'-', country:p.country||'-',
         job:p.job_title||'-', industry:p.industry||'-', landline:p.landline||'-',
-        date:this.short(p.created_at), typeLabel:c[2], tagBg:c[0], tagColor:c[1],
+        date:this.shortTime(p.created_at), dateFull:(p.created_at?(new Date(p.created_at).getFullYear()+'.'+this.shortTime(p.created_at)):''),
+        dateColor:(p.created_at&&new Date(p.created_at).toDateString()===new Date().toDateString())?'#0B5FA5':'#8295ab', dateWeight:(p.created_at&&new Date(p.created_at).toDateString()===new Date().toDateString())?'800':'400', typeLabel:c[2], tagBg:c[0], tagColor:c[1],
         isBuyer:p.type==='buyer',
         modeLabel:(MODE_L[p.attend_mode||'onsite']||MODE_L.onsite)[0],
         modeStyle:'font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap;background:'+(MODE_L[p.attend_mode||'onsite']||MODE_L.onsite)[1]+';color:'+(MODE_L[p.attend_mode||'onsite']||MODE_L.onsite)[2]+';',
@@ -1895,7 +1896,7 @@ class Component extends DCLogic {
         grant:()=>this.grantMatch(p), del:()=>this.deleteMember(p) };
     });
     const exportMembers=()=>{
-      const rows=[['유형','참가 방식','기관/기업명','담당자','직책','소속','이메일','연락처','유선전화','업종','국가','가입일']].concat(membersView.map(m=>[m.typeLabel,(m.isBuyer?m.modeLabel:'-'),m.name,m.person,m.job,m.dept,m.email,m.phone,m.landline,m.industry,m.country,m.date]));
+      const rows=[['유형','참가 방식','기관/기업명','담당자','직책','소속','이메일','연락처','유선전화','업종','국가','가입일시']].concat(membersView.map(m=>[m.typeLabel,(m.isBuyer?m.modeLabel:'-'),m.name,m.person,m.job,m.dept,m.email,m.phone,m.landline,m.industry,m.country,m.dateFull]));
       const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
       const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
       a.download='BIMTC_회원명단_'+(({all:'전체',exhibitor:'참가기업',buyer:'바이어',buyer_online:'온라인바이어',visitor:'방문객'})[mTab]||mTab)+'.csv'; a.click();
