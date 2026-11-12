@@ -745,11 +745,15 @@ class Component extends DCLogic {
   DAYLABEL = { D1:'11.13', D2:'11.14' };
   DAYLABEL_EN = { D1:'Nov 13', D2:'Nov 14' };
 
-  // MOU 체결식(11/13) — 한 건에 5분. ① 13:00 부터 50분(10칸), ② 15:30 부터 25분(5칸).
-  // 남는 시간은 무대 전환용이라 칸을 만들지 않는다. 칸 번호 0~14 는 DB(mou_requests.slot_idx) 와 같다.
+  // MOU 체결식 — 한 건에 5분. 11/13(금) ① 13:00 부터 50분(10칸), ② 15:30 부터 25분(5칸),
+  // 11/14(토) ③ 10:00 부터 40분(8칸). 남는 시간은 무대 전환용이라 칸을 만들지 않는다.
+  // 칸 번호 0~22 는 DB(mou_requests.slot_idx) 와 같다. 15번부터 토요일.
   MOU_SLOTS = ['13:00','13:05','13:10','13:15','13:20','13:25','13:30','13:35','13:40','13:45',
-               '15:30','15:35','15:40','15:45','15:50'];
+               '15:30','15:35','15:40','15:45','15:50',
+               '10:00','10:05','10:10','10:15','10:20','10:25','10:30','10:35'];
   MOU_R2 = 10;   // 이 번호부터 2회차
+  MOU_SAT = 15;  // 이 번호부터 토요일(11/14)
+  mouDayTime(i){ return (i>=this.MOU_SAT ? this.L('토 ','Sat ') : this.L('금 ','Fri ')) + this.MOU_SLOTS[i]; }
   // 서버가 돌려주는 오류 문구는 한국어다. 영어 화면에서만 바꿔 보여 준다.
   MOUERR = {
     '로그인이 필요합니다':'You need to sign in first',
@@ -771,7 +775,8 @@ class Component extends DCLogic {
   mouErr(m){ return this.state.lang==='en' ? (this.MOUERR[m] || m) : m; }
   mouSlotLabel(i){
     if(i==null) return this.L('시간 미지정','Time not set');
-    return this.L('11.13 '+this.MOU_SLOTS[i], 'Nov 13 '+this.MOU_SLOTS[i]);
+    return i>=this.MOU_SAT ? this.L('11.14(토) '+this.MOU_SLOTS[i], 'Nov 14 (Sat) '+this.MOU_SLOTS[i])
+                           : this.L('11.13(금) '+this.MOU_SLOTS[i], 'Nov 13 (Fri) '+this.MOU_SLOTS[i]);
   }
 
   async componentDidMount(){
@@ -1146,10 +1151,12 @@ class Component extends DCLogic {
              : (pend ? 'color:#A96A00;font-weight:700;white-space:pre-line;' : 'color:#9aa9bd;font-weight:600;') };
     };
     const mouRounds = [
-      { title:this.L('13:00 ~ 13:50','13:00-13:50'), note:this.L('5분씩 10건','10 slots, 5 min each'),
+      { title:this.L('11.13(금) 13:00 ~ 13:50','Fri 13 Nov 13:00-13:50'), note:this.L('5분씩 10건','10 slots, 5 min each'),
         cells: Array.from({length:this.MOU_R2}, (x,i)=>mouCell(i)) },
-      { title:this.L('15:30 ~ 15:55','15:30-15:55'), note:this.L('5분씩 5건','5 slots, 5 min each'),
-        cells: Array.from({length:this.MOU_SLOTS.length-this.MOU_R2}, (x,i)=>mouCell(this.MOU_R2+i)) },
+      { title:this.L('11.13(금) 15:30 ~ 15:55','Fri 13 Nov 15:30-15:55'), note:this.L('5분씩 5건','5 slots, 5 min each'),
+        cells: Array.from({length:this.MOU_SAT-this.MOU_R2}, (x,i)=>mouCell(this.MOU_R2+i)) },
+      { title:this.L('11.14(토) 10:00 ~ 10:40','Sat 14 Nov 10:00-10:40'), note:this.L('5분씩 8건','8 slots, 5 min each'),
+        cells: Array.from({length:this.MOU_SLOTS.length-this.MOU_SAT}, (x,i)=>mouCell(this.MOU_SAT+i)) },
     ];
     const mouFree = this.MOU_SLOTS.length - Object.keys(mouSlotRows).length;
     const mouMap = (r)=>({
@@ -1192,7 +1199,7 @@ class Component extends DCLogic {
       if(taken){ style+="background:#eef1f6;color:#adb8c6;border:1px solid #e1e8f0;cursor:not-allowed;"; }
       else if(sel){ style+="background:#0B5FA5;color:#fff;border:1px solid #0B5FA5;cursor:pointer;"; }
       else { style+="background:#fff;color:#33485e;border:1px solid #d3deea;cursor:pointer;"; }
-      return { label:time, style, taken, onClick:()=> taken?null:this.setState({mouSlot:i}) };
+      return { label:this.mouDayTime(i), style, taken, onClick:()=> taken?null:this.setState({mouSlot:i}) };
     });
     const pkTabBase="flex:1;padding:11px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;";
 
@@ -1283,7 +1290,7 @@ class Component extends DCLogic {
         k112:L('회사 자료','Catalog'),
         k120:L('MOU 체결 신청','Request MOU signing'),
         k121:L('MOU 체결','MOU signing'),
-        k122:L('11월 13일(금) 메인무대 협약 체결식에 함께 오를 상대를 신청합니다. 한 건에 5분이고, 상대가 수락하면 그 칸이 확정됩니다.','Request a partner to sign an MOU with you on the main stage on Friday, 13 November. Each signing takes 5 minutes and the slot is confirmed once the other party accepts.'),
+        k122:L('11월 13일(금)·14일(토) 메인무대 협약 체결식에 함께 오를 상대를 신청합니다. 한 건에 5분이고, 상대가 수락하면 그 칸이 확정됩니다.','Request a partner to sign an MOU with you on the main stage on Friday 13 or Saturday 14 November. Each signing takes 5 minutes and the slot is confirmed once the other party accepts.'),
         k123:L('체결식 타임테이블','Signing timetable'),
         k124:L('받은 MOU 신청','MOU requests received'),
         k125:L('체결 시간','Signing time'),
@@ -1294,8 +1301,8 @@ class Component extends DCLogic {
         k130:L('파트너 찾기 →','Find partners →'),
         k131:L('어떤 내용의 협약인지 한 줄로 적어주세요 (선택)','One line on what the MOU is about (optional)'),
         k132:L('신청 취소','Cancel request'),
-        k133:L('MOU 체결식은 11월 13일(금) 메인무대에서 두 번 진행됩니다.','The MOU signing ceremony runs twice on Friday, 13 November, on the main stage.'),
-        k134:L('남은 칸이 없습니다. 15건이 모두 찼습니다 — 사무국으로 문의해 주세요.','All 15 slots are taken. Please contact the secretariat.'),
+        k133:L('MOU 체결식은 메인무대에서 11월 13일(금) 두 번, 11월 14일(토) 오전 한 번 진행됩니다.','The MOU signing ceremony runs on the main stage twice on Friday 13 November and once on Saturday 14 November (morning).'),
+        k134:L('고를 수 있는 시간이 없습니다 — 사무국으로 문의해 주세요.','No time is available. Please contact the secretariat.'),
         k135:L('참가기업과 MOU','MOU with another exhibitor'),
         k136:L('바이어뿐 아니라 함께 참가하는 기업·기관과도 MOU를 신청할 수 있습니다.','You can also request an MOU with other exhibiting companies and organisations, not only buyers.'),
         k137:L('기업·기관명으로 찾기','Search by company name'),
@@ -1368,7 +1375,7 @@ class Component extends DCLogic {
       hasMouEx:mouExAll.length>0, mouExView, mouExEmpty:mouExAll.length>0 && mouExView.length===0,
       mouExQ:this.state.mouExQ, setMouExQ:this.set('mouExQ'),
       mouExCount:this.L('승인된 참가기업 '+mouExAll.length+'곳','Approved exhibitors: '+mouExAll.length),
-      mouFreeLabel:this.L('남은 칸 '+mouFree+'개 / 전체 15개','Open slots: '+mouFree+' of 15'),
+      mouFreeLabel:this.L('남은 칸 '+mouFree+'개 / 전체 '+this.MOU_SLOTS.length+'개','Open slots: '+mouFree+' of '+this.MOU_SLOTS.length),
       mouNoFree:mouPickerSlots.every(x=>x.taken),
       mouPickerOpen:this.state.mouPickId!=null, mouPickName:this.state.mouPickName,
       mouPickerSlots, mouMsg:this.state.mouMsg, setMouMsg:this.set('mouMsg'),
@@ -1377,11 +1384,11 @@ class Component extends DCLogic {
       mouPickTitle: this.state.mouAcceptId ? this.L('시간 바꿔 수락','Accept at another time') : this.L('MOU 체결 신청','Request MOU signing'),
       mouPickDesc: this.state.mouAcceptId
         ? this.L('원하는 체결 시간을 고르면 그 시간으로 바뀌면서 바로 확정됩니다. 다른 기관이 쓰는 칸은 고를 수 없습니다.','Pick the time you prefer. The request moves to that slot and is confirmed right away. Slots used by other organisations cannot be chosen.')
-        : this.L('11월 13일(금) 메인무대 협약 체결식에 함께 오를 상대를 신청합니다. 한 건에 5분이고, 상대가 수락하면 그 칸이 확정됩니다.','Request a partner to sign an MOU with you on the main stage on Friday, 13 November. Each signing takes 5 minutes and the slot is confirmed once the other party accepts.'),
+        : this.L('11월 13일(금)·14일(토) 메인무대 협약 체결식에 함께 오를 상대를 신청합니다. 한 건에 5분이고, 상대가 수락하면 그 칸이 확정됩니다.','Request a partner to sign an MOU with you on the main stage on Friday 13 or Saturday 14 November. Each signing takes 5 minutes and the slot is confirmed once the other party accepts.'),
       mouConfirmLabel: this.state.mouBusy ? this.L('처리 중…','Sending...')
         : (this.state.mouSlot!=null
-            ? (this.state.mouAcceptId ? this.L(this.MOU_SLOTS[this.state.mouSlot]+' 수락','Accept '+this.MOU_SLOTS[this.state.mouSlot])
-                                      : this.L(this.MOU_SLOTS[this.state.mouSlot]+' 신청','Request '+this.MOU_SLOTS[this.state.mouSlot]))
+            ? (this.state.mouAcceptId ? this.L(this.mouDayTime(this.state.mouSlot)+' 수락','Accept '+this.mouDayTime(this.state.mouSlot))
+                                      : this.L(this.mouDayTime(this.state.mouSlot)+' 신청','Request '+this.mouDayTime(this.state.mouSlot)))
             : this.L('시간 선택','Choose a time')),
       mouConfirmStyle: "padding:12px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;border:none;" + (this.state.mouSlot!=null?'background:#0B5FA5;color:#fff;':'background:#cdd6e2;color:#fff;'),
       goMou:()=>this.setView('mou'),
