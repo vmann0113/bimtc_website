@@ -315,6 +315,7 @@
               </div>
               <h3 style="font-size:16.5px;font-weight:800;margin:0 0 4px;color:#0F2440;">{{ p.name }}</h3>
               <div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#8295ab;margin-bottom:14px;">{{ p.meta }}</div>
+              <sc-if value="{{ p.regLabel }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:{{ p.regColor }};font-weight:{{ p.regWeight }};margin:-10px 0 14px;">{{ p.regLabel }}</div></sc-if>
               <sc-if value="{{ p.onsiteBuyer }}" hint-placeholder-val="{{ false }}"><div style="display:inline-flex;align-items:center;gap:6px;background:#E7F6F0;border:1px solid #bfe7d8;color:#0d8f6b;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:800;border-radius:8px;padding:5px 10px;margin:-8px 0 14px;"><span style="width:7px;height:7px;border-radius:50%;background:#11A37B;display:inline-block;"></span>{{ t.k057b }}</div></sc-if>
               <sc-if value="{{ p.onlineOnly }}" hint-placeholder-val="{{ false }}"><div style="display:inline-flex;align-items:center;gap:5px;background:#F3EEFB;border:1px solid #ddd0f0;color:#7a5cc4;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);font-weight:700;border-radius:8px;padding:5px 10px;margin:-8px 0 14px;">{{ t.k057 }}</div></sc-if>
               <sc-if value="{{ p.person }}" hint-placeholder-val="{{ '' }}"><div style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#33485e;font-weight:600;margin:-10px 0 14px;">{{ t.k058 }} {{ p.person }} <span style="color:#8295ab;font-weight:400;">{{ p.job }}</span></div></sc-if>
@@ -766,6 +767,7 @@ class Component extends DCLogic {
     '그 시간에는 다른 기관의 협약이 이미 확정되어 있습니다. 다른 시간을 골라 주세요.':'Another organisation has already confirmed an MOU in that slot. Please pick another time.',
     '그 시간에는 다른 기관의 협약이 신청되어 있습니다. 다른 시간을 골라 주세요.':'Another organisation has already requested that slot. Please pick another time.'
   };
+  kstStamp(iso){ const d=new Date(new Date(iso).getTime()+9*3600*1000); const z=n=>String(n).padStart(2,'0'); return z(d.getUTCMonth()+1)+'.'+z(d.getUTCDate())+' '+z(d.getUTCHours())+':'+z(d.getUTCMinutes()); }
   mouErr(m){ return this.state.lang==='en' ? (this.MOUERR[m] || m) : m; }
   mouSlotLabel(i){
     if(i==null) return this.L('시간 미지정','Time not set');
@@ -808,7 +810,7 @@ class Component extends DCLogic {
     const partnersMapped = partners.map(p=>({ id:p.id, name:p.name||this.L('(이름 미입력)','(no name)'), type:this.typeLabel(p.type), ptype:p.type, attendMode:p.attend_mode||'onsite',
       person:this.personName(p), job:p.job_title||'',
       country:p.country||'', org:((p.category||p.industry||'')+'').trim(), tags:(p.interests||[]).map(c=>this.fieldLabel(c)), status: requestedIds.has(p.id)?'requested':'none',
-      invited:this.isInvited(p.id), docs:this.buyerDoc(p.id) }));
+      invited:this.isInvited(p.id), docs:this.buyerDoc(p.id), regAt:p.created_at||null }));
     const requestsMapped = inbox.map(r=>({ id:r.id, from_profile:r.from_profile, name:(r.from&&r.from.name)||this.L('요청자','Requester'), type:this.typeLabel(r.from&&r.from.type), ptype:(r.from&&r.from.type)||'',
       person:this.personName(r.from),
       country:(r.from&&r.from.country)||'', org:(((r.from&&(r.from.category||r.from.industry))||'')+'').trim(), msg:r.message||'', status:r.status,
@@ -1076,6 +1078,10 @@ class Component extends DCLogic {
       hasDoc:!!(p.docs&&p.docs.doc), docUrl:(p.docs&&p.docs.doc)?('uploads/buyer/'+p.docs.doc):'',
       hasCat:!!(p.docs&&p.docs.cat), catUrl:(p.docs&&p.docs.cat)?('uploads/buyer/'+p.docs.cat):'',
       meta:[(p.country||'').trim(), (p.org||'').trim()].filter(Boolean).join(' · '),
+      // 바이어 등록 일시(한국 시간). 새로 들어온 바이어를 구분하려고 보여 주고, 오늘 등록이면 강조한다
+      regLabel:(p.ptype==='buyer' && p.regAt) ? (this.L('등록 ','Registered ')+this.kstStamp(p.regAt)) : '',
+      regColor:(p.regAt && this.kstStamp(p.regAt).slice(0,5)===this.kstStamp(new Date().toISOString()).slice(0,5)) ? '#0B5FA5' : '#8295ab',
+      regWeight:(p.regAt && this.kstStamp(p.regAt).slice(0,5)===this.kstStamp(new Date().toISOString()).slice(0,5)) ? '800' : '500',
       initial:this.initialOf(p.name), ...this.avatarColors(p.ptype==='buyer'), openPicker:()=>this.openPicker(p),
       openMou:()=>this.openMouPicker(p)
     }));
