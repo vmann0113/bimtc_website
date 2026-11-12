@@ -179,7 +179,7 @@
   /* ===== 라벨 100×70mm (미리보기와 인쇄가 같은 규칙) ===== */
   .lbl{width:100mm;height:70mm;background:#fff;color:#000;position:relative;overflow:hidden;font-family:'Pretendard','Malgun Gothic',sans-serif;flex:none}
   .lbl .bx{position:absolute;left:5mm;right:5mm;top:5mm;bottom:5mm;display:flex;flex-direction:column;justify-content:center;gap:1.8mm;text-align:center}
-  .lbl .t{width:100%;overflow:hidden;line-height:1.2;word-break:keep-all;flex:none;text-wrap:balance}
+  .lbl .t{width:92%;margin:0 auto;overflow:hidden;line-height:1.2;word-break:keep-all;flex:none;text-wrap:balance}
   .lbl .w1{white-space:nowrap}
   .lbl .nm{font-size:13mm;font-weight:800;white-space:normal;max-height:2.3em;line-height:1.12;letter-spacing:.2mm}
   .lbl .ti{font-size:5.4mm;font-weight:600;white-space:nowrap}
@@ -350,7 +350,9 @@
     var pa = document.getElementById('printArea');
     pa.innerHTML = list.map(labelHtml).join('');
     pa.style.cssText = 'display:block;position:fixed;left:-300mm;top:0';
-    return (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () {
+    // 인쇄할 굵기의 글꼴을 먼저 다 받아 놓고 잰다(안 받은 채 재면 인쇄 때 글자가 넓어져 넘침)
+    var fl = document.fonts ? Promise.all(['600', '700', '800', '900'].map(function (w) { return document.fonts.load(w + ' 20px Pretendard', '가A'); })).catch(function () {}).then(function () { return document.fonts.ready; }) : Promise.resolve();
+    return fl.then(function () {
       fitAll(pa);
       pa.removeAttribute('style');
       return new Promise(function (res) { setTimeout(function () { window.print(); res(); }, 60); });
