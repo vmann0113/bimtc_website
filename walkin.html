@@ -75,6 +75,8 @@
   .foot{text-align:center;font-size:13px;color:#7a8898;margin-top:20px;line-height:1.8}
   .foot a{color:#0B5FA5;text-decoration:none}
 </style>
+<script src="bimtc-config.js"></script>
+<script src="bimtc-closed.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -84,7 +86,9 @@
     <p class="ko" id="hero_ko">2026 부산국제의료관광컨벤션</p>
     <a class="lang" id="lang" href="?lang=en">EN</a>
   </div>
-  <div class="card" id="card">
+  <!-- 행사가 끝나면(bimtc-config.js 의 closed) 아래 신청 화면은 감춰지고 마감·감사 카드가 대신 보인다 -->
+  <div data-closed="block"></div>
+  <div class="card" id="card" data-closed="hide">
     <h1 id="h1">현장 등록</h1>
     <p class="sub1" id="sub1">아래를 입력하시고 데스크에서 팔찌를 받으세요.</p>
 

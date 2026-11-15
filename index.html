@@ -178,10 +178,17 @@
           <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#2E90D6;flex-shrink:0;"></span>2026.11.13(FRI) – 11.14(SAT)</span>
           <span style="display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(24,53,102,0.12);color:#183566;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(24,53,102,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#11A37B;flex-shrink:0;"></span>{{ t.hero_venue }}</span>
         </div>
+        <!-- 행사 종료 뒤에는 가입 버튼 대신 안내 보기로 바뀐다 (bimtc-config.js 의 closed) -->
         <div style="display:flex;gap:14px;flex-wrap:wrap;">
-          <button onClick="{{ regEx }}" style="background:#183566;color:#fff;border:none;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:9px;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,53,102,0.45);">{{ t.reg_ex }}</button>
-          <button onClick="{{ regBuyer }}" style="background:#0B5FA5;color:#fff;border:none;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);">{{ t.reg_buyer }}</button>
-          <button onClick="{{ regVisitor }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);background:#fff;">{{ t.reg_visitor }}</button>
+          <sc-if value="{{ signupOpen }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ regEx }}" style="background:#183566;color:#fff;border:none;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:9px;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,53,102,0.45);">{{ t.reg_ex }}</button>
+            <button onClick="{{ regBuyer }}" style="background:#0B5FA5;color:#fff;border:none;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);">{{ t.reg_buyer }}</button>
+            <button onClick="{{ regVisitor }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);background:#fff;">{{ t.reg_visitor }}</button>
+          </sc-if>
+          <sc-if value="{{ eventClosed }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ goExhibitInfo }}" style="background:#183566;color:#fff;border:none;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;box-shadow:0 12px 30px rgba(24,53,102,0.32);" style-hover="transform:translateY(-2px);">{{ t.closed_cta_ex }}</button>
+            <button onClick="{{ goVisitInfo }}" style="background:rgba(255,255,255,0.85);color:#183566;border:1.5px solid #fff;padding:19px clamp(18px,4vw,30px);border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;" style-hover="transform:translateY(-2px);background:#fff;">{{ t.closed_cta_visit }}</button>
+          </sc-if>
         </div>
       </div>
       <div style="position:relative;">
@@ -490,8 +497,13 @@
         <p style="font-size:clamp(13.5px,calc(17.63px - 0.35vw),15.5px);color:rgba(255,255,255,0.7);margin:8px 0 0;">{{ t.cta_biz_note }}</p>
       </div>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
-        <button onClick="{{ regEx }}" style="background:#fff;color:#0A2236;border:none;padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.reg_ex }}</button>
-        <button onClick="{{ regBuyer }}" style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.reg_buyer }} →</button>
+        <sc-if value="{{ signupOpen }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ regEx }}" style="background:#fff;color:#0A2236;border:none;padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.reg_ex }}</button>
+          <button onClick="{{ regBuyer }}" style="background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.55);padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.reg_buyer }} →</button>
+        </sc-if>
+        <sc-if value="{{ eventClosed }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ goExhibitInfo }}" style="background:#fff;color:#0A2236;border:none;padding:16px clamp(17px,4vw,28px);border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Pretendard',sans-serif;">{{ t.closed_cta_ex }}</button>
+        </sc-if>
       </div>
     </div>
   </section>
@@ -1564,7 +1576,10 @@ class Component extends DCLogic {
     }catch(e){} })();
     if(typeof window!=='undefined'){ this._rz=()=>{ if(window.innerWidth!==this.state.vw) this.setState({ vw:window.innerWidth }); }; window.addEventListener('resize',this._rz); }
     this._tick = setInterval(()=>this.setState({ now:Date.now() }), 1000);
-    if(typeof location!=='undefined' && location.hash==='#signup'){ this.setState({ page:'login', authMode:'signup' }); }
+    if(typeof location!=='undefined' && location.hash==='#signup'){
+      if(this.isClosed()) this.setState({ page:'login', authMode:'login', authInfo:this.closedMsg() });
+      else this.setState({ page:'login', authMode:'signup' });
+    }
     // 모집 링크 — /?join=buyer&mode=online&lang=en 처럼 가입 화면을 바로 열고 유형·참가방식·언어를 미리 골라 둔다
     if(typeof location!=='undefined'){
       const q=location.search||'';
@@ -1572,7 +1587,10 @@ class Component extends DCLogic {
       if(lm){ try{ localStorage.setItem('bimtc_lang', lm[1]); }catch(e){} }
       if(jm||mm||lm){
         const nx={}; if(lm) nx.lang=lm[1];
-        if(jm||mm){ nx.page='login'; nx.authMode='signup'; this._joinLink=true; }
+        // 행사 종료 뒤에는 /buyer 같은 모집 링크로 들어와도 가입 화면이 아니라 마감·감사 안내를 보여 준다
+        if(jm||mm){ nx.page='login'; this._joinLink=true;
+          if(this.isClosed()){ nx.authMode='login'; nx.authInfo=this.closedMsg(); }
+          else nx.authMode='signup'; }
         if(jm) nx.loginRole=jm[1];
         if(mm) nx.auMode=mm[1];
         this.setState(nx);
@@ -1613,10 +1631,20 @@ class Component extends DCLogic {
     window.scrollTo(0, top);
     if(Math.abs(window.pageYOffset - top) > 4 && n>0) setTimeout(()=>this.scrollToId(id, n-1), 80);
   }
-  goConsole(){ if(this.gate('buyer')) window.location.href = 'bizmeeting.html'; }
-  visitOpen(){ const c=window.BIMTC_CONFIG; if(c && c.apply.visit && c.apply.visit.open) return true; return !!this.state.isAdmin; }
+  // ── 행사 종료 (bimtc-config.js 의 closed) ───────────────────────────
+  // 종료 뒤에는 새 접수만 막는다. 기존 신청 내역 조회와 비즈미팅 일정 확인은 그대로 열어 둔다.
+  isClosed(){ try{ const c=window.BIMTC_CONFIG; return !!(c && c.isClosed && c.isClosed()); }catch(e){ return false; } }
+  closedMsg(){
+    try{ const c=window.BIMTC_CONFIG, lg=this.state.lang;
+      return ((c.closedText&&c.closedText(lg))+' '+(c.thanksText&&c.thanksText(lg))).trim();
+    }catch(e){ return this.L('2026 행사가 종료되었습니다. 많은 관심과 성원에 감사드립니다.','BIMTC 2026 has concluded. Thank you for your support.'); }
+  }
+  // 종료 뒤에도 바이어·참가기업이 확정된 미팅 일정을 볼 수 있어야 하므로 게이트를 통과시킨다
+  goConsole(){ if(this.isClosed() || this.gate('buyer')) window.location.href = 'bizmeeting.html'; }
+  visitOpen(){ if(this.isClosed()) return false; const c=window.BIMTC_CONFIG; if(c && c.apply.visit && c.apply.visit.open) return true; return !!this.state.isAdmin; }
   goBooth(){ if(this.gate('booth')) window.location.href = 'booth.html'; }
   gate(kind){
+    if(this.isClosed()){ this.flash(this.closedMsg()); return false; }   // 행사 종료 — 새 신청 차단
     const cfg = window.BIMTC_CONFIG; if(!cfg) return true;
     if(cfg.apply[kind] && cfg.apply[kind].open) return true;
     if(this.state.isAdmin) return true;
@@ -1624,6 +1652,15 @@ class Component extends DCLogic {
     return false;
   }
   goAdmin(){ if(typeof window!=='undefined') window.location.href = 'admin.html'; }
+  // 회원가입 화면으로. 행사가 끝난 뒤에는 로그인 화면 + 마감·감사 안내만 보여 준다.
+  goSignup(role){
+    if(this.isClosed()){
+      this.setState({ page:'login', authMode:'login', loginRole:role, authError:'',
+        authInfo:this.closedMsg()+' '+this.L('새 회원가입은 다음 회차 모집과 함께 다시 열립니다.','Sign-up will reopen with the next edition.') });
+      return;
+    }
+    this.setState({ loginRole:role, authMode:'signup', page:'login' });
+  }
 
   toggleVInterest(c){ this.setState(s=>{ const has=s.vInterests.includes(c); return { vInterests: has ? s.vInterests.filter(x=>x!==c) : [...s.vInterests, c] }; }); }
   async checkReg(){
@@ -1675,6 +1712,12 @@ class Component extends DCLogic {
       return;
     }
     if(!s.auEmail || !s.auPw){ this.setState({authError:'이메일과 비밀번호를 입력해 주세요.'}); return; }
+    // 행사 종료 — 새 회원가입은 받지 않는다 (기존 회원 로그인은 그대로 된다)
+    if(s.authMode==='signup' && this.isClosed()){
+      this.setState({ authMode:'login', authBusy:false, authError:'',
+        authInfo:this.closedMsg()+' '+this.L('새 회원가입은 다음 회차 모집과 함께 다시 열립니다. 기존 회원은 그대로 로그인하실 수 있습니다.','Sign-up will reopen with the next edition. Existing members can still sign in.') });
+      return;
+    }
     this.setState({authBusy:true, authError:''});
     try{
       let res;
@@ -1791,11 +1834,14 @@ class Component extends DCLogic {
     else eb=C&&C.earlyBirdLive&&C.earlyBirdLive(); // 관리자가 ON 했거나 접수가 수동 오픈된 경우에만 '접수중'
     if(!eb){
       // 얼리버드가 끝났다고 8월 오픈 안내로 되돌아가면 안 된다. 개최일까지 남은 날을 보여 준다.
-      const OPEN=new Date('2026-11-13T00:00:00+09:00').getTime();
-      const CLOSE=new Date('2026-11-14T17:00:00+09:00').getTime();
+      const D=(C&&C.eventDates)||{};
+      const OPEN=new Date((D.start||'2026-11-13')+'T00:00:00+09:00').getTime();
+      const CLOSE=new Date(C&&C.closedAt?C.closedAt:'2026-11-14T17:00:00+09:00').getTime();
       const now=Date.now();
-      if(now>CLOSE) return { ebStripBadge:'THANK YOU',
-        ebStripText:L('2026 부산국제의료관광컨벤션이 성황리에 마무리되었습니다. 함께해 주셔서 감사합니다.','The 2026 Busan International Medical Tourism Convention has concluded. Thank you for joining us.'),
+      // 행사 종료 — 감사 인사(문구는 bimtc-config.js 의 thanks 한 곳에서 관리)
+      if(this.isClosed() || now>CLOSE) return { ebStripBadge:L('THANK YOU','THANK YOU'),
+        ebStripText:(C&&C.thanksText&&C.thanksText(this.state.lang))
+          || L('2026 부산국제의료관광컨벤션이 성황리에 마무리되었습니다. 함께해 주셔서 감사합니다.','The 2026 Busan International Medical Tourism Convention has concluded. Thank you for joining us.'),
         ebStripOpen:false };
       if(now>=OPEN) return { ebStripBadge:'NOW OPEN',
         ebStripText:L('지금 열리고 있습니다 · BEXCO 제1전시장 3A홀 10:00–17:00','Happening now · BEXCO Hall 1 (3A) 10:00–17:00'),
@@ -1820,6 +1866,20 @@ class Component extends DCLogic {
     const me=this.state.me;
     if(!me||this.state.authMode==='setpw') return {on:false,msg:'',btn:'',go:()=>{}};
     const C=window.BIMTC_CONFIG||{};
+    // 행사 종료 — 새 신청 안내 대신 감사 인사와 '내 내역 보기'를 띄운다
+    if(this.isClosed()){
+      const thx=(C.thanksText&&C.thanksText(this.state.lang))||'';
+      if(me.type==='exhibitor') return { on:true,
+        msg:L('2026 행사가 마무리되었습니다. ','BIMTC 2026 has concluded. ')+thx,
+        btn:L('내 부스 신청 내역 보기','View my booth application'),
+        go:()=>{ if(typeof window!=='undefined') window.location.href='booth.html'; } };
+      if(me.type==='buyer') return { on:true,
+        msg:L('2026 행사가 마무리되었습니다. ','BIMTC 2026 has concluded. ')+thx,
+        btn:L('내 미팅 일정 보기','View my meetings'),
+        go:()=>{ if(typeof window!=='undefined') window.location.href='bizmeeting.html'; } };
+      return { on:true, msg:L('2026 행사가 마무리되었습니다. ','BIMTC 2026 has concluded. ')+thx,
+        btn:L('행사 기록 보기','See the 2026 edition'), go:()=>this.go('about') };
+    }
     const ebOn=Object.values(C.earlyBirdOverride||{}).indexOf('on')>=0;
     const boothOpen=(C.apply&&C.apply.booth&&C.apply.booth.open)||ebOn;
     const eb2=(()=>{ try{ return (C.currentEarlyBird&&C.currentEarlyBird())||null; }catch(e){ return null; } })();
@@ -2120,6 +2180,40 @@ class Component extends DCLogic {
       acc_air:L('김해국제공항 → 리무진버스 약 50분','Gimhae Int\u2019l Airport → approx. 50 min by limousine bus'),
       acc_metro:L('2호선 센텀시티역 1번 출구, 도보 5분','Line 2 Centum City Stn Exit 1, 5 min walk'),
     };
+
+    /* ── 행사 종료 뒤 문구 (bimtc-config.js 의 closed 가 true 일 때만) ──────────────
+       접수 관련 문구만 '종료 + 감사 인사'로 바꾼다. 행사 소개·배치도·프로그램 같은
+       기록성 내용은 그대로 둔다. 내년에 closed:false 로 바꾸면 아래는 자동으로 꺼진다. */
+    const closed = this.isClosed();
+    if(closed){
+      const C0=window.BIMTC_CONFIG||{};
+      const thx = (C0.thanksText && C0.thanksText(this.state.lang)) || '';
+      Object.assign(t, {
+        // 상단 버튼 — 종료 뒤에는 '사전등록'이 아니라 지난 등록 확인으로
+        u_prereg:  L('등록 확인','Check registration'),
+        // 참관안내 · 사전등록
+        vi_soon:   L('2026 행사가 종료되었습니다','BIMTC 2026 has concluded'),
+        vi_soon_d: thx,
+        vi_sub:    L('2026 행사는 11월 13일(금)~14일(토) 성황리에 마무리되었습니다. 지난 등록 내역은 아래에서 조회하실 수 있습니다.','BIMTC 2026 concluded on Nov 13–14. You can still look up your registration below.'),
+        // 메인 CTA 띠
+        cta_band_title:  L('2026 BIMTC에 보내주신','Thank you for your interest'),
+        cta_band_title2: L('관심과 성원에 감사드립니다','and support for BIMTC 2026'),
+        cta_band_sub:    L('내년에 더 좋은 모습으로 뵙겠습니다. 다음 회차 일정은 홈페이지와 공지로 안내드립니다.','We look forward to seeing you again next year. The next edition will be announced here.'),
+        // 참가 유형 카드
+        part1_cta: L('참가 안내 보기','See exhibitor info'),
+        part3_cta: L('참관 안내 보기','See visitor info'),
+        // 부스 신청
+        ex_apply_btn:   L('2026 부스 신청 마감','Applications closed'),
+        booth_deadline: L('* 2026 부스 신청은 마감되었습니다. 다음 회차 모집은 홈페이지와 공지로 안내드립니다.','* Booth applications for 2026 are closed. The next call will be announced here.'),
+        floor_apply_cta:L('2026 부스 신청 마감','Applications closed'),
+        // 부대행사 사전신청
+        prog_pre_b: L('접수 마감','Closed'),
+        // 종료 뒤 첫 화면 버튼
+        closed_cta_ex:    L('참가 안내 보기','About exhibiting'),
+        closed_cta_visit: L('행사 돌아보기','Look back at 2026'),
+      });
+    }
+
     const go = (t2)=>()=>this.go(t2);
     // 얼리버드 카운트다운 / 오픈 예정 티저
     let cdOn=false, cdLabel='', cdRate='', cdEnd='', cdText='', teaser=false;
@@ -2294,9 +2388,13 @@ class Component extends DCLogic {
       crMsg:this.state.crRows.length>0?'사전등록이 확인되었습니다 ('+this.state.crRows.length+'건). 하단 [사전등록 확인] 메뉴에서 상세를 볼 수 있습니다.':'해당 이메일로 등록된 내역이 없습니다.',
       crMsgColor:this.state.crRows.length>0?'#0d8f6b':'#8a6d2f', crMsgBg:this.state.crRows.length>0?'#E7F6F0':'#FBF3E2',
       goConsole:()=>this.goConsole(), goAdmin:()=>this.goAdmin(), goBooth:()=>this.goBooth(),
-      regEx:()=>this.setState({loginRole:'exhibitor',authMode:'signup',page:'login'}),
-      regBuyer:()=>this.setState({loginRole:'buyer',authMode:'signup',page:'login'}),
-      regVisitor:()=>this.setState({loginRole:'visitor',authMode:'signup',page:'login'}),
+      // 행사 종료 뒤에는 가입 버튼을 감추고 안내 보기 버튼을 대신 보여 준다
+      eventClosed:closed, signupOpen:!closed,
+      goExhibitInfo:()=>this.go('exhibit'),
+      goVisitInfo:()=>this.go('about'),
+      regEx:()=>this.goSignup('exhibitor'),
+      regBuyer:()=>this.goSignup('buyer'),
+      regVisitor:()=>this.goSignup('visitor'),
       countdownOn: cdOn, teaserOn: teaser, ebLabel: cdLabel, ebRateLabel: cdRate, ebEndLabel: cdEnd, countdown: cdText,
       toast:this.state.toast,
 
@@ -2413,7 +2511,10 @@ class Component extends DCLogic {
       exTabs, exFilters, exhibitors, timetable,
       bizOpen,
       bizPill:L('비즈매칭 진행 중','Matching open now'),
-      bizBandNote:L('참가기업·바이어 비즈매칭이 진행 중입니다 · 로그인하면 바로 상담을 신청할 수 있습니다.','Business matching is open — sign in to request meetings now.'),
+      // 행사 종료 뒤에는 '진행 중'이 아니라 '지난 일정 확인'으로 (DB 의 biz_matching 스위치는 켜 둔 채 문구만 바꾼다)
+      bizBandNote: closed
+        ? L('확정되었던 비즈매칭 일정은 로그인 후 그대로 확인하실 수 있습니다.','Sign in to review your confirmed business meetings.')
+        : L('참가기업·바이어 비즈매칭이 진행 중입니다 · 로그인하면 바로 상담을 신청할 수 있습니다.','Business matching is open — sign in to request meetings now.'),
       exbListOn:(()=>{ const C=window.BIMTC_CONFIG; if(!C||!C.earlyBird||!C.earlyBird[0]) return false; const e1=new Date((C.earlyBird[0].end||'2026-09-30')+'T23:59:59+09:00'); return Date.now()>e1.getTime(); })(),
       exbListTitle:L('참가기업 배치 리스트','Exhibitor Placement List'),
       exbListColBooth:L('부스 위치','Booth'), exbListColCompany:L('기업명','Company'),

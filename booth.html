@@ -78,7 +78,13 @@
       <div style="width:66px;height:66px;border-radius:16px;background:#FBF3E2;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;"><div style="width:26px;height:26px;border-radius:7px;border:3px solid #E0A23C;"></div></div>
       <h1 style="font-size:24px;font-weight:800;margin:0 0 10px;letter-spacing:-0.02em;">{{ closed_t }}</h1>
       <p style="font-size:14.5px;color:#5E7289;margin:0 0 28px;line-height:1.7;">{{ closed_d1 }}<br>{{ closed_d2 }}</p>
-      <a href="index.html" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;">{{ homeLabel }}</a>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <a href="index.html" style="background:#0B5FA5;color:#fff;text-decoration:none;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;">{{ homeLabel }}</a>
+        <!-- 행사 종료 뒤에도 참가기업이 자기 신청서를 열어 볼 수 있어야 한다 -->
+        <sc-if value="{{ eventClosed }}" hint-placeholder-val="{{ false }}">
+          <span onClick="{{ openMyApps }}" style="background:#fff;color:#0B5FA5;border:1px solid #cfe0f2;padding:14px 26px;border-radius:11px;font-size:15px;font-weight:800;font-family:'Pretendard',sans-serif;cursor:pointer;">{{ myAppsLabel }}</span>
+        </sc-if>
+      </div>
     </div>
   </sc-if>
 
@@ -621,6 +627,8 @@ class Component extends DCLogic {
   RENTALS = [];   // 비품 렌탈 품목 — site_settings.pricing.rentals 에서 로드 (없으면 섹션 숨김)
 
   cfg(){ return window.BIMTC_CONFIG; }
+  // 행사 종료 여부 — bimtc-config.js 의 closed 한 곳에서 결정된다
+  eventClosed(){ try{ const c=this.cfg(); return !!(c && c.isClosed && c.isClosed()); }catch(e){ return false; } }
 
   async checkDup(){ // 기존 신청 내역이 있으면 확인 화면을 먼저 보여줌
     try{
@@ -671,6 +679,8 @@ class Component extends DCLogic {
       const open = this.cfg().apply.booth.open || ebOn;
       const previewHost = typeof location!=='undefined' && /claudeusercontent|localhost/.test(location.hostname);
       const preview = previewHost && /[?&]preview=1/.test(location.search||'');
+      // 행사 종료 — 관리자·미리보기도 새 신청 폼을 열지 않는다 (내 신청 내역 조회만 가능)
+      if(this.eventClosed()){ this.setState({ gate:'closed' }); return; }
       if(!open && !isAdmin && !preview && !picker){ this.setState({ gate:'closed' }); return; }
       // 부스 선택 팝업(picker)도 로그인은 요구한다. 신청 폼에서 열리므로 같은 세션을 그대로 쓰며,
       // 예전에는 비로그인 상태로 URL 만 알면 배치도와 신청 현황이 그대로 노출됐다.
@@ -1168,9 +1178,17 @@ class Component extends DCLogic {
         try{ await navigator.clipboard.writeText(txt); this.flash(L('계좌번호가 복사되었습니다','Account number copied')); }
         catch(e){ try{ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); this.flash(L('계좌번호가 복사되었습니다','Account number copied')); }catch(e2){ this.flash(txt); } }
       },
-      closed_t:L('부스 신청 오픈 예정','Booth Application Coming Soon'),
-      closed_d1:L('부스 온라인 신청은 8월 21일(금) 15:00에 오픈됩니다.','Online booth applications open on Aug 21 (Fri) at 15:00.'),
-      closed_d2:L('오픈과 동시에 조기신청 할인이 적용됩니다.','The early-bird discount applies from open.'),
+      // 행사 종료(bimtc-config.js 의 closed) 뒤에는 '오픈 예정'이 아니라 마감 + 감사 인사를 보여 준다
+      eventClosed:this.eventClosed(),
+      closed_t:this.eventClosed()
+        ? L('2026 부스 신청이 마감되었습니다','Booth applications are closed')
+        : L('부스 신청 오픈 예정','Booth Application Coming Soon'),
+      closed_d1:this.eventClosed()
+        ? ((this.cfg().thanksText&&this.cfg().thanksText(en?'en':'ko')) || L('2026 BIMTC에 보내주신 관심과 성원에 감사드립니다.','Thank you for your interest and support for BIMTC 2026.'))
+        : L('부스 온라인 신청은 8월 21일(금) 15:00에 오픈됩니다.','Online booth applications open on Aug 21 (Fri) at 15:00.'),
+      closed_d2:this.eventClosed()
+        ? L('다음 회차 부스 모집은 홈페이지와 공지로 안내드립니다.','The next call for booths will be announced on this website.')
+        : L('오픈과 동시에 조기신청 할인이 적용됩니다.','The early-bird discount applies from open.'),
       done_t:L('부스 신청이 접수되었습니다','Your application has been received'), done_inv:L('인보이스 번호','Invoice No.'),
       doneHasRental:this.hasRental(this.state.lastRow),
       dl_rental:L('비품 견적서 (PDF)','Rental quote (PDF)'),

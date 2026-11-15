@@ -926,6 +926,72 @@
       </sc-if>
 
       <!-- CMS -->
+      <!-- ARCHIVE — 지난 회차 결산·기록 (event_archive / event_archive_summary) -->
+      <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-0.02em;">{{ arcEdition }} 결산·기록</h1>
+        <p style="font-size:14px;color:#5E7289;margin:0 0 20px;line-height:1.65;">행사가 끝난 시점의 숫자와 명단을 그대로 보관한 기록입니다. 운영 표를 나중에 고쳐도 이 숫자는 바뀌지 않습니다.<br>보관 기록 <b style="color:#0B5FA5;">{{ arcTotalRows }}행</b> · 표 {{ arcTableCount }}개</p>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ arcEditionTabs }}" as="e" hint-placeholder-count="1">
+              <span onClick="{{ e.onClick }}" style="{{ e.style }}">{{ e.label }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:9px;">
+            <button onClick="{{ arcReload }}" style="background:#fff;color:#5E7289;border:1px solid #e6ebf2;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">다시 불러오기</button>
+            <button onClick="{{ exportArcSummary }}" style="background:#0B5FA5;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">결산 지표 CSV</button>
+          </div>
+        </div>
+
+        <sc-if value="{{ arcBusy }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:40px;text-align:center;color:#8295ab;font-size:14px;">기록을 불러오는 중…</div>
+        </sc-if>
+        <sc-if value="{{ arcErr }}" hint-placeholder-val="{{ '' }}">
+          <div style="background:#FDF3F2;border:1px solid #f0cfc9;border-radius:14px;padding:18px 22px;color:#c0392b;font-size:14px;line-height:1.6;">{{ arcErr }}</div>
+        </sc-if>
+        <sc-if value="{{ arcEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:40px;text-align:center;color:#8295ab;font-size:14px;line-height:1.7;">보관된 결산 기록이 없습니다.<br>행사가 끝난 뒤 기록을 보관하면 이곳에 표시됩니다.</div>
+        </sc-if>
+
+        <sc-if value="{{ arcHas }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ arcSections }}" as="s" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 24px;margin-bottom:14px;">
+              <div style="font-size:16px;font-weight:800;color:#0F2440;margin:0 0 16px;letter-spacing:-0.01em;"><span style="{{ s.dotStyle }}"></span>{{ s.label }}</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(238px,100%),1fr));gap:12px;">
+                <sc-for list="{{ s.rows }}" as="r" hint-placeholder-count="4">
+                  <div style="background:#F7F9FC;border:1px solid #eef2f7;border-radius:12px;padding:14px 16px;">
+                    <div style="font-size:13px;color:#5E7289;font-weight:600;line-height:1.45;margin-bottom:7px;">{{ r.label }}</div>
+                    <div><span style="{{ r.numStyle }}">{{ r.value }}</span><span style="font-size:13px;color:#8295ab;margin-left:5px;">{{ r.unit }}</span></div>
+                    <sc-if value="{{ r.hasDetail }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12.5px;color:#8295ab;margin-top:7px;line-height:1.55;">{{ r.detail }}</div>
+                    </sc-if>
+                    <sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12px;color:#B45309;background:#FBF6E9;border-radius:7px;padding:7px 9px;margin-top:8px;line-height:1.55;">{{ r.note }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+
+          <div style="background:#fff;border:1px solid #e6ebf2;border-radius:16px;padding:22px 24px;margin-top:18px;">
+            <div style="font-size:16px;font-weight:800;color:#0F2440;margin:0 0 6px;">보관된 원본 명단</div>
+            <p style="font-size:13px;color:#8295ab;margin:0 0 16px;line-height:1.6;">행사 당시의 표를 그대로 복사해 둔 것입니다. 필요한 표를 CSV로 내려받아 쓰세요.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:10px;">
+              <sc-for list="{{ arcTableRows }}" as="t" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F7F9FC;border:1px solid #eef2f7;border-radius:11px;padding:12px 14px;">
+                  <div style="min-width:0;">
+                    <div style="font-family:'Pretendard',sans-serif;font-size:13.5px;font-weight:700;color:#33485e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.table }}</div>
+                    <div style="font-size:12.5px;color:#8295ab;margin-top:2px;">{{ t.rows }}행</div>
+                  </div>
+                  <button onClick="{{ t.down }}" style="flex:none;background:#fff;color:#0B5FA5;border:1px solid #cfe0f2;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">CSV</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+
       <sc-if value="{{ isCms }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px;">
           <div>
@@ -1037,6 +1103,8 @@ class Component extends DCLogic {
     prospects: [], pFilter: 'all', pQuery: '', pMemo: {},
     obLeads: [], obFilter: 'all', obQuery: '', obMemo: {},
     psRows: [], psCfg: null, psFilter: 'all', psQuery: '', psMemo: {}, psBusy: false,
+    // 2026 결산·기록 (event_archive / event_archive_summary — 관리자만 조회)
+    arcEdition: '2026', arcEditions: [], arcSummary: null, arcTables: [], arcBusy: false, arcErr: '',
     addOpen: false, addMode: 'one', addForm: {}, addBulk: '', addBusy: false,
     pSort: 'seq', pDesc: false, editId: null,
     cmsFlash: false,
@@ -1116,6 +1184,22 @@ class Component extends DCLogic {
   // 전체를 다시 받지 않고 '마지막으로 본 시각 이후 바뀐 행'만 받아 덮어쓴다.
   proMark(rows){
     (rows||[]).forEach(r=>{ if(r.updated_at && (!this._proSince || Date.parse(r.updated_at)>Date.parse(this._proSince))) this._proSince=r.updated_at; });
+  }
+  // ── 2026 결산·기록 ─────────────────────────────────────────────────
+  // 행사가 끝난 뒤 event_archive 에 고정해 둔 기록을 읽는다. 원본 표는 건드리지 않는다.
+  async loadArchive(ed){
+    const edition = ed || this.state.arcEdition || '2026';
+    this.setState({ arcBusy:true, arcErr:'', arcEdition:edition });
+    try{
+      const [eds, sum, tabs] = await Promise.all([
+        window.BimtcDB.archiveEditions(),
+        window.BimtcDB.archiveSummary(edition),
+        window.BimtcDB.archiveTables(edition)
+      ]);
+      this.setState({ arcEditions:(eds&&eds.length?eds:[edition]), arcSummary:sum||[], arcTables:tabs||[], arcBusy:false });
+    }catch(e){
+      this.setState({ arcBusy:false, arcErr:'기록을 불러오지 못했습니다: '+(e&&e.message?e.message:e) });
+    }
   }
   async pollProspects(){
     if(this.state.gate!=='ready' || this.state.view!=='prospect') return;
@@ -1498,11 +1582,12 @@ class Component extends DCLogic {
       {k:'inq',label:'문의 관리',badge:(this.state.inquiries||[]).filter(q=>!q.answer).length},
       {k:'noti',label:'알림함',badge:(this.state.notifications||[]).filter(n=>n.status==='pending').length},
       {k:'cms',label:'공지·콘텐츠'},
+      {k:'archive',label:'2026 결산·기록'},
       // 별도 화면(같은 관리자 로그인으로 열림)
       {k:'rsvp',label:'개막식 초청 회신 ↗',href:'rsvp-admin.html'},
       {k:'invite',label:'초청바이어 정보 ↗',href:'invite-admin.html'},
       {k:'badge',label:'현장 데스크(입장·비표) ↗',href:'badge.html'},
-    ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>{ if(n.href){ window.location.href=n.href; return; } this.setState({view:n.k}); if(n.k==='prospect') setTimeout(()=>this.pollProspects(),60); }}));
+    ].map(n=>({...n,badge:n.badge||0,style:(v===n.k?active:idle),onClick:()=>{ if(n.href){ window.location.href=n.href; return; } this.setState({view:n.k}); if(n.k==='prospect') setTimeout(()=>this.pollProspects(),60); if(n.k==='archive') setTimeout(()=>this.loadArchive(),30); }}));
 
 
     // ── 부대행사 사전신청 (회원가입 없이 이름·연락처만 받은 명단) ──
@@ -2303,6 +2388,52 @@ class Component extends DCLogic {
 
     // 사전등록(홈 > 참관안내)은 이메일이 필수라 전부 들어 있고, 현장등록(walkin.html)은 안 받는다.
     // 그래서 이메일이 비면 현장 등록으로 본다. 사전등록에서 이메일을 선택으로 바꾸면 이 구분이 깨진다.
+    /* ── 2026 결산·기록 화면 ──────────────────────────────────────────────
+       숫자는 event_archive_summary 에 저장된 값을 그대로 보여 준다(화면에서 다시 계산하지 않는다).
+       원본 표를 나중에 손대도 결산 숫자는 행사 당시 기준으로 고정돼 있다. */
+    const ARC_SEC=[['visitors','참관객 등록','#0B5FA5'],['booths','참가기업·부스','#0d8f6b'],
+      ['members','회원','#7a5cc4'],['matching','비즈매칭·MOU','#D97706'],['badges','비표 발급','#0E7490'],
+      ['programs','부대행사','#B45309'],['invites','초청·바이어 모집','#1D4ED8'],['outreach','유치 활동·문의','#6B7280']];
+    const arcAll=this.state.arcSummary;
+    const arcNum=(v)=>{ const n=Number(v); return isFinite(n)?n.toLocaleString('ko-KR'):''; };
+    const arcDetail=(d)=>{
+      if(!d) return '';
+      if(Array.isArray(d)) return d.map(x=>typeof x==='object'?Object.keys(x).map(k=>x[k]).join(' '):String(x)).join(' · ');
+      return Object.keys(d).map(k=>k+' '+(typeof d[k]==='number'?d[k].toLocaleString('ko-KR'):d[k])).join(' · ');
+    };
+    const arcSections=(arcAll||[]).length ? ARC_SEC.map(([key,label,color])=>{
+      const rows=(arcAll||[]).filter(r=>r.section===key).map(r=>({
+        label:r.label, value:arcNum(r.value), unit:r.unit||'',
+        detail:arcDetail(r.detail), note:r.note||'',
+        hasNote:!!r.note, hasDetail:!!r.detail,
+        numStyle:'font-family:\'Pretendard\',sans-serif;font-size:21px;font-weight:700;color:'+color+';'
+      }));
+      return { key, label, color, rows, has:rows.length>0,
+        dotStyle:'width:9px;height:9px;border-radius:50%;background:'+color+';display:inline-block;margin-right:9px;vertical-align:1px;' };
+    }).filter(s=>s.has) : [];
+    const arcTableRows=(this.state.arcTables||[]).map(t=>({
+      table:t.table, rows:t.rows.toLocaleString('ko-KR'),
+      down:async()=>{
+        this.flash(t.table+' 내려받는 중…');
+        const r=await window.BimtcDB.archiveRows(this.state.arcEdition, t.table);
+        if(!r.ok || !r.rows.length){ this.flash('내려받을 기록이 없습니다'+(r.error?' ('+r.error+')':'')); return; }
+        const keys=[]; r.rows.forEach(x=>Object.keys(x.data||{}).forEach(k=>{ if(keys.indexOf(k)<0) keys.push(k); }));
+        const cell=(v)=> v==null?'':(typeof v==='object'?JSON.stringify(v):String(v));
+        csvSave([keys].concat(r.rows.map(x=>keys.map(k=>cell((x.data||{})[k])))),
+          'BIMTC'+this.state.arcEdition+'_'+t.table+'.csv');
+        this.flash(t.table+' '+r.rows.length+'행을 내려받았습니다');
+      }
+    }));
+    const arcTotalRows=(this.state.arcTables||[]).reduce((a,b)=>a+b.rows,0);
+    const exportArcSummary=()=>{
+      if(!(arcAll||[]).length){ this.flash('내보낼 결산 항목이 없습니다'); return; }
+      const SEC={}; ARC_SEC.forEach(([k,l])=>{ SEC[k]=l; });
+      csvSave([['구분','항목','값','단위','세부','비고']].concat(
+        (arcAll||[]).map(r=>[SEC[r.section]||r.section, r.label, r.value==null?'':r.value, r.unit||'', arcDetail(r.detail), r.note||''])),
+        'BIMTC'+this.state.arcEdition+'_결산지표.csv');
+      this.flash('결산 지표를 내려받았습니다');
+    };
+
     const regKind=(r)=> (r.email && String(r.email).trim()) ? '사전' : '현장';
     const regs=regsData.map(r=>({ id:r.id, name:r.name||'ooo', org:r.org||'개인', field:(r.interests||[]).join('·'),
       del:()=>this.deleteRow('visitor_registrations', r.id, '사전등록 · '+(r.name||'이름 없음'), [r.org,r.email,r.phone].filter(Boolean).join(' · ')),
@@ -2313,6 +2444,16 @@ class Component extends DCLogic {
 
     return {
       navItems:nav,
+      // 2026 결산·기록
+      isArchive:v==='archive', arcEdition:this.state.arcEdition, arcSections, arcTableRows,
+      arcTotalRows:arcTotalRows.toLocaleString('ko-KR'), arcTableCount:(this.state.arcTables||[]).length,
+      arcBusy:!!this.state.arcBusy, arcErr:this.state.arcErr,
+      arcEmpty: !this.state.arcBusy && !this.state.arcErr && arcSections.length===0,
+      arcHas: arcSections.length>0, exportArcSummary,
+      arcReload:()=>this.loadArchive(this.state.arcEdition),
+      arcEditionTabs:(this.state.arcEditions||[]).map(e=>({ label:e+'년', onClick:()=>this.loadArchive(e),
+        style:'cursor:pointer;padding:8px 16px;border-radius:999px;font-size:14px;font-weight:700;border:1px solid '
+          +(e===this.state.arcEdition?'#0B5FA5;background:#0B5FA5;color:#fff;':'#e6ebf2;background:#fff;color:#5E7289;') })),
       adminName: this.state.user ? ('사무국 '+(this.state.user.name||this.state.user.email||'관리자')) : '사무국',
       doLogout: async()=>{ await window.BimtcDB.logout(); window.location.href='index.html'; },
       isInq:v==='inq', inqTabs, inqView, noInq:inqView.length===0, exportInquiries,

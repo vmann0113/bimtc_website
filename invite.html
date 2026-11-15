@@ -78,13 +78,17 @@
     footer{text-align:center;color:#8295ab;font-size:12.5px;margin-top:22px;}
   [hidden]{display:none !important;}
 </style>
+<script src="bimtc-config.js"></script>
+<script src="bimtc-closed.js"></script>
 </head>
 <body>
 <div class="top"><div class="bar"></div><div class="in">
   <div class="brand"><div class="logo"></div><span>BIMTC 2026</span></div>
   <div class="langs" id="langs"></div>
 </div></div>
-<main id="app"><div class="center muted" id="boot">Loading…</div></main>
+<!-- Once the event is over (see `closed` in bimtc-config.js) the form below is hidden and a thank-you card is shown instead -->
+<div data-closed="block"></div>
+<main id="app" data-closed="hide"><div class="center muted" id="boot">Loading…</div></main>
 
 <script>
 (function () {

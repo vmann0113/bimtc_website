@@ -9,8 +9,44 @@
 (function () {
   var CONFIG = {
 
+    /* ══════════════════════════════════════════════════════════════
+       0) 회차·행사 기본 정보  ★ 내년 준비는 이 블록부터 고치세요
+       ──────────────────────────────────────────────────────────────
+       내년 행사를 다시 열 때 손댈 곳 (자세한 순서는 docs/다음행사_준비.md):
+         ① edition / eventName / eventDates 를 새 회차 값으로
+         ② closed 를 false 로 (그래야 접수 화면이 다시 열립니다)
+         ③ launchAt 을 새 접수 시작 일시로
+         ④ earlyBird 단계의 end 날짜를 새로
+       ══════════════════════════════════════════════════════════════ */
+    edition: '2026',
+    eventName: {
+      ko: '2026 부산국제의료관광컨벤션',
+      en: '2026 Busan International Medical Tourism Convention'
+    },
+    eventDates: {
+      start: '2026-11-13', end: '2026-11-14',
+      label: { ko: '2026년 11월 13일(금) ~ 14일(토)', en: 'Nov 13 (Fri) – 14 (Sat), 2026' },
+      hours: '10:00 ~ 17:00',
+      venue: { ko: 'BEXCO 제1전시장 3A홀', en: 'BEXCO Exhibition Hall 1 (3A)' }
+    },
+
+    /* 행사 종료 스위치 — true 이면 홈페이지의 모든 온라인 접수가 닫히고
+       감사 인사가 표시됩니다. 기존 신청자의 '내 내역 조회'와 사무국 관리자
+       기능은 그대로 열려 있습니다. 내년 준비를 시작할 때 false 로 바꾸세요. */
+    closed: true,
+    closedAt: '2026-11-14T17:00:00+09:00',
+    thanks: {
+      ko: '2026 BIMTC에 주신 많은 관심과 성원에 감사드립니다. 내년에 더 좋은 모습으로 뵙겠습니다!',
+      en: 'Thank you for your interest and support for BIMTC 2026. We look forward to seeing you again next year!'
+    },
+    closedNotice: {
+      ko: '2026 행사가 종료되어 온라인 접수가 마감되었습니다.',
+      en: 'BIMTC 2026 has concluded and online applications are now closed.'
+    },
+
     /* 1) 신청 오픈 여부 — false 이면 버튼이 '오픈 예정'으로 표시됩니다.
-       관리자(is_admin) 계정은 오픈 전에도 신청 기능을 테스트할 수 있습니다. */
+       관리자(is_admin) 계정은 오픈 전에도 신청 기능을 테스트할 수 있습니다.
+       ※ 위 closed:true 이면 이 값과 상관없이 전부 닫힙니다. */
     /* 정식 오픈 일시 — 이 시각이 되면 아래 open:false 여도 자동으로 전부 오픈됩니다. */
     launchAt: '2026-08-21T15:00:00',
     apply: {
@@ -76,9 +112,35 @@
     contact: { office: '(사)부산권의료산업협의회', tel: '051-461-4276~8', email: 'bmia0528@naver.com' }
   };
 
+  /* ── 행사 종료 판정 ────────────────────────────────────────────
+     closed:true 이거나 closedAt 을 지났으면 종료로 본다.
+     종료 상태에서는 접수(apply.*)가 전부 닫히고 얼리버드도 표시되지 않는다. */
+  CONFIG.isClosed = function () {
+    if (CONFIG.closed === true) return true;
+    if (CONFIG.closed === false) return false;          // 사무국이 명시적으로 열어 둔 경우
+    if (!CONFIG.closedAt) return false;
+    return Date.now() > new Date(CONFIG.closedAt).getTime();
+  };
+  // 감사 인사 / 마감 안내 문구 (lang: 'ko' | 'en')
+  CONFIG.thanksText = function (lang) {
+    var t = CONFIG.thanks || {}; return (lang === 'en' ? (t.en || t.ko) : t.ko) || '';
+  };
+  CONFIG.closedText = function (lang) {
+    var t = CONFIG.closedNotice || {}; return (lang === 'en' ? (t.en || t.ko) : t.ko) || '';
+  };
+  CONFIG.applyClosed = function () {
+    if (!CONFIG.isClosed()) return false;
+    CONFIG.apply.booth.open = false;
+    CONFIG.apply.buyer.open = false;
+    CONFIG.apply.visit.open = false;
+    CONFIG.countdownEnabled = false;
+    return true;
+  };
+
   // 정식 오픈 시각 도달 시 자동 오픈 (접속 시점 판정 + 열려있는 페이지도 시각 도달 시 자동 전환)
-  CONFIG.isLaunched = function () { return Date.now() >= new Date(CONFIG.launchAt).getTime(); };
+  CONFIG.isLaunched = function () { return !CONFIG.isClosed() && Date.now() >= new Date(CONFIG.launchAt).getTime(); };
   CONFIG.applyLaunch = function () {
+    if (CONFIG.isClosed()) return CONFIG.applyClosed();
     if (!CONFIG.isLaunched()) return false;
     CONFIG.apply.booth.open = true;
     CONFIG.apply.buyer.open = true;
@@ -93,6 +155,7 @@
 
   // 접수중인 얼리버드: 관리자가 '켜기'한 단계 (접수 오픈의 기준)
   CONFIG.earlyBirdLive = function () {
+    if (CONFIG.isClosed()) return null;                 // 행사 종료 — 조기신청 띠를 띄우지 않는다
     for (var i = 0; i < CONFIG.earlyBird.length; i++) {
       var p = CONFIG.earlyBird[i];
       if (CONFIG.earlyBirdOverride[p.key] === 'on') return p;
@@ -105,6 +168,7 @@
   // CONFIG.earlyBirdOverride = { phase1:'on'|'off'|'auto', phase2:... } — DB(site_settings.early_bird)에서 로드됨
   CONFIG.earlyBirdOverride = CONFIG.earlyBirdOverride || window.__bimtcEbOv || {};
   CONFIG.currentEarlyBird = function () {
+    if (CONFIG.isClosed()) return null;                 // 행사 종료 — 할인 단계도 없다
     var now = Date.now();
     for (var i = 0; i < CONFIG.earlyBird.length; i++) {
       var p = CONFIG.earlyBird[i];

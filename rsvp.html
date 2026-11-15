@@ -64,11 +64,15 @@
   .pbtn{display:inline-block;border:1px solid #1F7FBF;background:#fff;color:#1F7FBF;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
   .pbtn.sub2{border-color:#d8e0ea;color:#5b6878;margin-left:6px}
 </style>
+<script src="bimtc-config.js"></script>
+<script src="bimtc-closed.js"></script>
 </head>
 <body>
 <div class="wrap">
   <div class="hero" style="margin:0 12px"><img src="uploads/mail/invite_header.jpg" alt="2026 부산국제의료관광컨벤션 MEDI × WELLNESS" style="border-radius:16px 16px 0 0"></div>
-  <div class="card" id="card">
+  <!-- 행사가 끝나면(bimtc-config.js 의 closed) 아래 회신 화면은 감춰지고 마감·감사 카드가 대신 보인다 -->
+  <div data-closed="block"></div>
+  <div class="card" id="card" data-closed="hide">
     <h1>개막식 참석 회신</h1>
     <div class="info">
       <div><b>일시</b><span>2026년 11월 13일(금) 11:00</span></div>

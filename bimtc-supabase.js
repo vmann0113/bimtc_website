@@ -707,6 +707,43 @@
       var r = await sb.from('site_settings').upsert({ key: 'program_signup', value: obj, updated_at: new Date().toISOString() });
       return r.error ? { ok: false, error: r.error.message } : { ok: true };
     },
+    // ---------- 행사 기록 보관함 (관리자 전용) ----------
+    // 행사가 끝난 회차의 기록을 event_archive / event_archive_summary 에서 읽는다.
+    // 두 표 모두 RLS 로 관리자(is_admin)만 조회할 수 있다.
+    async archiveEditions() {
+      var sb = await ready();
+      var r = await sb.from('event_archive_summary').select('edition');
+      if (r.error || !r.data) return [];
+      var seen = {}, out = [];
+      r.data.forEach(function (x) { if (x.edition && !seen[x.edition]) { seen[x.edition] = 1; out.push(x.edition); } });
+      return out.sort().reverse();
+    },
+    // 결산 지표 (화면에 그대로 뿌리는 표)
+    async archiveSummary(edition) {
+      var sb = await ready();
+      var r = await sb.from('event_archive_summary').select('*')
+        .eq('edition', edition || '2026')
+        .order('section', { ascending: true }).order('sort_order', { ascending: true });
+      return r.error ? [] : (r.data || []);
+    },
+    // 보관된 표별 행 수
+    async archiveTables(edition) {
+      var sb = await ready();
+      var r = await sb.from('event_archive').select('src_table').eq('edition', edition || '2026');
+      if (r.error || !r.data) return [];
+      var m = {};
+      r.data.forEach(function (x) { m[x.src_table] = (m[x.src_table] || 0) + 1; });
+      return Object.keys(m).sort().map(function (k) { return { table: k, rows: m[k] }; });
+    },
+    // 보관된 원본 행 (명단 보기·엑셀 내려받기용)
+    async archiveRows(edition, table, limit) {
+      var sb = await ready();
+      var r = await sb.from('event_archive').select('src_id, data, archived_at')
+        .eq('edition', edition || '2026').eq('src_table', table)
+        .limit(limit || 5000);
+      return r.error ? { ok: false, error: r.error.message, rows: [] } : { ok: true, rows: r.data || [] };
+    },
+
     // ---------- 예약 ----------
     async listReservations(day) { var sb = await ready(); var q = sb.from('reservations').select('*'); if (day) q = q.eq('day', day); var r = await q; return r.data || []; },
     async myReservations() { var sb = await ready(); var u = (await sb.auth.getUser()).data.user; if (!u) return []; var r = await sb.from('reservations').select('*').or('owner_profile.eq.' + u.id + ',guest_profile.eq.' + u.id); return r.data || []; },
