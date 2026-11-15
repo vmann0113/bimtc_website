@@ -158,10 +158,10 @@
   <sc-if value="{{ hasImportant }}" hint-placeholder-val="{{ false }}">
   <div style="background:#254075;border-bottom:1px solid rgba(255,255,255,0.06);">
     <div style="max-width:1180px;margin:0 auto;padding:12px clamp(16px,4.5vw,32px);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <span style="background:#25C281;color:#04261a;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);font-weight:700;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;flex-shrink:0;">중요</span>
+      <span style="background:#25C281;color:#04261a;font-family:'Pretendard',sans-serif;font-size:clamp(11px,calc(15.13px - 0.35vw),13px);font-weight:700;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;flex-shrink:0;">{{ t.strip_badge }}</span>
       <span onClick="{{ goCommunity }}" style="flex:1;min-width:200px;font-size:14px;color:#cfe0ee;font-weight:500;cursor:pointer;">{{ importantTitle }}</span>
       <span style="font-family:'Pretendard',sans-serif;font-size:clamp(12px,calc(16.13px - 0.35vw),14px);color:#6b8aa6;flex-shrink:0;">{{ importantDate }}</span>
-      <span onClick="{{ goCommunity }}" style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#25C281;font-weight:700;cursor:pointer;flex-shrink:0;">공지 전체 →</span>
+      <span onClick="{{ goCommunity }}" style="font-size:clamp(13px,calc(17.13px - 0.35vw),15px);color:#25C281;font-weight:700;cursor:pointer;flex-shrink:0;">{{ t.strip_all }}</span>
     </div>
   </div>
   </sc-if>
@@ -2091,7 +2091,7 @@ class Component extends DCLogic {
       access_way:L('오시는 길','Directions'), access_map:L('지도 크게 보기 →','View larger map →'),
       floor_title:L('부스 배치도 (플로어맵)','Booth Layout (Floor Map)'), floor_desc:L('BEXCO 제1전시장 부스 배치와 참가기업 위치를 확인하세요. 카테고리별 전시 구역 안내 제공.','Check the booth layout and exhibitor locations at BEXCO Hall 1. Zone guide by category provided.'), floor_btn:L('부스 배치도 보기','View booth layout'), floor_soon:L('준비 중입니다','Coming soon'), floor_soon_desc:L('부스 배치도는 현재 준비 중입니다. 확정되는 대로 공개할 예정입니다.','The booth layout is being prepared and will be published once confirmed.'),
       exh_over:L('EXHIBITORS','EXHIBITORS'), exh_title:L('참가기업 미리보기','Exhibitor Preview'), exh_soon:L('참가기업 모집 예정','Exhibitor recruitment coming soon'), exh_soon_desc:L('참가 신청 접수 후 참가기업이 순차적으로 소개될 예정입니다. 많은 관심 부탁드립니다.','Exhibitors will be introduced after applications open. Stay tuned.'),
-      notice_title:L('공지사항','Notices'), press_title:L('보도기사','Press'), more:L('MORE +','MORE +'),
+      notice_title:L('공지사항','Notices'), strip_badge:L('중요','NOTICE'), strip_all:L('공지 전체 →','All notices →'), press_title:L('보도기사','Press'), more:L('MORE +','MORE +'),
       no_notice:L('등록된 공지사항이 없습니다.','No notices yet.'), no_press:L('등록된 보도기사가 없습니다.','No press articles yet.'),
       cta_band_title:L('지금 사전등록하고','Pre-register now and'), cta_band_title2:L('비즈미팅을 신청하세요','apply for business meetings'),
       cta_band_sub:L('참가기업 신청 · 바이어 매칭 · 참관객 사전등록 모두 온라인으로.','Exhibitor application, buyer matching & visitor pre-registration — all online.'),
@@ -2208,6 +2208,8 @@ class Component extends DCLogic {
         floor_apply_cta:L('2026 부스 신청 마감','Applications closed'),
         // 부대행사 사전신청
         prog_pre_b: L('접수 마감','Closed'),
+        // 상단 공지 띠
+        strip_badge: L('안내','NOTICE'),
         // 종료 뒤 첫 화면 버튼
         closed_cta_ex:    L('참가 안내 보기','About exhibiting'),
         closed_cta_visit: L('행사 돌아보기','Look back at 2026'),
